@@ -1,4 +1,11 @@
-See:
-* http://code.google.com/p/libregf/wiki/Building
-* README.macosx
+libregf is a library to access the Windows NT Registry File (REGF) format.
+
+Planned:
+* Dokan support
+* Multi-threading support
+* Python 3 support
+
+For more information see:
+* Project documentation: https://github.com/libyal/libregf/wiki/Home
+* How to build from source: https://github.com/libyal/libregf/wiki/Building
 

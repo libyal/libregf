@@ -1,0 +1,52 @@
+Source: libregf
+Section: unknown
+Priority: extra
+Maintainer: Joachim Metz <joachim.metz@gmail.com>
+Build-Depends: debhelper (>= 7), autotools-dev, libfuse-dev, python-dev
+Standards-Version: 3.8.3
+Homepage: http://code.google.com/p/libregf/
+
+Package: libregf
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Suggests: libregf-dbg
+Description: Library to access the Windows NT Registry File (REGF) format
+ libregf is a library to access the Windows NT Registry File (REGF) format.
+
+Package: libregf-dbg
+Architecture: any
+Section: debug
+Depends: libregf (= ${Source-Version}), ${misc:Depends}
+Description: Debugging symbols for libregf
+ Debugging symbols for libregf.
+
+Package: libregf-dev
+Section: libdevel
+Architecture: any
+Depends: libregf (= ${Source-Version})
+Description: Header files and libraries for developing applications for libregf
+ Header files and libraries for developing applications for libregf.
+
+Package: libregf-tools
+Section: utils
+Architecture: any
+Depends: libregf (= ${Source-Version}), ${shlibs:Depends}
+Description: Several tools for reading Windows NT Registry Files (REGF)
+ Several tools for reading Windows NT Registry Files (REGF).
+
+Package: libregf-python
+Section: python
+Architecture: any
+Depends: libregf (= ${Source-Version}), ${shlibs:Depends}, ${python:Depends}
+Suggests: libregf-python-dbg
+Description: Python bindings for libregf
+ Python bindings for libregf.
+
+Package: libregf-python-dbg
+Section: debug
+Architecture: any
+Depends: libregf-python (= ${Source-Version})
+Description: Debugging symbols for libregf-python
+ Debugging symbols for libregf-python.
+

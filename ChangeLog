@@ -97,6 +97,9 @@ Release:
 * removed README.macosx
 * changes for project site move
 
+20141004
+* update Python-bindings tests
+
 20140905
 * updated libfwsi version check
 

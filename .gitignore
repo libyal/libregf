@@ -102,6 +102,10 @@ stamp-h1
 /libregf/libregf.rc
 /libregf/libregf_definitions.h
 /pyregf/setup.py
+/regftools/regfexport
+/regftools/regfinfo
+/regftools/regfmount
+/regftools/regfreport
 /tests/input
 /tests/regf_test_open_close
 /tests/regf_test_set_ascii_codepage

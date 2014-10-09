@@ -97,6 +97,9 @@ Release:
 * removed README.macosx
 * changes for project site move
 
+20141009
+* updated dependencies and corresponding changes
+
 20141004
 * update Python-bindings tests
 

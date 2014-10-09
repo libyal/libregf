@@ -1607,7 +1607,7 @@ int libregf_key_item_read_values_list(
 	     NULL,
 	     (int (*)(intptr_t *, intptr_t *, libfdata_list_element_t *, libfcache_cache_t *, int, off64_t, size64_t, uint32_t, uint8_t, libcerror_error_t **)) &libregf_value_item_read_element_data,
 	     NULL,
-	     LIBFDATA_FLAG_DATA_HANDLE_NON_MANAGED,
+	     LIBFDATA_DATA_HANDLE_FLAG_NON_MANAGED,
 	     error ) != 1 )
 	{
 		libcerror_error_set(

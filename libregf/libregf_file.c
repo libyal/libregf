@@ -928,7 +928,7 @@ int libregf_file_open_read(
 			     NULL,
 			     (int (*)(intptr_t *, intptr_t *, libfdata_tree_node_t *, libfcache_cache_t *, int, off64_t, size64_t, uint32_t, uint8_t, libcerror_error_t **)) &libregf_key_item_read_node_data,
 			     (int (*)(intptr_t *, intptr_t *, libfdata_tree_node_t *, libfcache_cache_t *, int, off64_t, size64_t, uint32_t, uint8_t, libcerror_error_t **)) &libregf_key_item_read_sub_nodes,
-			     LIBFDATA_FLAG_DATA_HANDLE_NON_MANAGED,
+			     LIBFDATA_DATA_HANDLE_FLAG_NON_MANAGED,
 			     error ) != 1 )
 			{
 				libcerror_error_set(

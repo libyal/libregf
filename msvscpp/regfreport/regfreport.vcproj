@@ -206,6 +206,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\regftools\regftools_libbfio.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\regftools\regftools_libcerror.h"
 				>
 			</File>
@@ -226,11 +230,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\regftools\regftools_libfdata.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\regftools\regftools_libfdatetime.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\regftools\regftools_libfguid.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\regftools\regftools_libfwnt.h"
 				>
 			</File>
 			<File

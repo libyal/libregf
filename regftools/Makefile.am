@@ -35,12 +35,15 @@ regfexport_SOURCES = \
 	log_handle.c log_handle.h \
 	regfexport.c \
 	regfoutput.c regfoutput.h \
+	regftools_libbfio.h \
 	regftools_libcerror.h \
 	regftools_libclocale.h \
 	regftools_libcnotify.h \
 	regftools_libcsystem.h \
+	regftools_libfdata.h \
 	regftools_libfdatetime.h \
 	regftools_libfguid.h \
+	regftools_libfwnt.h \
 	regftools_libfwsi.h \
 	regftools_libregf.h \
 	regftools_libuna.h
@@ -58,13 +61,16 @@ regfinfo_SOURCES = \
 	info_handle.c info_handle.h \
 	regfinfo.c \
 	regfoutput.c regfoutput.h \
+	regftools_libbfio.h \
 	regftools_libcerror.h \
 	regftools_libclocale.h \
 	regftools_libcnotify.h \
 	regftools_libcstring.h \
 	regftools_libcsystem.h \
+	regftools_libfdata.h \
 	regftools_libfdatetime.h \
 	regftools_libfguid.h \
+	regftools_libfwnt.h \
 	regftools_libfwsi.h \
 	regftools_libregf.h \
 	regftools_libuna.h
@@ -82,13 +88,16 @@ regfmount_SOURCES = \
 	mount_handle.c mount_handle.h \
 	regfmount.c \
 	regfoutput.c regfoutput.h \
+	regftools_libbfio.h \
 	regftools_libcerror.h \
 	regftools_libclocale.h \
 	regftools_libcnotify.h \
 	regftools_libcstring.h \
 	regftools_libcsystem.h \
+	regftools_libfdata.h \
 	regftools_libfdatetime.h \
 	regftools_libfguid.h \
+	regftools_libfwnt.h \
 	regftools_libfwsi.h \
 	regftools_libregf.h \
 	regftools_libuna.h
@@ -106,13 +115,16 @@ regfmount_LDADD = \
 regfreport_SOURCES = \
 	regfreport.c \
 	regfoutput.c regfoutput.h \
+	regftools_libbfio.h \
 	regftools_libcerror.h \
 	regftools_libclocale.h \
 	regftools_libcnotify.h \
 	regftools_libcstring.h \
 	regftools_libcsystem.h \
+	regftools_libfdata.h \
 	regftools_libfdatetime.h \
 	regftools_libfguid.h \
+	regftools_libfwnt.h \
 	regftools_libfwsi.h \
 	regftools_libregf.h \
 	regftools_libuna.h \

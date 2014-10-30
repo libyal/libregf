@@ -24,37 +24,17 @@
 #include <memory.h>
 #include <types.h>
 
-#if defined( HAVE_LOCAL_LIBBFIO )
-#include <libbfio_definitions.h>
-#elif defined( HAVE_LIBBFIO_H )
-#include <libbfio.h>
-#endif
-
-#if defined( HAVE_LOCAL_LIBFDATA )
-#include <libfdata_definitions.h>
-#elif defined( HAVE_LIBFDATA )
-#include <libfdata.h>
-#endif
-
-#if defined( HAVE_LOCAL_LIBFGUID )
-#include <libfguid_definitions.h>
-#elif defined( HAVE_LIBFGUID_H )
-#include <libfguid.h>
-#endif
-
-#if defined( HAVE_LOCAL_LIBFWNT )
-#include <libfwnt_definitions.h>
-#elif defined( HAVE_LIBFWNT )
-#include <libfwnt.h>
-#endif
-
 #include "regfoutput.h"
+#include "regftools_libbfio.h"
 #include "regftools_libcerror.h"
 #include "regftools_libclocale.h"
 #include "regftools_libcnotify.h"
 #include "regftools_libcstring.h"
 #include "regftools_libcsystem.h"
+#include "regftools_libfdata.h"
 #include "regftools_libfdatetime.h"
+#include "regftools_libfguid.h"
+#include "regftools_libfwnt.h"
 #include "regftools_libfwsi.h"
 #include "regftools_libregf.h"
 #include "regftools_libuna.h"

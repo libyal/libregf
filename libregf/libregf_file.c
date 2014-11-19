@@ -492,7 +492,7 @@ on_error:
 	return( -1 );
 }
 
-#endif
+#endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
 
 /* Opens a file using a Basic File IO (bfio) handle
  * Returns 1 if successful or -1 on error
@@ -1008,71 +1008,6 @@ int libregf_file_get_format_version(
 {
 	libregf_internal_file_t *internal_file = NULL;
 	static char *function                  = "libregf_file_get_format_version";
-
-	if( file == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid file.",
-		 function );
-
-		return( -1 );
-	}
-	internal_file = (libregf_internal_file_t *) file;
-
-	if( internal_file->io_handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file - missing IO handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( major_version == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid major version.",
-		 function );
-
-		return( -1 );
-	}
-	if( minor_version == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid minor version.",
-		 function );
-
-		return( -1 );
-	}
-	*major_version = internal_file->io_handle->major_version;
-	*minor_version = internal_file->io_handle->minor_version;
-
-	return( 1 );
-}
-
-/* TODO: deprecated */
-/* Retrieves the version
- * Returns 1 if successful or -1 on error
- */
-int libregf_file_get_version(
-     libregf_file_t *file,
-     uint32_t *major_version,
-     uint32_t *minor_version,
-     libcerror_error_t **error )
-{
-	libregf_internal_file_t *internal_file = NULL;
-	static char *function                  = "libregf_file_get_version";
 
 	if( file == NULL )
 	{

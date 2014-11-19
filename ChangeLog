@@ -71,9 +71,6 @@ Performance
   - use hash table/map ? search tree based on hash ?
 * read the security key on demand ?
 
-Beta release:
-* remove libregf_file_get_version
-
 Library
 * build registry key hierarchy
   - validate parent key offset
@@ -92,6 +89,10 @@ Python bindings
 
 Release:
 * check TODOs
+
+20141119
+* code clean up
+* removed libregf_file_get_version
 
 20141030
 * changes for deployment

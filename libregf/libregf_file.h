@@ -98,13 +98,15 @@ int libregf_file_open(
      libcerror_error_t **error );
 
 #if defined( HAVE_WIDE_CHARACTER_TYPE )
+
 LIBREGF_EXTERN \
 int libregf_file_open_wide(
      libregf_file_t *file,
      const wchar_t *filename,
      int access_flags,
      libcerror_error_t **error );
-#endif
+
+#endif /* defined( HAVE_WIDE_CHARACTER_TYPE ) */
 
 LIBREGF_EXTERN \
 int libregf_file_open_file_io_handle(
@@ -142,14 +144,6 @@ int libregf_file_set_ascii_codepage(
 
 LIBREGF_EXTERN \
 int libregf_file_get_format_version(
-     libregf_file_t *file,
-     uint32_t *major_version,
-     uint32_t *minor_version,
-     libcerror_error_t **error );
-
-/* TODO: deprecated */
-LIBREGF_EXTERN \
-int libregf_file_get_version(
      libregf_file_t *file,
      uint32_t *major_version,
      uint32_t *minor_version,

@@ -286,19 +286,6 @@ int libregf_file_get_format_version(
      uint32_t *minor_version,
      libregf_error_t **error );
 
-/* Retrieves the version
- * Returns 1 if successful or -1 on error
- *
- * This function is deprecated use libregf_file_get_format_version instead
- */
-LIBREGF_DEPRECATED \
-LIBREGF_EXTERN \
-int libregf_file_get_version(
-     libregf_file_t *file,
-     uint32_t *major_version,
-     uint32_t *minor_version,
-     libregf_error_t **error );
-
 /* Retrieves the file type
  * Returns 1 if successful or -1 on error
  */

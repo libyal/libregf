@@ -73,7 +73,7 @@ int libregf_set_codepage(
      int codepage,
      libregf_error_t **error );
 
-/* Determines if a file is a REGF file (check for the REGF file signature)
+/* Determines if a file contains a REGF file signature
  * Returns 1 if true, 0 if not or -1 on error
  */
 LIBREGF_EXTERN \
@@ -82,24 +82,28 @@ int libregf_check_file_signature(
      libregf_error_t **error );
 
 #if defined( LIBREGF_HAVE_WIDE_CHARACTER_TYPE )
-/* Determines if a file is a REGF file (check for the REGF file signature)
+
+/* Determines if a file contains a REGF file signature
  * Returns 1 if true, 0 if not or -1 on error
  */
 LIBREGF_EXTERN \
 int libregf_check_file_signature_wide(
      const wchar_t *filename,
      libregf_error_t **error );
-#endif
+
+#endif /* defined( LIBREGF_HAVE_WIDE_CHARACTER_TYPE ) */
 
 #if defined( LIBREGF_HAVE_BFIO )
-/* Determines if a file is a REGF file (check for the REGF file signature) using a Basic File IO (bfio) handle
+
+/* Determines if a file contains a REGF file signature using a Basic File IO (bfio) handle
  * Returns 1 if true, 0 if not or -1 on error
  */
 LIBREGF_EXTERN \
 int libregf_check_file_signature_file_io_handle(
      libbfio_handle_t *bfio_handle,
      libregf_error_t **error );
-#endif
+
+#endif /* defined( LIBREGF_HAVE_BFIO ) */
 
 /* -------------------------------------------------------------------------
  * Notify functions
@@ -219,6 +223,7 @@ int libregf_file_open(
      libregf_error_t **error );
 
 #if defined( LIBREGF_HAVE_WIDE_CHARACTER_TYPE )
+
 /* Opens a file
  * Returns 1 if successful or -1 on error
  */
@@ -228,9 +233,11 @@ int libregf_file_open_wide(
      const wchar_t *filename,
      int access_flags,
      libregf_error_t **error );
-#endif
+
+#endif /* defined( LIBREGF_HAVE_WIDE_CHARACTER_TYPE ) */
 
 #if defined( LIBREGF_HAVE_BFIO )
+
 /* Opens a file using a Basic File IO (bfio) handle
  * Returns 1 if successful or -1 on error
  */
@@ -240,7 +247,8 @@ int libregf_file_open_file_io_handle(
      libbfio_handle_t *file_io_handle,
      int access_flags,
      libregf_error_t **error );
-#endif
+
+#endif /* defined( LIBREGF_HAVE_BFIO ) */
 
 /* Closes a file
  * Returns 0 if successful or -1 on error

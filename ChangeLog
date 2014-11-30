@@ -90,6 +90,9 @@ Python bindings
 Release:
 * check TODOs
 
+20141130
+* code clean up
+
 20141119
 * code clean up
 * removed libregf_file_get_version

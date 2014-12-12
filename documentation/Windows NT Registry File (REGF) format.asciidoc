@@ -131,7 +131,7 @@ Registry key: HKEY_CURRENT_USER
 | NTUSER.MAN | NT4 and later | Mandatory user specific part of the Registry +
 Location: %UserProfile%\
 | SAM | NT4 and later | Security Account Manager (SAM) part of the Registry +
-| Location: %SystemRoot%\System32\Config\ 
+Location: %SystemRoot%\System32\Config\ 
 | SOFTWARE | NT4 and later | Software specific part of the Registry +
 Location: %SystemRoot%\System32\Config\ +
 Registry key: HKEY_LOCAL_MACHINE\Software

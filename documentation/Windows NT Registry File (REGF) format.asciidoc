@@ -135,7 +135,7 @@ Location: %SystemRoot%\System32\Config\
 | SOFTWARE | NT4 and later | Software specific part of the Registry +
 Location: %SystemRoot%\System32\Config\ +
 Registry key: HKEY_LOCAL_MACHINE\Software
-| Syscache.hve | [backgroung-yelolow]*Windows 7* | [yellow-background]*TODO* +
+| Syscache.hve | [yellow-background]*Windows 7* | [yellow-background]*TODO* +
 Location: System Volume Information
 | SYSTEM | NT4 and later | System specific part of the Registry +
 Location: %SystemRoot%\System32\Config\ +

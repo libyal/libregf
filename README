@@ -4,10 +4,12 @@ Project information:
 * Status: alpha
 * Licence: LGPLv3+
 
+Work in progress:
+* Python 3 support
+
 Planned:
 * Dokan support
 * Multi-threading support
-* Python 3 support
 
 For more information see:
 * Project documentation: https://github.com/libyal/libregf/wiki/Home

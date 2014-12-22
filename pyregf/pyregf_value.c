@@ -129,10 +129,8 @@ PyGetSetDef pyregf_value_object_get_set_definitions[] = {
 };
 
 PyTypeObject pyregf_value_type_object = {
-	PyObject_HEAD_INIT( NULL )
+	PyVarObject_HEAD_INIT( NULL, 0 )
 
-	/* ob_size */
-	0,
 	/* tp_name */
 	"pyregf.value",
 	/* tp_basicsize */
@@ -313,8 +311,9 @@ int pyregf_value_init(
 void pyregf_value_free(
       pyregf_value_t *pyregf_value )
 {
-	libcerror_error_t *error = NULL;
-	static char *function    = "pyregf_value_free";
+	libcerror_error_t *error    = NULL;
+	struct _typeobject *ob_type = NULL;
+	static char *function       = "pyregf_value_free";
 
 	if( pyregf_value == NULL )
 	{
@@ -325,29 +324,32 @@ void pyregf_value_free(
 
 		return;
 	}
-	if( pyregf_value->ob_type == NULL )
-	{
-		PyErr_Format(
-		 PyExc_TypeError,
-		 "%s: invalid value - missing ob_type.",
-		 function );
-
-		return;
-	}
-	if( pyregf_value->ob_type->tp_free == NULL )
-	{
-		PyErr_Format(
-		 PyExc_TypeError,
-		 "%s: invalid value - invalid ob_type - missing tp_free.",
-		 function );
-
-		return;
-	}
 	if( pyregf_value->value == NULL )
 	{
 		PyErr_Format(
 		 PyExc_TypeError,
 		 "%s: invalid value - missing libregf value.",
+		 function );
+
+		return;
+	}
+	ob_type = Py_TYPE(
+	           pyregf_value );
+
+	if( ob_type == NULL )
+	{
+		PyErr_Format(
+		 PyExc_ValueError,
+		 "%s: missing ob_type.",
+		 function );
+
+		return;
+	}
+	if( ob_type->tp_free == NULL )
+	{
+		PyErr_Format(
+		 PyExc_ValueError,
+		 "%s: invalid ob_type - missing tp_free.",
 		 function );
 
 		return;
@@ -370,7 +372,7 @@ void pyregf_value_free(
 		Py_DecRef(
 		 (PyObject *) pyregf_value->file_object );
 	}
-	pyregf_value->ob_type->tp_free(
+	ob_type->tp_free(
 	 (PyObject*) pyregf_value );
 }
 
@@ -548,6 +550,7 @@ PyObject *pyregf_value_get_type(
            PyObject *arguments PYREGF_ATTRIBUTE_UNUSED )
 {
 	libcerror_error_t *error = NULL;
+	PyObject *integer_object = NULL;
 	static char *function    = "pyregf_value_get_type";
 	uint16_t value_type      = 0;
 	int result               = 0;
@@ -585,8 +588,14 @@ PyObject *pyregf_value_get_type(
 
 		return( NULL );
 	}
-	return( PyInt_FromLong(
-	         (long) value_type ) );
+#if PY_MAJOR_VERSION >= 3
+	integer_object = PyLong_FromLong(
+	                  (long) value_type );
+#else
+	integer_object = PyInt_FromLong(
+	                  (long) value_type );
+#endif
+	return( integer_object );
 }
 
 /* Retrieves the data
@@ -679,10 +688,15 @@ PyObject *pyregf_value_get_data(
 
 		goto on_error;
 	}
+#if PY_MAJOR_VERSION >= 3
+	string_object = PyBytes_FromStringAndSize(
+			 (char *) value_data,
+			 (Py_ssize_t) value_data_size );
+#else
 	string_object = PyString_FromStringAndSize(
 			 (char *) value_data,
 			 (Py_ssize_t) value_data_size );
-
+#endif
 	PyMem_Free(
 	 value_data );
 

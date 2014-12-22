@@ -105,7 +105,7 @@ PyObject *pyregf_file_set_ascii_codepage(
 
 int pyregf_file_set_ascii_codepage_setter(
      pyregf_file_t *pyregf_file,
-     PyObject *value_object,
+     PyObject *string_object,
      void *closure );
 
 PyObject *pyregf_file_get_format_version(

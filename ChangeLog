@@ -90,6 +90,10 @@ Python bindings
 Release:
 * check TODOs
 
+20141222
+* worked on Python 3 support
+* worked on tests
+
 20141130
 * code clean up
 

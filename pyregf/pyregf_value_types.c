@@ -26,16 +26,14 @@
 #include <stdlib.h>
 #endif
 
-#include "pyregf_value_types.h"
 #include "pyregf_libregf.h"
 #include "pyregf_python.h"
 #include "pyregf_unused.h"
+#include "pyregf_value_types.h"
 
 PyTypeObject pyregf_value_types_type_object = {
-	PyObject_HEAD_INIT( NULL )
+	PyVarObject_HEAD_INIT( NULL, 0 )
 
-	/* ob_size */
-	0,
 	/* tp_name */
 	"pyregf.value_types",
 	/* tp_basicsize */
@@ -134,6 +132,8 @@ PyTypeObject pyregf_value_types_type_object = {
 int pyregf_value_types_init_type(
      PyTypeObject *type_object )
 {
+	PyObject *value_object = NULL;
+
 	if( type_object == NULL )
 	{
 		return( -1 );
@@ -144,99 +144,171 @@ int pyregf_value_types_init_type(
 	{
 		return( -1 );
 	}
+#if PY_MAJOR_VERSION >= 3
+	value_object = PyLong_FromLong(
+	                LIBREGF_VALUE_TYPE_UNDEFINED );
+#else
+	value_object = PyInt_FromLong(
+	                LIBREGF_VALUE_TYPE_UNDEFINED );
+#endif
 	if( PyDict_SetItemString(
 	     type_object->tp_dict,
 	     "UNDEFINED",
-	     PyInt_FromLong(
-	      LIBREGF_VALUE_TYPE_UNDEFINED ) ) != 0 )
+	     value_object ) != 0 )
 	{
 		goto on_error;
 	}
+#if PY_MAJOR_VERSION >= 3
+	value_object = PyLong_FromLong(
+	                LIBREGF_VALUE_TYPE_STRING );
+#else
+	value_object = PyInt_FromLong(
+	                LIBREGF_VALUE_TYPE_STRING );
+#endif
 	if( PyDict_SetItemString(
 	     type_object->tp_dict,
 	     "STRING",
-	     PyInt_FromLong(
-	      LIBREGF_VALUE_TYPE_STRING ) ) != 0 )
+	     value_object ) != 0 )
 	{
 		goto on_error;
 	}
+#if PY_MAJOR_VERSION >= 3
+	value_object = PyLong_FromLong(
+	                LIBREGF_VALUE_TYPE_EXPANDABLE_STRING );
+#else
+	value_object = PyInt_FromLong(
+	                LIBREGF_VALUE_TYPE_EXPANDABLE_STRING );
+#endif
 	if( PyDict_SetItemString(
 	     type_object->tp_dict,
 	     "EXPANDABLE_STRING",
-	     PyInt_FromLong(
-	      LIBREGF_VALUE_TYPE_EXPANDABLE_STRING ) ) != 0 )
+	     value_object ) != 0 )
 	{
 		goto on_error;
 	}
+#if PY_MAJOR_VERSION >= 3
+	value_object = PyLong_FromLong(
+	                LIBREGF_VALUE_TYPE_BINARY_DATA );
+#else
+	value_object = PyInt_FromLong(
+	                LIBREGF_VALUE_TYPE_BINARY_DATA );
+#endif
 	if( PyDict_SetItemString(
 	     type_object->tp_dict,
 	     "BINARY_DATA",
-	     PyInt_FromLong(
-	      LIBREGF_VALUE_TYPE_BINARY_DATA ) ) != 0 )
+	     value_object ) != 0 )
 	{
 		goto on_error;
 	}
+#if PY_MAJOR_VERSION >= 3
+	value_object = PyLong_FromLong(
+	                LIBREGF_VALUE_TYPE_INTEGER_32BIT_LITTLE_ENDIAN );
+#else
+	value_object = PyInt_FromLong(
+	                LIBREGF_VALUE_TYPE_INTEGER_32BIT_LITTLE_ENDIAN );
+#endif
 	if( PyDict_SetItemString(
 	     type_object->tp_dict,
 	     "INTEGER_32BIT_LITTLE_ENDIAN",
-	     PyInt_FromLong(
-	      LIBREGF_VALUE_TYPE_INTEGER_32BIT_LITTLE_ENDIAN ) ) != 0 )
+	     value_object ) != 0 )
 	{
 		goto on_error;
 	}
+#if PY_MAJOR_VERSION >= 3
+	value_object = PyLong_FromLong(
+	                LIBREGF_VALUE_TYPE_INTEGER_32BIT_BIG_ENDIAN );
+#else
+	value_object = PyInt_FromLong(
+	                LIBREGF_VALUE_TYPE_INTEGER_32BIT_BIG_ENDIAN );
+#endif
 	if( PyDict_SetItemString(
 	     type_object->tp_dict,
 	     "INTEGER_32BIT_BIG_ENDIAN",
-	     PyInt_FromLong(
-	      LIBREGF_VALUE_TYPE_INTEGER_32BIT_BIG_ENDIAN ) ) != 0 )
+	     value_object ) != 0 )
 	{
 		goto on_error;
 	}
+#if PY_MAJOR_VERSION >= 3
+	value_object = PyLong_FromLong(
+	                LIBREGF_VALUE_TYPE_SYMBOLIC_LINK );
+#else
+	value_object = PyInt_FromLong(
+	                LIBREGF_VALUE_TYPE_SYMBOLIC_LINK );
+#endif
 	if( PyDict_SetItemString(
 	     type_object->tp_dict,
 	     "SYMBOLIC_LINK",
-	     PyInt_FromLong(
-	      LIBREGF_VALUE_TYPE_SYMBOLIC_LINK ) ) != 0 )
+	     value_object ) != 0 )
 	{
 		goto on_error;
 	}
+#if PY_MAJOR_VERSION >= 3
+	value_object = PyLong_FromLong(
+	                LIBREGF_VALUE_TYPE_MULTI_VALUE_STRING );
+#else
+	value_object = PyInt_FromLong(
+	                LIBREGF_VALUE_TYPE_MULTI_VALUE_STRING );
+#endif
 	if( PyDict_SetItemString(
 	     type_object->tp_dict,
 	     "MULTI_VALUE_STRING",
-	     PyInt_FromLong(
-	      LIBREGF_VALUE_TYPE_MULTI_VALUE_STRING ) ) != 0 )
+	     value_object ) != 0 )
 	{
 		goto on_error;
 	}
+#if PY_MAJOR_VERSION >= 3
+	value_object = PyLong_FromLong(
+	                LIBREGF_VALUE_TYPE_RESOURCE_LIST );
+#else
+	value_object = PyInt_FromLong(
+	                LIBREGF_VALUE_TYPE_RESOURCE_LIST );
+#endif
 	if( PyDict_SetItemString(
 	     type_object->tp_dict,
 	     "RESOURCE_LIST",
-	     PyInt_FromLong(
-	      LIBREGF_VALUE_TYPE_RESOURCE_LIST ) ) != 0 )
+	     value_object ) != 0 )
 	{
 		goto on_error;
 	}
+#if PY_MAJOR_VERSION >= 3
+	value_object = PyLong_FromLong(
+	                LIBREGF_VALUE_TYPE_FULL_RESOURCE_DESCRIPTOR );
+#else
+	value_object = PyInt_FromLong(
+	                LIBREGF_VALUE_TYPE_FULL_RESOURCE_DESCRIPTOR );
+#endif
 	if( PyDict_SetItemString(
 	     type_object->tp_dict,
 	     "FULL_RESOURCE_DESCRIPTOR",
-	     PyInt_FromLong(
-	      LIBREGF_VALUE_TYPE_FULL_RESOURCE_DESCRIPTOR ) ) != 0 )
+	     value_object ) != 0 )
 	{
 		goto on_error;
 	}
+#if PY_MAJOR_VERSION >= 3
+	value_object = PyLong_FromLong(
+	                LIBREGF_VALUE_TYPE_RESOURCE_REQUIREMENTS_LIST );
+#else
+	value_object = PyInt_FromLong(
+	                LIBREGF_VALUE_TYPE_RESOURCE_REQUIREMENTS_LIST );
+#endif
 	if( PyDict_SetItemString(
 	     type_object->tp_dict,
 	     "RESOURCE_REQUIREMENTS_LIST",
-	     PyInt_FromLong(
-	      LIBREGF_VALUE_TYPE_RESOURCE_REQUIREMENTS_LIST ) ) != 0 )
+	     value_object ) != 0 )
 	{
 		goto on_error;
 	}
+#if PY_MAJOR_VERSION >= 3
+	value_object = PyLong_FromLong(
+	                LIBREGF_VALUE_TYPE_INTEGER_32BIT_LITTLE_ENDIAN );
+#else
+	value_object = PyInt_FromLong(
+	                LIBREGF_VALUE_TYPE_INTEGER_32BIT_LITTLE_ENDIAN );
+#endif
 	if( PyDict_SetItemString(
 	     type_object->tp_dict,
 	     "INTEGER_64BIT_LITTLE_ENDIAN",
-	     PyInt_FromLong(
-	      LIBREGF_VALUE_TYPE_INTEGER_32BIT_LITTLE_ENDIAN ) ) != 0 )
+	     value_object ) != 0 )
 	{
 		goto on_error;
 	}
@@ -321,7 +393,8 @@ int pyregf_value_types_init(
 void pyregf_value_types_free(
       pyregf_value_types_t *pyregf_value_types )
 {
-	static char *function = "pyregf_value_types_free";
+	struct _typeobject *ob_type = NULL;
+	static char *function       = "pyregf_value_types_free";
 
 	if( pyregf_value_types == NULL )
 	{
@@ -332,25 +405,28 @@ void pyregf_value_types_free(
 
 		return;
 	}
-	if( pyregf_value_types->ob_type == NULL )
+	ob_type = Py_TYPE(
+	           pyregf_value_types );
+
+	if( ob_type == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
-		 "%s: invalid value types - missing ob_type.",
+		 PyExc_ValueError,
+		 "%s: missing ob_type.",
 		 function );
 
 		return;
 	}
-	if( pyregf_value_types->ob_type->tp_free == NULL )
+	if( ob_type->tp_free == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
-		 "%s: invalid value types - invalid ob_type - missing tp_free.",
+		 PyExc_ValueError,
+		 "%s: invalid ob_type - missing tp_free.",
 		 function );
 
 		return;
 	}
-	pyregf_value_types->ob_type->tp_free(
+	ob_type->tp_free(
 	 (PyObject*) pyregf_value_types );
 }
 

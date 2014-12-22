@@ -57,10 +57,8 @@ PySequenceMethods pyregf_values_sequence_methods = {
 };
 
 PyTypeObject pyregf_values_type_object = {
-	PyObject_HEAD_INIT( NULL )
+	PyVarObject_HEAD_INIT( NULL, 0 )
 
-	/* ob_size */
-	0,
 	/* tp_name */
 	"pyregf._values",
 	/* tp_basicsize */
@@ -259,7 +257,8 @@ int pyregf_values_init(
 void pyregf_values_free(
       pyregf_values_t *pyregf_values )
 {
-	static char *function = "pyregf_values_free";
+	struct _typeobject *ob_type = NULL;
+	static char *function       = "pyregf_values_free";
 
 	if( pyregf_values == NULL )
 	{
@@ -270,20 +269,23 @@ void pyregf_values_free(
 
 		return;
 	}
-	if( pyregf_values->ob_type == NULL )
+	ob_type = Py_TYPE(
+	           pyregf_values );
+
+	if( ob_type == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid values - missing ob_type.",
+		 "%s: missing ob_type.",
 		 function );
 
 		return;
 	}
-	if( pyregf_values->ob_type->tp_free == NULL )
+	if( ob_type->tp_free == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid values - invalid ob_type - missing tp_free.",
+		 "%s: invalid ob_type - missing tp_free.",
 		 function );
 
 		return;
@@ -293,7 +295,7 @@ void pyregf_values_free(
 		Py_DecRef(
 		 (PyObject *) pyregf_values->key_object );
 	}
-	pyregf_values->ob_type->tp_free(
+	ob_type->tp_free(
 	 (PyObject*) pyregf_values );
 }
 

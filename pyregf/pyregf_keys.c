@@ -56,10 +56,8 @@ PySequenceMethods pyregf_keys_sequence_methods = {
 };
 
 PyTypeObject pyregf_keys_type_object = {
-	PyObject_HEAD_INIT( NULL )
+	PyVarObject_HEAD_INIT( NULL, 0 )
 
-	/* ob_size */
-	0,
 	/* tp_name */
 	"pyregf._keys",
 	/* tp_basicsize */
@@ -258,7 +256,8 @@ int pyregf_keys_init(
 void pyregf_keys_free(
       pyregf_keys_t *pyregf_keys )
 {
-	static char *function = "pyregf_keys_free";
+	struct _typeobject *ob_type = NULL;
+	static char *function       = "pyregf_keys_free";
 
 	if( pyregf_keys == NULL )
 	{
@@ -269,20 +268,23 @@ void pyregf_keys_free(
 
 		return;
 	}
-	if( pyregf_keys->ob_type == NULL )
+	ob_type = Py_TYPE(
+	           pyregf_keys );
+
+	if( ob_type == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid keys - missing ob_type.",
+		 "%s: missing ob_type.",
 		 function );
 
 		return;
 	}
-	if( pyregf_keys->ob_type->tp_free == NULL )
+	if( ob_type->tp_free == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid keys - invalid ob_type - missing tp_free.",
+		 "%s: invalid ob_type - missing tp_free.",
 		 function );
 
 		return;
@@ -292,7 +294,7 @@ void pyregf_keys_free(
 		Py_DecRef(
 		 (PyObject *) pyregf_keys->key_object );
 	}
-	pyregf_keys->ob_type->tp_free(
+	ob_type->tp_free(
 	 (PyObject*) pyregf_keys );
 }
 

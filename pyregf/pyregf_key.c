@@ -191,10 +191,8 @@ PyGetSetDef pyregf_key_object_get_set_definitions[] = {
 };
 
 PyTypeObject pyregf_key_type_object = {
-	PyObject_HEAD_INIT( NULL )
+	PyVarObject_HEAD_INIT( NULL, 0 )
 
-	/* ob_size */
-	0,
 	/* tp_name */
 	"pyregf.key",
 	/* tp_basicsize */
@@ -375,8 +373,9 @@ int pyregf_key_init(
 void pyregf_key_free(
       pyregf_key_t *pyregf_key )
 {
-	libcerror_error_t *error = NULL;
-	static char *function    = "pyregf_key_free";
+	libcerror_error_t *error    = NULL;
+	struct _typeobject *ob_type = NULL;
+	static char *function       = "pyregf_key_free";
 
 	if( pyregf_key == NULL )
 	{
@@ -387,29 +386,32 @@ void pyregf_key_free(
 
 		return;
 	}
-	if( pyregf_key->ob_type == NULL )
-	{
-		PyErr_Format(
-		 PyExc_TypeError,
-		 "%s: invalid key - missing ob_type.",
-		 function );
-
-		return;
-	}
-	if( pyregf_key->ob_type->tp_free == NULL )
-	{
-		PyErr_Format(
-		 PyExc_TypeError,
-		 "%s: invalid key - invalid ob_type - missing tp_free.",
-		 function );
-
-		return;
-	}
 	if( pyregf_key->key == NULL )
 	{
 		PyErr_Format(
 		 PyExc_TypeError,
 		 "%s: invalid key - missing libregf key.",
+		 function );
+
+		return;
+	}
+	ob_type = Py_TYPE(
+	           pyregf_key );
+
+	if( ob_type == NULL )
+	{
+		PyErr_Format(
+		 PyExc_ValueError,
+		 "%s: missing ob_type.",
+		 function );
+
+		return;
+	}
+	if( ob_type->tp_free == NULL )
+	{
+		PyErr_Format(
+		 PyExc_ValueError,
+		 "%s: invalid ob_type - missing tp_free.",
 		 function );
 
 		return;
@@ -432,7 +434,7 @@ void pyregf_key_free(
 		Py_DecRef(
 		 (PyObject *) pyregf_key->file_object );
 	}
-	pyregf_key->ob_type->tp_free(
+	ob_type->tp_free(
 	 (PyObject*) pyregf_key );
 }
 
@@ -828,6 +830,7 @@ PyObject *pyregf_key_get_number_of_sub_keys(
            PyObject *arguments PYREGF_ATTRIBUTE_UNUSED )
 {
 	libcerror_error_t *error = NULL;
+	PyObject *integer_object = NULL;
 	static char *function    = "pyregf_key_get_number_of_sub_keys";
 	int number_of_sub_keys   = 0;
 	int result               = 0;
@@ -865,8 +868,14 @@ PyObject *pyregf_key_get_number_of_sub_keys(
 
 		return( NULL );
 	}
-	return( PyInt_FromLong(
-	         (long) number_of_sub_keys ) );
+#if PY_MAJOR_VERSION >= 3
+	integer_object = PyLong_FromLong(
+	                  (long) number_of_sub_keys );
+#else
+	integer_object = PyInt_FromLong(
+	                  (long) number_of_sub_keys );
+#endif
+	return( integer_object );
 }
 
 /* Retrieves a specific sub key by index
@@ -1231,6 +1240,7 @@ PyObject *pyregf_key_get_number_of_values(
            PyObject *arguments PYREGF_ATTRIBUTE_UNUSED )
 {
 	libcerror_error_t *error = NULL;
+	PyObject *integer_object = NULL;
 	static char *function    = "pyregf_key_get_number_of_values";
 	int number_of_values     = 0;
 	int result               = 0;
@@ -1268,8 +1278,14 @@ PyObject *pyregf_key_get_number_of_values(
 
 		return( NULL );
 	}
-	return( PyInt_FromLong(
-	         (long) number_of_values ) );
+#if PY_MAJOR_VERSION >= 3
+	integer_object = PyLong_FromLong(
+	                  (long) number_of_values );
+#else
+	integer_object = PyInt_FromLong(
+	                  (long) number_of_values );
+#endif
+	return( integer_object );
 }
 
 /* Retrieves a specific value by index

@@ -2827,8 +2827,7 @@ int libregf_key_get_sub_key_by_utf8_path(
 	}
 	/* If the string is empty return the current key
 	 */
-	if( ( utf8_string_length == 0 )
-	 || ( utf8_string_length == utf8_string_index ) )
+	if( utf8_string_length == utf8_string_index )
 	{
 		result = 1;
 	}
@@ -3213,8 +3212,7 @@ int libregf_key_get_sub_key_by_utf16_path(
 	}
 	/* If the string is empty return the current key
 	 */
-	if( ( utf16_string_length == 0 )
-	 || ( utf16_string_length == utf16_string_index ) )
+	if( utf16_string_length == utf16_string_index )
 	{
 		result = 1;
 	}

@@ -90,6 +90,9 @@ Python bindings
 Release:
 * check TODOs
 
+20150315
+* bug fix in _get_sub_key_by_path for single character sub key paths
+
 20150105
 * 2015 update
 

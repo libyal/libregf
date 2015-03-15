@@ -1498,7 +1498,7 @@ int libregf_file_get_key_by_utf8_path(
 		return( -1 );
 	}
 	if( ( utf8_string_length == 0 )
-	 || ( utf8_string_length == 1 ) )
+	 || ( utf8_string_length == utf8_string_index ) )
 	{
 		result = 1;
 	}
@@ -1740,7 +1740,7 @@ int libregf_file_get_key_by_utf16_path(
 		return( -1 );
 	}
 	if( ( utf16_string_length == 0 )
-	 || ( utf16_string_length == 1 ) )
+	 || ( utf16_string_length == utf16_string_index ) )
 	{
 		result = 1;
 	}

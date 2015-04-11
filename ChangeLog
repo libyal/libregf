@@ -9,7 +9,6 @@ TODO
 * pyregf
   - add multi string value support
   - as string function: if not a string try to represent the data as a string?
-  - pyregf_value_get_data_size
 * profile large regf files
 * libregf_value_item_values_get_data
   - improve data stream solution
@@ -89,6 +88,12 @@ Python bindings
 
 Release:
 * check TODOs
+
+20150411
+* worked on Python-bindings
+
+20150409
+* worked on empty hive bins data corruption scenario handling
 
 20150315
 * bug fix in _get_sub_key_by_path for single character sub key paths

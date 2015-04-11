@@ -61,6 +61,13 @@ PyMethodDef pyregf_value_object_methods[] = {
 	  "\n"
 	  "Retrieves the type." },
 
+	{ "get_data_size",
+	  (PyCFunction) pyregf_value_get_data_size,
+	  METH_NOARGS,
+	  "get_data -> String or None\n"
+	  "\n"
+	  "Retrieves the size of the data as a binary string." },
+
 	{ "get_data",
 	  (PyCFunction) pyregf_value_get_data,
 	  METH_NOARGS,
@@ -104,6 +111,12 @@ PyGetSetDef pyregf_value_object_get_set_definitions[] = {
 	  (getter) pyregf_value_get_type,
 	  (setter) 0,
 	  "The type.",
+	  NULL },
+
+	{ "data_size",
+	  (getter) pyregf_value_get_data_size,
+	  (setter) 0,
+	  "The data size.",
 	  NULL },
 
 	{ "data",
@@ -595,6 +608,58 @@ PyObject *pyregf_value_get_type(
 	integer_object = PyInt_FromLong(
 	                  (long) value_type );
 #endif
+	return( integer_object );
+}
+
+/* Retrieves the data size
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyregf_value_get_data_size(
+           pyregf_value_t *pyregf_value,
+           PyObject *arguments PYREGF_ATTRIBUTE_UNUSED )
+{
+	libcerror_error_t *error = NULL;
+	PyObject *integer_object = NULL;
+	static char *function    = "pyregf_value_get_data_size";
+	size64_t data_size       = 0;
+	int result               = 0;
+
+	PYREGF_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyregf_value == NULL )
+	{
+		PyErr_Format(
+		 PyExc_TypeError,
+		 "%s: invalid value.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libregf_value_get_value_data_size(
+	          pyregf_value->value,
+	          &data_size,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
+	{
+		pyregf_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve data size.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	integer_object = pyregf_integer_unsigned_new_from_64bit(
+	                  (uint64_t) data_size );
+
 	return( integer_object );
 }
 

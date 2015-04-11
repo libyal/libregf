@@ -75,6 +75,10 @@ PyObject *pyregf_value_get_type(
            pyregf_value_t *pyregf_value,
            PyObject *arguments );
 
+PyObject *pyregf_value_get_data_size(
+           pyregf_value_t *pyregf_value,
+           PyObject *arguments );
+
 PyObject *pyregf_value_get_data(
            pyregf_value_t *pyregf_value,
            PyObject *arguments );

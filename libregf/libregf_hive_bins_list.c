@@ -309,8 +309,9 @@ int libregf_hive_bins_list_read(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_IO,
 			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read hive bin header.",
-			 function );
+			 "%s: unable to read hive bin header at offset: %" PRIi64 ".",
+			 function,
+			 file_offset );
 
 			goto on_error;
 		}
@@ -411,6 +412,7 @@ int libregf_hive_bins_list_read_element_data(
 {
 	libregf_hive_bin_t *hive_bin = NULL;
 	static char *function        = "libregf_hive_bins_list_read_element_data";
+	int result                   = 0;
 
 	LIBREGF_UNREFERENCED_PARAMETER( data_handle )
 	LIBREGF_UNREFERENCED_PARAMETER( data_range_file_index )
@@ -456,17 +458,20 @@ int libregf_hive_bins_list_read_element_data(
 
 		goto on_error;
 	}
-	if( libregf_hive_bin_read_header(
-	     hive_bin,
-	     file_io_handle,
-	     error ) != 1 )
+	result = libregf_hive_bin_read_header(
+	          hive_bin,
+	          file_io_handle,
+	          error );
+
+	if( result != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read hive bin header.",
-		 function );
+		 "%s: unable to read hive bin header at offset: %" PRIi64 ".",
+		 function,
+		 data_range_offset + 4096 );
 
 		goto on_error;
 	}

@@ -529,7 +529,7 @@ int libregf_value_item_read_value_key(
 		libcnotify_print_data(
 		 hive_bin_cell_data,
 		 hive_bin_cell_size,
-		 0 );
+		 LIBCNOTIFY_PRINT_DATA_FLAG_GROUP_DATA );
 	}
 #endif
 	if( hive_bin_cell_size < sizeof( regf_value_key_t ) )
@@ -637,15 +637,26 @@ int libregf_value_item_read_value_key(
 	data_offset_data = ( (regf_value_key_t *) hive_bin_cell_data )->data_offset;
 
 	hive_bin_cell_data += sizeof( regf_value_key_t );
-
-#if defined( HAVE_DEBUG_OUTPUT )
 	hive_bin_cell_size -= sizeof( regf_value_key_t );
-#endif
 
 	value_item->name_hash = 0;
 
 	if( value_item->name_size > 0 )
 	{
+		if( value_item->name_size > hive_bin_cell_size )
+		{
+#if defined( HAVE_DEBUG_OUTPUT )
+			if( libcnotify_verbose != 0 )
+			{
+				libcnotify_printf(
+				 "%s: invalid value name size value out of bounds.",
+				 function );
+			}
+#endif
+			value_item->item_flags |= LIBREGF_VALUE_ITEM_FLAG_IS_CORRUPTED;
+
+			return( 1 );
+		}
 		value_item->name = (uint8_t *) memory_allocate(
 		                                sizeof( uint8_t ) * (size_t) value_item->name_size );
 
@@ -671,6 +682,12 @@ int libregf_value_item_read_value_key(
 			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
 			 "%s: unable to copy value name.",
 			 function );
+
+			memory_free(
+			 value_item->name );
+
+			value_item->name      = NULL;
+			value_item->name_size = 0;
 
 			goto on_error;
 		}
@@ -878,7 +895,7 @@ int libregf_value_item_read_value_key(
 			libcnotify_print_data(
 			 hive_bin_cell_data,
 			 hive_bin_cell_size,
-			 0 );
+			 LIBCNOTIFY_PRINT_DATA_FLAG_GROUP_DATA );
 		}
 		else
 		{
@@ -897,15 +914,17 @@ int libregf_value_item_read_value_key(
 
 		if( data_size > 4 )
 		{
-/* TODO add error tolerrability */
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-			 "%s: invalid data size.",
-			 function );
+#if defined( HAVE_DEBUG_OUTPUT )
+			if( libcnotify_verbose != 0 )
+			{
+				libcnotify_printf(
+				 "%s: invalid data size value out of bounds.",
+				 function );
+			}
+#endif
+			value_item->item_flags |= LIBREGF_VALUE_ITEM_FLAG_IS_CORRUPTED;
 
-			goto on_error;
+			return( 1 );
 		}
 		else if( data_size > 0 )
 		{
@@ -948,6 +967,12 @@ int libregf_value_item_read_value_key(
 				 "%s: unable to copy data buffer.",
 				 function );
 
+				memory_free(
+				 value_item->data_buffer );
+
+				value_item->data_buffer      = NULL;
+				value_item->data_buffer_size = 0;
+
 				goto on_error;
 			}
 		}
@@ -983,18 +1008,6 @@ on_error:
 		 value_string );
 	}
 #endif
-	if( value_item->data_buffer != NULL )
-	{
-		memory_free(
-		 value_item->data_buffer );
-
-		value_item->data_buffer = NULL;
-	}
-	if( value_item->name != NULL )
-	{
-		memory_free(
-		 value_item->name );
-	}
 	return( -1 );
 }
 
@@ -1105,7 +1118,7 @@ int libregf_value_item_read_value_data(
 		libcnotify_print_data(
 		 hive_bin_cell_data,
 		 hive_bin_cell_size,
-		 0 );
+		 LIBCNOTIFY_PRINT_DATA_FLAG_GROUP_DATA );
 	}
 #endif
 	/* As of version 1.5 large value data is stored in a data block
@@ -1309,7 +1322,7 @@ int libregf_value_item_read_value_data(
 			libcnotify_print_data(
 			 hive_bin_cell_data,
 			 hive_bin_cell_size,
-			 0 );
+			 LIBCNOTIFY_PRINT_DATA_FLAG_GROUP_DATA );
 		}
 	}
 #endif
@@ -1445,7 +1458,7 @@ int libregf_value_item_read_data_block_list(
 		libcnotify_print_data(
 		 hive_bin_cell_data,
 		 hive_bin_cell_size,
-		 0 );
+		 LIBCNOTIFY_PRINT_DATA_FLAG_GROUP_DATA );
 	}
 #endif
 	if( hive_bin_cell_size < (size_t) ( number_of_segments * 4 ) )
@@ -1650,7 +1663,7 @@ int libregf_value_item_read_data_block_list(
 			libcnotify_print_data(
 			 hive_bin_cell_data,
 			 hive_bin_cell_size,
-			 0 );
+			 LIBCNOTIFY_PRINT_DATA_FLAG_GROUP_DATA );
 		}
 		else
 		{

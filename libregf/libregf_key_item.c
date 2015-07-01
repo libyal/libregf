@@ -1035,6 +1035,17 @@ int libregf_key_item_read_class_name(
 
 		return( -1 );
 	}
+	if( key_item->class_name != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid key item - class name value already set.",
+		 function );
+
+		return( -1 );
+	}
 	if( hive_bins_list == NULL )
 	{
 		libcerror_error_set(
@@ -1047,6 +1058,11 @@ int libregf_key_item_read_class_name(
 		return( -1 );
 	}
 	if( ( class_name_offset == 0 )
+	 && ( class_name_size == 0 ) )
+	{
+		return( 1 );
+	}
+	if( ( class_name_offset == 0 )
 	 || ( class_name_offset == 0xffffffffUL ) )
 	{
 		libcerror_error_set(
@@ -1054,17 +1070,6 @@ int libregf_key_item_read_class_name(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
 		 "%s: invalid class name offset.",
-		 function );
-
-		return( -1 );
-	}
-	if( key_item->class_name != NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid key item - class name value already set.",
 		 function );
 
 		return( -1 );

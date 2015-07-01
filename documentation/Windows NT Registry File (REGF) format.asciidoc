@@ -64,6 +64,7 @@ toc::[]
 | 0.0.15 | J.B. Metz | August 2014 | More information on classnames.
 | 0.0.16 | J.B. Metz | December 2014 | Switched to asccidoc format.
 | 0.0.17 | J.B. Metz | April 2015 | Additional information regarding corruption scenario.
+| 0.0.18 | J.B. Metz | July 2015 | Additional information regarding class name.
 |===
 
 :numbered:
@@ -345,6 +346,10 @@ Maximum of 255 characters
 due to 8 byte alignment of cell size +
 Sometimes contains remnant data
 |===
+
+[NOTE]
+The class name offset can also be 0 if not set. Seen in combination with a
+class name size of 0.
 
 ==== [[named_key_flags]]Flags
 

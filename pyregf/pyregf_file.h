@@ -90,6 +90,10 @@ PyObject *pyregf_file_close(
            pyregf_file_t *pyregf_file,
            PyObject *arguments );
 
+PyObject *pyregf_file_is_corrupted(
+           pyregf_file_t *pyregf_file,
+           PyObject *arguments );
+
 PyObject *pyregf_file_get_ascii_codepage(
            pyregf_file_t *pyregf_file,
            PyObject *arguments );

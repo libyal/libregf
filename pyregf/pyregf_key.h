@@ -63,6 +63,10 @@ int pyregf_key_init(
 void pyregf_key_free(
       pyregf_key_t *pyregf_key );
 
+PyObject *pyregf_key_is_corrupted(
+           pyregf_key_t *pyregf_key,
+           PyObject *arguments );
+
 PyObject *pyregf_key_get_offset(
            pyregf_key_t *pyregf_key,
            PyObject *arguments );

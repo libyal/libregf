@@ -40,6 +40,13 @@ PyMethodDef pyregf_value_object_methods[] = {
 
 	/* Functions to access the value values */
 
+	{ "is_corrupted",
+	  (PyCFunction) pyregf_value_is_corrupted,
+	  METH_NOARGS,
+	  "is_corrupted() -> Boolean\n"
+	  "\n"
+	  "Indicates if the value is corrupted." },
+
 	{ "get_offset",
 	  (PyCFunction) pyregf_value_get_offset,
 	  METH_NOARGS,
@@ -94,6 +101,12 @@ PyMethodDef pyregf_value_object_methods[] = {
 };
 
 PyGetSetDef pyregf_value_object_get_set_definitions[] = {
+
+	{ "corrupted",
+	  (getter) pyregf_value_is_corrupted,
+	  (setter) 0,
+	  "Value to indicate the value is corrupted.",
+	  NULL },
 
 	{ "offset",
 	  (getter) pyregf_value_get_offset,
@@ -387,6 +400,62 @@ void pyregf_value_free(
 	}
 	ob_type->tp_free(
 	 (PyObject*) pyregf_value );
+}
+
+/* Determines if the value is corrupted
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyregf_value_is_corrupted(
+           pyregf_value_t *pyregf_value,
+           PyObject *arguments PYREGF_ATTRIBUTE_UNUSED )
+{
+	libcerror_error_t *error = NULL;
+	static char *function    = "pyregf_value_is_corrupted";
+	int result               = 0;
+
+	PYREGF_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyregf_value == NULL )
+	{
+		PyErr_Format(
+		 PyExc_ValueError,
+		 "%s: invalid value.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libregf_value_is_corrupted(
+	          pyregf_value->value,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result == -1 )
+	{
+		pyregf_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to determine if value is corrupted.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	if( result != 0 )
+	{
+		Py_IncRef(
+		 (PyObject *) Py_True );
+
+		return( Py_True );
+	}
+	Py_IncRef(
+	 (PyObject *) Py_False );
+
+	return( Py_False );
 }
 
 /* Retrieves the offset

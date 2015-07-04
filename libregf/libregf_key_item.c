@@ -46,7 +46,7 @@
 #include "regf_cell_values.h"
 
 /* Creates key item
- * Make sure the value key_item is referencing, is set to NULL
+ * Make sure the key_item is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
 int libregf_key_item_initialize(
@@ -535,10 +535,12 @@ int libregf_key_item_read_named_key(
 		 "%s: parent key offset\t\t\t: 0x%08" PRIx32 "\n",
 		 function,
 		 value_32bit );
+
 		libcnotify_printf(
 		 "%s: number of sub keys\t\t\t: %" PRIu32 "\n",
 		 function,
 		 number_of_sub_keys );
+
 		byte_stream_copy_to_uint32_little_endian(
 		 ( (regf_named_key_t *) hive_bin_cell_data )->number_of_volatile_sub_keys,
 		 value_32bit );
@@ -546,10 +548,12 @@ int libregf_key_item_read_named_key(
 		 "%s: number of volatile sub keys\t\t: %" PRIu32 "\n",
 		 function,
 		 value_32bit );
+
 		libcnotify_printf(
 		 "%s: sub keys list offset\t\t\t: 0x%08" PRIx32 "\n",
 		 function,
 		 sub_keys_list_offset );
+
 		byte_stream_copy_to_uint32_little_endian(
 		 ( (regf_named_key_t *) hive_bin_cell_data )->volatile_sub_keys_list_offset,
 		 value_32bit );
@@ -562,14 +566,17 @@ int libregf_key_item_read_named_key(
 		 "%s: number of values\t\t\t: %" PRIu32 "\n",
 		 function,
 		 number_of_values_list_elements );
+
 		libcnotify_printf(
 		 "%s: values list offset\t\t\t: 0x%08" PRIx32 "\n",
 		 function,
 		 values_list_offset );
+
 		libcnotify_printf(
 		 "%s: security key offset\t\t\t: 0x%08" PRIx32 "\n",
 		 function,
 		 security_key_offset );
+
 		libcnotify_printf(
 		 "%s: class name offset\t\t\t: 0x%08" PRIx32 "\n",
 		 function,
@@ -583,6 +590,7 @@ int libregf_key_item_read_named_key(
 		 function,
 		 value_32bit,
 		 value_32bit );
+
 		byte_stream_copy_to_uint32_little_endian(
 		 ( (regf_named_key_t *) hive_bin_cell_data )->largest_sub_key_class_name_size,
 		 value_32bit );
@@ -591,6 +599,7 @@ int libregf_key_item_read_named_key(
 		 function,
 		 value_32bit,
 		 value_32bit );
+
 		byte_stream_copy_to_uint32_little_endian(
 		 ( (regf_named_key_t *) hive_bin_cell_data )->largest_value_name_size,
 		 value_32bit );
@@ -599,6 +608,7 @@ int libregf_key_item_read_named_key(
 		 function,
 		 value_32bit,
 		 value_32bit );
+
 		byte_stream_copy_to_uint32_little_endian(
 		 ( (regf_named_key_t *) hive_bin_cell_data )->largest_value_data_size,
 		 value_32bit );
@@ -607,6 +617,7 @@ int libregf_key_item_read_named_key(
 		 function,
 		 value_32bit,
 		 value_32bit );
+
 		byte_stream_copy_to_uint32_little_endian(
 		 ( (regf_named_key_t *) hive_bin_cell_data )->unknown6,
 		 value_32bit );
@@ -638,7 +649,7 @@ int libregf_key_item_read_named_key(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-		 "%s: invalid value key name size.",
+		 "%s: invalid key name size.",
 		 function );
 
 		goto on_error;
@@ -932,13 +943,34 @@ int libregf_key_item_read_named_key(
 		}
 		else if( result == 0 )
 		{
-			if( libfdata_tree_node_set_sub_nodes_data_range(
-			     key_tree_node,
-			     0,
-			     (off64_t) sub_keys_list_offset,
-			     0,
-			     0,
-			     error ) != 1 )
+			result = libregf_hive_bins_list_get_index_at_offset(
+			          hive_bins_list,
+			          (off64_t) sub_keys_list_offset,
+			          &hive_bin_index,
+			          error );
+
+			if( result == -1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+				 "%s: unable to determine if sub keys list offset is valid.",
+				 function );
+
+				goto on_error;
+			}
+			else if( result == 0 )
+			{
+				key_item->flags |= LIBREGF_KEY_ITEM_FLAG_IS_CORRUPTED;
+			}
+			else if( libfdata_tree_node_set_sub_nodes_data_range(
+			          key_tree_node,
+			          0,
+			          (off64_t) sub_keys_list_offset,
+			          0,
+			          0,
+			          error ) != 1 )
 			{
 				libcerror_error_set(
 				 error,
@@ -951,23 +983,81 @@ int libregf_key_item_read_named_key(
 			}
 		}
 	}
-	if( libregf_key_item_read_values_list(
-	     key_item,
-	     file_io_handle,
-	     hive_bins_list,
-	     values_list_offset,
-	     number_of_values_list_elements,
+/* TODO clone function */
+	if( libfdata_list_initialize(
+	     &( key_item->values_list ),
+	     (intptr_t *) hive_bins_list,
+	     NULL,
+	     NULL,
+	     (int (*)(intptr_t *, intptr_t *, libfdata_list_element_t *, libfcache_cache_t *, int, off64_t, size64_t, uint32_t, uint8_t, libcerror_error_t **)) &libregf_value_item_read_element_data,
+	     NULL,
+	     LIBFDATA_DATA_HANDLE_FLAG_NON_MANAGED,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read values list at offset: %" PRIu32 ".",
-		 function,
-		 values_list_offset );
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create values data list.",
+		 function );
 
 		goto on_error;
+	}
+	if( libfcache_cache_initialize(
+	     &( key_item->values_cache ),
+	     LIBREGF_MAXIMUM_CACHE_ENTRIES_VALUES,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create values cache.",
+		 function );
+
+		goto on_error;
+	}
+	result = libregf_hive_bins_list_get_index_at_offset(
+	          hive_bins_list,
+	          (off64_t) values_list_offset,
+	          &hive_bin_index,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to determine if values list offset is valid.",
+		 function );
+
+		goto on_error;
+	}
+	else if( result == 0 )
+	{
+		key_item->flags |= LIBREGF_KEY_ITEM_FLAG_IS_CORRUPTED;
+	}
+	else
+	{
+		if( libregf_key_item_read_values_list(
+		     key_item,
+		     file_io_handle,
+		     hive_bins_list,
+		     values_list_offset,
+		     number_of_values_list_elements,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read values list at offset: %" PRIu32 ".",
+			 function,
+			 values_list_offset );
+
+			goto on_error;
+		}
 	}
 	/* The values and sub keys are read on demand
 	 */
@@ -987,6 +1077,18 @@ on_error:
 		 value_string );
 	}
 #endif
+	if( key_item->values_cache != NULL )
+	{
+		libfcache_cache_free(
+		 &( key_item->values_cache ),
+		 NULL );
+	}
+	if( key_item->values_list != NULL )
+	{
+		libfdata_list_free(
+		 &( key_item->values_list ),
+		 NULL );
+	}
 	if( key_item->name != NULL )
 	{
 		memory_free(
@@ -1580,7 +1682,9 @@ int libregf_key_item_read_values_list(
 	size_t hive_bin_cell_size              = 0;
 	uint32_t values_list_element_iterator  = 0;
 	uint32_t values_list_element_offset    = 0;
+	int element_index                      = 0;
 	int hive_bin_index                     = 0;
+	int result                             = 0;
 
 	if( key_item == NULL )
 	{
@@ -1600,40 +1704,6 @@ int libregf_key_item_read_values_list(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid hive bins list.",
-		 function );
-
-		return( -1 );
-	}
-/* TODO clone function */
-	if( libfdata_list_initialize(
-	     &( key_item->values_list ),
-	     (intptr_t *) hive_bins_list,
-	     NULL,
-	     NULL,
-	     (int (*)(intptr_t *, intptr_t *, libfdata_list_element_t *, libfcache_cache_t *, int, off64_t, size64_t, uint32_t, uint8_t, libcerror_error_t **)) &libregf_value_item_read_element_data,
-	     NULL,
-	     LIBFDATA_DATA_HANDLE_FLAG_NON_MANAGED,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create values data list.",
-		 function );
-
-		return( -1 );
-	}
-	if( libfcache_cache_initialize(
-	     &( key_item->values_cache ),
-	     LIBREGF_MAXIMUM_CACHE_ENTRIES_VALUES,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create values cache.",
 		 function );
 
 		return( -1 );
@@ -1717,20 +1787,6 @@ int libregf_key_item_read_values_list(
 
 		return( -1 );
 	}
-	if( libfdata_list_resize(
-	     key_item->values_list,
-	     (int) number_of_values_list_elements,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_RESIZE_FAILED,
-		 "%s: unable to resize values data list.",
-		 function );
-
-		return( -1 );
-	}
 	for( values_list_element_iterator = 0;
 	     values_list_element_iterator < number_of_values_list_elements;
 	     values_list_element_iterator++ )
@@ -1752,14 +1808,35 @@ int libregf_key_item_read_values_list(
 			 values_list_element_offset );
 		}
 #endif
-		if( libfdata_list_set_element_by_index(
-		     key_item->values_list,
-		     (int) values_list_element_iterator,
-		     0,
-		     (off64_t) values_list_element_offset,
-		     0,
-		     0,
-		     error ) != 1 )
+		result = libregf_hive_bins_list_get_index_at_offset(
+		          hive_bins_list,
+		          (off64_t) values_list_element_offset,
+		          &hive_bin_index,
+		          error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to determine if values list element offset is valid.",
+			 function );
+
+			return( -1 );
+		}
+		else if( result == 0 )
+		{
+			key_item->flags |= LIBREGF_KEY_ITEM_FLAG_IS_CORRUPTED;
+		}
+		else if( libfdata_list_append_element(
+		          key_item->values_list,
+		          &element_index,
+		          0,
+		          (off64_t) values_list_element_offset,
+		          0,
+		          0,
+		          error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -1893,7 +1970,7 @@ on_error:
 }
 
 /* Reads a sub keys list
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if not or -1 on error
  */
 int libregf_key_item_read_sub_keys_list(
      libfdata_tree_node_t *key_tree_node,
@@ -1915,7 +1992,9 @@ int libregf_key_item_read_sub_keys_list(
 	uint16_t sub_keys_list_element_iterator   = 0;
 	uint8_t sub_keys_list_element_size        = 0;
 	uint8_t at_leaf_level                     = 0;
+	int corruption_detected                   = 0;
 	int hive_bin_index                        = 0;
+	int result                                = 0;
 	int sub_node_index                        = 0;
 
 	if( hive_bins_list == NULL )
@@ -2157,46 +2236,72 @@ int libregf_key_item_read_sub_keys_list(
 		{
 			element_hash = 0;
 		}
-		if( at_leaf_level != 0 )
-		{
-			if( libfdata_tree_node_append_sub_node(
-			     key_tree_node,
-			     &sub_node_index,
-			     0,
-			     (off64_t) sub_keys_list_element_offset,
-			     (size64_t) element_hash,
-			     0,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-				 "%s: unable to append sub node in data tree node.",
-				 function );
+		result = libregf_hive_bins_list_get_index_at_offset(
+		          hive_bins_list,
+		          (off64_t) sub_keys_list_element_offset,
+		          &hive_bin_index,
+		          error );
 
-				goto on_error;
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to determine if sub keys list element offset is valid.",
+			 function );
+
+			goto on_error;
+		}
+		else if( result != 0 )
+		{
+			if( at_leaf_level != 0 )
+			{
+				if( libfdata_tree_node_append_sub_node(
+				     key_tree_node,
+				     &sub_node_index,
+				     0,
+				     (off64_t) sub_keys_list_element_offset,
+				     (size64_t) element_hash,
+				     0,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+					 "%s: unable to append sub node in data tree node.",
+					 function );
+
+					goto on_error;
+				}
+			}
+			else
+			{
+				result = libregf_key_item_read_sub_keys_list(
+					  key_tree_node,
+					  file_io_handle,
+					  hive_bins_list,
+					  (off64_t) sub_keys_list_element_offset,
+					  error );
+
+				if( result == -1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_IO,
+					 LIBCERROR_IO_ERROR_READ_FAILED,
+					 "%s: unable to read sub keys list at offset: %" PRIu32 ".",
+					 function,
+					 sub_keys_list_element_offset );
+
+					goto on_error;
+				}
 			}
 		}
-		else
+		if( result == 0 )
 		{
-			if( libregf_key_item_read_sub_keys_list(
-			     key_tree_node,
-			     file_io_handle,
-			     hive_bins_list,
-			     (off64_t) sub_keys_list_element_offset,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_IO,
-				 LIBCERROR_IO_ERROR_READ_FAILED,
-				 "%s: unable to read sub keys list at offset: %" PRIu32 ".",
-				 function,
-				 sub_keys_list_element_offset );
-
-				goto on_error;
-			}
+			corruption_detected = 1;
 		}
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
@@ -2222,6 +2327,10 @@ int libregf_key_item_read_sub_keys_list(
 	memory_free(
 	 hive_bin_cell_data );
 
+	if( corruption_detected != 0 )
+	{
+		return( 0 );
+	}
 	return( 1 );
 
 on_error:
@@ -2249,6 +2358,7 @@ int libregf_key_item_read_sub_nodes(
      libcerror_error_t **error )
 {
 	static char *function = "libregf_key_item_read_sub_nodes";
+	int result            = 0;
 
 	LIBREGF_UNREFERENCED_PARAMETER( cache )
 	LIBREGF_UNREFERENCED_PARAMETER( sub_nodes_data_file_index )
@@ -2256,12 +2366,14 @@ int libregf_key_item_read_sub_nodes(
 	LIBREGF_UNREFERENCED_PARAMETER( sub_nodes_data_flags )
 	LIBREGF_UNREFERENCED_PARAMETER( read_flags )
 
-	if( libregf_key_item_read_sub_keys_list(
-	     node,
-	     file_io_handle,
-	     hive_bins_list,
-	     sub_nodes_data_offset,
-	     error ) != 1 )
+	result = libregf_key_item_read_sub_keys_list(
+	          node,
+	          file_io_handle,
+	          hive_bins_list,
+	          sub_nodes_data_offset,
+	          error );
+
+	if( result == -1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -2272,6 +2384,10 @@ int libregf_key_item_read_sub_nodes(
 		 sub_nodes_data_offset );
 
 		return( -1 );
+	}
+	else if( result == 0 )
+	{
+/* TODO signal corruption */
 	}
 	return( 1 );
 }

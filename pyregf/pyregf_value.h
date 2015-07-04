@@ -63,6 +63,10 @@ int pyregf_value_init(
 void pyregf_value_free(
       pyregf_value_t *pyregf_value );
 
+PyObject *pyregf_value_is_corrupted(
+           pyregf_value_t *pyregf_value,
+           PyObject *arguments );
+
 PyObject *pyregf_value_get_offset(
            pyregf_value_t *pyregf_value,
            PyObject *arguments );

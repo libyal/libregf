@@ -80,6 +80,15 @@ PyMethodDef pyregf_file_object_methods[] = {
 	  "\n"
 	  "Closes a file." },
 
+	/* Functions to access metadata */
+
+	{ "is_corrupted",
+	  (PyCFunction) pyregf_file_is_corrupted,
+	  METH_NOARGS,
+	  "is_corrupted() -> Boolean\n"
+	  "\n"
+	  "Indicates if the file is corrupted." },
+
 	{ "get_ascii_codepage",
 	  (PyCFunction) pyregf_file_get_ascii_codepage,
 	  METH_NOARGS,
@@ -94,8 +103,6 @@ PyMethodDef pyregf_file_object_methods[] = {
 	  "\n"
 	  "Set the codepage used for ASCII strings in the file.\n"
 	  "Expects the codepage to be a String containing a Python codec definition." },
-
-	/* Functions to access metadata */
 
 	{ "get_format_version",
 	  (PyCFunction) pyregf_file_get_format_version,
@@ -132,6 +139,12 @@ PyMethodDef pyregf_file_object_methods[] = {
 };
 
 PyGetSetDef pyregf_file_object_get_set_definitions[] = {
+
+	{ "corrupted",
+	  (getter) pyregf_file_is_corrupted,
+	  (setter) 0,
+	  "Value to indicate the file is corrupted.",
+	  NULL },
 
 	{ "ascii_codepage",
 	  (getter) pyregf_file_get_ascii_codepage,
@@ -879,6 +892,62 @@ PyObject *pyregf_file_close(
 	 Py_None );
 
 	return( Py_None );
+}
+
+/* Determines if the file is corrupted
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyregf_file_is_corrupted(
+           pyregf_file_t *pyregf_file,
+           PyObject *arguments PYREGF_ATTRIBUTE_UNUSED )
+{
+	libcerror_error_t *error = NULL;
+	static char *function    = "pyregf_file_is_corrupted";
+	int result               = 0;
+
+	PYREGF_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyregf_file == NULL )
+	{
+		PyErr_Format(
+		 PyExc_ValueError,
+		 "%s: invalid file.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libregf_file_is_corrupted(
+	          pyregf_file->file,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result == -1 )
+	{
+		pyregf_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to determine if file is corrupted.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	if( result != 0 )
+	{
+		Py_IncRef(
+		 (PyObject *) Py_True );
+
+		return( Py_True );
+	}
+	Py_IncRef(
+	 (PyObject *) Py_False );
+
+	return( Py_False );
 }
 
 /* Retrieves the codepage used for ASCII strings in the file

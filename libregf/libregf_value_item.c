@@ -979,13 +979,34 @@ int libregf_value_item_read_value_key(
 	}
 	else
 	{
-		if( libregf_value_item_read_value_data(
-		     value_item,
-		     file_io_handle,
-		     hive_bins_list,
-		     data_offset,
-		     data_size,
-		     error ) != 1 )
+		result = libregf_hive_bins_list_get_index_at_offset(
+		          hive_bins_list,
+		          (off64_t) data_offset,
+		          &hive_bin_index,
+		          error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to determine if data offset is valid.",
+			 function );
+
+			goto on_error;
+		}
+		else if( result == 0 )
+		{
+			value_item->item_flags |= LIBREGF_VALUE_ITEM_FLAG_IS_CORRUPTED;
+		}
+		else if( libregf_value_item_read_value_data(
+		          value_item,
+		          file_io_handle,
+		          hive_bins_list,
+		          data_offset,
+		          data_size,
+		          error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -1173,14 +1194,35 @@ int libregf_value_item_read_value_data(
 #endif
 /* TODO: Check if stored number of segments matches the calculated */
 
-		if( libregf_value_item_read_data_block_list(
-		     value_item,
-		     file_io_handle,
-		     hive_bins_list,
-		     data_block_list_offset,
-		     number_of_segments,
-		     value_data_size,
-		     error ) != 1 )
+		result = libregf_hive_bins_list_get_index_at_offset(
+		          hive_bins_list,
+		          (off64_t) data_block_list_offset,
+		          &hive_bin_index,
+		          error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to determine if data block list offset is valid.",
+			 function );
+
+			goto on_error;
+		}
+		else if( result == 0 )
+		{
+			value_item->item_flags |= LIBREGF_VALUE_ITEM_FLAG_IS_CORRUPTED;
+		}
+		else if( libregf_value_item_read_data_block_list(
+		          value_item,
+		          file_io_handle,
+		          hive_bins_list,
+		          data_block_list_offset,
+		          number_of_segments,
+		          value_data_size,
+		          error ) == -1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -1340,7 +1382,7 @@ on_error:
 }
 
 /* Reads a data block (segments) list cell value
- * Returns 1 if successful or -1 on error
+ * Returns 1 if successful, 0 if not or -1 on error
  */
 int libregf_value_item_read_data_block_list(
      libregf_value_item_t *value_item,
@@ -1420,15 +1462,18 @@ int libregf_value_item_read_data_block_list(
 	     0,
 	     error ) != 1 )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve hive bin at offset: %" PRIu32 ".",
-		 function,
-		 data_block_list_offset );
+#if defined( HAVE_DEBUG_OUTPUT )
+		if( libcnotify_verbose != 0 )
+		{
+			libcnotify_printf(
+			 "%s: unable to retrieve hive bin at offset: %" PRIu32 ".",
+			 function,
+			 data_block_list_offset );
+		}
+#endif
+		value_item->item_flags |= LIBREGF_VALUE_ITEM_FLAG_IS_CORRUPTED;
 
-		goto on_error;
+		return( 0 );
 	}
 	if( libregf_hive_bin_get_cell_at_offset(
 	     hive_bin,
@@ -1544,15 +1589,23 @@ int libregf_value_item_read_data_block_list(
 			     0,
 			     error ) != 1 )
 			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to retrieve hive bin at offset: %" PRIu32 ".",
-				 function,
-				 element_offset );
+#if defined( HAVE_DEBUG_OUTPUT )
+				if( libcnotify_verbose != 0 )
+				{
+					libcnotify_printf(
+					 "%s: unable to retrieve hive bin at offset: %" PRIu32 ".",
+					 function,
+					 element_offset );
+				}
+#endif
+				value_item->item_flags |= LIBREGF_VALUE_ITEM_FLAG_IS_CORRUPTED;
 
-				goto on_error;
+/* TODO return partial stream or 0-byte the missing data ? */
+				libfdata_stream_free(
+				 &( value_item->data_stream ),
+				 NULL );
+
+				return( 0 );
 			}
 			if( libregf_hive_bin_get_cell_at_offset(
 			     hive_bin,

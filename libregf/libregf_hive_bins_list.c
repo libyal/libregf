@@ -230,6 +230,52 @@ int libregf_hive_bins_list_free(
 	return( result );
 }
 
+/* Retrieves the hive bin index for a specific offset
+ * Returns 1 if successful, 0 if not or -1 on error
+ */
+int libregf_hive_bins_list_get_index_at_offset(
+     libregf_hive_bins_list_t *hive_bins_list,
+     off64_t offset,
+     int *hive_bin_index,
+     libcerror_error_t **error )
+{
+	static char *function       = "libregf_hive_bins_list_get_index_at_offset";
+	off64_t element_data_offset = 0;
+	int result                  = 0;
+
+	if( hive_bins_list == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid hive bins list.",
+		 function );
+
+		return( -1 );
+	}
+	result = libfdata_list_get_element_index_at_offset(
+	          hive_bins_list->data_list,
+	          offset,
+	          hive_bin_index,
+	          &element_data_offset,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve data list element index at offset: %" PRIi64 ".",
+		 function,
+		 offset );
+
+		return( -1 );
+	}
+	return( result );
+}
+
 /* Reads the hive bins
  * Returns 1 if successful, 0 if no hive bin signature was found or -1 on error
  */

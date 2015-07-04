@@ -44,6 +44,13 @@ PyMethodDef pyregf_key_object_methods[] = {
 
 	/* Functions to access the key values */
 
+	{ "is_corrupted",
+	  (PyCFunction) pyregf_key_is_corrupted,
+	  METH_NOARGS,
+	  "is_corrupted() -> Boolean\n"
+	  "\n"
+	  "Indicates if the key is corrupted." },
+
 	{ "get_offset",
 	  (PyCFunction) pyregf_key_get_offset,
 	  METH_NOARGS,
@@ -137,6 +144,12 @@ PyMethodDef pyregf_key_object_methods[] = {
 };
 
 PyGetSetDef pyregf_key_object_get_set_definitions[] = {
+
+	{ "corrupted",
+	  (getter) pyregf_key_is_corrupted,
+	  (setter) 0,
+	  "Value to indicate the key is corrupted.",
+	  NULL },
 
 	{ "offset",
 	  (getter) pyregf_key_get_offset,
@@ -436,6 +449,62 @@ void pyregf_key_free(
 	}
 	ob_type->tp_free(
 	 (PyObject*) pyregf_key );
+}
+
+/* Determines if the key is corrupted
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyregf_key_is_corrupted(
+           pyregf_key_t *pyregf_key,
+           PyObject *arguments PYREGF_ATTRIBUTE_UNUSED )
+{
+	libcerror_error_t *error = NULL;
+	static char *function    = "pyregf_key_is_corrupted";
+	int result               = 0;
+
+	PYREGF_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyregf_key == NULL )
+	{
+		PyErr_Format(
+		 PyExc_ValueError,
+		 "%s: invalid key.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libregf_key_is_corrupted(
+	          pyregf_key->key,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result == -1 )
+	{
+		pyregf_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to determine if key is corrupted.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	if( result != 0 )
+	{
+		Py_IncRef(
+		 (PyObject *) Py_True );
+
+		return( Py_True );
+	}
+	Py_IncRef(
+	 (PyObject *) Py_False );
+
+	return( Py_False );
 }
 
 /* Retrieves the offset

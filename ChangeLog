@@ -89,6 +89,9 @@ Python bindings
 Release:
 * check TODOs
 
+20150704
+* worked on handling corrupt hive bins
+
 20150701
 * Bug fixes
 

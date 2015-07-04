@@ -317,19 +317,7 @@ int libregf_hive_bins_list_read(
 		}
 		else if( result == 0 )
 		{
-			if( hive_bin_index != 0 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_IO,
-				 LIBCERROR_IO_ERROR_READ_FAILED,
-				 "%s: missing hive bin at offset: %" PRIi64 ".",
-				 function,
-				 file_offset );
-
-				goto on_error;
-			}
-			return( 0 );
+			break;
 		}
 		if( hive_bin->offset != ( file_offset - 4096 ) )
 		{
@@ -383,6 +371,23 @@ int libregf_hive_bins_list_read(
 	}
 	hive_bin = NULL;
 
+	if( result == 0 )
+	{
+		if( hive_bin_index == 0 )
+		{
+			return( 0 );
+		}
+#if defined( HAVE_DEBUG_OUTPUT )
+		if( libcnotify_verbose != 0 )
+		{
+			libcnotify_printf(
+			 "%s: missing hive bin at offset: %" PRIi64 ".",
+			 function,
+			 file_offset );
+		}
+#endif
+		hive_bins_list->io_handle->flags |= LIBREGF_IO_HANDLE_FLAG_IS_CORRUPTED;
+	}
 	return( 1 );
 
 on_error:

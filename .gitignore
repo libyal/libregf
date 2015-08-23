@@ -112,7 +112,6 @@ stamp-h[1-9]
 /include/libregf/types.h
 /libregf/libregf.rc
 /libregf/libregf_definitions.h
-/pyregf/setup.py
 /regftools/regfexport
 /regftools/regfinfo
 /regftools/regfmount

@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libregf],
- [20150704],
+ [20150823],
  [joachim.metz@gmail.com])
 
 AC_CONFIG_SRCDIR(
@@ -247,7 +247,6 @@ AC_CONFIG_FILES([common/types.h])
 AC_CONFIG_FILES([dpkg/changelog])
 AC_CONFIG_FILES([dpkg/copyright])
 AC_CONFIG_FILES([libregf/libregf.rc])
-AC_CONFIG_FILES([pyregf/setup.py])
 AC_CONFIG_FILES([libregf.pc])
 AC_CONFIG_FILES([libregf.spec])
 dnl Have configure write its configuration

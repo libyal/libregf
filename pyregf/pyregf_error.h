@@ -28,7 +28,7 @@
 #include "pyregf_libcerror.h"
 #include "pyregf_python.h"
 
-#define PYREGF_ERROR_STRING_SIZE		768
+#define PYREGF_ERROR_STRING_SIZE		2048
 
 #if defined( __cplusplus )
 extern "C" {

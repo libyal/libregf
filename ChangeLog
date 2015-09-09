@@ -89,6 +89,10 @@ Python bindings
 Release:
 * check TODOs
 
+20150909
+* updated dependencies
+* enlarged pyregf error string buffer
+
 20150823
 * worked on setup.py
 

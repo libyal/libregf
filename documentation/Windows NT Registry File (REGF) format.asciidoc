@@ -59,6 +59,7 @@ in the section entitled "GNU Free Documentation License".
 | 0.0.16 | J.B. Metz | December 2014 | Switched to asccidoc format.
 | 0.0.17 | J.B. Metz | April 2015 | Additional information regarding corruption scenario.
 | 0.0.18 | J.B. Metz | July 2015 | Additional information regarding class name.
+| 0.0.19 | J.B. Metz | November 2015 | Additional information.
 |===
 
 :numbered:
@@ -292,7 +293,7 @@ data are identifier by a 2 byte signature value.
 |===
 
 === Named key
-The named key is variable of size and consists of:
+The named key (CM_KEY_NODE) is variable of size and consists of:
 
 [cols="1,1,1,5",options="header"]
 |===
@@ -347,26 +348,30 @@ Sometimes contains remnant data
 The class name offset can also be 0 if not set. Seen in combination with a
 class name size of 0.
 
-==== [[named_key_flags]]Flags
+==== [[named_key_flags]]Named key flags
+The named key (CM_KEY_NODE) flags consists of:
 
 [cols="1,1,5",options="header"]
 |===
 | Value | Identifier | Description
-| 0x0001 | | Is volatile key
-| 0x0002 | | Is mount point (of another Registry hive)
-| 0x0004 | | Is root key (of current Registry hive)
-| 0x0008 | | Cannot be deleted
-| 0x0010 | | Is symbolic link key
-| 0x0020 | | Name is an ASCII string +
+| 0x0001 | KEY_IS_VOLATILE | Is volatile key
+| 0x0002 | KEY_HIVE_EXIT | Is mount point (of another Registry hive)
+| 0x0004 | KEY_HIVE_ENTRY | Is root key (of current Registry hive)
+| 0x0008 | KEY_NO_DELETE | Cannot be deleted
+| 0x0010 | KEY_SYM_LINK | Is symbolic link key
+| 0x0020 | KEY_COMP_NAME | Name is an ASCII string +
 Otherwise the name is an Unicode (UTF-16 little-endian) string
-| 0x0040 | | Is predefined handle
-| 0x0080 | | [yellow-background]*Unknown*
+| 0x0040 | KEY_PREFEF_HANDLE | Is predefined handle
+| 0x0080 | KEY_VIRT_MIRRORED | [yellow-background]*Unknown*
+| 0x0100 | KEY_VIRT_TARGET | [yellow-background]*Unknown*
+| 0x0200 | KEY_VIRTUAL_STORE | [yellow-background]*Unknown*
 | | | 
 | 0x1000 | | [yellow-background]*Unknown*
 | | | 
 | 0x4000 | | [yellow-background]*Unknown*
 |===
 
+==== Notes
 [yellow-background]*TODO*
 ....
 Value	Meaning
@@ -463,7 +468,7 @@ The offset value is in bytes and relative from the start of the hive bin data +
 [yellow-background]*RI => Reference item ?*
 
 === Value key
-The value key is variable of size and consists of:
+The value key (CM_KEY_VALUE) is variable of size and consists of:
 
 [cols="1,1,1,5",options="header"]
 |===
@@ -531,12 +536,13 @@ REG_QWORD_LITTLE_ENDIAN | Integer 64-bit signed little-endian +
 (quad word)
 |===
 
-==== [[value_key_flags]]Flags
+==== [[value_key_flags]]Value key flags
+The value key (CM_KEY_VALUE) flags consists of:
 
 [cols="1,1,5",options="header"]
 |===
 | Value | Identifier | Description
-| 0x0001 | | Name is an ASCII string +
+| 0x0001 | VALUE_COMP_NAME | Name is an ASCII string +
 Otherwise the name is an Unicode (UTF-16 little-endian) string
 |===
 
@@ -906,7 +912,7 @@ bins.
 
 [cols="1,5",options="header"]
 |===
-| Title: | The Windows NT∗ Registry File Format
+| Title: | The Windows NT Registry File Format
 | Version: | 0.4
 | Author(s): | Timothy D. Morgan
 | Date: | June 9, 2009
@@ -928,6 +934,14 @@ bins.
 | Title: | Registry
 | URL: | http://msdn.microsoft.com +
 http://msdn.microsoft.com/en-us/library/windows/desktop/ms724872(v=vs.85).aspx
+|===
+
+`[ReactOS]`
+
+[cols="1,5",options="header"]
+|===
+| Title: | ReactOS
+| URL: | http://doxygen.reactos.org
 |===
 
 [appendix]

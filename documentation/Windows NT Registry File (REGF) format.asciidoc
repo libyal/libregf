@@ -846,6 +846,9 @@ key name                               : Class
 key name hash                          : 0x07b82c9a
 ....
 
+=== Truncated Registry file
+[yellow-background]*TODO: add descrition*
+
 == Notes
 SPARE value in XP SYSTEM regf
 ....

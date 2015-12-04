@@ -1290,6 +1290,14 @@ int libregf_value_get_value_32bit(
 
 		return( -1 );
 	}
+	if( value_data_size != 4 )
+	{
+		if( value_data_size > 4 )
+		{
+			value_data_size = 4;
+		}
+		value_item->item_flags |= LIBREGF_VALUE_ITEM_FLAG_IS_CORRUPTED;
+	}
 	if( libregf_value_type_copy_to_32bit(
 	     value_data,
 	     value_data_size,
@@ -1391,6 +1399,14 @@ int libregf_value_get_value_64bit(
 		 function );
 
 		return( -1 );
+	}
+	if( value_data_size != 8 )
+	{
+		if( value_data_size > 8 )
+		{
+			value_data_size = 8;
+		}
+		value_item->item_flags |= LIBREGF_VALUE_ITEM_FLAG_IS_CORRUPTED;
 	}
 	if( libregf_value_type_copy_to_64bit(
 	     value_data,

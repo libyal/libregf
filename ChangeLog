@@ -41,6 +41,7 @@ Tools:
   - analyze shell bags
   - move shell item code to separate file and reuse in liblnk
 * regfmount:
+  - fix list file of specific value success withouh (values)\
   - detect key names with (classname), (values)
   - detect value names with (default)
   - detect duplicate key and value names
@@ -88,6 +89,9 @@ Python bindings
 
 Release:
 * check TODOs
+
+20151203
+* worked on handling corrupt integer values
 
 20150909
 * updated dependencies

@@ -60,6 +60,7 @@ in the section entitled "GNU Free Documentation License".
 | 0.0.17 | J.B. Metz | April 2015 | Additional information regarding corruption scenario.
 | 0.0.18 | J.B. Metz | July 2015 | Additional information regarding class name.
 | 0.0.19 | J.B. Metz | November 2015 | Additional information.
+| 0.0.20 | J.B. Metz | November 2015 | Additional information regarding corruption scenario.
 |===
 
 :numbered:
@@ -807,6 +808,26 @@ REG_BINARY value contains a data block key, but the total size of the data
 block segments does not match the data size in the value key. It seems that the 
 data size in the value key is leading.
 
+=== Value key data size - size mismatch
+In the value key data size - size mismatch scenario a REG_DWORD_LITTLE_ENDIAN
+value data does not correspond with the size of the data type.
+
+....
+signature                            : vk
+value name size                      : 6
+data size                            : 0x00000008 (8)
+data offset                          : 0x000c1b80
+data type                            : 4 (REG_DWORD_LITTLE_ENDIAN) Integer 32-bit signed little-endian
+flags                                : 0x0001
+        Value name is an ASCII string
+
+unknown1                             : 0x000b (11)
+value name                           : lParam
+value name hash                      : 0x4343bfdd
+padding:
+00000000: 6e 00                                              n.
+....
+
 === Empty hive bins
 In a Windows 8.1 SYSTEM regf file a scenario was encountered that the last
 part of the hive bins data contained empty (zero byte filled) blocks. The 
@@ -891,14 +912,24 @@ bins.
 [appendix]
 == References
 
-`[PROBERT03]`
+`[MORGAN09]`
 
 [cols="1,5",options="header"]
 |===
-| Title: | Windows Kernel Internals - NT Registry Implementation
-| Author(s): | David B. Probert
-| Date: | August 29, 2003
-| URL: | http://www.i.u- tokyo.ac.jp/edu/training/ss/lecture/new-documents/Lectures/09-Registry/Registry.pdf
+| Title: | The Windows NT Registry File Format
+| Version: | 0.4
+| Author(s): | Timothy D. Morgan
+| Date: | June 9, 2009
+| URL: | http://www.sentinelchicken.com/data/TheWindowsNTRegistryFileFormat.pdf
+|===
+
+`[MSDN]`
+
+[cols="1,5",options="header"]
+|===
+| Title: | Registry
+| URL: | http://msdn.microsoft.com +
+http://msdn.microsoft.com/en-us/library/windows/desktop/ms724872(v=vs.85).aspx
 |===
 
 `[NORRIS09]`
@@ -911,32 +942,14 @@ bins.
 | URL: | http://amnesia.gtisc.gatech.edu/~moyix/suzibandit.ltd.uk/MSc/
 |===
 
-`[MORGAN09]`
+`[PROBERT03]`
 
 [cols="1,5",options="header"]
 |===
-| Title: | The Windows NT Registry File Format
-| Version: | 0.4
-| Author(s): | Timothy D. Morgan
-| Date: | June 9, 2009
-| URL: | http://www.sentinelchicken.com/data/TheWindowsNTRegistryFileFormat.pdf
-|===
-
-`[WINREG]`
-
-[cols="1,5",options="header"]
-|===
-| Title: | WinReg.txt
-| Author(s): | B.D.
-|===
-
-`[MSDN]`
-
-[cols="1,5",options="header"]
-|===
-| Title: | Registry
-| URL: | http://msdn.microsoft.com +
-http://msdn.microsoft.com/en-us/library/windows/desktop/ms724872(v=vs.85).aspx
+| Title: | Windows Kernel Internals - NT Registry Implementation
+| Author(s): | David B. Probert
+| Date: | August 29, 2003
+| URL: | http://www.i.u- tokyo.ac.jp/edu/training/ss/lecture/new-documents/Lectures/09-Registry/Registry.pdf
 |===
 
 `[ReactOS]`
@@ -945,6 +958,14 @@ http://msdn.microsoft.com/en-us/library/windows/desktop/ms724872(v=vs.85).aspx
 |===
 | Title: | ReactOS
 | URL: | http://doxygen.reactos.org
+|===
+
+`[WINREG]`
+
+[cols="1,5",options="header"]
+|===
+| Title: | WinReg.txt
+| Author(s): | B.D.
 |===
 
 [appendix]

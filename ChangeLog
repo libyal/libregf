@@ -90,6 +90,9 @@ Python bindings
 Release:
 * check TODOs
 
+20151205
+* worked on Python bindings
+
 20151203
 * worked on handling corrupt integer values
 

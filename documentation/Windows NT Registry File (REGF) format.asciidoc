@@ -869,7 +869,7 @@ signature                            : vk
 value name size                      : 6
 data size                            : 0x00000008 (8)
 data offset                          : 0x000c1b80
-data type                            : 4 (REG_DWORD_LITTLE_ENDIAN) Integer 32-bit signed little-endian
+data type                            : 0x00000004 (REG_DWORD_LITTLE_ENDIAN) Integer 32-bit signed little-endian
 flags                                : 0x0001
         Value name is an ASCII string
 

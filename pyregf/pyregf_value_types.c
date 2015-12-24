@@ -73,7 +73,7 @@ PyTypeObject pyregf_value_types_type_object = {
 	/* tp_types */
 	Py_TPFLAGS_DEFAULT,
 	/* tp_doc */
-	"pyregf value types object (wraps LIBREGF_COLUMN_TYPES)",
+	"pyregf value types object (wraps LIBREGF_VALUE_TYPES)",
 	/* tp_traverse */
 	0,
 	/* tp_clear */

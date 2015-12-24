@@ -194,6 +194,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\pyregf\pyregf_file_types.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\pyregf\pyregf_integer.c"
 				>
 			</File>
@@ -245,6 +249,10 @@
 			</File>
 			<File
 				RelativePath="..\..\pyregf\pyregf_file_object_io_handle.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\pyregf\pyregf_file_types.h"
 				>
 			</File>
 			<File

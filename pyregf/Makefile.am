@@ -21,6 +21,7 @@ pyregf_la_SOURCES = \
 	pyregf_error.c pyregf_error.h \
 	pyregf_file.c pyregf_file.h \
 	pyregf_file_object_io_handle.c pyregf_file_object_io_handle.h \
+	pyregf_file_types.c pyregf_file_types.h \
 	pyregf_integer.c pyregf_integer.h \
 	pyregf_key.c pyregf_key.h \
 	pyregf_keys.c pyregf_keys.h \

@@ -30,6 +30,7 @@
 #include "pyregf_error.h"
 #include "pyregf_file.h"
 #include "pyregf_file_object_io_handle.h"
+#include "pyregf_file_types.h"
 #include "pyregf_key.h"
 #include "pyregf_keys.h"
 #include "pyregf_libcerror.h"
@@ -459,6 +460,7 @@ PyMODINIT_FUNC initpyregf(
 {
 	PyObject *module                      = NULL;
 	PyTypeObject *file_type_object        = NULL;
+	PyTypeObject *file_types_type_object  = NULL;
 	PyTypeObject *key_type_object         = NULL;
 	PyTypeObject *keys_type_object        = NULL;
 	PyTypeObject *value_type_object       = NULL;
@@ -593,6 +595,30 @@ PyMODINIT_FUNC initpyregf(
 	 module,
 	 "value",
 	 (PyObject *) value_type_object );
+
+	/* Setup the file types type object
+	 */
+	pyregf_file_types_type_object.tp_new = PyType_GenericNew;
+
+	if( pyregf_file_types_init_type(
+	     &pyregf_file_types_type_object ) != 1 )
+	{
+		goto on_error;
+	}
+	if( PyType_Ready(
+	     &pyregf_file_types_type_object ) < 0 )
+	{
+		goto on_error;
+	}
+	Py_IncRef(
+	 (PyObject *) &pyregf_file_types_type_object );
+
+	file_types_type_object = &pyregf_file_types_type_object;
+
+	PyModule_AddObject(
+	 module,
+	 "file_types",
+	 (PyObject *) file_types_type_object );
 
 	/* Setup the value types type object
 	 */

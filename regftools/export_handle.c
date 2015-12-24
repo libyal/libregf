@@ -575,7 +575,7 @@ int export_handle_export_key(
 	ssize_t print_count                         = 0;
 	uint64_t value_64bit                        = 0;
 	uint32_t value_32bit                        = 0;
-	uint16_t value_type                         = 0;
+	uint32_t value_type                         = 0;
 	int number_of_sub_keys                      = 0;
 	int number_of_values                        = 0;
 	int result                                  = 0;
@@ -983,7 +983,8 @@ int export_handle_export_key(
 			default:
 				fprintf(
 				 export_handle->notify_stream,
-				 "Type: unknown\n" );
+				 "Type: unknown: 0x%08" PRIx32 "\n",
+				 value_type );
 				break;
 		}
 		if( libregf_value_get_value_data_size(

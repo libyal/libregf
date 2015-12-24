@@ -92,6 +92,7 @@ Release:
 
 20151223
 * worked on format support
+* changed libregf_value_get_value_type to require a 32-bit value type
 
 20151222
 * applied updates

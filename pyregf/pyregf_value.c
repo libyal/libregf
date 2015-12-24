@@ -634,7 +634,7 @@ PyObject *pyregf_value_get_type(
 	libcerror_error_t *error = NULL;
 	PyObject *integer_object = NULL;
 	static char *function    = "pyregf_value_get_type";
-	uint16_t value_type      = 0;
+	uint32_t value_type      = 0;
 	int result               = 0;
 
 	PYREGF_UNREFERENCED_PARAMETER( arguments )
@@ -670,13 +670,9 @@ PyObject *pyregf_value_get_type(
 
 		return( NULL );
 	}
-#if PY_MAJOR_VERSION >= 3
-	integer_object = PyLong_FromLong(
-	                  (long) value_type );
-#else
-	integer_object = PyInt_FromLong(
-	                  (long) value_type );
-#endif
+	integer_object = pyregf_integer_unsigned_new_from_64bit(
+	                  (uint64_t) value_type );
+
 	return( integer_object );
 }
 
@@ -858,7 +854,7 @@ PyObject *pyregf_value_get_data_as_integer(
 	uint64_t value_64bit     = 0;
 	int64_t integer_value    = 0;
 	uint32_t value_32bit     = 0;
-	uint16_t value_type      = 0;
+	uint32_t value_type      = 0;
 	int result               = 0;
 
 	PYREGF_UNREFERENCED_PARAMETER( arguments )
@@ -969,7 +965,7 @@ PyObject *pyregf_value_get_data_as_string(
 	uint8_t *value_string    = NULL;
 	static char *function    = "pyregf_value_get_data_as_string";
 	size_t value_string_size = 0;
-	uint16_t value_type      = 0;
+	uint32_t value_type      = 0;
 	int result               = 0;
 
 	PYREGF_UNREFERENCED_PARAMETER( arguments )

@@ -934,7 +934,7 @@ int libregf_value_get_utf16_name(
  */
 int libregf_value_get_value_type(
      libregf_value_t *value,
-     uint16_t *value_type,
+     uint32_t *value_type,
      libcerror_error_t **error )
 {
 	libregf_internal_value_t *internal_value = NULL;

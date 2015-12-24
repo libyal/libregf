@@ -541,6 +541,53 @@ REG_QWORD_LITTLE_ENDIAN | Integer 64-bit signed little-endian +
 [NOTE]
 Other data types are allowed and typically represented as binary data by regedit.
 
+===== Notes
+Seen in SAM:
+
+[cols="1,1,5",options="header"]
+|===
+| Value | Identifier | Description
+| 0x000001f4 | |
+| 0x000001f5 | |
+| 0x00000201 | |
+| 0x00000220 | |
+| 0x00000221 | |
+| 0x00000222 | |
+| 0x00000223 | |
+| 0x00000227 | |
+| 0x00000228 | |
+| 0x000003e8 | |
+|===
+
+yellow-background]*Is this supposed to be the Relative ID (RID)?*
+
+Seen in SCHEMA.DAT:
+
+[cols="1,1,5",options="header"]
+|===
+| Value | Identifier | Description
+| 0x10000001 | | [yellow-background]*Unknown (boolean?) 1 byte in size*
+| 0x10000003 | | [yellow-background]*Unknown (16-bit integer?) 2 bytes in size*
+| 0x10000005 | | [yellow-background]*Unknown (32-bit integer?) 4 bytes in size*
+| 0x10000006 | | [yellow-background]*Unknown (32-bit integer?) 4 bytes in size*
+| 0x10000008 | | [yellow-background]*Unknown (64-bit integer?) 8 bytes in size*
+| 0x1000000b | | [yellow-background]*Unknown (boolean?) 1 byte in size*
+| 0x1000000c | | [yellow-background]*Unknown (UTF-16 little-endian string?*
+| | |
+| 0x10002005 | |
+| 0x10002006 | |
+| 0x1000200c | |
+| | |
+| 0x1000800c | |
+| | |
+| 0x10008101 | |
+| | |
+| 0x1000a006 | |
+| 0x1000a00c | |
+| | |
+| 0x1000c101 | |
+|===
+
 ==== [[value_key_flags]]Value key flags
 The value key (CM_KEY_VALUE) flags consists of:
 

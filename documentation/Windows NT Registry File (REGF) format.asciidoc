@@ -61,6 +61,7 @@ in the section entitled "GNU Free Documentation License".
 | 0.0.18 | J.B. Metz | July 2015 | Additional information regarding class name.
 | 0.0.19 | J.B. Metz | November 2015 | Additional information.
 | 0.0.20 | J.B. Metz | November 2015 | Additional information regarding corruption scenario.
+| 0.0.21 | J.B. Metz | December 2015 | Additional information regarding value data types.
 |===
 
 :numbered:
@@ -506,7 +507,7 @@ the data value.
 * A data size of 1 uses the last byte (on a little-endian system)
 * A data size of 0 represents that the value is not set (or NULL).
 
-[[yellow-background]]*The behavior on a big-endian system is unknown.*
+[yellow-background]*The behavior on a big-endian system is unknown.*
 
 ==== [[value_data_types]]Data types
 
@@ -536,6 +537,9 @@ Either in ASCII or Unicode with an end-of-string character
 REG_QWORD_LITTLE_ENDIAN | Integer 64-bit signed little-endian +
 (quad word)
 |===
+
+[NOTE]
+Other data types are allowed and typically represented as binary data by regedit.
 
 ==== [[value_key_flags]]Value key flags
 The value key (CM_KEY_VALUE) flags consists of:

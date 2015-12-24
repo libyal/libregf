@@ -28,18 +28,18 @@
 #if defined( HAVE_DEBUG_OUTPUT )
 
 libregf_data_type_t libregf_data_types[ ] = {
-	{ 0x0000, "REG_NONE",				"Undefined" },
-	{ 0x0001, "REG_SZ",				"String" },
-	{ 0x0002, "REG_EXPAND_SZ",			"String with expandable variables" },
-	{ 0x0003, "REG_BINARY",				"Binary data" },
-	{ 0x0004, "REG_DWORD_LITTLE_ENDIAN",		"Integer 32-bit signed little-endian" },
-	{ 0x0005, "REG_DWORD_BIG_ENDIAN",		"Integer 32-bit signed big-endian" },
-	{ 0x0006, "REG_LINK",				"Link" },
-	{ 0x0007, "REG_MULTI_SZ",			"Array of strings" },
-	{ 0x0008, "REG_RESOURCE_LIST",			"Resource list" },
-	{ 0x0009, "REG_FULL_RESOURCE_DESCRIPTOR",	"Full resource descriptor" },
-	{ 0x000a, "REG_RESOURCE_REQUIREMENTS_LIST",	"Resource requirements list" },
-	{ 0x000b, "REG_QWORD_LITTLE_ENDIAN",		"Integer 64-bit signed little-endian" },
+	{ 0x00000000, "REG_NONE",			"Undefined" },
+	{ 0x00000001, "REG_SZ",				"String" },
+	{ 0x00000002, "REG_EXPAND_SZ",			"String with expandable variables" },
+	{ 0x00000003, "REG_BINARY",			"Binary data" },
+	{ 0x00000004, "REG_DWORD_LITTLE_ENDIAN",	"Integer 32-bit signed little-endian" },
+	{ 0x00000005, "REG_DWORD_BIG_ENDIAN",		"Integer 32-bit signed big-endian" },
+	{ 0x00000006, "REG_LINK",			"Link" },
+	{ 0x00000007, "REG_MULTI_SZ",			"Array of strings" },
+	{ 0x00000008, "REG_RESOURCE_LIST",		"Resource list" },
+	{ 0x00000009, "REG_FULL_RESOURCE_DESCRIPTOR",	"Full resource descriptor" },
+	{ 0x0000000a, "REG_RESOURCE_REQUIREMENTS_LIST",	"Resource requirements list" },
+	{ 0x0000000b, "REG_QWORD_LITTLE_ENDIAN",	"Integer 64-bit signed little-endian" },
 
 	{ (uint32_t) -1, "_UNKNOWN_", "Unknown" } };
 

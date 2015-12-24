@@ -609,7 +609,7 @@ int libregf_value_item_read_value_key(
 		 data_offset );
 
 		libcnotify_printf(
-		 "%s: data type\t\t\t\t: %" PRIu32 " (%s) %s\n",
+		 "%s: data type\t\t\t\t: 0x%08" PRIx32 " (%s) %s\n",
 		 function,
 		 value_item->type,
 		 libregf_data_type_get_identifier(

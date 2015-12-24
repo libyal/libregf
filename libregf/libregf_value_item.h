@@ -57,7 +57,7 @@ struct libregf_value_item
 
 	/* The value type
 	 */
-	uint16_t type;
+	uint32_t type;
 
 	/* The value data type
 	 */

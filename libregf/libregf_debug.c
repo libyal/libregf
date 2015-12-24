@@ -86,10 +86,8 @@ void libregf_debug_print_value_key_flags(
 	if( ( value_key_flags & LIBREGF_VALUE_KEY_FLAG_NAME_IS_ASCII ) != 0 )
 	{
 		libcnotify_printf(
-		 "\tValue name is an ASCII string\n" );
+		 "\tValue name is an ASCII string (VALUE_COMP_NAME)\n" );
 	}
-/* TODO */
-
 	libcnotify_printf(
 	 "\n" );
 }

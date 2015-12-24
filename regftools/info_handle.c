@@ -788,12 +788,32 @@ int info_handle_file_fprint(
 	 major_version,
 	 minor_version );
 
-/* TODO print string representation
 	fprintf(
 	 info_handle->notify_stream,
-	 "\tFile type\t\t\t: %" PRIu32 "\n",
-	 file_type );
-*/
+	 "\tFile type:\t" );
+
+	if( file_type == LIBREGF_FILE_TYPE_REGISTRY )
+	{
+		fprintf(
+		 info_handle->notify_stream,
+		 "Registry" );
+	}
+	else if( file_type == LIBREGF_FILE_TYPE_TRANSACTION_LOG )
+	{
+		fprintf(
+		 info_handle->notify_stream,
+		 "Transaction log" );
+	}
+	else
+	{
+		fprintf(
+		 info_handle->notify_stream,
+		 "Unknown: 0x%08" PRIx32 "",
+		 file_type );
+	}
+	fprintf(
+	 info_handle->notify_stream,
+	 "\n" );
 
 /* TODO calculate number of keys and values */
 

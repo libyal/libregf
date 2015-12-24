@@ -302,6 +302,17 @@ int libregf_hive_bins_list_read(
 
 		return( -1 );
 	}
+	if( hive_bins_list->io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid hive bins list - missing IO handle.",
+		 function );
+
+		return( -1 );
+	}
 	if( libregf_hive_bin_initialize(
 	     &hive_bin,
 	     error ) != 1 )
@@ -427,7 +438,7 @@ int libregf_hive_bins_list_read(
 		if( libcnotify_verbose != 0 )
 		{
 			libcnotify_printf(
-			 "%s: missing hive bin at offset: %" PRIi64 ".",
+			 "%s: missing hive bin at offset: %" PRIi64 ".\n",
 			 function,
 			 file_offset );
 		}

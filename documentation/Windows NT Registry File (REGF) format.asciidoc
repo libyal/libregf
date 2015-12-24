@@ -73,6 +73,7 @@ hives.
 A REGF consist of the following distinguishable elements:
 
 * file header
+* dirty vector (only used by transaction log files)
 * hive bins
 * trailing empty blocks
 

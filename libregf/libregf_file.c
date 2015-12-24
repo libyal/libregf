@@ -874,7 +874,8 @@ int libregf_file_open_read(
 
 		goto on_error;
 	}
-	if( file_size > 4096 )
+	if( ( internal_file->io_handle->file_type == LIBREGF_FILE_TYPE_REGISTRY )
+	 && ( file_size > 4096 ) )
 	{
 /* TODO print data between header and hive bins list offset ? */
 #if defined( HAVE_DEBUG_OUTPUT )
@@ -1270,7 +1271,7 @@ int libregf_file_set_ascii_codepage(
 }
 
 /* Retrieves the root key
- * Returns 1 if successful, if no such key or -1 on error
+ * Returns 1 if successful, 0 if no such key or -1 on error
  */
 int libregf_file_get_root_key(
      libregf_file_t *file,
@@ -1294,6 +1295,17 @@ int libregf_file_get_root_key(
 	}
 	internal_file = (libregf_internal_file_t *) file;
 
+	if( internal_file->io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid file - missing IO handle.",
+		 function );
+
+		return( -1 );
+	}
 	if( key == NULL )
 	{
 		libcerror_error_set(
@@ -1316,7 +1328,8 @@ int libregf_file_get_root_key(
 
 		return( -1 );
 	}
-	if( internal_file->key_tree == NULL )
+	if( ( internal_file->io_handle->file_type != LIBREGF_FILE_TYPE_REGISTRY )
+	 || ( internal_file->key_tree == NULL ) )
 	{
 		return( 0 );
 	}

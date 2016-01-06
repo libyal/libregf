@@ -30,13 +30,13 @@ Requires: libregf = %{version}-%{release} @ax_libcsystem_spec_requires@ @ax_libf
 %description tools
 Several tools for reading Windows NT Registry Files (REGF)
 
-%package python2
+%package python
 Summary: Python 2 bindings for libregf
 Group: System Environment/Libraries
 Requires: libregf = %{version}-%{release} python
 BuildRequires: python-devel
 
-%description python2
+%description python
 Python 2 bindings for libregf
 
 %package python3
@@ -90,7 +90,7 @@ rm -rf %{buildroot}
 %attr(755,root,root) %{_bindir}/regfreport
 %{_mandir}/man1/*
 
-%files python2
+%files python
 %defattr(644,root,root,755)
 %doc AUTHORS COPYING NEWS README
 %{_libdir}/python2*/site-packages/*.a

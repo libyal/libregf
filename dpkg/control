@@ -34,20 +34,20 @@ Depends: libregf (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
 Description: Several tools for reading Windows NT Registry Files (REGF)
  Several tools for reading Windows NT Registry Files (REGF).
 
-Package: libregf-python2
+Package: libregf-python
 Section: python
 Architecture: any
 Depends: libregf (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
-Suggests: libregf-python2-dbg
+Suggests: libregf-python-dbg
 Description: Python bindings for libregf
  Python 2 bindings for libregf.
 
-Package: libregf-python2-dbg
+Package: libregf-python-dbg
 Section: debug
 Architecture: any
-Depends: libregf-python2 (= ${binary:Version}), ${misc:Depends}
-Description: Debugging symbols for libregf-python2
- Debugging symbols for libregf-python2.
+Depends: libregf-python (= ${binary:Version}), ${misc:Depends}
+Description: Debugging symbols for libregf-python
+ Debugging symbols for libregf-python.
 
 Package: libregf-python3
 Section: python

@@ -26,6 +26,8 @@ SUBDIRS = \
 	libcsystem \
 	regftools \
 	pyregf \
+	pyregf2 \
+	pyregf3 \
 	po \
 	manuals \
 	tests \

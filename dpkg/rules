@@ -12,7 +12,7 @@ export DH_OPTIONS
 
 .PHONY: override_dh_auto_configure
 override_dh_auto_configure:
-	dh_auto_configure -- --enable-python CFLAGS="-g"
+	dh_auto_configure -- --enable-python2 --enable-python3 CFLAGS="-g"
 
 .PHONY: override_dh_auto_test
 override_dh_auto_test:
@@ -32,9 +32,12 @@ override_dh_install:
 	# Create the libregf-tools package.
 	dh_install "debian/tmp/usr/bin/*" -p libregf-tools
 	dh_install "debian/tmp/usr/share/man/man1/*" -p libregf-tools
-	# Create the libregf-python package.
-	dh_install -X"*_d.so" "debian/tmp/usr/lib/python*/*" -p libregf-python
-	# The libregf-dbg and libregf-python-dbg packages are created by dh_strip.
+	# Create the libregf-python2 package.
+	dh_install -X"*_d.so" "debian/tmp/usr/lib/python2*/*" -p libregf-python2
+	# Create the libregf-python3 package.
+	dh_install -X"*_d.so" "debian/tmp/usr/lib/python3*/*" -p libregf-python3
+	# The libregf-dbg, libregf-python2-dbg and libregf-python3-dbg packages
+	# are created by dh_strip.
 	dh_install
 
 .PHONY: override_dh_installmenu
@@ -83,7 +86,8 @@ override_dh_pysupport:
 override_dh_strip:
 ifeq (,$(filter nostrip,$(DEB_BUILD_OPTIONS)))
 	dh_strip -plibregf --dbg-package=libregf-dbg
-	dh_strip -plibregf-python --dbg-package=libregf-python-dbg
+	dh_strip -plibregf-python2 --dbg-package=libregf-python2-dbg
+	dh_strip -plibregf-python3 --dbg-package=libregf-python3-dbg
 endif
 
 .PHONY: override_dh_shlibdeps

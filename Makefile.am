@@ -41,8 +41,10 @@ DPKG_FILES = \
 	dpkg/copyright \
 	dpkg/copyright.in \
 	dpkg/rules \
-	dpkg/libregf-dev.docs \
 	dpkg/libregf.docs \
+	dpkg/libregf-dev.docs \
+	dpkg/libregf-python.docs \
+	dpkg/libregf-python3.docs \
 	dpkg/libregf-tools.docs \
 	dpkg/source/format
 

@@ -39,7 +39,7 @@ Section: python
 Architecture: any
 Depends: libregf (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
 Suggests: libregf-python-dbg
-Description: Python bindings for libregf
+Description: Python 2 bindings for libregf
  Python 2 bindings for libregf.
 
 Package: libregf-python-dbg
@@ -54,7 +54,7 @@ Section: python
 Architecture: any
 Depends: libregf (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
 Suggests: libregf-python3-dbg
-Description: Python bindings for libregf
+Description: Python 3 bindings for libregf
  Python 3 bindings for libregf.
 
 Package: libregf-python3-dbg

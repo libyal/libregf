@@ -90,6 +90,9 @@ Python bindings
 Release:
 * check TODOs
 
+20160109
+* fixes for rpmbuild
+
 20160107
 * worked on Python 3 support
 

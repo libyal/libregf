@@ -114,7 +114,6 @@ stamp-h[1-9]
 /libregf/libregf.rc
 /libregf/libregf_definitions.h
 /pyregf[23]/*.[ch]
-/LICENSE.pyregf
 /regftools/regfexport
 /regftools/regfinfo
 /regftools/regfmount

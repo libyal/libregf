@@ -61,15 +61,15 @@ pyregf_la_CPPFLAGS = $(PYTHON3_CPPFLAGS)
 pyregf_la_LDFLAGS  = -module -avoid-version $(PYTHON3_LDFLAGS)
 
 $(BUILT_SOURCES):
-	/bin/cp -f $(top_srcdir)/pyregf/pyregf*.[ch] .
-
-clean-local:
-	/bin/rm -f pyregf*.[ch]
+	/bin/cp -f $(top_srcdir)/pyregf/$@ $@
 
 endif
 
 MAINTAINERCLEANFILES = \
 	Makefile.in
+
+clean-local:
+	/bin/rm -f pyregf*.[ch]
 
 distclean: clean
 	/bin/rm -f Makefile

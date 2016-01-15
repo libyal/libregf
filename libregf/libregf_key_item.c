@@ -1916,7 +1916,7 @@ int libregf_key_item_read_node_data(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid node datea size value exceeds maximum.",
+		 "%s: invalid node data size value exceeds maximum.",
 		 function );
 
 		goto on_error;

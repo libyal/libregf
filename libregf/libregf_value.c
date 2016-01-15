@@ -290,7 +290,7 @@ int libregf_value_get_offset(
 
 		return( -1 );
 	}
-	/* The offset is relative from the start of the hive bin list
+	/* The offset is relative from the start of the hive bins list
 	 * and points to the start of the corresponding hive bin cell
 	 */
 	*offset += internal_value->io_handle->hive_bins_list_offset + 4;

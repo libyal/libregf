@@ -29,8 +29,8 @@
 #include "libregf_libfcache.h"
 #include "libregf_libfdata.h"
 
-/* Retrieves the sub key values (key tree node and key item values) for the specific UTF-8 formatted name
- * Returns 1 if successful, 0 if no such sub key item values or -1 on error
+/* Retrieves the sub key values (key tree node and key item) for the specific UTF-8 formatted name
+ * Returns 1 if successful, 0 if no such sub key item or -1 on error
  */
 int libregf_key_tree_get_sub_key_values_by_utf8_name(
      libfdata_tree_node_t *key_tree_node,
@@ -66,7 +66,7 @@ int libregf_key_tree_get_sub_key_values_by_utf8_name(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid sub key item values.",
+		 "%s: invalid sub key item.",
 		 function );
 
 		return( -1 );
@@ -123,7 +123,7 @@ int libregf_key_tree_get_sub_key_values_by_utf8_name(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve sub key item values.",
+			 "%s: unable to retrieve sub key item.",
 			 function );
 
 			return( -1 );
@@ -159,8 +159,8 @@ int libregf_key_tree_get_sub_key_values_by_utf8_name(
 	return( 1 );
 }
 
-/* Retrieves the sub key values (key tree node and key item values) for the specific UTF-16 formatted name
- * Returns 1 if successful, 0 if no such sub key item values or -1 on error
+/* Retrieves the sub key values (key tree node and key item) for the specific UTF-16 formatted name
+ * Returns 1 if successful, 0 if no such sub key item or -1 on error
  */
 int libregf_key_tree_get_sub_key_values_by_utf16_name(
      libfdata_tree_node_t *key_tree_node,
@@ -196,7 +196,7 @@ int libregf_key_tree_get_sub_key_values_by_utf16_name(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid sub key item values.",
+		 "%s: invalid sub key item.",
 		 function );
 
 		return( -1 );
@@ -253,7 +253,7 @@ int libregf_key_tree_get_sub_key_values_by_utf16_name(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve sub key item values.",
+			 "%s: unable to retrieve sub key item.",
 			 function );
 
 			return( -1 );

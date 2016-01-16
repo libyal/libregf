@@ -1,5 +1,5 @@
 /*
- * Key item values functions
+ * Key item functions
  *
  * Copyright (C) 2009-2016, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -415,12 +415,15 @@ int libregf_key_item_read_named_key(
 	byte_stream_copy_to_uint32_little_endian(
 	 ( (regf_named_key_t *) hive_bin_cell_data )->number_of_values,
 	 number_of_values_list_elements );
+
 	byte_stream_copy_to_uint32_little_endian(
 	 ( (regf_named_key_t *) hive_bin_cell_data )->values_list_offset,
 	 values_list_offset );
+
 	byte_stream_copy_to_uint32_little_endian(
 	 ( (regf_named_key_t *) hive_bin_cell_data )->security_key_offset,
 	 security_key_offset );
+
 	byte_stream_copy_to_uint32_little_endian(
 	 ( (regf_named_key_t *) hive_bin_cell_data )->class_name_offset,
 	 class_name_offset );
@@ -428,6 +431,7 @@ int libregf_key_item_read_named_key(
 	byte_stream_copy_to_uint16_little_endian(
 	 ( (regf_named_key_t *) hive_bin_cell_data )->key_name_size,
 	 key_item->name_size );
+
 	byte_stream_copy_to_uint16_little_endian(
 	 ( (regf_named_key_t *) hive_bin_cell_data )->class_name_size,
 	 class_name_size );
@@ -631,6 +635,7 @@ int libregf_key_item_read_named_key(
 		 "%s: key name size\t\t\t\t: %" PRIu16 "\n",
 		 function,
 		 key_item->name_size );
+
 		libcnotify_printf(
 		 "%s: class name size\t\t\t: %" PRIu16 "\n",
 		 function,
@@ -677,7 +682,7 @@ int libregf_key_item_read_named_key(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_MEMORY,
 		 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-		 "%s: unable to copy hive bin cell data to name.",
+		 "%s: unable to copy key name.",
 		 function );
 
 		goto on_error;
@@ -1891,7 +1896,6 @@ int libregf_key_item_read_node_data(
 	static char *function        = "libregf_key_item_read_node_data";
 
 	LIBREGF_UNREFERENCED_PARAMETER( node_data_file_index )
-	LIBREGF_UNREFERENCED_PARAMETER( node_data_size )
 	LIBREGF_UNREFERENCED_PARAMETER( node_data_flags )
 	LIBREGF_UNREFERENCED_PARAMETER( read_flags )
 
@@ -1903,7 +1907,7 @@ int libregf_key_item_read_node_data(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create key items values.",
+		 "%s: unable to create key item.",
 		 function );
 
 		goto on_error;
@@ -1952,7 +1956,7 @@ int libregf_key_item_read_node_data(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set key items values as node value.",
+		 "%s: unable to set key item as node value.",
 		 function );
 
 		goto on_error;
@@ -2270,7 +2274,7 @@ int libregf_key_item_read_sub_keys_list(
 					 error,
 					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 					 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-					 "%s: unable to append sub node in data tree node.",
+					 "%s: unable to append sub node.",
 					 function );
 
 					goto on_error;

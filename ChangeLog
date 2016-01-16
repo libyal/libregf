@@ -1,4 +1,7 @@
 TODO
+* clean up
+  - move named key, value key etc into separate source files
+  - libregf_hive_bins_list_read_element_data remove the need for + 4096
 * dokan add classname and values support
 * libregf:
   - add file type definitions
@@ -89,6 +92,12 @@ Python bindings
 
 Release:
 * check TODOs
+
+20160116
+* Code clean up
+
+20160115
+* Code clean up
 
 20160109
 * fixes for rpmbuild

@@ -1801,7 +1801,7 @@ int libregf_value_item_read_element_data(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create value items values.",
+		 "%s: unable to create value item.",
 		 function );
 
 		goto on_error;
@@ -1840,7 +1840,7 @@ int libregf_value_item_read_element_data(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set value items values as element value.",
+		 "%s: unable to set value item as element value.",
 		 function );
 
 		goto on_error;

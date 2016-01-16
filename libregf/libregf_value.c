@@ -157,7 +157,7 @@ int libregf_value_free(
 		internal_value = (libregf_internal_value_t *) *value;
 		*value         = NULL;
 
-		/* The io_handle, file_io_handle, and values_list_element references are freed elsewhere
+		/* The io_handle, file_io_handle and values_list_element references are freed elsewhere
 		 */
 		memory_free(
 		 internal_value );
@@ -1051,24 +1051,7 @@ int libregf_value_get_value_data_size(
 
 		return( -1 );
 	}
-	if( value_item->data_type != 0 )
-	{
-		if( libregf_value_item_get_data_size(
-		     value_item,
-		     value_data_size,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve value data.",
-			 function );
-
-			return( -1 );
-		}
-	}
-	else
+	if( value_item->data_type == 0 )
 	{
 		if( value_data_size == NULL )
 		{
@@ -1082,6 +1065,23 @@ int libregf_value_get_value_data_size(
 			return( -1 );
 		}
 		*value_data_size = 0;
+	}
+	else
+	{
+		if( libregf_value_item_get_data_size(
+		     value_item,
+		     value_data_size,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve value data size.",
+			 function );
+
+			return( -1 );
+		}
 	}
 	return( 1 );
 }
@@ -1967,7 +1967,7 @@ int libregf_value_get_value_binary_data_size(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve value data.",
+		 "%s: unable to retrieve value data size.",
 		 function );
 
 		return( -1 );

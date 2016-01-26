@@ -47,6 +47,7 @@ libregf_la_SOURCES = \
 	libregf_libfdata.h \
 	libregf_libfdatetime.h \
 	libregf_libuna.h \
+	libregf_named_key.c libregf_named_key.h \
 	libregf_notify.c libregf_notify.h \
 	libregf_support.c libregf_support.h \
 	libregf_types.h \

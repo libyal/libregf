@@ -222,6 +222,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libregf\libregf_named_key.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libregf\libregf_notify.c"
 				>
 			</File>
@@ -345,6 +349,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libregf\libregf_libuna.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libregf\libregf_named_key.h"
 				>
 			</File>
 			<File

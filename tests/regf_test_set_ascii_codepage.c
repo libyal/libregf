@@ -20,12 +20,11 @@
  */
 
 #include <common.h>
+#include <file_stream.h>
 
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
 #endif
-
-#include <stdio.h>
 
 #include "regf_test_libcerror.h"
 #include "regf_test_libclocale.h"
@@ -41,7 +40,7 @@ int main( int argc, char * const argv[] )
 #endif
 {
 	libcerror_error_t *error = NULL;
-	libregf_file_t *file      = NULL;
+	libregf_file_t *file     = NULL;
 	size_t string_length     = 0;
 	uint32_t feature_flags   = 0;
 	int ascii_codepage       = 0;

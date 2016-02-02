@@ -11,6 +11,8 @@ AM_CPPFLAGS = \
 	@LIBCFILE_CPPFLAGS@ \
 	@LIBCPATH_CPPFLAGS@ \
 	@LIBBFIO_CPPFLAGS@ \
+	@LIBCSYSTEM_CPPFLAGS@ \
+	@PTHREAD_CPPFLAGS@ \
 	@LIBREGF_DLL_IMPORT@
 
 if HAVE_PYTHON
@@ -48,17 +50,13 @@ regf_test_open_close_SOURCES = \
 	regf_test_libcerror.h \
 	regf_test_libregf.h \
 	regf_test_libcstring.h \
+	regf_test_libcsystem.h \
 	regf_test_open_close.c
 
 regf_test_open_close_LDADD = \
+	@LIBCSYSTEM_LIBADD@ \
 	../libregf/libregf.la \
-	@LIBBFIO_LIBADD@ \
-	@LIBCPATH_LIBADD@ \
-	@LIBCFILE_LIBADD@ \
-	@LIBUNA_LIBADD@ \
-	@LIBCSPLIT_LIBADD@ \
-	@LIBCNOTIFY_LIBADD@ \
-	@LIBCLOCALE_LIBADD@ \
+	@LIBCTHREADS_LIBADD@ \
 	@LIBCDATA_LIBADD@ \
 	@LIBCERROR_LIBADD@ \
 	@LIBCSTRING_LIBADD@

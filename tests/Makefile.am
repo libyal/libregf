@@ -16,7 +16,7 @@ AM_CPPFLAGS = \
 	@LIBREGF_DLL_IMPORT@
 
 if HAVE_PYTHON
-TESTS_PYREGF  = \
+TESTS_PYREGF = \
 	test_pyregf_set_ascii_codepage.sh \
 	test_pyregf_open_close.sh
 endif
@@ -42,7 +42,7 @@ check_SCRIPTS = \
 EXTRA_DIST = \
 	$(check_SCRIPTS)
 
-check_PROGRAMS =  \
+check_PROGRAMS = \
 	regf_test_open_close \
 	regf_test_set_ascii_codepage
 

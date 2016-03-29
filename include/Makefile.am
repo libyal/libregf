@@ -1,13 +1,13 @@
 include_HEADERS = \
-        libregf.h
+	libregf.h
 
 pkginclude_HEADERS = \
-        libregf/codepage.h \
-        libregf/definitions.h \
-        libregf/error.h \
-        libregf/extern.h \
-        libregf/features.h \
-        libregf/types.h
+	libregf/codepage.h \
+	libregf/definitions.h \
+	libregf/error.h \
+	libregf/extern.h \
+	libregf/features.h \
+	libregf/types.h
 
 EXTRA_DIST = \
 	libregf.h.in \

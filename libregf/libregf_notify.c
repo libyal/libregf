@@ -20,13 +20,12 @@
  */
 
 #include <common.h>
+#include <file_stream.h>
 #include <types.h>
 
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
 #endif
-
-#include <stdio.h>
 
 #include "libregf_libcerror.h"
 #include "libregf_libcnotify.h"
@@ -117,5 +116,5 @@ int libregf_notify_stream_close(
 	return( 0 );
 }
 
-#endif
+#endif /* !defined( HAVE_LOCAL_LIBREGF ) */
 

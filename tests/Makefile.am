@@ -17,23 +17,24 @@ AM_CPPFLAGS = \
 
 if HAVE_PYTHON
 TESTS_PYREGF = \
-	test_pyregf_set_ascii_codepage.sh \
-	test_pyregf_open_close.sh
+	test_python_functions.sh \
+	test_pyregf_set_ascii_codepage.sh
 endif
 
 TESTS = \
+	test_api_functions.sh \
 	test_set_ascii_codepage.sh \
-	test_open_close.sh \
 	test_regfinfo.sh \
 	test_regfexport.sh \
 	$(TESTS_PYREGF)
 
 check_SCRIPTS = \
+	pyregf_test_get_version.py \
 	pyregf_test_open_close.py \
 	pyregf_test_set_ascii_codepage.py \
-	test_open_close.sh \
-	test_pyregf_open_close.sh \
+	test_api_functions.sh \
 	test_pyregf_set_ascii_codepage.sh \
+	test_python_functions.sh \
 	test_regfexport.sh \
 	test_regfinfo.sh \
 	test_runner.sh \
@@ -43,8 +44,19 @@ EXTRA_DIST = \
 	$(check_SCRIPTS)
 
 check_PROGRAMS = \
+	regf_test_get_version \
 	regf_test_open_close \
 	regf_test_set_ascii_codepage
+
+regf_test_get_version_SOURCES = \
+	regf_test_get_version.c \
+	regf_test_libcstring.h \
+	regf_test_libregf.h \
+	regf_test_unused.h
+
+regf_test_get_version_LDADD = \
+	../libregf/libregf.la \
+	@LIBCSTRING_LIBADD@
 
 regf_test_open_close_SOURCES = \
 	regf_test_libcerror.h \

@@ -80,11 +80,11 @@ enum LIBREGF_CODEPAGES
 	LIBREGF_CODEPAGE_WINDOWS_1258			= 1258
 };
 
-#endif
+#endif /* !defined( HAVE_LOCAL_LIBREGF ) */
 
 #if defined( __cplusplus )
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBREGF_INTERNAL_CODEPAGE_H ) */
 

@@ -44,7 +44,7 @@
 
 #include <libcerror.h>
 
-#endif
+#endif /* defined( HAVE_LOCAL_LIBCERROR ) */
 
-#endif
+#endif /* !defined( _PYREGF_LIBCERROR_H ) */
 

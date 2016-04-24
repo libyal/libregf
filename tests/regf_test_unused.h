@@ -1,5 +1,5 @@
 /*
- * The libfdata header wrapper
+ * The unused definition
  *
  * Copyright (C) 2009-2016, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -19,37 +19,32 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _REGFTOOLS_LIBFDATA_H )
-#define _REGFTOOLS_LIBFDATA_H
+#if !defined( _REGF_TEST_UNUSED_H )
+#define _REGF_TEST_UNUSED_H
 
 #include <common.h>
 
-/* Define HAVE_LOCAL_LIBFDATA for local use of libfdata
- */
-#if defined( HAVE_LOCAL_LIBFDATA )
+#if !defined( REGF_TEST_ATTRIBUTE_UNUSED )
 
-#include <libfdata_definitions.h>
-#include <libfdata_list.h>
-#include <libfdata_list_element.h>
-#include <libfdata_range_list.h>
-#include <libfdata_stream.h>
-#include <libfdata_tree.h>
-#include <libfdata_tree_node.h>
-#include <libfdata_types.h>
-#include <libfdata_vector.h>
+#if defined( __GNUC__ ) && __GNUC__ >= 3
+#define REGF_TEST_ATTRIBUTE_UNUSED	__attribute__ ((__unused__))
 
 #else
+#define REGF_TEST_ATTRIBUTE_UNUSED
 
-/* If libtool DLL support is enabled set LIBFDATA_DLL_IMPORT
- * before including libfdata.h
- */
-#if defined( _WIN32 ) && defined( DLL_IMPORT )
-#define LIBFDATA_DLL_IMPORT
-#endif
+#endif /* defined( __GNUC__ ) && __GNUC__ >= 3 */
 
-#include <libfdata.h>
+#endif /* !defined( REGF_TEST_ATTRIBUTE_UNUSED ) */
 
-#endif /* defined( HAVE_LOCAL_LIBFDATA ) */
+#if defined( _MSC_VER )
+#define REGF_TEST_UNREFERENCED_PARAMETER( parameter ) \
+	UNREFERENCED_PARAMETER( parameter );
 
-#endif /* !defined( _REGFTOOLS_LIBFDATA_H ) */
+#else
+#define REGF_TEST_UNREFERENCED_PARAMETER( parameter ) \
+	/* parameter */
+
+#endif /* defined( _MSC_VER ) */
+
+#endif /* !defined( _REGF_TEST_UNUSED_H ) */
 

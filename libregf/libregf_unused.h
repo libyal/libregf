@@ -40,5 +40,5 @@
 	/* parameter */
 #endif
 
-#endif
+#endif /* !defined( _LIBREGF_INTERNAL_UNUSED_H ) */
 

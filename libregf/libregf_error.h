@@ -23,9 +23,8 @@
 #define _LIBREGF_INTERNAL_ERROR_H
 
 #include <common.h>
+#include <file_stream.h>
 #include <types.h>
-
-#include <stdio.h>
 
 #if !defined( HAVE_LOCAL_LIBREGF )
 #include <libregf/error.h>
@@ -65,11 +64,11 @@ int libregf_error_backtrace_sprint(
      char *string,
      size_t size );
 
-#endif
+#endif /* !defined( HAVE_LOCAL_LIBREGF ) */
 
 #if defined( __cplusplus )
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBREGF_INTERNAL_ERROR_H ) */
 

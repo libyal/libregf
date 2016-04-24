@@ -52,5 +52,5 @@ int pyregf_integer_unsigned_copy_to_64bit(
 }
 #endif
 
-#endif
+#endif /* !defined( _PYREGF_INTEGER_H ) */
 

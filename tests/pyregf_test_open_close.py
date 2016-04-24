@@ -18,13 +18,19 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with this software.  If not, see <http://www.gnu.org/licenses/>.
-#
 
 from __future__ import print_function
 import argparse
 import sys
 
 import pyregf
+
+
+def get_filename_string(filename):
+  """Retrieves a human readable string representation of the filename."""
+  if not filename:
+    return "None"
+  return filename
 
 
 def get_mode_string(mode):
@@ -39,16 +45,15 @@ def get_mode_string(mode):
 
 
 def pyregf_test_single_open_close_file(filename, mode):
-  if not filename:
-    filename_string = "None"
-  else:
-    filename_string = filename
+  """Tests a single open and close."""
+  description = (
+      "Testing single open close of: {0:s} with access: {1:s}"
+      "\t").format(get_filename_string(filename), get_mode_string(mode))
+  print(description, end="")
 
-  print(
-      "Testing single open close of: {0:s} with access: {1:s}\t".format(
-          filename_string, get_mode_string(mode)), end="")
-
+  error_string = None
   result = True
+
   try:
     regf_file = pyregf.file()
 
@@ -91,11 +96,15 @@ def pyregf_test_single_open_close_file(filename, mode):
 
 
 def pyregf_test_multi_open_close_file(filename, mode):
-  print(
-      "Testing multi open close of: {0:s} with access: {1:s}\t".format(
-          filename, get_mode_string(mode)), end="")
+  """Tests multiple open and close."""
+  description = (
+      "Testing multi open close of: {0:s} with access: {1:s}"
+      "\t").format(get_filename_string(filename), get_mode_string(mode))
+  print(description, end="")
 
+  error_string = None
   result = True
+
   try:
     regf_file = pyregf.file()
 
@@ -119,11 +128,15 @@ def pyregf_test_multi_open_close_file(filename, mode):
 
 
 def pyregf_test_single_open_close_file_object(filename, mode):
-  print(
-      ("Testing single open close of file-like object of: {0:s} "
-       "with access: {1:s}\t").format(filename, get_mode_string(mode)), end="")
+  """Tests a single file-like object open and close."""
+  description = (
+      "Testing single open close of file-like object of: {0:s} with access: "
+      "{1:s}\t").format(get_filename_string(filename), get_mode_string(mode))
+  print(description, end="")
 
+  error_string = None
   result = True
+
   try:
     file_object = open(filename, "rb")
     regf_file = pyregf.file()
@@ -147,12 +160,16 @@ def pyregf_test_single_open_close_file_object(filename, mode):
 
 def pyregf_test_single_open_close_file_object_with_dereference(
     filename, mode):
-  print(
-      ("Testing single open close of file-like object with dereference "
-       "of: {0:s} with access: {1:s}\t").format(
-          filename, get_mode_string(mode)), end="")
+  """Tests single file-like object open and close with dereference."""
+  description = (
+      "Testing single open close of file-like object with dereference of: "
+      "{0:s} with access: {1:s}\t").format(
+          get_filename_string(filename), get_mode_string(mode))
+  print(description, end="")
 
+  error_string = None
   result = True
+
   try:
     file_object = open(filename, "rb")
     regf_file = pyregf.file()
@@ -176,11 +193,16 @@ def pyregf_test_single_open_close_file_object_with_dereference(
 
 
 def pyregf_test_multi_open_close_file_object(filename, mode):
-  print(
-      ("Testing multi open close of file-like object of: {0:s} "
-       "with access: {1:s}\t").format(filename, get_mode_string(mode)), end="")
+  """Tests multiple file-like object open and close."""
+  description = (
+      "Testing multi open close of file-like object of: {0:s} "
+      "with access: {1:s}\t").format(
+          get_filename_string(filename), get_mode_string(mode))
+  print(description, end="")
 
+  error_string = None
   result = True
+
   try:
     file_object = open(filename, "rb")
     regf_file = pyregf.file()
@@ -205,8 +227,8 @@ def pyregf_test_multi_open_close_file_object(filename, mode):
 
 
 def main():
-  args_parser = argparse.ArgumentParser(description=(
-      "Tests open and close."))
+  args_parser = argparse.ArgumentParser(
+      description="Tests open and close.")
 
   args_parser.add_argument(
       "source", nargs="?", action="store", metavar="FILENAME",
@@ -252,4 +274,3 @@ if __name__ == "__main__":
     sys.exit(1)
   else:
     sys.exit(0)
-

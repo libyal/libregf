@@ -38,5 +38,5 @@ const char *pyregf_codepage_to_string(
 }
 #endif
 
-#endif
+#endif /* !defined( _PYREGF_CODEPAGE_H */
 

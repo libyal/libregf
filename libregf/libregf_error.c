@@ -20,9 +20,8 @@
  */
 
 #include <common.h>
+#include <file_stream.h>
 #include <types.h>
-
-#include <stdio.h>
 
 #include "libregf_error.h"
 #include "libregf_libcerror.h"
@@ -51,6 +50,7 @@ int libregf_error_fprint(
 }
 
 /* Prints a descriptive string of the error to the string
+ * The end-of-string character is not included in the return value
  * Returns the number of printed characters if successful or -1 on error
  */
 int libregf_error_sprint(
@@ -77,6 +77,7 @@ int libregf_error_backtrace_fprint(
 }
 
 /* Prints a backtrace of the error to the string
+ * The end-of-string character is not included in the return value
  * Returns the number of printed characters if successful or -1 on error
  */
 int libregf_error_backtrace_sprint(
@@ -90,5 +91,5 @@ int libregf_error_backtrace_sprint(
 	         size ) );
 }
 
-#endif
+#endif /* !defined( HAVE_LOCAL_LIBREGF ) */
 

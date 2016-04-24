@@ -49,7 +49,7 @@
 
 #include <libfdatetime.h>
 
-#endif
+#endif /* defined( HAVE_LOCAL_LIBFDATETIME ) */
 
-#endif
+#endif /* !defined( _LIBREGF_LIBFDATETIME_H ) */
 

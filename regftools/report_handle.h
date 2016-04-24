@@ -53,7 +53,7 @@ struct report_handle
 	 */
 	size_t base_key_name_size;
 
-	/* The nofication output stream
+	/* The notification output stream
 	 */
 	FILE *notify_stream;
 

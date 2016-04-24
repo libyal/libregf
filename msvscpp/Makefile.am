@@ -22,6 +22,9 @@ MSVSCPP_FILES = \
 	libregf/libregf.vcproj \
 	libuna/libuna.vcproj \
 	pyregf/pyregf.vcproj \
+	regf_test_get_version/regf_test_get_version.vcproj \
+	regf_test_open_close/regf_test_open_close.vcproj \
+	regf_test_set_ascii_codepage/regf_test_set_ascii_codepage.vcproj \
 	regfexport/regfexport.vcproj \
 	regfinfo/regfinfo.vcproj \
 	regfmount/regfmount.vcproj \

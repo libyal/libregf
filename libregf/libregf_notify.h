@@ -23,9 +23,8 @@
 #define _LIBREGF_NOTIFY_H
 
 #include <common.h>
+#include <file_stream.h>
 #include <types.h>
-
-#include <stdio.h>
 
 #include "libregf_extern.h"
 #include "libregf_libcerror.h"
@@ -54,11 +53,11 @@ LIBREGF_EXTERN \
 int libregf_notify_stream_close(
      libcerror_error_t **error );
 
-#endif
+#endif /* !defined( HAVE_LOCAL_LIBREGF ) */
 
 #if defined( __cplusplus )
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBREGF_NOTIFY_H ) */
 

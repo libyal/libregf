@@ -44,14 +44,27 @@ EXTRA_DIST = \
 	$(check_SCRIPTS)
 
 check_PROGRAMS = \
+	regf_test_error \
 	regf_test_get_version \
 	regf_test_open_close \
 	regf_test_set_ascii_codepage
+
+regf_test_error_SOURCES = \
+	regf_test_error.c \
+	regf_test_libcstring.h \
+	regf_test_libregf.h \
+	regf_test_macros.h \
+	regf_test_unused.h
+
+regf_test_error_LDADD = \
+	../libregf/libregf.la \
+	@LIBCSTRING_LIBADD@
 
 regf_test_get_version_SOURCES = \
 	regf_test_get_version.c \
 	regf_test_libcstring.h \
 	regf_test_libregf.h \
+	regf_test_macros.h \
 	regf_test_unused.h
 
 regf_test_get_version_LDADD = \

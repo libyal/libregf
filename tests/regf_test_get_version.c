@@ -20,7 +20,6 @@
  */
 
 #include <common.h>
-#include <file_stream.h>
 
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
@@ -28,6 +27,7 @@
 
 #include "regf_test_libcstring.h"
 #include "regf_test_libregf.h"
+#include "regf_test_macros.h"
 #include "regf_test_unused.h"
 
 /* Tests retrieving the library version
@@ -46,11 +46,15 @@ int regf_test_get_version(
 	          LIBREGF_VERSION_STRING,
 	          9 );
 
-	if( result != 0 )
-	{
-		return( 0 );
-	}
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
 	return( 1 );
+
+on_error:
+	return( 0 );
 }
 
 /* The main program
@@ -68,10 +72,13 @@ int main(
 	REGF_TEST_UNREFERENCED_PARAMETER( argc )
 	REGF_TEST_UNREFERENCED_PARAMETER( argv )
 
-	if( regf_test_get_version() != 1 )
-	{
-		return( EXIT_FAILURE );
-	}
+	REGF_TEST_RUN(
+	 "libregf_get_version",
+	 regf_test_get_version() )
+
 	return( EXIT_SUCCESS );
+
+on_error:
+	return( EXIT_FAILURE );
 }
 

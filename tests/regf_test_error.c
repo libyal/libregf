@@ -20,6 +20,8 @@
  */
 
 #include <common.h>
+#include <file_stream.h>
+#include <types.h>
 
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
@@ -108,7 +110,7 @@ int regf_test_error_backtrace_sprint(
 
 /* The main program
  */
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 int wmain(
      int argc REGF_TEST_ATTRIBUTE_UNUSED,
      wchar_t * const argv[] REGF_TEST_ATTRIBUTE_UNUSED )
@@ -123,23 +125,23 @@ int main(
 
 	REGF_TEST_RUN(
 	 "libregf_error_free",
-	 regf_test_error_free() )
+	 regf_test_error_free );
 
 	REGF_TEST_RUN(
 	 "libregf_error_fprint",
-	 regf_test_error_fprint() )
+	 regf_test_error_fprint );
 
 	REGF_TEST_RUN(
 	 "libregf_error_sprint",
-	 regf_test_error_sprint() )
+	 regf_test_error_sprint );
 
 	REGF_TEST_RUN(
 	 "libregf_error_backtrace_fprint",
-	 regf_test_error_backtrace_fprint() )
+	 regf_test_error_backtrace_fprint );
 
 	REGF_TEST_RUN(
 	 "libregf_error_backtrace_sprint",
-	 regf_test_error_backtrace_sprint() )
+	 regf_test_error_backtrace_sprint );
 
 	return( EXIT_SUCCESS );
 

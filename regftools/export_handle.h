@@ -28,7 +28,6 @@
 
 #include "log_handle.h"
 #include "regftools_libcerror.h"
-#include "regftools_libcstring.h"
 #include "regftools_libregf.h"
 
 #if defined( __cplusplus )
@@ -70,7 +69,7 @@ int export_handle_signal_abort(
 
 int export_handle_set_ascii_codepage(
      export_handle_t *export_handle,
-     const libcstring_system_character_t *string,
+     const system_character_t *string,
      libcerror_error_t **error );
 
 int export_handle_print_data(
@@ -82,7 +81,7 @@ int export_handle_print_data(
 
 int export_handle_open_input(
      export_handle_t *export_handle,
-     const libcstring_system_character_t *filename,
+     const system_character_t *filename,
      libcerror_error_t **error );
 
 int export_handle_close_input(

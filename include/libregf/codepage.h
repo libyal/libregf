@@ -118,5 +118,5 @@ enum LIBREGF_CODEPAGES
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBREGF_CODEPAGE_H ) */
 

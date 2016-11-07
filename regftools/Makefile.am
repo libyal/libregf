@@ -1,7 +1,6 @@
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/common \
-	@LIBCSTRING_CPPFLAGS@ \
 	@LIBCERROR_CPPFLAGS@ \
 	@LIBCDATA_CPPFLAGS@ \
 	@LIBCLOCALE_CPPFLAGS@ \
@@ -54,7 +53,6 @@ regfexport_LDADD = \
 	@LIBCNOTIFY_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
 	@LIBCERROR_LIBADD@ \
-	@LIBCSTRING_LIBADD@ \
 	@LIBINTL@
 
 regfinfo_SOURCES = \
@@ -65,7 +63,6 @@ regfinfo_SOURCES = \
 	regftools_libcerror.h \
 	regftools_libclocale.h \
 	regftools_libcnotify.h \
-	regftools_libcstring.h \
 	regftools_libcsystem.h \
 	regftools_libfdata.h \
 	regftools_libfdatetime.h \
@@ -81,7 +78,6 @@ regfinfo_LDADD = \
 	@LIBCNOTIFY_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
 	@LIBCERROR_LIBADD@ \
-	@LIBCSTRING_LIBADD@ \
 	@LIBINTL@
 
 regfmount_SOURCES = \
@@ -92,7 +88,6 @@ regfmount_SOURCES = \
 	regftools_libcerror.h \
 	regftools_libclocale.h \
 	regftools_libcnotify.h \
-	regftools_libcstring.h \
 	regftools_libcsystem.h \
 	regftools_libfdata.h \
 	regftools_libfdatetime.h \
@@ -109,7 +104,6 @@ regfmount_LDADD = \
 	@LIBCNOTIFY_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
 	@LIBCERROR_LIBADD@ \
-	@LIBCSTRING_LIBADD@ \
 	@LIBINTL@
 
 regfreport_SOURCES = \
@@ -119,7 +113,6 @@ regfreport_SOURCES = \
 	regftools_libcerror.h \
 	regftools_libclocale.h \
 	regftools_libcnotify.h \
-	regftools_libcstring.h \
 	regftools_libcsystem.h \
 	regftools_libfdata.h \
 	regftools_libfdatetime.h \
@@ -145,7 +138,6 @@ regfreport_LDADD = \
 	@LIBCNOTIFY_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
 	@LIBCERROR_LIBADD@ \
-	@LIBCSTRING_LIBADD@ \
 	@LIBINTL@
 
 MAINTAINERCLEANFILES = \

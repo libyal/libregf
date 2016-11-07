@@ -22,7 +22,10 @@
 #include <common.h>
 #include <file_stream.h>
 #include <memory.h>
+#include <narrow_string.h>
+#include <system_string.h>
 #include <types.h>
+#include <wide_string.h>
 
 #if defined( HAVE_ERRNO_H )
 #include <errno.h>
@@ -55,7 +58,6 @@
 #include "regftools_libcerror.h"
 #include "regftools_libclocale.h"
 #include "regftools_libcnotify.h"
-#include "regftools_libcstring.h"
 #include "regftools_libcsystem.h"
 #include "regftools_libregf.h"
 
@@ -192,7 +194,7 @@ int regfmount_fuse_open(
 
 		goto on_error;
 	}
-	path_length = libcstring_narrow_string_length(
+	path_length = narrow_string_length(
 	               path );
 
 	normalized_path_length = path_length;
@@ -204,18 +206,18 @@ int regfmount_fuse_open(
 	}
 	if( ( normalized_path_length >= 12 )
 	 && ( path[ normalized_path_length - 12 ] == '/' )
-	 && ( libcstring_system_string_compare(
+	 && ( system_string_compare(
 	       &( path[ normalized_path_length - 11 ] ),
-	       _LIBCSTRING_SYSTEM_STRING( "(classname)" ),
+	       _SYSTEM_STRING( "(classname)" ),
 	       11 ) == 0 ) )
 	{
 		file_entry_type = REGFMOUNT_FILE_ENTRY_TYPE_CLASS_NAME;
 	}
 	else if( ( normalized_path_length >= 9 )
 	      && ( path[ normalized_path_length - 9 ] == '/' )
-	      && ( libcstring_system_string_compare(
+	      && ( system_string_compare(
 	            &( path[ normalized_path_length - 8 ] ),
-	            _LIBCSTRING_SYSTEM_STRING( "(values)" ),
+	            _SYSTEM_STRING( "(values)" ),
 	            8 ) == 0 ) )
 	{
 		file_entry_type = REGFMOUNT_FILE_ENTRY_TYPE_VALUES;
@@ -236,7 +238,7 @@ int regfmount_fuse_open(
 		     regfmount_mount_handle,
 		     path,
 		     path_length,
-		     (libcstring_system_character_t) '/',
+		     (system_character_t) '/',
 		     &key,
 		     &error ) != 1 )
 		{
@@ -259,7 +261,7 @@ int regfmount_fuse_open(
 		     regfmount_mount_handle,
 		     path,
 		     path_length,
-		     (libcstring_system_character_t) '/',
+		     (system_character_t) '/',
 		     &key,
 		     &value,
 		     &error ) != 1 )
@@ -427,7 +429,7 @@ int regfmount_fuse_read(
 
 		goto on_error;
 	}
-	path_length = libcstring_narrow_string_length(
+	path_length = narrow_string_length(
 	               path );
 
 	normalized_path_length = path_length;
@@ -439,18 +441,18 @@ int regfmount_fuse_read(
 	}
 	if( ( normalized_path_length >= 12 )
 	 && ( path[ normalized_path_length - 12 ] == '/' )
-	 && ( libcstring_system_string_compare(
+	 && ( system_string_compare(
 	       &( path[ normalized_path_length - 11 ] ),
-	       _LIBCSTRING_SYSTEM_STRING( "(classname)" ),
+	       _SYSTEM_STRING( "(classname)" ),
 	       11 ) == 0 ) )
 	{
 		file_entry_type = REGFMOUNT_FILE_ENTRY_TYPE_CLASS_NAME;
 	}
 	else if( ( normalized_path_length >= 9 )
 	      && ( path[ normalized_path_length - 9 ] == '/' )
-	      && ( libcstring_system_string_compare(
+	      && ( system_string_compare(
 	            &( path[ normalized_path_length - 8 ] ),
-	            _LIBCSTRING_SYSTEM_STRING( "(values)" ),
+	            _SYSTEM_STRING( "(values)" ),
 	            8 ) == 0 ) )
 	{
 		file_entry_type = REGFMOUNT_FILE_ENTRY_TYPE_VALUES;
@@ -471,7 +473,7 @@ int regfmount_fuse_read(
 		     regfmount_mount_handle,
 		     path,
 		     path_length,
-		     (libcstring_system_character_t) '/',
+		     (system_character_t) '/',
 		     &key,
 		     &error ) != 1 )
 		{
@@ -510,7 +512,7 @@ int regfmount_fuse_read(
 		     regfmount_mount_handle,
 		     path,
 		     path_length,
-		     (libcstring_system_character_t) '/',
+		     (system_character_t) '/',
 		     &key,
 		     &value,
 		     &error ) != 1 )
@@ -893,7 +895,7 @@ int regfmount_fuse_filldir(
 	     regfmount_mount_handle,
 	     name,
 	     name_size,
-	     (libcstring_system_character_t) '/',
+	     (system_character_t) '/',
 	     &sanitized_name,
 	     &sanitized_name_size,
 	     error ) != 1 )
@@ -1082,7 +1084,7 @@ int regfmount_fuse_readdir(
 
 		goto on_error;
 	}
-	path_length = libcstring_narrow_string_length(
+	path_length = narrow_string_length(
 	               path );
 
 	normalized_path_length = path_length;
@@ -1094,18 +1096,18 @@ int regfmount_fuse_readdir(
 	}
 	if( ( normalized_path_length >= 12 )
 	 && ( path[ normalized_path_length - 12 ] == '/' )
-	 && ( libcstring_system_string_compare(
+	 && ( system_string_compare(
 	       &( path[ normalized_path_length - 11 ] ),
-	       _LIBCSTRING_SYSTEM_STRING( "(classname)" ),
+	       _SYSTEM_STRING( "(classname)" ),
 	       11 ) == 0 ) )
 	{
 		file_entry_type = REGFMOUNT_FILE_ENTRY_TYPE_CLASS_NAME;
 	}
 	else if( ( normalized_path_length >= 9 )
 	      && ( path[ normalized_path_length - 9 ] == '/' )
-	      && ( libcstring_system_string_compare(
+	      && ( system_string_compare(
 	            &( path[ normalized_path_length - 8 ] ),
-	            _LIBCSTRING_SYSTEM_STRING( "(values)" ),
+	            _SYSTEM_STRING( "(values)" ),
 	            8 ) == 0 ) )
 	{
 		file_entry_type = REGFMOUNT_FILE_ENTRY_TYPE_VALUES;
@@ -1124,7 +1126,7 @@ int regfmount_fuse_readdir(
 	     regfmount_mount_handle,
 	     path,
 	     path_length,
-	     (libcstring_system_character_t) '/',
+	     (system_character_t) '/',
 	     &key,
 	     &error ) != 1 )
 	{
@@ -1226,7 +1228,7 @@ int regfmount_fuse_readdir(
 
 				goto on_error;
 			}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 			result = libregf_key_get_utf16_name_size(
 				  sub_key,
 				  &name_size,
@@ -1265,7 +1267,7 @@ int regfmount_fuse_readdir(
 
 					goto on_error;
 				}
-				name = libcstring_narrow_string_allocate(
+				name = narrow_string_allocate(
 					name_size );
 
 				if( name == NULL )
@@ -1281,7 +1283,7 @@ int regfmount_fuse_readdir(
 
 					goto on_error;
 				}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 				result = libregf_key_get_utf16_name(
 					  sub_key,
 					  (uint16_t *) name,
@@ -1483,7 +1485,7 @@ int regfmount_fuse_readdir(
 
 				goto on_error;
 			}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 			result = libregf_value_get_utf16_name_size(
 				  value,
 				  &name_size,
@@ -1522,7 +1524,7 @@ int regfmount_fuse_readdir(
 
 					goto on_error;
 				}
-				name = libcstring_narrow_string_allocate(
+				name = narrow_string_allocate(
 					name_size );
 
 				if( name == NULL )
@@ -1538,7 +1540,7 @@ int regfmount_fuse_readdir(
 
 					goto on_error;
 				}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 				result = libregf_value_get_utf16_name(
 					  value,
 					  (uint16_t *) name,
@@ -1761,7 +1763,7 @@ int regfmount_fuse_getattr(
 
 		goto on_error;
 	}
-	path_length = libcstring_narrow_string_length(
+	path_length = narrow_string_length(
 	               path );
 
 	if( path_length == 1 )
@@ -1784,18 +1786,18 @@ int regfmount_fuse_getattr(
 		}
 		if( ( normalized_path_length >= 12 )
 		 && ( path[ normalized_path_length - 12 ] == '/' )
-		 && ( libcstring_system_string_compare(
+		 && ( system_string_compare(
 		       &( path[ normalized_path_length - 11 ] ),
-		       _LIBCSTRING_SYSTEM_STRING( "(classname)" ),
+		       _SYSTEM_STRING( "(classname)" ),
 		       11 ) == 0 ) )
 		{
 			file_entry_type = REGFMOUNT_FILE_ENTRY_TYPE_CLASS_NAME;
 		}
 		else if( ( normalized_path_length >= 9 )
 		      && ( path[ normalized_path_length - 9 ] == '/' )
-		      && ( libcstring_system_string_compare(
+		      && ( system_string_compare(
 		            &( path[ normalized_path_length - 8 ] ),
-		            _LIBCSTRING_SYSTEM_STRING( "(values)" ),
+		            _SYSTEM_STRING( "(values)" ),
 		            8 ) == 0 ) )
 		{
 			file_entry_type = REGFMOUNT_FILE_ENTRY_TYPE_VALUES;
@@ -1808,7 +1810,7 @@ int regfmount_fuse_getattr(
 			  regfmount_mount_handle,
 			  path,
 			  path_length,
-			  (libcstring_system_character_t) '/',
+			  (system_character_t) '/',
 			  &key,
 			  &error );
 
@@ -1833,7 +1835,7 @@ int regfmount_fuse_getattr(
 				  regfmount_mount_handle,
 				  path,
 				  path_length,
-				  (libcstring_system_character_t) '/',
+				  (system_character_t) '/',
 				  &key,
 				  &value,
 				  &error );
@@ -2124,7 +2126,7 @@ int __stdcall regfmount_dokan_CreateFile(
 
 		goto on_error;
 	}
-	path_length = libcstring_wide_string_length(
+	path_length = wide_string_length(
 	               path );
 
 	if( path_length == 1 )
@@ -2155,18 +2157,18 @@ int __stdcall regfmount_dokan_CreateFile(
 		}
 		if( ( normalized_path_length >= 12 )
 		 && ( path[ normalized_path_length - 12 ] == '\\' )
-		 && ( libcstring_system_string_compare(
+		 && ( system_string_compare(
 		       &( path[ normalized_path_length - 11 ] ),
-		       _LIBCSTRING_SYSTEM_STRING( "(classname)" ),
+		       _SYSTEM_STRING( "(classname)" ),
 		       11 ) == 0 ) )
 		{
 			file_entry_type = REGFMOUNT_FILE_ENTRY_TYPE_CLASS_NAME;
 		}
 		else if( ( normalized_path_length >= 9 )
 		      && ( path[ normalized_path_length - 9 ] == '\\' )
-		      && ( libcstring_system_string_compare(
+		      && ( system_string_compare(
 			    &( path[ normalized_path_length - 8 ] ),
-			    _LIBCSTRING_SYSTEM_STRING( "(values)" ),
+			    _SYSTEM_STRING( "(values)" ),
 			    8 ) == 0 ) )
 		{
 			file_entry_type = REGFMOUNT_FILE_ENTRY_TYPE_VALUES;
@@ -2179,7 +2181,7 @@ int __stdcall regfmount_dokan_CreateFile(
 		          regfmount_mount_handle,
 		          path,
 		          path_length,
-		          (libcstring_system_character_t) '\\',
+		          (system_character_t) '\\',
 		          &key,
 		          &error );
 
@@ -2204,7 +2206,7 @@ int __stdcall regfmount_dokan_CreateFile(
 				  regfmount_mount_handle,
 				  path,
 				  path_length,
-			          (libcstring_system_character_t) '\\',
+			          (system_character_t) '\\',
 				  &key,
 				  &value,
 				  &error );
@@ -2322,7 +2324,7 @@ int __stdcall regfmount_dokan_OpenDirectory(
 
 		goto on_error;
 	}
-	path_length = libcstring_wide_string_length(
+	path_length = wide_string_length(
 	               path );
 
 	if( path_length == 1 )
@@ -2353,18 +2355,18 @@ int __stdcall regfmount_dokan_OpenDirectory(
 		}
 		if( ( normalized_path_length >= 12 )
 		 && ( path[ normalized_path_length - 12 ] == '\\' )
-		 && ( libcstring_system_string_compare(
+		 && ( system_string_compare(
 		       &( path[ normalized_path_length - 11 ] ),
-		       _LIBCSTRING_SYSTEM_STRING( "(classname)" ),
+		       _SYSTEM_STRING( "(classname)" ),
 		       11 ) == 0 ) )
 		{
 			file_entry_type = REGFMOUNT_FILE_ENTRY_TYPE_CLASS_NAME;
 		}
 		else if( ( normalized_path_length >= 9 )
 		      && ( path[ normalized_path_length - 9 ] == '\\' )
-		      && ( libcstring_system_string_compare(
+		      && ( system_string_compare(
 			    &( path[ normalized_path_length - 8 ] ),
-			    _LIBCSTRING_SYSTEM_STRING( "(values)" ),
+			    _SYSTEM_STRING( "(values)" ),
 			    8 ) == 0 ) )
 		{
 			file_entry_type = REGFMOUNT_FILE_ENTRY_TYPE_VALUES;
@@ -2383,7 +2385,7 @@ int __stdcall regfmount_dokan_OpenDirectory(
 		          regfmount_mount_handle,
 		          path,
 		          path_length,
-		          (libcstring_system_character_t) '\\',
+		          (system_character_t) '\\',
 		          &key,
 		          &error );
 
@@ -2545,7 +2547,7 @@ int __stdcall regfmount_dokan_ReadFile(
 
 		goto on_error;
 	}
-	path_length = libcstring_wide_string_length(
+	path_length = wide_string_length(
 	               path );
 
 	normalized_path_length = path_length;
@@ -2557,18 +2559,18 @@ int __stdcall regfmount_dokan_ReadFile(
 	}
 	if( ( normalized_path_length >= 12 )
 	 && ( path[ normalized_path_length - 12 ] == '\\' )
-	 && ( libcstring_system_string_compare(
+	 && ( system_string_compare(
 	       &( path[ normalized_path_length - 11 ] ),
-	       _LIBCSTRING_SYSTEM_STRING( "(classname)" ),
+	       _SYSTEM_STRING( "(classname)" ),
 	       11 ) == 0 ) )
 	{
 		file_entry_type = REGFMOUNT_FILE_ENTRY_TYPE_CLASS_NAME;
 	}
 	else if( ( normalized_path_length >= 9 )
 	      && ( path[ normalized_path_length - 9 ] == '\\' )
-	      && ( libcstring_system_string_compare(
+	      && ( system_string_compare(
 	            &( path[ normalized_path_length - 8 ] ),
-	            _LIBCSTRING_SYSTEM_STRING( "(values)" ),
+	            _SYSTEM_STRING( "(values)" ),
 	            8 ) == 0 ) )
 	{
 		file_entry_type = REGFMOUNT_FILE_ENTRY_TYPE_VALUES;
@@ -2589,7 +2591,7 @@ int __stdcall regfmount_dokan_ReadFile(
 		     regfmount_mount_handle,
 		     path,
 		     path_length,
-		     (libcstring_system_character_t) '\\',
+		     (system_character_t) '\\',
 		     &key,
 		     &error ) != 1 )
 		{
@@ -2628,7 +2630,7 @@ int __stdcall regfmount_dokan_ReadFile(
 		          regfmount_mount_handle,
 		          path,
 		          path_length,
-		          (libcstring_system_character_t) '\\',
+		          (system_character_t) '\\',
 		          &key,
 		          &value,
 		          &error );
@@ -2960,7 +2962,7 @@ int regfmount_dokan_filldir(
 	     regfmount_mount_handle,
 	     name,
 	     name_size,
-	     (libcstring_system_character_t) '\\',
+	     (system_character_t) '\\',
 	     &sanitized_name,
 	     &sanitized_name_size,
 	     error ) != 1 )
@@ -3039,7 +3041,7 @@ int regfmount_dokan_filldir(
 
 		goto on_error;
 	}
-	if( libcstring_wide_string_copy(
+	if( wide_string_copy(
 	     find_data->cFileName,
 	     sanitized_name,
 	     sanitized_name_size ) == NULL )
@@ -3055,7 +3057,7 @@ int regfmount_dokan_filldir(
 	}
 	if( sanitized_name_size < (size_t) 14 )
 	{
-		if( libcstring_wide_string_copy(
+		if( wide_string_copy(
 		     find_data->cAlternateFileName,
 		     sanitized_name,
 		     sanitized_name_size ) == NULL )
@@ -3158,7 +3160,7 @@ int __stdcall regfmount_dokan_FindFiles(
 
 		goto on_error;
 	}
-	path_length = libcstring_wide_string_length(
+	path_length = wide_string_length(
 	               path );
 
 	normalized_path_length = path_length;
@@ -3170,18 +3172,18 @@ int __stdcall regfmount_dokan_FindFiles(
 	}
 	if( ( normalized_path_length >= 12 )
 	 && ( path[ normalized_path_length - 12 ] == '\\' )
-	 && ( libcstring_system_string_compare(
+	 && ( system_string_compare(
 	       &( path[ normalized_path_length - 11 ] ),
-	       _LIBCSTRING_SYSTEM_STRING( "(classname)" ),
+	       _SYSTEM_STRING( "(classname)" ),
 	       11 ) == 0 ) )
 	{
 		file_entry_type = REGFMOUNT_FILE_ENTRY_TYPE_CLASS_NAME;
 	}
 	else if( ( normalized_path_length >= 9 )
 	      && ( path[ normalized_path_length - 9 ] == '\\' )
-	      && ( libcstring_system_string_compare(
+	      && ( system_string_compare(
 	            &( path[ normalized_path_length - 8 ] ),
-	            _LIBCSTRING_SYSTEM_STRING( "(values)" ),
+	            _SYSTEM_STRING( "(values)" ),
 	            8 ) == 0 ) )
 	{
 		file_entry_type = REGFMOUNT_FILE_ENTRY_TYPE_VALUES;
@@ -3200,7 +3202,7 @@ int __stdcall regfmount_dokan_FindFiles(
 	     regfmount_mount_handle,
 	     path,
 	     path_length,
-	     (libcstring_system_character_t) '\\',
+	     (system_character_t) '\\',
 	     &key,
 	     &error ) != 1 )
 	{
@@ -3333,7 +3335,7 @@ int __stdcall regfmount_dokan_FindFiles(
 
 					goto on_error;
 				}
-				name = libcstring_wide_string_allocate(
+				name = wide_string_allocate(
 					name_size );
 
 				if( name == NULL )
@@ -3605,7 +3607,7 @@ int __stdcall regfmount_dokan_FindFiles(
 
 					goto on_error;
 				}
-				name = libcstring_wide_string_allocate(
+				name = wide_string_allocate(
 					name_size );
 
 				if( name == NULL )
@@ -3889,7 +3891,7 @@ int __stdcall regfmount_dokan_GetFileInformation(
 
 		goto on_error;
 	}
-	path_length = libcstring_wide_string_length(
+	path_length = wide_string_length(
 	               path );
 
 	if( path_length == 1 )
@@ -3923,18 +3925,18 @@ int __stdcall regfmount_dokan_GetFileInformation(
 		}
 		if( ( normalized_path_length >= 12 )
 		 && ( path[ normalized_path_length - 12 ] == '\\' )
-		 && ( libcstring_system_string_compare(
+		 && ( system_string_compare(
 		       &( path[ normalized_path_length - 11 ] ),
-		       _LIBCSTRING_SYSTEM_STRING( "(classname)" ),
+		       _SYSTEM_STRING( "(classname)" ),
 		       11 ) == 0 ) )
 		{
 			file_entry_type = REGFMOUNT_FILE_ENTRY_TYPE_CLASS_NAME;
 		}
 		else if( ( normalized_path_length >= 9 )
 		      && ( path[ normalized_path_length - 9 ] == '\\' )
-		      && ( libcstring_system_string_compare(
+		      && ( system_string_compare(
 		            &( path[ normalized_path_length - 8 ] ),
-		            _LIBCSTRING_SYSTEM_STRING( "(values)" ),
+		            _SYSTEM_STRING( "(values)" ),
 		            8 ) == 0 ) )
 		{
 			file_entry_type = REGFMOUNT_FILE_ENTRY_TYPE_VALUES;
@@ -3947,7 +3949,7 @@ int __stdcall regfmount_dokan_GetFileInformation(
 		          regfmount_mount_handle,
 		          path,
 		          path_length,
-		          (libcstring_system_character_t) '\\',
+		          (system_character_t) '\\',
 		          &key,
 		          &error );
 
@@ -3972,7 +3974,7 @@ int __stdcall regfmount_dokan_GetFileInformation(
 				  regfmount_mount_handle,
 				  path,
 				  path_length,
-			          (libcstring_system_character_t) '\\',
+			          (system_character_t) '\\',
 				  &key,
 				  &value,
 				  &error );
@@ -4242,28 +4244,28 @@ int __stdcall regfmount_dokan_Unmount(
 
 /* The main program
  */
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 int wmain( int argc, wchar_t * const argv[] )
 #else
 int main( int argc, char * const argv[] )
 #endif
 {
-	libregf_error_t *error                                 = NULL;
-	libcstring_system_character_t *option_ascii_codepage   = NULL;
-	libcstring_system_character_t *option_extended_options = NULL;
-	libcstring_system_character_t *mount_point             = NULL;
-	libcstring_system_character_t *source                  = NULL;
-	char *program                                          = "regfmount";
-	libcstring_system_integer_t option                     = 0;
-	int result                                             = 0;
-	int verbose                                            = 0;
+	libregf_error_t *error                      = NULL;
+	system_character_t *option_ascii_codepage   = NULL;
+	system_character_t *option_extended_options = NULL;
+	system_character_t *mount_point             = NULL;
+	system_character_t *source                  = NULL;
+	char *program                               = "regfmount";
+	system_integer_t option                     = 0;
+	int result                                  = 0;
+	int verbose                                 = 0;
 
 #if defined( HAVE_LIBFUSE ) || defined( HAVE_LIBOSXFUSE )
 	struct fuse_operations regfmount_fuse_operations;
 
-	struct fuse_args regfmount_fuse_arguments              = FUSE_ARGS_INIT(0, NULL);
-	struct fuse_chan *regfmount_fuse_channel               = NULL;
-	struct fuse *regfmount_fuse_handle                     = NULL;
+	struct fuse_args regfmount_fuse_arguments   = FUSE_ARGS_INIT(0, NULL);
+	struct fuse_chan *regfmount_fuse_channel    = NULL;
+	struct fuse *regfmount_fuse_handle          = NULL;
 
 #elif defined( HAVE_LIBDOKAN )
 	DOKAN_OPERATIONS regfmount_dokan_operations;
@@ -4303,15 +4305,15 @@ int main( int argc, char * const argv[] )
 	while( ( option = libcsystem_getopt(
 	                   argc,
 	                   argv,
-	                   _LIBCSTRING_SYSTEM_STRING( "c:hvVX:" ) ) ) != (libcstring_system_integer_t) -1 )
+	                   _SYSTEM_STRING( "c:hvVX:" ) ) ) != (system_integer_t) -1 )
 	{
 		switch( option )
 		{
-			case (libcstring_system_integer_t) '?':
+			case (system_integer_t) '?':
 			default:
 				fprintf(
 				 stderr,
-				 "Invalid argument: %" PRIs_LIBCSTRING_SYSTEM "\n",
+				 "Invalid argument: %" PRIs_SYSTEM "\n",
 				 argv[ optind - 1 ] );
 
 				usage_fprint(
@@ -4319,29 +4321,29 @@ int main( int argc, char * const argv[] )
 
 				return( EXIT_FAILURE );
 
-			case (libcstring_system_integer_t) 'c':
+			case (system_integer_t) 'c':
 				option_ascii_codepage = optarg;
 
 				break;
 
-			case (libcstring_system_integer_t) 'h':
+			case (system_integer_t) 'h':
 				usage_fprint(
 				 stdout );
 
 				return( EXIT_SUCCESS );
 
-			case (libcstring_system_integer_t) 'v':
+			case (system_integer_t) 'v':
 				verbose = 1;
 
 				break;
 
-			case (libcstring_system_integer_t) 'V':
+			case (system_integer_t) 'V':
 				regfoutput_copyright_fprint(
 				 stdout );
 
 				return( EXIT_SUCCESS );
 
-			case (libcstring_system_integer_t) 'X':
+			case (system_integer_t) 'X':
 				option_extended_options = optarg;
 
 				break;

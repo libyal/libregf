@@ -26,7 +26,6 @@
 #include <types.h>
 
 #include "regftools_libcerror.h"
-#include "regftools_libcstring.h"
 #include "regftools_libregf.h"
 
 #if defined( __cplusplus )
@@ -104,7 +103,7 @@ int registry_file_set_ascii_codepage(
 
 int registry_file_open(
      registry_file_t *registry_file,
-     const libcstring_system_character_t *filename,
+     const system_character_t *filename,
      libcerror_error_t **error );
 
 int registry_file_close(
@@ -113,7 +112,7 @@ int registry_file_close(
 
 int registry_file_get_key_by_path(
      registry_file_t *registry_file,
-     const libcstring_system_character_t *key_path,
+     const system_character_t *key_path,
      size_t key_path_length,
      libregf_key_t **key,
      libcerror_error_t **error );

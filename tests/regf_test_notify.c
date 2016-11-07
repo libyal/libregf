@@ -1,5 +1,5 @@
 /*
- * Library get version test program
+ * Library notification functions test program
  *
  * Copyright (C) 2009-2016, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -20,46 +20,79 @@
  */
 
 #include <common.h>
+#include <file_stream.h>
+#include <types.h>
 
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
 #endif
 
-#include "regf_test_libcstring.h"
+#include "regf_test_libcerror.h"
 #include "regf_test_libregf.h"
 #include "regf_test_macros.h"
 #include "regf_test_unused.h"
 
-/* Tests retrieving the library version
+/* Tests the libregf_notify_set_verbose function
  * Returns 1 if successful or 0 if not
  */
-int regf_test_get_version(
+int regf_test_notify_set_verbose(
      void )
 {
-	const char *version_string = NULL;
-	int result                 = 0;
-
-	version_string = libregf_get_version();
-
-	result = libcstring_narrow_string_compare(
-	          version_string,
-	          LIBREGF_VERSION_STRING,
-	          9 );
-
-	REGF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
+	/* Test invocation of function only
+	 */
+	libregf_notify_set_verbose(
 	 0 );
 
 	return( 1 );
+}
 
-on_error:
-	return( 0 );
+/* Tests the libregf_notify_set_stream function
+ * Returns 1 if successful or 0 if not
+ */
+int regf_test_notify_set_stream(
+     void )
+{
+	/* Test invocation of function only
+	 */
+	libregf_notify_set_stream(
+	 NULL,
+	 NULL );
+
+	return( 1 );
+}
+
+/* Tests the libregf_notify_stream_open function
+ * Returns 1 if successful or 0 if not
+ */
+int regf_test_notify_stream_open(
+     void )
+{
+	/* Test invocation of function only
+	 */
+	libregf_notify_stream_open(
+	 NULL,
+	 NULL );
+
+	return( 1 );
+}
+
+/* Tests the libregf_notify_stream_close function
+ * Returns 1 if successful or 0 if not
+ */
+int regf_test_notify_stream_close(
+     void )
+{
+	/* Test invocation of function only
+	 */
+	libregf_notify_stream_close(
+	 NULL );
+
+	return( 1 );
 }
 
 /* The main program
  */
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 int wmain(
      int argc REGF_TEST_ATTRIBUTE_UNUSED,
      wchar_t * const argv[] REGF_TEST_ATTRIBUTE_UNUSED )
@@ -73,8 +106,20 @@ int main(
 	REGF_TEST_UNREFERENCED_PARAMETER( argv )
 
 	REGF_TEST_RUN(
-	 "libregf_get_version",
-	 regf_test_get_version() )
+	 "libregf_notify_set_verbose",
+	 regf_test_notify_set_verbose )
+
+	REGF_TEST_RUN(
+	 "libregf_notify_set_stream",
+	 regf_test_notify_set_stream )
+
+	REGF_TEST_RUN(
+	 "libregf_notify_stream_open",
+	 regf_test_notify_stream_open )
+
+	REGF_TEST_RUN(
+	 "libregf_notify_stream_close",
+	 regf_test_notify_stream_close )
 
 	return( EXIT_SUCCESS );
 

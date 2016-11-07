@@ -22,12 +22,14 @@
 #include <common.h>
 #include <file_stream.h>
 #include <memory.h>
+#include <narrow_string.h>
+#include <system_string.h>
 #include <types.h>
+#include <wide_string.h>
 
 #include "info_handle.h"
 #include "regftools_libcerror.h"
 #include "regftools_libclocale.h"
-#include "regftools_libcstring.h"
 #include "regftools_libregf.h"
 
 #define INFO_HANDLE_NOTIFY_STREAM	stdout
@@ -211,7 +213,7 @@ int info_handle_signal_abort(
  */
 int info_handle_set_ascii_codepage(
      info_handle_t *info_handle,
-     const libcstring_system_character_t *string,
+     const system_character_t *string,
      libcerror_error_t **error )
 {
 	static char *function  = "info_handle_set_ascii_codepage";
@@ -233,10 +235,10 @@ int info_handle_set_ascii_codepage(
 	feature_flags = LIBCLOCALE_CODEPAGE_FEATURE_FLAG_HAVE_KOI8
 	              | LIBCLOCALE_CODEPAGE_FEATURE_FLAG_HAVE_WINDOWS;
 
-	string_length = libcstring_system_string_length(
+	string_length = system_string_length(
 	                 string );
 
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libclocale_codepage_copy_from_string_wide(
 	          &( info_handle->ascii_codepage ),
 	          string,
@@ -270,7 +272,7 @@ int info_handle_set_ascii_codepage(
  */
 int info_handle_open_input(
      info_handle_t *info_handle,
-     const libcstring_system_character_t *filename,
+     const system_character_t *filename,
      libcerror_error_t **error )
 {
 	static char *function = "info_handle_open_input";
@@ -300,7 +302,7 @@ int info_handle_open_input(
 
 		return( -1 );
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	if( libregf_file_open_wide(
 	     info_handle->input_file,
 	     filename,
@@ -371,17 +373,17 @@ int info_handle_key_fprint(
      int indentation_level,
      libregf_error_t **error )
 {
-	libcstring_system_character_t *name = NULL;
-	libregf_key_t *sub_key              = NULL;
-	libregf_value_t *value              = NULL;
-	static char *function               = "info_handle_key_fprint";
-	size_t name_size                    = 0;
-	int indentation_level_iterator      = 0;
-	int number_of_sub_keys              = 0;
-	int number_of_values                = 0;
-	int result                          = 0;
-	int sub_key_index                   = 0;
-	int value_index                     = 0;
+	system_character_t *name       = NULL;
+	libregf_key_t *sub_key         = NULL;
+	libregf_value_t *value         = NULL;
+	static char *function          = "info_handle_key_fprint";
+	size_t name_size               = 0;
+	int indentation_level_iterator = 0;
+	int number_of_sub_keys         = 0;
+	int number_of_values           = 0;
+	int result                     = 0;
+	int sub_key_index              = 0;
+	int value_index                = 0;
 
 	if( info_handle == NULL )
 	{
@@ -394,7 +396,7 @@ int info_handle_key_fprint(
 
 		return( -1 );
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libregf_key_get_utf16_name_size(
 	          key,
 	          &name_size,
@@ -419,7 +421,7 @@ int info_handle_key_fprint(
 	if( name_size > 0 )
 	{
 		if( ( name_size > (size_t) SSIZE_MAX )
-		 || ( ( sizeof( libcstring_system_character_t ) * name_size ) > (size_t) SSIZE_MAX ) )
+		 || ( ( sizeof( system_character_t ) * name_size ) > (size_t) SSIZE_MAX ) )
 		{
 			libcerror_error_set(
 			 error,
@@ -430,7 +432,7 @@ int info_handle_key_fprint(
 
 			goto on_error;
 		}
-		name = libcstring_system_string_allocate(
+		name = system_string_allocate(
 		        name_size );
 
 		if( name == NULL )
@@ -444,7 +446,7 @@ int info_handle_key_fprint(
 
 			goto on_error;
 		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		result = libregf_key_get_utf16_name(
 		          key,
 		          (uint16_t *) name,
@@ -478,7 +480,7 @@ int info_handle_key_fprint(
 		}
 		fprintf(
 		 info_handle->notify_stream,
-		 "(key:) %" PRIs_LIBCSTRING_SYSTEM "\n",
+		 "(key:) %" PRIs_SYSTEM "\n",
 		 name );
 
 		memory_free(
@@ -520,7 +522,7 @@ int info_handle_key_fprint(
 
 			goto on_error;
 		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		result = libregf_value_get_utf16_name_size(
 		          value,
 		          &name_size,
@@ -553,7 +555,7 @@ int info_handle_key_fprint(
 		if( name_size > 0 )
 		{
 			if( ( name_size > (size_t) SSIZE_MAX )
-			 || ( ( sizeof( libcstring_system_character_t ) * name_size ) > (size_t) SSIZE_MAX ) )
+			 || ( ( sizeof( system_character_t ) * name_size ) > (size_t) SSIZE_MAX ) )
 			{
 				libcerror_error_set(
 				 error,
@@ -564,7 +566,7 @@ int info_handle_key_fprint(
 
 				goto on_error;
 			}
-			name = libcstring_system_string_allocate(
+			name = system_string_allocate(
 			        name_size );
 
 			if( name == NULL )
@@ -578,7 +580,7 @@ int info_handle_key_fprint(
 
 				goto on_error;
 			}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 			result = libregf_value_get_utf16_name(
 			          value,
 			          (uint16_t *) name,
@@ -604,7 +606,7 @@ int info_handle_key_fprint(
 			}
 			fprintf(
 			 info_handle->notify_stream,
-			 "(value: %d) %" PRIs_LIBCSTRING_SYSTEM "\n",
+			 "(value: %d) %" PRIs_SYSTEM "\n",
 			 value_index,
 			 name );
 

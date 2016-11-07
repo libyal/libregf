@@ -27,7 +27,6 @@
 
 #include "pyregf_libbfio.h"
 #include "pyregf_libcerror.h"
-#include "pyregf_libcstring.h"
 #include "pyregf_python.h"
 
 #if defined( __cplusplus )

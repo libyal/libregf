@@ -21,7 +21,10 @@
 
 #include <common.h>
 #include <memory.h>
+#include <narrow_string.h>
+#include <system_string.h>
 #include <types.h>
+#include <wide_string.h>
 
 #if defined( HAVE_WCTYPE_H )
 #include <wctype.h>
@@ -265,9 +268,9 @@ int libregf_key_item_read_named_key(
 	int result                                   = 0;
 
 #if defined( HAVE_DEBUG_OUTPUT )
-	libcstring_system_character_t filetime_string[ 32 ];
+	system_character_t filetime_string[ 32 ];
 
-	libcstring_system_character_t *value_string  = NULL;
+	system_character_t *value_string             = NULL;
 	libfdatetime_filetime_t *filetime            = NULL;
 	size_t value_string_size                     = 0;
 	uint32_t value_32bit                         = 0;
@@ -479,7 +482,7 @@ int libregf_key_item_read_named_key(
 
 			goto on_error;
 		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		result = libfdatetime_filetime_copy_to_utf16_string(
 		          filetime,
 		          (uint16_t *) filetime_string,
@@ -506,7 +509,7 @@ int libregf_key_item_read_named_key(
 			goto on_error;
 		}
 		libcnotify_printf(
-		 "%s: last written time\t\t\t: %" PRIs_LIBCSTRING_SYSTEM " UTC\n",
+		 "%s: last written time\t\t\t: %" PRIs_SYSTEM " UTC\n",
 		 function,
 		 filetime_string );
 
@@ -730,7 +733,7 @@ int libregf_key_item_read_named_key(
 	{
 		if( ( key_item->flags & LIBREGF_NAMED_KEY_FLAG_NAME_IS_ASCII ) != 0 )
 		{
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 			result = libuna_utf16_string_size_from_byte_stream(
 				  key_item->name,
 				  (size_t) key_item->name_size,
@@ -748,7 +751,7 @@ int libregf_key_item_read_named_key(
 		}
 		else
 		{
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 			result = libuna_utf16_string_size_from_utf16_stream(
 				  key_item->name,
 				  (size_t) key_item->name_size,
@@ -775,7 +778,7 @@ int libregf_key_item_read_named_key(
 
 			goto on_error;
 		}
-		value_string = libcstring_system_string_allocate(
+		value_string = system_string_allocate(
 		                value_string_size );
 
 		if( value_string == NULL )
@@ -791,7 +794,7 @@ int libregf_key_item_read_named_key(
 		}
 		if( ( key_item->flags & LIBREGF_NAMED_KEY_FLAG_NAME_IS_ASCII ) != 0 )
 		{
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 			result = libuna_utf16_string_copy_from_byte_stream(
 				  (libuna_utf16_character_t *) value_string,
 				  value_string_size,
@@ -811,7 +814,7 @@ int libregf_key_item_read_named_key(
 		}
 		else
 		{
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 			result = libuna_utf16_string_copy_from_utf16_stream(
 				  (libuna_utf16_character_t *) value_string,
 				  value_string_size,
@@ -841,7 +844,7 @@ int libregf_key_item_read_named_key(
 			goto on_error;
 		}
 		libcnotify_printf(
-		 "%s: key name\t\t\t\t: %" PRIs_LIBCSTRING_SYSTEM "\n",
+		 "%s: key name\t\t\t\t: %" PRIs_SYSTEM "\n",
 		 function,
 		 value_string );
 
@@ -1117,18 +1120,18 @@ int libregf_key_item_read_class_name(
      uint16_t class_name_size,
      libcerror_error_t **error )
 {
-	libregf_hive_bin_t *hive_bin                = NULL;
-	libregf_hive_bin_cell_t *hive_bin_cell      = NULL;
-	uint8_t *hive_bin_cell_data                 = NULL;
-	static char *function                       = "libregf_key_item_read_class_name";
-	off64_t hive_bin_data_offset                = 0;
-	size_t hive_bin_cell_size                   = 0;
-	int hive_bin_index                          = 0;
+	libregf_hive_bin_t *hive_bin           = NULL;
+	libregf_hive_bin_cell_t *hive_bin_cell = NULL;
+	uint8_t *hive_bin_cell_data            = NULL;
+	static char *function                  = "libregf_key_item_read_class_name";
+	off64_t hive_bin_data_offset           = 0;
+	size_t hive_bin_cell_size              = 0;
+	int hive_bin_index                     = 0;
 
 #if defined( HAVE_DEBUG_OUTPUT )
-	libcstring_system_character_t *value_string = NULL;
-	size_t value_string_size                    = 0;
-	int result                                  = 0;
+	system_character_t *value_string       = NULL;
+	size_t value_string_size               = 0;
+	int result                             = 0;
 #endif
 
 	if( key_item == NULL )
@@ -1288,7 +1291,7 @@ int libregf_key_item_read_class_name(
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
 	{
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		result = libuna_utf16_string_size_from_utf16_stream(
 			  key_item->class_name,
 			  (size_t) key_item->class_name_size,
@@ -1315,7 +1318,7 @@ int libregf_key_item_read_class_name(
 
 			goto on_error;
 		}
-		value_string = libcstring_system_string_allocate(
+		value_string = system_string_allocate(
 		                value_string_size );
 
 		if( value_string == NULL )
@@ -1329,7 +1332,7 @@ int libregf_key_item_read_class_name(
 
 			goto on_error;
 		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		result = libuna_utf16_string_copy_from_utf16_stream(
 		          (libuna_utf16_character_t *) value_string,
 		          value_string_size,
@@ -1359,7 +1362,7 @@ int libregf_key_item_read_class_name(
 			goto on_error;
 		}
 		libcnotify_printf(
-		 "%s: class name\t\t\t: %" PRIs_LIBCSTRING_SYSTEM "\n",
+		 "%s: class name\t\t\t: %" PRIs_SYSTEM "\n",
 		 function,
 		 value_string );
 

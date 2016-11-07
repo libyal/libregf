@@ -8,7 +8,6 @@ if HAVE_PYTHON3
 AM_CFLAGS = \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/common \
-	@LIBCSTRING_CPPFLAGS@ \
 	@LIBCERROR_CPPFLAGS@ \
 	@LIBCDATA_CPPFLAGS@ \
 	@LIBCLOCALE_CPPFLAGS@ \
@@ -34,7 +33,6 @@ BUILT_SOURCES = \
 	pyregf_libbfio.h \
 	pyregf_libcerror.h \
 	pyregf_libclocale.h \
-	pyregf_libcstring.h \
 	pyregf_libregf.h \
 	pyregf_python.h \
 	pyregf_unused.h \
@@ -47,15 +45,14 @@ pyexec_LTLIBRARIES = pyregf.la
 nodist_pyregf_la_SOURCES = $(BUILT_SOURCES)
 
 pyregf_la_LIBADD = \
+	@LIBCERROR_LIBADD@ \
 	../libregf/libregf.la \
 	@LIBBFIO_LIBADD@ \
 	@LIBCPATH_LIBADD@ \
 	@LIBCFILE_LIBADD@ \
 	@LIBCSPLIT_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
-	@LIBCDATA_LIBADD@ \
-	@LIBCERROR_LIBADD@ \
-	@LIBCSTRING_LIBADD@
+	@LIBCDATA_LIBADD@
 
 pyregf_la_CPPFLAGS = $(PYTHON3_CPPFLAGS)
 pyregf_la_LDFLAGS  = -module -avoid-version $(PYTHON3_LDFLAGS)

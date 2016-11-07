@@ -22,6 +22,7 @@
 #include <common.h>
 #include <byte_stream.h>
 #include <memory.h>
+#include <system_string.h>
 #include <types.h>
 
 #include "libregf_checksum.h"
@@ -207,7 +208,7 @@ int libregf_io_handle_read_file_header(
 	uint32_t stored_xor32_checksum     = 0;
 
 #if defined( HAVE_DEBUG_OUTPUT )
-	libcstring_system_character_t filetime_string[ 32 ];
+	system_character_t filetime_string[ 32 ];
 
 	libfdatetime_filetime_t *filetime  = NULL;
 	uint32_t value_32bit               = 0;
@@ -421,7 +422,7 @@ int libregf_io_handle_read_file_header(
 
 			goto on_error;
 		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		result = libfdatetime_filetime_copy_to_utf16_string(
 		          filetime,
 		          (uint16_t *) filetime_string,
@@ -448,7 +449,7 @@ int libregf_io_handle_read_file_header(
 			goto on_error;
 		}
 		libcnotify_printf(
-		 "%s: modification time\t\t\t: %" PRIs_LIBCSTRING_SYSTEM " UTC\n",
+		 "%s: modification time\t\t\t: %" PRIs_SYSTEM " UTC\n",
 		 function,
 		 filetime_string );
 

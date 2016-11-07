@@ -8,7 +8,6 @@ MSVSCPP_FILES = \
 	libcnotify/libcnotify.vcproj \
 	libcpath/libcpath.vcproj \
 	libcsplit/libcsplit.vcproj \
-	libcstring/libcstring.vcproj \
 	libcsystem/libcsystem.vcproj \
 	libcthreads/libcthreads.vcproj \
 	libfcache/libfcache.vcproj \
@@ -23,9 +22,9 @@ MSVSCPP_FILES = \
 	libuna/libuna.vcproj \
 	pyregf/pyregf.vcproj \
 	regf_test_error/regf_test_error.vcproj \
-	regf_test_get_version/regf_test_get_version.vcproj \
+	regf_test_notify/regf_test_notify.vcproj \
 	regf_test_open_close/regf_test_open_close.vcproj \
-	regf_test_set_ascii_codepage/regf_test_set_ascii_codepage.vcproj \
+	regf_test_support/regf_test_support.vcproj \
 	regfexport/regfexport.vcproj \
 	regfinfo/regfinfo.vcproj \
 	regfmount/regfmount.vcproj \

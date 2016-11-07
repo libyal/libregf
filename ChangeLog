@@ -2,6 +2,7 @@ TODO
 * clean up
   - move named key, value key etc into separate source files
   - libregf_hive_bins_list_read_element_data remove the need for + 4096
+  - deprecate regfreport in favor of winreg-kb scripts
 * dokan add classname and values support
 * libregf:
   - add file type definitions

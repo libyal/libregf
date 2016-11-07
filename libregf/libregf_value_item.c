@@ -21,7 +21,10 @@
 
 #include <common.h>
 #include <memory.h>
+#include <narrow_string.h>
+#include <system_string.h>
 #include <types.h>
+#include <wide_string.h>
 
 #if defined( HAVE_WCTYPE_H )
 #include <wctype.h>
@@ -441,7 +444,7 @@ int libregf_value_item_read_value_key(
 	int result                                   = 0;
 
 #if defined( HAVE_DEBUG_OUTPUT )
-	libcstring_system_character_t *value_string  = NULL;
+	system_character_t *value_string             = NULL;
 	size_t value_string_size                     = 0;
 	uint16_t value_16bit                         = 0;
 #endif
@@ -732,7 +735,7 @@ int libregf_value_item_read_value_key(
 		{
 			if( ( value_item->flags & LIBREGF_VALUE_KEY_FLAG_NAME_IS_ASCII ) != 0 )
 			{
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 				result = libuna_utf16_string_size_from_byte_stream(
 					  value_item->name,
 					  (size_t) value_item->name_size,
@@ -750,7 +753,7 @@ int libregf_value_item_read_value_key(
 			}
 			else
 			{
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 				result = libuna_utf16_string_size_from_utf16_stream(
 					  value_item->name,
 					  (size_t) value_item->name_size,
@@ -778,7 +781,7 @@ int libregf_value_item_read_value_key(
 				goto on_error;
 			}
 			if( ( value_string_size > (size_t) SSIZE_MAX )
-			 || ( ( sizeof( libcstring_system_character_t ) * value_string_size )  > (size_t) SSIZE_MAX ) )
+			 || ( ( sizeof( system_character_t ) * value_string_size )  > (size_t) SSIZE_MAX ) )
 			{
 				libcerror_error_set(
 				 error,
@@ -789,7 +792,7 @@ int libregf_value_item_read_value_key(
 
 				goto on_error;
 			}
-			value_string = libcstring_system_string_allocate(
+			value_string = system_string_allocate(
 			                value_string_size );
 
 			if( value_string == NULL )
@@ -805,7 +808,7 @@ int libregf_value_item_read_value_key(
 			}
 			if( ( value_item->flags & LIBREGF_VALUE_KEY_FLAG_NAME_IS_ASCII ) != 0 )
 			{
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 				result = libuna_utf16_string_copy_from_byte_stream(
 					  (libuna_utf16_character_t *) value_string,
 					  value_string_size,
@@ -825,7 +828,7 @@ int libregf_value_item_read_value_key(
 			}
 			else
 			{
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 				result = libuna_utf16_string_copy_from_utf16_stream(
 					  (libuna_utf16_character_t *) value_string,
 					  value_string_size,
@@ -855,7 +858,7 @@ int libregf_value_item_read_value_key(
 				goto on_error;
 			}
 			libcnotify_printf(
-			 "%s: value name\t\t\t\t: %" PRIs_LIBCSTRING_SYSTEM "\n",
+			 "%s: value name\t\t\t\t: %" PRIs_SYSTEM "\n",
 			 function,
 			 value_string );
 

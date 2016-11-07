@@ -22,6 +22,7 @@
 #include <common.h>
 #include <byte_stream.h>
 #include <memory.h>
+#include <system_string.h>
 #include <types.h>
 
 #include "libregf_definitions.h"
@@ -31,7 +32,6 @@
 #include "libregf_libcdata.h"
 #include "libregf_libcerror.h"
 #include "libregf_libcnotify.h"
-#include "libregf_libcstring.h"
 #include "libregf_libfdatetime.h"
 
 #include "regf_hive_bin.h"
@@ -178,7 +178,7 @@ int libregf_hive_bin_read_header(
 	ssize_t read_count                = 0;
 
 #if defined( HAVE_DEBUG_OUTPUT )
-	libcstring_system_character_t filetime_string[ 32 ];
+	system_character_t filetime_string[ 32 ];
 
 	libfdatetime_filetime_t *filetime = NULL;
 	uint32_t value_32bit              = 0;
@@ -306,7 +306,7 @@ int libregf_hive_bin_read_header(
 
 			goto on_error;
 		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		result = libfdatetime_filetime_copy_to_utf16_string(
 		          filetime,
 		          (uint16_t *) filetime_string,
@@ -333,7 +333,7 @@ int libregf_hive_bin_read_header(
 			goto on_error;
 		}
 		libcnotify_printf(
-		 "%s: unknown time\t\t\t\t: %" PRIs_LIBCSTRING_SYSTEM " UTC\n",
+		 "%s: unknown time\t\t\t\t: %" PRIs_SYSTEM " UTC\n",
 		 function,
 		 filetime_string );
 

@@ -28,7 +28,6 @@
 #include "pyregf_integer.h"
 #include "pyregf_libbfio.h"
 #include "pyregf_libcerror.h"
-#include "pyregf_libcstring.h"
 #include "pyregf_python.h"
 
 /* Creates a file object IO handle

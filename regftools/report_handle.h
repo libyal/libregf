@@ -25,7 +25,6 @@
 #include <common.h>
 #include <types.h>
 
-#include "regftools_libcstring.h"
 #include "regftools_libregf.h"
 #include "registry_file.h"
 
@@ -47,7 +46,7 @@ struct report_handle
 
 	/* The base key name
 	 */
-	libcstring_system_character_t *base_key_name;
+	system_character_t *base_key_name;
 
 	/* The base key name
 	 */
@@ -80,7 +79,7 @@ int report_handle_signal_abort(
 
 int report_handle_set_ascii_codepage(
      report_handle_t *report_handle,
-     const libcstring_system_character_t *string,
+     const system_character_t *string,
      libcerror_error_t **error );
 
 int report_handle_print_data(
@@ -91,7 +90,7 @@ int report_handle_print_data(
 
 int report_handle_open_input(
      report_handle_t *report_handle,
-     const libcstring_system_character_t *filename,
+     const system_character_t *filename,
      libcerror_error_t **error );
 
 int report_handle_close_input(
@@ -100,13 +99,13 @@ int report_handle_close_input(
 
 int report_handle_get_key_name(
      libregf_key_t *key,
-     libcstring_system_character_t **name,
+     system_character_t **name,
      size_t *name_size,
      libcerror_error_t **error );
 
 int report_handle_get_value_name(
      libregf_value_t *value,
-     libcstring_system_character_t **name,
+     system_character_t **name,
      size_t *name_size,
      libcerror_error_t **error );
 
@@ -118,7 +117,7 @@ int report_handle_get_value_data(
 
 int report_handle_get_value_data_string(
      libregf_value_t *value,
-     libcstring_system_character_t **data_string,
+     system_character_t **data_string,
      size_t *data_string_size,
      libcerror_error_t **error );
 
@@ -131,14 +130,14 @@ int report_handle_get_value_binary_data(
 int report_handle_analyze_key_with_posix_time_value(
      report_handle_t *report_handle,
      libregf_key_t *key,
-     libcstring_system_character_t *value_name,
+     system_character_t *value_name,
      size_t value_name_length,
      libcerror_error_t **error );
 
 int report_handle_analyze_key_with_string_value(
      report_handle_t *report_handle,
      libregf_key_t *key,
-     libcstring_system_character_t *value_name,
+     system_character_t *value_name,
      size_t value_name_length,
      libcerror_error_t **error );
 
@@ -149,7 +148,7 @@ int report_handle_analyze_key_with_string_values(
 
 int report_handle_analyze_key_path_with_string_values(
      report_handle_t *report_handle,
-     const libcstring_system_character_t *key_path,
+     const system_character_t *key_path,
      size_t key_path_length,
      libregf_error_t **error );
 
@@ -184,7 +183,7 @@ int report_handle_analyze_shell_item_list_mrulist_key(
 
 int report_handle_analyze_shell_item_list_mrulist_key_path(
      report_handle_t *report_handle,
-     const libcstring_system_character_t *key_path,
+     const system_character_t *key_path,
      size_t key_path_length,
      libcerror_error_t **error );
 
@@ -195,13 +194,13 @@ int report_handle_analyze_shell_item_list_mrulistex_key(
 
 int report_handle_analyze_shell_item_list_mrulistex_key_path(
      report_handle_t *report_handle,
-     const libcstring_system_character_t *key_path,
+     const system_character_t *key_path,
      size_t key_path_length,
      libcerror_error_t **error );
 
 int report_handle_analyze_shell_item_list_mrulistex_sub_keys_path(
      report_handle_t *report_handle,
-     const libcstring_system_character_t *key_path,
+     const system_character_t *key_path,
      size_t key_path_length,
      libcerror_error_t **error );
 
@@ -212,13 +211,13 @@ int report_handle_analyze_string_and_shell_item_mrulistex_key(
 
 int report_handle_analyze_string_and_shell_item_mrulistex_key_path(
      report_handle_t *report_handle,
-     const libcstring_system_character_t *key_path,
+     const system_character_t *key_path,
      size_t key_path_length,
      libcerror_error_t **error );
 
 int report_handle_analyze_string_and_shell_item_mrulistex_sub_keys_path(
      report_handle_t *report_handle,
-     const libcstring_system_character_t *key_path,
+     const system_character_t *key_path,
      size_t key_path_length,
      libcerror_error_t **error );
 
@@ -229,13 +228,13 @@ int report_handle_analyze_string_and_shell_item_list_mrulistex_key(
 
 int report_handle_analyze_string_and_shell_item_list_mrulistex_key_path(
      report_handle_t *report_handle,
-     const libcstring_system_character_t *key_path,
+     const system_character_t *key_path,
      size_t key_path_length,
      libcerror_error_t **error );
 
 int report_handle_analyze_string_and_shell_item_list_mrulistex_sub_keys_path(
      report_handle_t *report_handle,
-     const libcstring_system_character_t *key_path,
+     const system_character_t *key_path,
      size_t key_path_length,
      libcerror_error_t **error );
 
@@ -246,7 +245,7 @@ int report_handle_analyze_bagmru_key(
 
 int report_handle_analyze_bagmru_key_path(
      report_handle_t *report_handle,
-     const libcstring_system_character_t *key_path,
+     const system_character_t *key_path,
      size_t key_path_length,
      libregf_error_t **error );
 

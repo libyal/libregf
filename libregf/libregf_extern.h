@@ -38,10 +38,9 @@
 #include <libregf/extern.h>
 
 #else
-
-#define LIBREGF_EXTERN  extern
-
-#endif
+#define LIBREGF_EXTERN	extern
 
 #endif
+
+#endif /* !defined( _LIBREGF_INTERNAL_EXTERN_H ) */
 

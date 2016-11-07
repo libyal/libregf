@@ -21,11 +21,13 @@
 
 #include <common.h>
 #include <memory.h>
+#include <narrow_string.h>
+#include <system_string.h>
 #include <types.h>
+#include <wide_string.h>
 
 #include "regftools_libcerror.h"
 #include "regftools_libclocale.h"
-#include "regftools_libcstring.h"
 #include "regftools_libfdatetime.h"
 #include "regftools_libfguid.h"
 #include "regftools_libfwsi.h"
@@ -214,7 +216,7 @@ int report_handle_signal_abort(
  */
 int report_handle_set_ascii_codepage(
      report_handle_t *report_handle,
-     const libcstring_system_character_t *string,
+     const system_character_t *string,
      libcerror_error_t **error )
 {
 	static char *function  = "report_handle_set_ascii_codepage";
@@ -236,10 +238,10 @@ int report_handle_set_ascii_codepage(
 	feature_flags = LIBCLOCALE_CODEPAGE_FEATURE_FLAG_HAVE_KOI8
 	              | LIBCLOCALE_CODEPAGE_FEATURE_FLAG_HAVE_WINDOWS;
 
-	string_length = libcstring_system_string_length(
+	string_length = system_string_length(
 	                 string );
 
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libclocale_codepage_copy_from_string_wide(
 	          &( report_handle->ascii_codepage ),
 	          string,
@@ -454,7 +456,7 @@ int report_handle_print_data(
  */
 int report_handle_open_input(
      report_handle_t *report_handle,
-     const libcstring_system_character_t *filename,
+     const system_character_t *filename,
      libcerror_error_t **error )
 {
 	static char *function = "report_handle_open_input";
@@ -542,7 +544,7 @@ int report_handle_close_input(
  */
 int report_handle_get_key_name(
      libregf_key_t *key,
-     libcstring_system_character_t **name,
+     system_character_t **name,
      size_t *name_size,
      libcerror_error_t **error )
 {
@@ -571,7 +573,7 @@ int report_handle_get_key_name(
 
 		return( -1 );
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libregf_key_get_utf16_name_size(
 		  key,
 		  name_size,
@@ -596,7 +598,7 @@ int report_handle_get_key_name(
 	if( *name_size > 0 )
 	{
 		if( ( *name_size > (size_t) SSIZE_MAX )
-		 || ( ( sizeof( libcstring_system_character_t ) * *name_size ) > (size_t) SSIZE_MAX ) )
+		 || ( ( sizeof( system_character_t ) * *name_size ) > (size_t) SSIZE_MAX ) )
 		{
 			libcerror_error_set(
 			 error,
@@ -607,7 +609,7 @@ int report_handle_get_key_name(
 
 			goto on_error;
 		}
-		*name = libcstring_system_string_allocate(
+		*name = system_string_allocate(
 			 *name_size );
 
 		if( *name == NULL )
@@ -621,7 +623,7 @@ int report_handle_get_key_name(
 
 			goto on_error;
 		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		result = libregf_key_get_utf16_name(
 			  key,
 			  (uint16_t *) *name,
@@ -666,7 +668,7 @@ on_error:
  */
 int report_handle_get_value_name(
      libregf_value_t *value,
-     libcstring_system_character_t **name,
+     system_character_t **name,
      size_t *name_size,
      libcerror_error_t **error )
 {
@@ -695,7 +697,7 @@ int report_handle_get_value_name(
 
 		return( -1 );
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libregf_value_get_utf16_name_size(
 		  value,
 		  name_size,
@@ -720,7 +722,7 @@ int report_handle_get_value_name(
 	if( *name_size > 0 )
 	{
 		if( ( *name_size > (size_t) SSIZE_MAX )
-		 || ( ( sizeof( libcstring_system_character_t ) * *name_size ) > (size_t) SSIZE_MAX ) )
+		 || ( ( sizeof( system_character_t ) * *name_size ) > (size_t) SSIZE_MAX ) )
 		{
 			libcerror_error_set(
 			 error,
@@ -731,7 +733,7 @@ int report_handle_get_value_name(
 
 			goto on_error;
 		}
-		*name = libcstring_system_string_allocate(
+		*name = system_string_allocate(
 			 *name_size );
 
 		if( *name == NULL )
@@ -745,7 +747,7 @@ int report_handle_get_value_name(
 
 			goto on_error;
 		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		result = libregf_value_get_utf16_name(
 			  value,
 			  (uint16_t *) *name,
@@ -886,7 +888,7 @@ on_error:
  */
 int report_handle_get_value_data_string(
      libregf_value_t *value,
-     libcstring_system_character_t **data_string,
+     system_character_t **data_string,
      size_t *data_string_size,
      libcerror_error_t **error )
 {
@@ -915,7 +917,7 @@ int report_handle_get_value_data_string(
 
 		return( -1 );
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libregf_value_get_value_utf16_string_size(
 		  value,
 		  data_string_size,
@@ -940,7 +942,7 @@ int report_handle_get_value_data_string(
 	if( *data_string_size > 0 )
 	{
 		if( ( *data_string_size > (size_t) SSIZE_MAX )
-		 || ( ( sizeof( libcstring_system_character_t ) * *data_string_size ) > (size_t) SSIZE_MAX ) )
+		 || ( ( sizeof( system_character_t ) * *data_string_size ) > (size_t) SSIZE_MAX ) )
 		{
 			libcerror_error_set(
 			 error,
@@ -951,7 +953,7 @@ int report_handle_get_value_data_string(
 
 			goto on_error;
 		}
-		*data_string = libcstring_system_string_allocate(
+		*data_string = system_string_allocate(
 				*data_string_size );
 
 		if( *data_string == NULL )
@@ -965,7 +967,7 @@ int report_handle_get_value_data_string(
 
 			goto on_error;
 		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		result = libregf_value_get_value_utf16_string(
 			  value,
 			  (uint16_t *) *data_string,
@@ -1107,11 +1109,11 @@ on_error:
 int report_handle_analyze_key_with_posix_time_value(
      report_handle_t *report_handle,
      libregf_key_t *key,
-     libcstring_system_character_t *value_name,
+     system_character_t *value_name,
      size_t value_name_length,
      libcerror_error_t **error )
 {
-	libcstring_system_character_t date_string[ 32 ];
+	system_character_t date_string[ 32 ];
 
 	libfdatetime_posix_time_t *posix_time = NULL;
 	libregf_value_t *value                = NULL;
@@ -1130,7 +1132,7 @@ int report_handle_analyze_key_with_posix_time_value(
 
 		return( -1 );
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libregf_key_get_value_by_utf16_name(
 		  key,
 		  (uint16_t *) value_name,
@@ -1151,7 +1153,7 @@ int report_handle_analyze_key_with_posix_time_value(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve value: %" PRIs_LIBCSTRING_SYSTEM ".",
+		 "%s: unable to retrieve value: %" PRIs_SYSTEM ".",
 		 function,
 		 value_name );
 
@@ -1203,7 +1205,7 @@ int report_handle_analyze_key_with_posix_time_value(
 
 			goto on_error;
 		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		result = libfdatetime_posix_time_copy_to_utf16_string(
 			  posix_time,
 			  (uint16_t *) date_string,
@@ -1231,11 +1233,11 @@ int report_handle_analyze_key_with_posix_time_value(
 		}
 		fprintf(
 		 report_handle->notify_stream,
-		 "Value\t: %" PRIs_LIBCSTRING_SYSTEM "\n",
+		 "Value\t: %" PRIs_SYSTEM "\n",
 		 value_name );
 		fprintf(
 		 report_handle->notify_stream,
-		 "\tPOSIX time\t\t\t: %" PRIs_LIBCSTRING_SYSTEM "\n",
+		 "\tPOSIX time\t\t\t: %" PRIs_SYSTEM "\n",
 		 date_string );
 
 		if( libfdatetime_posix_time_free(
@@ -1259,7 +1261,7 @@ int report_handle_analyze_key_with_posix_time_value(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free value: %" PRIs_LIBCSTRING_SYSTEM ".",
+			 "%s: unable to free value: %" PRIs_SYSTEM ".",
 			 function,
 			 value_name );
 
@@ -1290,15 +1292,15 @@ on_error:
 int report_handle_analyze_key_with_string_value(
      report_handle_t *report_handle,
      libregf_key_t *key,
-     libcstring_system_character_t *value_name,
+     system_character_t *value_name,
      size_t value_name_length,
      libcerror_error_t **error )
 {
-	libcstring_system_character_t *value_string = NULL;
-	libregf_value_t *value                      = NULL;
-	static char *function                       = "report_handle_analyze_key_with_string_value";
-	size_t value_string_size                    = 0;
-	int result                                  = 0;
+	system_character_t *value_string = NULL;
+	libregf_value_t *value           = NULL;
+	static char *function            = "report_handle_analyze_key_with_string_value";
+	size_t value_string_size         = 0;
+	int result                       = 0;
 
 	if( report_handle == NULL )
 	{
@@ -1311,7 +1313,7 @@ int report_handle_analyze_key_with_string_value(
 
 		return( -1 );
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libregf_key_get_value_by_utf16_name(
 		  key,
 		  (uint16_t *) value_name,
@@ -1332,7 +1334,7 @@ int report_handle_analyze_key_with_string_value(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve value: %" PRIs_LIBCSTRING_SYSTEM ".",
+		 "%s: unable to retrieve value: %" PRIs_SYSTEM ".",
 		 function,
 		 value_name );
 
@@ -1357,11 +1359,11 @@ int report_handle_analyze_key_with_string_value(
 		}
 		fprintf(
 		 report_handle->notify_stream,
-		 "Value\t: %" PRIs_LIBCSTRING_SYSTEM "\n",
+		 "Value\t: %" PRIs_SYSTEM "\n",
 		 value_name );
 		fprintf(
 		 report_handle->notify_stream,
-		 "\tString\t\t\t\t: %" PRIs_LIBCSTRING_SYSTEM "\n",
+		 "\tString\t\t\t\t: %" PRIs_SYSTEM "\n",
 		 value_string );
 
 		memory_free(
@@ -1377,7 +1379,7 @@ int report_handle_analyze_key_with_string_value(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free value: %" PRIs_LIBCSTRING_SYSTEM ".",
+			 "%s: unable to free value: %" PRIs_SYSTEM ".",
 			 function,
 			 value_name );
 
@@ -1409,14 +1411,14 @@ int report_handle_analyze_key_with_string_values(
      libregf_key_t *key,
      libcerror_error_t **error )
 {
-	libcstring_system_character_t *value_name   = NULL;
-	libcstring_system_character_t *value_string = NULL;
-	libregf_value_t *value                      = NULL;
-	static char *function                       = "report_handle_analyze_key_with_string_values";
-	size_t value_name_size                      = 0;
-	size_t value_string_size                    = 0;
-	int number_of_values                        = 0;
-	int value_index                             = 0;
+	system_character_t *value_name   = NULL;
+	system_character_t *value_string = NULL;
+	libregf_value_t *value           = NULL;
+	static char *function            = "report_handle_analyze_key_with_string_values";
+	size_t value_name_size           = 0;
+	size_t value_string_size         = 0;
+	int number_of_values             = 0;
+	int value_index                  = 0;
 
 	if( report_handle == NULL )
 	{
@@ -1495,11 +1497,11 @@ int report_handle_analyze_key_with_string_values(
 		}
 		fprintf(
 		 report_handle->notify_stream,
-		 "Value\t: %" PRIs_LIBCSTRING_SYSTEM "\n",
+		 "Value\t: %" PRIs_SYSTEM "\n",
 		 value_name );
 		fprintf(
 		 report_handle->notify_stream,
-		 "\tString\t\t\t\t: %" PRIs_LIBCSTRING_SYSTEM "\n",
+		 "\tString\t\t\t\t: %" PRIs_SYSTEM "\n",
 		 value_string );
 
 		memory_free(
@@ -1557,7 +1559,7 @@ on_error:
  */
 int report_handle_analyze_key_path_with_string_values(
      report_handle_t *report_handle,
-     const libcstring_system_character_t *key_path,
+     const system_character_t *key_path,
      size_t key_path_length,
      libregf_error_t **error )
 {
@@ -1609,7 +1611,7 @@ int report_handle_analyze_key_path_with_string_values(
 	{
 		fprintf(
 		 report_handle->notify_stream,
-		 "Key\t: %" PRIs_LIBCSTRING_SYSTEM "\n",
+		 "Key\t: %" PRIs_SYSTEM "\n",
 		 key_path );
 
 		if( report_handle_analyze_key_with_string_values(
@@ -1621,7 +1623,7 @@ int report_handle_analyze_key_path_with_string_values(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GENERIC,
-			 "%s: unable to analyze key: %" PRIs_LIBCSTRING_SYSTEM ".",
+			 "%s: unable to analyze key: %" PRIs_SYSTEM ".",
 			 function,
 			 key_path );
 
@@ -1666,10 +1668,10 @@ int report_handle_analyze_autorun(
      report_handle_t *report_handle,
      libregf_error_t **error )
 {
-	libcstring_system_character_t *key_path = NULL;
-	static char *function                   = "report_handle_analyze_autorun";
-	size_t key_path_length                  = 0;
-	int result                              = 0;
+	system_character_t *key_path = NULL;
+	static char *function        = "report_handle_analyze_autorun";
+	size_t key_path_length       = 0;
+	int result                   = 0;
 
 	if( report_handle == NULL )
 	{
@@ -1682,9 +1684,9 @@ int report_handle_analyze_autorun(
 
 		return( -1 );
 	}
-	key_path = _LIBCSTRING_SYSTEM_STRING( "\\Microsoft\\Windows\\CurrentVersion\\Run" );
+	key_path = _SYSTEM_STRING( "\\Microsoft\\Windows\\CurrentVersion\\Run" );
 
-	key_path_length = libcstring_system_string_length(
+	key_path_length = system_string_length(
 	                   key_path );
 
 	result = report_handle_analyze_key_path_with_string_values(
@@ -1699,15 +1701,15 @@ int report_handle_analyze_autorun(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GENERIC,
-		 "%s: unable to analyze: %" PRIs_LIBCSTRING_SYSTEM ".",
+		 "%s: unable to analyze: %" PRIs_SYSTEM ".",
 		 function,
 		 key_path );
 
 		return( -1 );
 	}
-	key_path = _LIBCSTRING_SYSTEM_STRING( "\\Microsoft\\Windows\\CurrentVersion\\RunOnce" );
+	key_path = _SYSTEM_STRING( "\\Microsoft\\Windows\\CurrentVersion\\RunOnce" );
 
-	key_path_length = libcstring_system_string_length(
+	key_path_length = system_string_length(
 	                   key_path );
 
 	result = report_handle_analyze_key_path_with_string_values(
@@ -1722,15 +1724,15 @@ int report_handle_analyze_autorun(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GENERIC,
-		 "%s: unable to analyze: %" PRIs_LIBCSTRING_SYSTEM ".",
+		 "%s: unable to analyze: %" PRIs_SYSTEM ".",
 		 function,
 		 key_path );
 
 		return( -1 );
 	}
-	key_path = _LIBCSTRING_SYSTEM_STRING( "\\Software\\Microsoft\\Windows\\CurrentVersion\\Run" );
+	key_path = _SYSTEM_STRING( "\\Software\\Microsoft\\Windows\\CurrentVersion\\Run" );
 
-	key_path_length = libcstring_system_string_length(
+	key_path_length = system_string_length(
 	                   key_path );
 
 	result = report_handle_analyze_key_path_with_string_values(
@@ -1745,15 +1747,15 @@ int report_handle_analyze_autorun(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GENERIC,
-		 "%s: unable to analyze: %" PRIs_LIBCSTRING_SYSTEM ".",
+		 "%s: unable to analyze: %" PRIs_SYSTEM ".",
 		 function,
 		 key_path );
 
 		return( -1 );
 	}
-	key_path = _LIBCSTRING_SYSTEM_STRING( "\\Software\\Microsoft\\Windows\\CurrentVersion\\RunOnce" );
+	key_path = _SYSTEM_STRING( "\\Software\\Microsoft\\Windows\\CurrentVersion\\RunOnce" );
 
-	key_path_length = libcstring_system_string_length(
+	key_path_length = system_string_length(
 	                   key_path );
 
 	result = report_handle_analyze_key_path_with_string_values(
@@ -1768,7 +1770,7 @@ int report_handle_analyze_autorun(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GENERIC,
-		 "%s: unable to analyze: %" PRIs_LIBCSTRING_SYSTEM ".",
+		 "%s: unable to analyze: %" PRIs_SYSTEM ".",
 		 function,
 		 key_path );
 
@@ -2038,14 +2040,14 @@ int report_handle_analyze_string_and_shell_item_value(
      libregf_value_t *value,
      libcerror_error_t **error )
 {
-	libcstring_system_character_t *value_string = NULL;
-	libfwsi_item_t *shell_item                  = NULL;
-	uint8_t *binary_data                        = NULL;
-	static char *function                       = "report_handle_analyze_string_and_shell_item_value";
-	size_t binary_data_offset                   = 0;
-	size_t binary_data_size                     = 0;
-	size_t value_string_size                    = 0;
-	int result                                  = 0;
+	system_character_t *value_string = NULL;
+	libfwsi_item_t *shell_item       = NULL;
+	uint8_t *binary_data             = NULL;
+	static char *function            = "report_handle_analyze_string_and_shell_item_value";
+	size_t binary_data_offset        = 0;
+	size_t binary_data_size          = 0;
+	size_t value_string_size         = 0;
+	int result                       = 0;
 
 	if( report_handle == NULL )
 	{
@@ -2095,7 +2097,7 @@ int report_handle_analyze_string_and_shell_item_value(
 	}
 	binary_data_offset += 2;
 
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libuna_utf16_string_size_from_utf16_stream(
 		  binary_data,
 		  binary_data_offset,
@@ -2121,7 +2123,7 @@ int report_handle_analyze_string_and_shell_item_value(
 
 		goto on_error;
 	}
-	value_string = libcstring_system_string_allocate(
+	value_string = system_string_allocate(
 	                value_string_size );
 
 	if( value_string == NULL )
@@ -2135,7 +2137,7 @@ int report_handle_analyze_string_and_shell_item_value(
 
 		goto on_error;
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libuna_utf16_string_copy_from_utf16_stream(
 		  (libuna_utf16_character_t *) value_string,
 		  value_string_size,
@@ -2165,7 +2167,7 @@ int report_handle_analyze_string_and_shell_item_value(
 	}
 	fprintf(
 	 report_handle->notify_stream,
-	 "\tString\t\t\t\t: %" PRIs_LIBCSTRING_SYSTEM "\n",
+	 "\tString\t\t\t\t: %" PRIs_SYSTEM "\n",
 	 value_string );
 
 	memory_free(
@@ -2263,14 +2265,14 @@ int report_handle_analyze_string_and_shell_item_list_value(
      libregf_value_t *value,
      libcerror_error_t **error )
 {
-	libcstring_system_character_t *value_string = NULL;
-	libfwsi_item_list_t *shell_item_list        = NULL;
-	uint8_t *binary_data                        = NULL;
-	static char *function                       = "report_handle_analyze_string_and_shell_item_list_value";
-	size_t binary_data_offset                   = 0;
-	size_t binary_data_size                     = 0;
-	size_t value_string_size                    = 0;
-	int result                                  = 0;
+	system_character_t *value_string     = NULL;
+	libfwsi_item_list_t *shell_item_list = NULL;
+	uint8_t *binary_data                 = NULL;
+	static char *function                = "report_handle_analyze_string_and_shell_item_list_value";
+	size_t binary_data_offset            = 0;
+	size_t binary_data_size              = 0;
+	size_t value_string_size             = 0;
+	int result                           = 0;
 
 	if( report_handle == NULL )
 	{
@@ -2320,7 +2322,7 @@ int report_handle_analyze_string_and_shell_item_list_value(
 	}
 	binary_data_offset += 2;
 
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libuna_utf16_string_size_from_utf16_stream(
 		  binary_data,
 		  binary_data_offset,
@@ -2346,7 +2348,7 @@ int report_handle_analyze_string_and_shell_item_list_value(
 
 		goto on_error;
 	}
-	value_string = libcstring_system_string_allocate(
+	value_string = system_string_allocate(
 	                value_string_size );
 
 	if( value_string == NULL )
@@ -2360,7 +2362,7 @@ int report_handle_analyze_string_and_shell_item_list_value(
 
 		goto on_error;
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libuna_utf16_string_copy_from_utf16_stream(
 		  (libuna_utf16_character_t *) value_string,
 		  value_string_size,
@@ -2390,7 +2392,7 @@ int report_handle_analyze_string_and_shell_item_list_value(
 	}
 	fprintf(
 	 report_handle->notify_stream,
-	 "\tString\t\t\t\t: %" PRIs_LIBCSTRING_SYSTEM "\n",
+	 "\tString\t\t\t\t: %" PRIs_SYSTEM "\n",
 	 value_string );
 
 	memory_free(
@@ -2487,7 +2489,7 @@ int report_handle_analyze_shell_item_list_mrulist_key(
      libregf_key_t *key,
      libcerror_error_t **error )
 {
-	libcstring_system_character_t name[ 2 ];
+	system_character_t name[ 2 ];
 
 	libregf_value_t *value = NULL;
 	static char *function  = "report_handle_analyze_shell_item_list_mrulist_key";
@@ -2542,7 +2544,7 @@ int report_handle_analyze_shell_item_list_mrulist_key(
 
 			goto on_error;
 		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		result = libregf_value_get_utf16_name_size(
 		          value,
 		          &name_size,
@@ -2566,7 +2568,7 @@ int report_handle_analyze_shell_item_list_mrulist_key(
 		}
 		if( name_size == 2 )
 		{
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 			result = libregf_value_get_utf16_name(
 			          value,
 			          (uint16_t *) name,
@@ -2593,16 +2595,16 @@ int report_handle_analyze_shell_item_list_mrulist_key(
 			/* A-Z is not a continous range on an EBCDIC based system
 			 * it consists of the ranges: A-I, J-R, S-Z
 			 */
-			if( ( ( name[ 0 ] >= (libcstring_system_character_t) 'a' )
-			  &&  ( name[ 0 ] <= (libcstring_system_character_t) 'i' ) )
-			 || ( ( name[ 0 ] >= (libcstring_system_character_t) 'j' )
-			  &&  ( name[ 0 ] <= (libcstring_system_character_t) 'r' ) )
-			 || ( ( name[ 0 ] >= (libcstring_system_character_t) 's' )
-			  &&  ( name[ 0 ] <= (libcstring_system_character_t) 'z' ) ) )
+			if( ( ( name[ 0 ] >= (system_character_t) 'a' )
+			  &&  ( name[ 0 ] <= (system_character_t) 'i' ) )
+			 || ( ( name[ 0 ] >= (system_character_t) 'j' )
+			  &&  ( name[ 0 ] <= (system_character_t) 'r' ) )
+			 || ( ( name[ 0 ] >= (system_character_t) 's' )
+			  &&  ( name[ 0 ] <= (system_character_t) 'z' ) ) )
 			{
 				fprintf(
 				 report_handle->notify_stream,
-				 "Value\t: %" PRIs_LIBCSTRING_SYSTEM "\n",
+				 "Value\t: %" PRIs_SYSTEM "\n",
 				 name );
 
 				if( report_handle_analyze_shell_item_list_value(
@@ -2614,7 +2616,7 @@ int report_handle_analyze_shell_item_list_mrulist_key(
 					 error,
 					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 					 LIBCERROR_RUNTIME_ERROR_GENERIC,
-					 "%s: unable to analyze value: %" PRIs_LIBCSTRING_SYSTEM ".",
+					 "%s: unable to analyze value: %" PRIs_SYSTEM ".",
 					 function,
 					 name );
 
@@ -2654,7 +2656,7 @@ on_error:
  */
 int report_handle_analyze_shell_item_list_mrulist_key_path(
      report_handle_t *report_handle,
-     const libcstring_system_character_t *key_path,
+     const system_character_t *key_path,
      size_t key_path_length,
      libregf_error_t **error )
 {
@@ -2717,7 +2719,7 @@ int report_handle_analyze_shell_item_list_mrulist_key_path(
 	{
 		fprintf(
 		 report_handle->notify_stream,
-		 "Key\t: %" PRIs_LIBCSTRING_SYSTEM "\n",
+		 "Key\t: %" PRIs_SYSTEM "\n",
 		 key_path );
 
 		if( report_handle_analyze_shell_item_list_mrulist_key(
@@ -2729,7 +2731,7 @@ int report_handle_analyze_shell_item_list_mrulist_key_path(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GENERIC,
-			 "%s: unable to analyze key: %" PRIs_LIBCSTRING_SYSTEM ".",
+			 "%s: unable to analyze key: %" PRIs_SYSTEM ".",
 			 function,
 			 key_path );
 
@@ -2774,7 +2776,7 @@ int report_handle_analyze_shell_item_list_mrulistex_key(
 {
 	/* The largest string of a 32-bit unsigned integer is: 4294967295 (10 characters)
 	 */
-	libcstring_system_character_t name[ 11 ];
+	system_character_t name[ 11 ];
 
 	libregf_value_t *value = NULL;
 	static char *function  = "report_handle_analyze_shell_item_list_mrulistex_key";
@@ -2830,7 +2832,7 @@ int report_handle_analyze_shell_item_list_mrulistex_key(
 
 			goto on_error;
 		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		result = libregf_value_get_utf16_name_size(
 		          value,
 		          &name_size,
@@ -2854,7 +2856,7 @@ int report_handle_analyze_shell_item_list_mrulistex_key(
 		}
 		if( name_size == 2 )
 		{
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 			result = libregf_value_get_utf16_name(
 			          value,
 			          (uint16_t *) name,
@@ -2888,8 +2890,8 @@ int report_handle_analyze_shell_item_list_mrulistex_key(
 				{
 					break;
 				}
-				if( ( name[ name_index ] < (libcstring_system_character_t) '0' )
-				 || ( name[ name_index ] > (libcstring_system_character_t) '9' ) )
+				if( ( name[ name_index ] < (system_character_t) '0' )
+				 || ( name[ name_index ] > (system_character_t) '9' ) )
 				{
 					result = 0;
 
@@ -2900,7 +2902,7 @@ int report_handle_analyze_shell_item_list_mrulistex_key(
 			{
 				fprintf(
 				 report_handle->notify_stream,
-				 "Value\t: %" PRIs_LIBCSTRING_SYSTEM "\n",
+				 "Value\t: %" PRIs_SYSTEM "\n",
 				 name );
 
 				if( report_handle_analyze_shell_item_list_value(
@@ -2912,7 +2914,7 @@ int report_handle_analyze_shell_item_list_mrulistex_key(
 					 error,
 					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 					 LIBCERROR_RUNTIME_ERROR_GENERIC,
-					 "%s: unable to analyze value: %" PRIs_LIBCSTRING_SYSTEM ".",
+					 "%s: unable to analyze value: %" PRIs_SYSTEM ".",
 					 function,
 					 name );
 
@@ -2952,7 +2954,7 @@ on_error:
  */
 int report_handle_analyze_shell_item_list_mrulistex_key_path(
      report_handle_t *report_handle,
-     const libcstring_system_character_t *key_path,
+     const system_character_t *key_path,
      size_t key_path_length,
      libregf_error_t **error )
 {
@@ -3015,7 +3017,7 @@ int report_handle_analyze_shell_item_list_mrulistex_key_path(
 	{
 		fprintf(
 		 report_handle->notify_stream,
-		 "Key\t: %" PRIs_LIBCSTRING_SYSTEM "\n",
+		 "Key\t: %" PRIs_SYSTEM "\n",
 		 key_path );
 
 		if( report_handle_analyze_shell_item_list_mrulistex_key(
@@ -3027,7 +3029,7 @@ int report_handle_analyze_shell_item_list_mrulistex_key_path(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GENERIC,
-			 "%s: unable to analyze key: %" PRIs_LIBCSTRING_SYSTEM ".",
+			 "%s: unable to analyze key: %" PRIs_SYSTEM ".",
 			 function,
 			 key_path );
 
@@ -3067,18 +3069,18 @@ on_error:
  */
 int report_handle_analyze_shell_item_list_mrulistex_sub_keys_path(
      report_handle_t *report_handle,
-     const libcstring_system_character_t *key_path,
+     const system_character_t *key_path,
      size_t key_path_length,
      libregf_error_t **error )
 {
-	libcstring_system_character_t *sub_key_name = NULL;
-	libregf_key_t *key                          = NULL;
-	libregf_key_t *sub_key                      = NULL;
-	static char *function                       = "report_handle_analyze_shell_item_list_mrulistex_sub_keys_path";
-	size_t sub_key_name_size                    = 0;
-	int number_of_sub_keys                      = 0;
-	int sub_key_index                           = 0;
-	int result                                  = 0;
+	system_character_t *sub_key_name = NULL;
+	libregf_key_t *key               = NULL;
+	libregf_key_t *sub_key           = NULL;
+	static char *function            = "report_handle_analyze_shell_item_list_mrulistex_sub_keys_path";
+	size_t sub_key_name_size         = 0;
+	int number_of_sub_keys           = 0;
+	int sub_key_index                = 0;
+	int result                       = 0;
 
 	if( report_handle == NULL )
 	{
@@ -3185,7 +3187,7 @@ int report_handle_analyze_shell_item_list_mrulistex_sub_keys_path(
 			}
 			fprintf(
 			 report_handle->notify_stream,
-			 "Key\t: %" PRIs_LIBCSTRING_SYSTEM "\\%" PRIs_LIBCSTRING_SYSTEM "\n",
+			 "Key\t: %" PRIs_SYSTEM "\\%" PRIs_SYSTEM "\n",
 			 key_path,
 			 sub_key_name );
 
@@ -3198,7 +3200,7 @@ int report_handle_analyze_shell_item_list_mrulistex_sub_keys_path(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBCERROR_RUNTIME_ERROR_GENERIC,
-				 "%s: unable to analyze key: %" PRIs_LIBCSTRING_SYSTEM "\\%" PRIs_LIBCSTRING_SYSTEM ".",
+				 "%s: unable to analyze key: %" PRIs_SYSTEM "\\%" PRIs_SYSTEM ".",
 				 function,
 				 key_path,
 				 sub_key_name );
@@ -3275,7 +3277,7 @@ int report_handle_analyze_string_and_shell_item_mrulistex_key(
 {
 	/* The largest string of a 32-bit unsigned integer is: 4294967295 (10 characters)
 	 */
-	libcstring_system_character_t name[ 11 ];
+	system_character_t name[ 11 ];
 
 	libregf_value_t *value = NULL;
 	static char *function  = "report_handle_analyze_string_and_shell_item_mrulistex_key";
@@ -3331,7 +3333,7 @@ int report_handle_analyze_string_and_shell_item_mrulistex_key(
 
 			goto on_error;
 		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		result = libregf_value_get_utf16_name_size(
 		          value,
 		          &name_size,
@@ -3355,7 +3357,7 @@ int report_handle_analyze_string_and_shell_item_mrulistex_key(
 		}
 		if( name_size == 2 )
 		{
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 			result = libregf_value_get_utf16_name(
 			          value,
 			          (uint16_t *) name,
@@ -3389,8 +3391,8 @@ int report_handle_analyze_string_and_shell_item_mrulistex_key(
 				{
 					break;
 				}
-				if( ( name[ name_index ] < (libcstring_system_character_t) '0' )
-				 || ( name[ name_index ] > (libcstring_system_character_t) '9' ) )
+				if( ( name[ name_index ] < (system_character_t) '0' )
+				 || ( name[ name_index ] > (system_character_t) '9' ) )
 				{
 					result = 0;
 
@@ -3401,7 +3403,7 @@ int report_handle_analyze_string_and_shell_item_mrulistex_key(
 			{
 				fprintf(
 				 report_handle->notify_stream,
-				 "Value\t: %" PRIs_LIBCSTRING_SYSTEM "\n",
+				 "Value\t: %" PRIs_SYSTEM "\n",
 				 name );
 
 				if( report_handle_analyze_string_and_shell_item_value(
@@ -3413,7 +3415,7 @@ int report_handle_analyze_string_and_shell_item_mrulistex_key(
 					 error,
 					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 					 LIBCERROR_RUNTIME_ERROR_GENERIC,
-					 "%s: unable to analyze value: %" PRIs_LIBCSTRING_SYSTEM ".",
+					 "%s: unable to analyze value: %" PRIs_SYSTEM ".",
 					 function,
 					 name );
 
@@ -3453,7 +3455,7 @@ on_error:
  */
 int report_handle_analyze_string_and_shell_item_mrulistex_key_path(
      report_handle_t *report_handle,
-     const libcstring_system_character_t *key_path,
+     const system_character_t *key_path,
      size_t key_path_length,
      libregf_error_t **error )
 {
@@ -3516,7 +3518,7 @@ int report_handle_analyze_string_and_shell_item_mrulistex_key_path(
 	{
 		fprintf(
 		 report_handle->notify_stream,
-		 "Key\t: %" PRIs_LIBCSTRING_SYSTEM "\n",
+		 "Key\t: %" PRIs_SYSTEM "\n",
 		 key_path );
 
 		if( report_handle_analyze_string_and_shell_item_mrulistex_key(
@@ -3528,7 +3530,7 @@ int report_handle_analyze_string_and_shell_item_mrulistex_key_path(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GENERIC,
-			 "%s: unable to analyze key: %" PRIs_LIBCSTRING_SYSTEM ".",
+			 "%s: unable to analyze key: %" PRIs_SYSTEM ".",
 			 function,
 			 key_path );
 
@@ -3568,18 +3570,18 @@ on_error:
  */
 int report_handle_analyze_string_and_shell_item_mrulistex_sub_keys_path(
      report_handle_t *report_handle,
-     const libcstring_system_character_t *key_path,
+     const system_character_t *key_path,
      size_t key_path_length,
      libregf_error_t **error )
 {
-	libcstring_system_character_t *sub_key_name = NULL;
-	libregf_key_t *key                          = NULL;
-	libregf_key_t *sub_key                      = NULL;
-	static char *function                       = "report_handle_analyze_string_and_shell_item_mrulistex_sub_keys_path";
-	size_t sub_key_name_size                    = 0;
-	int number_of_sub_keys                      = 0;
-	int sub_key_index                           = 0;
-	int result                                  = 0;
+	system_character_t *sub_key_name = NULL;
+	libregf_key_t *key               = NULL;
+	libregf_key_t *sub_key           = NULL;
+	static char *function            = "report_handle_analyze_string_and_shell_item_mrulistex_sub_keys_path";
+	size_t sub_key_name_size         = 0;
+	int number_of_sub_keys           = 0;
+	int sub_key_index                = 0;
+	int result                       = 0;
 
 	if( report_handle == NULL )
 	{
@@ -3686,7 +3688,7 @@ int report_handle_analyze_string_and_shell_item_mrulistex_sub_keys_path(
 			}
 			fprintf(
 			 report_handle->notify_stream,
-			 "Key\t: %" PRIs_LIBCSTRING_SYSTEM "\\%" PRIs_LIBCSTRING_SYSTEM "\n",
+			 "Key\t: %" PRIs_SYSTEM "\\%" PRIs_SYSTEM "\n",
 			 key_path,
 			 sub_key_name );
 
@@ -3699,7 +3701,7 @@ int report_handle_analyze_string_and_shell_item_mrulistex_sub_keys_path(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBCERROR_RUNTIME_ERROR_GENERIC,
-				 "%s: unable to analyze key: %" PRIs_LIBCSTRING_SYSTEM "\\%" PRIs_LIBCSTRING_SYSTEM ".",
+				 "%s: unable to analyze key: %" PRIs_SYSTEM "\\%" PRIs_SYSTEM ".",
 				 function,
 				 key_path,
 				 sub_key_name );
@@ -3776,7 +3778,7 @@ int report_handle_analyze_string_and_shell_item_list_mrulistex_key(
 {
 	/* The largest string of a 32-bit unsigned integer is: 4294967295 (10 characters)
 	 */
-	libcstring_system_character_t name[ 11 ];
+	system_character_t name[ 11 ];
 
 	libregf_value_t *value = NULL;
 	static char *function  = "report_handle_analyze_string_and_shell_item_list_mrulistex_key";
@@ -3832,7 +3834,7 @@ int report_handle_analyze_string_and_shell_item_list_mrulistex_key(
 
 			goto on_error;
 		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		result = libregf_value_get_utf16_name_size(
 		          value,
 		          &name_size,
@@ -3856,7 +3858,7 @@ int report_handle_analyze_string_and_shell_item_list_mrulistex_key(
 		}
 		if( name_size == 2 )
 		{
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 			result = libregf_value_get_utf16_name(
 			          value,
 			          (uint16_t *) name,
@@ -3890,8 +3892,8 @@ int report_handle_analyze_string_and_shell_item_list_mrulistex_key(
 				{
 					break;
 				}
-				if( ( name[ name_index ] < (libcstring_system_character_t) '0' )
-				 || ( name[ name_index ] > (libcstring_system_character_t) '9' ) )
+				if( ( name[ name_index ] < (system_character_t) '0' )
+				 || ( name[ name_index ] > (system_character_t) '9' ) )
 				{
 					result = 0;
 
@@ -3902,7 +3904,7 @@ int report_handle_analyze_string_and_shell_item_list_mrulistex_key(
 			{
 				fprintf(
 				 report_handle->notify_stream,
-				 "Value\t: %" PRIs_LIBCSTRING_SYSTEM "\n",
+				 "Value\t: %" PRIs_SYSTEM "\n",
 				 name );
 
 				if( report_handle_analyze_string_and_shell_item_list_value(
@@ -3914,7 +3916,7 @@ int report_handle_analyze_string_and_shell_item_list_mrulistex_key(
 					 error,
 					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 					 LIBCERROR_RUNTIME_ERROR_GENERIC,
-					 "%s: unable to analyze value: %" PRIs_LIBCSTRING_SYSTEM ".",
+					 "%s: unable to analyze value: %" PRIs_SYSTEM ".",
 					 function,
 					 name );
 
@@ -3954,7 +3956,7 @@ on_error:
  */
 int report_handle_analyze_string_and_shell_item_list_mrulistex_key_path(
      report_handle_t *report_handle,
-     const libcstring_system_character_t *key_path,
+     const system_character_t *key_path,
      size_t key_path_length,
      libregf_error_t **error )
 {
@@ -4017,7 +4019,7 @@ int report_handle_analyze_string_and_shell_item_list_mrulistex_key_path(
 	{
 		fprintf(
 		 report_handle->notify_stream,
-		 "Key\t: %" PRIs_LIBCSTRING_SYSTEM "\n",
+		 "Key\t: %" PRIs_SYSTEM "\n",
 		 key_path );
 
 		if( report_handle_analyze_string_and_shell_item_list_mrulistex_key(
@@ -4029,7 +4031,7 @@ int report_handle_analyze_string_and_shell_item_list_mrulistex_key_path(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GENERIC,
-			 "%s: unable to analyze key: %" PRIs_LIBCSTRING_SYSTEM ".",
+			 "%s: unable to analyze key: %" PRIs_SYSTEM ".",
 			 function,
 			 key_path );
 
@@ -4069,18 +4071,18 @@ on_error:
  */
 int report_handle_analyze_string_and_shell_item_list_mrulistex_sub_keys_path(
      report_handle_t *report_handle,
-     const libcstring_system_character_t *key_path,
+     const system_character_t *key_path,
      size_t key_path_length,
      libregf_error_t **error )
 {
-	libcstring_system_character_t *sub_key_name = NULL;
-	libregf_key_t *key                          = NULL;
-	libregf_key_t *sub_key                      = NULL;
-	static char *function                       = "report_handle_analyze_string_and_shell_item_list_mrulistex_sub_keys_path";
-	size_t sub_key_name_size                    = 0;
-	int number_of_sub_keys                      = 0;
-	int sub_key_index                           = 0;
-	int result                                  = 0;
+	system_character_t *sub_key_name = NULL;
+	libregf_key_t *key               = NULL;
+	libregf_key_t *sub_key           = NULL;
+	static char *function            = "report_handle_analyze_string_and_shell_item_list_mrulistex_sub_keys_path";
+	size_t sub_key_name_size         = 0;
+	int number_of_sub_keys           = 0;
+	int sub_key_index                = 0;
+	int result                       = 0;
 
 	if( report_handle == NULL )
 	{
@@ -4187,7 +4189,7 @@ int report_handle_analyze_string_and_shell_item_list_mrulistex_sub_keys_path(
 			}
 			fprintf(
 			 report_handle->notify_stream,
-			 "Key\t: %" PRIs_LIBCSTRING_SYSTEM "\\%" PRIs_LIBCSTRING_SYSTEM "\n",
+			 "Key\t: %" PRIs_SYSTEM "\\%" PRIs_SYSTEM "\n",
 			 key_path,
 			 sub_key_name );
 
@@ -4200,7 +4202,7 @@ int report_handle_analyze_string_and_shell_item_list_mrulistex_sub_keys_path(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBCERROR_RUNTIME_ERROR_GENERIC,
-				 "%s: unable to analyze key: %" PRIs_LIBCSTRING_SYSTEM "\\%" PRIs_LIBCSTRING_SYSTEM ".",
+				 "%s: unable to analyze key: %" PRIs_SYSTEM "\\%" PRIs_SYSTEM ".",
 				 function,
 				 key_path,
 				 sub_key_name );
@@ -4275,7 +4277,7 @@ int report_handle_analyze_bagmru_key(
      libregf_key_t *key,
      libcerror_error_t **error )
 {
-	libcstring_system_character_t name[ 2 ];
+	system_character_t name[ 2 ];
 
 	libregf_key_t *sub_key = NULL;
 	libregf_value_t *value = NULL;
@@ -4332,7 +4334,7 @@ int report_handle_analyze_bagmru_key(
 
 			goto on_error;
 		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		result = libregf_value_get_utf16_name_size(
 		          value,
 		          &name_size,
@@ -4356,7 +4358,7 @@ int report_handle_analyze_bagmru_key(
 		}
 		if( name_size == 2 )
 		{
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 			result = libregf_value_get_utf16_name(
 			          value,
 			          (uint16_t *) name,
@@ -4380,12 +4382,12 @@ int report_handle_analyze_bagmru_key(
 
 				goto on_error;
 			}
-			if( ( name[ 0 ] >= (libcstring_system_character_t) '0' )
-			 && ( name[ 0 ] <= (libcstring_system_character_t) '9' ) )
+			if( ( name[ 0 ] >= (system_character_t) '0' )
+			 && ( name[ 0 ] <= (system_character_t) '9' ) )
 			{
 				fprintf(
 				 report_handle->notify_stream,
-				 "(value: %d) %" PRIs_LIBCSTRING_SYSTEM "\n",
+				 "(value: %d) %" PRIs_SYSTEM "\n",
 				 value_index,
 				 name );
 
@@ -4398,7 +4400,7 @@ int report_handle_analyze_bagmru_key(
 					 error,
 					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 					 LIBCERROR_RUNTIME_ERROR_GENERIC,
-					 "%s: unable to analyze value: %" PRIs_LIBCSTRING_SYSTEM ".",
+					 "%s: unable to analyze value: %" PRIs_SYSTEM ".",
 					 function,
 					 name );
 
@@ -4455,7 +4457,7 @@ int report_handle_analyze_bagmru_key(
 
 			goto on_error;
 		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		result = libregf_key_get_utf16_name_size(
 		          sub_key,
 		          &name_size,
@@ -4480,7 +4482,7 @@ int report_handle_analyze_bagmru_key(
 		}
 		if( name_size == 2 )
 		{
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 			result = libregf_key_get_utf16_name(
 			          sub_key,
 			          (uint16_t *) name,
@@ -4510,7 +4512,7 @@ int report_handle_analyze_bagmru_key(
 			{
 				fprintf(
 				 report_handle->notify_stream,
-				 "(key:) %" PRIs_LIBCSTRING_SYSTEM "\n",
+				 "(key:) %" PRIs_SYSTEM "\n",
 				 name );
 
 				if( report_handle_analyze_bagmru_key(
@@ -4568,7 +4570,7 @@ on_error:
  */
 int report_handle_analyze_bagmru_key_path(
      report_handle_t *report_handle,
-     const libcstring_system_character_t *key_path,
+     const system_character_t *key_path,
      size_t key_path_length,
      libregf_error_t **error )
 {
@@ -4631,7 +4633,7 @@ int report_handle_analyze_bagmru_key_path(
 	{
 		fprintf(
 		 report_handle->notify_stream,
-		 "Key\t: %" PRIs_LIBCSTRING_SYSTEM "\n",
+		 "Key\t: %" PRIs_SYSTEM "\n",
 		 key_path );
 
 		if( report_handle_analyze_bagmru_key(
@@ -4643,7 +4645,7 @@ int report_handle_analyze_bagmru_key_path(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GENERIC,
-			 "%s: unable to analyze key: %" PRIs_LIBCSTRING_SYSTEM ".",
+			 "%s: unable to analyze key: %" PRIs_SYSTEM ".",
 			 function,
 			 key_path );
 
@@ -4685,10 +4687,10 @@ int report_handle_analyze_bagmru(
      report_handle_t *report_handle,
      libregf_error_t **error )
 {
-	libcstring_system_character_t *key_path = NULL;
-	static char *function                   = "report_handle_analyze_bagmru";
-	size_t key_path_length                  = 0;
-	int result                              = 0;
+	system_character_t *key_path = NULL;
+	static char *function        = "report_handle_analyze_bagmru";
+	size_t key_path_length       = 0;
+	int result                   = 0;
 
 	if( report_handle == NULL )
 	{
@@ -4703,9 +4705,9 @@ int report_handle_analyze_bagmru(
 	}
 /* TODO */
 
-	key_path = _LIBCSTRING_SYSTEM_STRING( "\\Software\\Microsoft\\Windows\\Shell\\BagMRU" );
+	key_path = _SYSTEM_STRING( "\\Software\\Microsoft\\Windows\\Shell\\BagMRU" );
 
-	key_path_length = libcstring_system_string_length(
+	key_path_length = system_string_length(
 	                   key_path );
 
 	result = report_handle_analyze_bagmru_key_path(
@@ -4720,15 +4722,15 @@ int report_handle_analyze_bagmru(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GENERIC,
-		 "%s: unable to analyze: %" PRIs_LIBCSTRING_SYSTEM ".",
+		 "%s: unable to analyze: %" PRIs_SYSTEM ".",
 		 function,
 		 key_path );
 
 		return( -1 );
 	}
-	key_path = _LIBCSTRING_SYSTEM_STRING( "\\Software\\Microsoft\\Windows\\ShellNoRoam\\BagMRU" );
+	key_path = _SYSTEM_STRING( "\\Software\\Microsoft\\Windows\\ShellNoRoam\\BagMRU" );
 
-	key_path_length = libcstring_system_string_length(
+	key_path_length = system_string_length(
 	                   key_path );
 
 	result = report_handle_analyze_bagmru_key_path(
@@ -4743,15 +4745,15 @@ int report_handle_analyze_bagmru(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GENERIC,
-		 "%s: unable to analyze: %" PRIs_LIBCSTRING_SYSTEM ".",
+		 "%s: unable to analyze: %" PRIs_SYSTEM ".",
 		 function,
 		 key_path );
 
 		return( -1 );
 	}
-	key_path = _LIBCSTRING_SYSTEM_STRING( "\\Local Settings\\Software\\Microsoft\\Windows\\Shell\\BagMRU" );
+	key_path = _SYSTEM_STRING( "\\Local Settings\\Software\\Microsoft\\Windows\\Shell\\BagMRU" );
 
-	key_path_length = libcstring_system_string_length(
+	key_path_length = system_string_length(
 	                   key_path );
 
 	result = report_handle_analyze_bagmru_key_path(
@@ -4766,15 +4768,15 @@ int report_handle_analyze_bagmru(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GENERIC,
-		 "%s: unable to analyze: %" PRIs_LIBCSTRING_SYSTEM ".",
+		 "%s: unable to analyze: %" PRIs_SYSTEM ".",
 		 function,
 		 key_path );
 
 		return( -1 );
 	}
-	key_path = _LIBCSTRING_SYSTEM_STRING( "\\Local Settings\\Software\\Microsoft\\Windows\\ShellNoRoam\\BagMRU" );
+	key_path = _SYSTEM_STRING( "\\Local Settings\\Software\\Microsoft\\Windows\\ShellNoRoam\\BagMRU" );
 
-	key_path_length = libcstring_system_string_length(
+	key_path_length = system_string_length(
 	                   key_path );
 
 	result = report_handle_analyze_bagmru_key_path(
@@ -4789,15 +4791,15 @@ int report_handle_analyze_bagmru(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GENERIC,
-		 "%s: unable to analyze: %" PRIs_LIBCSTRING_SYSTEM ".",
+		 "%s: unable to analyze: %" PRIs_SYSTEM ".",
 		 function,
 		 key_path );
 
 		return( -1 );
 	}
-	key_path = _LIBCSTRING_SYSTEM_STRING( "\\Wow6432Node\\Local Settings\\Software\\Microsoft\\Windows\\Shell\\BagMRU" );
+	key_path = _SYSTEM_STRING( "\\Wow6432Node\\Local Settings\\Software\\Microsoft\\Windows\\Shell\\BagMRU" );
 
-	key_path_length = libcstring_system_string_length(
+	key_path_length = system_string_length(
 	                   key_path );
 
 	result = report_handle_analyze_bagmru_key_path(
@@ -4812,15 +4814,15 @@ int report_handle_analyze_bagmru(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GENERIC,
-		 "%s: unable to analyze: %" PRIs_LIBCSTRING_SYSTEM ".",
+		 "%s: unable to analyze: %" PRIs_SYSTEM ".",
 		 function,
 		 key_path );
 
 		return( -1 );
 	}
-	key_path = _LIBCSTRING_SYSTEM_STRING( "\\Wow6432Node\\Local Settings\\Software\\Microsoft\\Windows\\ShellNoRoam\\BagMRU" );
+	key_path = _SYSTEM_STRING( "\\Wow6432Node\\Local Settings\\Software\\Microsoft\\Windows\\ShellNoRoam\\BagMRU" );
 
-	key_path_length = libcstring_system_string_length(
+	key_path_length = system_string_length(
 	                   key_path );
 
 	result = report_handle_analyze_bagmru_key_path(
@@ -4835,7 +4837,7 @@ int report_handle_analyze_bagmru(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GENERIC,
-		 "%s: unable to analyze: %" PRIs_LIBCSTRING_SYSTEM ".",
+		 "%s: unable to analyze: %" PRIs_SYSTEM ".",
 		 function,
 		 key_path );
 
@@ -4851,10 +4853,10 @@ int report_handle_analyze_mru_keys(
      report_handle_t *report_handle,
      libregf_error_t **error )
 {
-	libcstring_system_character_t *key_path = NULL;
-	static char *function                   = "report_handle_analyze_mru_keys";
-	size_t key_path_length                  = 0;
-	int result                              = 0;
+	system_character_t *key_path = NULL;
+	static char *function        = "report_handle_analyze_mru_keys";
+	size_t key_path_length       = 0;
+	int result                   = 0;
 
 	if( report_handle == NULL )
 	{
@@ -4869,9 +4871,9 @@ int report_handle_analyze_mru_keys(
 	}
 	/* MRUList keys with shell item list values
 	 */
-	key_path = _LIBCSTRING_SYSTEM_STRING( "\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\DesktopStreamMRU" );
+	key_path = _SYSTEM_STRING( "\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\DesktopStreamMRU" );
 
-	key_path_length = libcstring_system_string_length(
+	key_path_length = system_string_length(
 	                   key_path );
 
 	result = report_handle_analyze_shell_item_list_mrulist_key_path(
@@ -4886,7 +4888,7 @@ int report_handle_analyze_mru_keys(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GENERIC,
-		 "%s: unable to analyze: %" PRIs_LIBCSTRING_SYSTEM ".",
+		 "%s: unable to analyze: %" PRIs_SYSTEM ".",
 		 function,
 		 key_path );
 
@@ -4894,9 +4896,9 @@ int report_handle_analyze_mru_keys(
 	}
 	/* MRUListEx keys with shell item list values
 	 */
-	key_path = _LIBCSTRING_SYSTEM_STRING( "\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\ComDlg32\\OpenSavePidlMRU" );
+	key_path = _SYSTEM_STRING( "\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\ComDlg32\\OpenSavePidlMRU" );
 
-	key_path_length = libcstring_system_string_length(
+	key_path_length = system_string_length(
 	                   key_path );
 
 	result = report_handle_analyze_shell_item_list_mrulistex_sub_keys_path(
@@ -4911,15 +4913,15 @@ int report_handle_analyze_mru_keys(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GENERIC,
-		 "%s: unable to analyze: %" PRIs_LIBCSTRING_SYSTEM ".",
+		 "%s: unable to analyze: %" PRIs_SYSTEM ".",
 		 function,
 		 key_path );
 
 		return( -1 );
 	}
-	key_path = _LIBCSTRING_SYSTEM_STRING( "\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\StreamMRU" );
+	key_path = _SYSTEM_STRING( "\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\StreamMRU" );
 
-	key_path_length = libcstring_system_string_length(
+	key_path_length = system_string_length(
 	                   key_path );
 
 	result = report_handle_analyze_shell_item_list_mrulistex_key_path(
@@ -4934,7 +4936,7 @@ int report_handle_analyze_mru_keys(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GENERIC,
-		 "%s: unable to analyze: %" PRIs_LIBCSTRING_SYSTEM ".",
+		 "%s: unable to analyze: %" PRIs_SYSTEM ".",
 		 function,
 		 key_path );
 
@@ -4942,9 +4944,9 @@ int report_handle_analyze_mru_keys(
 	}
 	/* MRUListEx keys with "string and shell item" values
 	 */
-	key_path = _LIBCSTRING_SYSTEM_STRING( "\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\RecentDocs" );
+	key_path = _SYSTEM_STRING( "\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\RecentDocs" );
 
-	key_path_length = libcstring_system_string_length(
+	key_path_length = system_string_length(
 	                   key_path );
 
 	result = report_handle_analyze_string_and_shell_item_mrulistex_sub_keys_path(
@@ -4959,7 +4961,7 @@ int report_handle_analyze_mru_keys(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GENERIC,
-		 "%s: unable to analyze: %" PRIs_LIBCSTRING_SYSTEM ".",
+		 "%s: unable to analyze: %" PRIs_SYSTEM ".",
 		 function,
 		 key_path );
 
@@ -4967,9 +4969,9 @@ int report_handle_analyze_mru_keys(
 	}
 	/* MRUListEx keys with "string and shell item list" values
 	 */
-	key_path = _LIBCSTRING_SYSTEM_STRING( "\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\ComDlg32\\LastVisitedPidlMRU" );
+	key_path = _SYSTEM_STRING( "\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\ComDlg32\\LastVisitedPidlMRU" );
 
-	key_path_length = libcstring_system_string_length(
+	key_path_length = system_string_length(
 	                   key_path );
 
 	result = report_handle_analyze_string_and_shell_item_list_mrulistex_key_path(
@@ -4984,7 +4986,7 @@ int report_handle_analyze_mru_keys(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GENERIC,
-		 "%s: unable to analyze: %" PRIs_LIBCSTRING_SYSTEM ".",
+		 "%s: unable to analyze: %" PRIs_SYSTEM ".",
 		 function,
 		 key_path );
 
@@ -5000,9 +5002,9 @@ int report_handle_analyze_explorer(
      report_handle_t *report_handle,
      libregf_error_t **error )
 {
-	libcstring_system_character_t *key_path = NULL;
-	static char *function                   = "report_handle_analyze_explorer";
-	size_t key_path_length                  = 0;
+	system_character_t *key_path = NULL;
+	static char *function        = "report_handle_analyze_explorer";
+	size_t key_path_length       = 0;
 
 	if( report_handle == NULL )
 	{
@@ -5015,9 +5017,9 @@ int report_handle_analyze_explorer(
 
 		return( -1 );
 	}
-	key_path = _LIBCSTRING_SYSTEM_STRING( "\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Browser Helper Objects" );
+	key_path = _SYSTEM_STRING( "\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Browser Helper Objects" );
 
-	key_path_length = libcstring_system_string_length(
+	key_path_length = system_string_length(
 	                   key_path );
 
 /* TODO contains a key with sub keys and a value "name"
@@ -5031,7 +5033,7 @@ int report_handle_analyze_explorer(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GENERIC,
-		 "%s: unable to analyze: %" PRIs_LIBCSTRING_SYSTEM ".",
+		 "%s: unable to analyze: %" PRIs_SYSTEM ".",
 		 function,
 		 key_path );
 
@@ -5211,14 +5213,14 @@ int report_handle_analyze_sam(
      report_handle_t *report_handle,
      libregf_error_t **error )
 {
-	libcstring_system_character_t *key_path = NULL;
-	libregf_key_t *key                      = NULL;
-	libregf_key_t *sub_key                  = NULL;
-	static char *function                   = "report_handle_analyze_sam";
-	size_t key_path_length                  = 0;
-	int number_of_sub_keys                  = 0;
-	int result                              = 0;
-	int sub_key_index                       = 0;
+	system_character_t *key_path = NULL;
+	libregf_key_t *key           = NULL;
+	libregf_key_t *sub_key       = NULL;
+	static char *function        = "report_handle_analyze_sam";
+	size_t key_path_length       = 0;
+	int number_of_sub_keys       = 0;
+	int result                   = 0;
+	int sub_key_index            = 0;
 
 	if( report_handle == NULL )
 	{
@@ -5232,9 +5234,9 @@ int report_handle_analyze_sam(
 		return( -1 );
 	}
 /* TODO dynamically handle user keys */
-	key_path = _LIBCSTRING_SYSTEM_STRING( "SAM\\Domains\\Account\\Users" );
+	key_path = _SYSTEM_STRING( "SAM\\Domains\\Account\\Users" );
 
-	key_path_length = libcstring_system_string_length(
+	key_path_length = system_string_length(
 	                   key_path );
 
 	result = registry_file_get_key_by_path(
@@ -5250,7 +5252,7 @@ int report_handle_analyze_sam(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve key by path: %" PRIs_LIBCSTRING_SYSTEM ".",
+		 "%s: unable to retrieve key by path: %" PRIs_SYSTEM ".",
 		 function,
 		 key_path );
 
@@ -5363,7 +5365,7 @@ int report_handle_analyze_recent_docs_key(
      libregf_key_t *key,
      libcerror_error_t **error )
 {
-	libcstring_system_character_t name[ 32 ];
+	system_character_t name[ 32 ];
 
 	libregf_key_t *sub_key = NULL;
 	static char *function  = "report_handle_analyze_recent_docs_key";
@@ -5417,7 +5419,7 @@ int report_handle_analyze_recent_docs_key(
 
 			goto on_error;
 		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		result = libregf_key_get_utf16_name_size(
 		          sub_key,
 		          &name_size,
@@ -5452,7 +5454,7 @@ int report_handle_analyze_recent_docs_key(
 
 			goto on_error;
 		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		result = libregf_key_get_utf16_name(
 		          sub_key,
 		          (uint16_t *) name,
@@ -5479,7 +5481,7 @@ int report_handle_analyze_recent_docs_key(
 		}
 		fprintf(
 		 report_handle->notify_stream,
-		 "\tType\t\t\t\t: %" PRIs_LIBCSTRING_SYSTEM "\n",
+		 "\tType\t\t\t\t: %" PRIs_SYSTEM "\n",
 		 name );
 
 		if( report_handle_analyze_recent_docs_sub_key(
@@ -5491,7 +5493,7 @@ int report_handle_analyze_recent_docs_key(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GENERIC,
-			 "%s: unable to analyze RecentDocs sub key: %" PRIs_LIBCSTRING_SYSTEM ".",
+			 "%s: unable to analyze RecentDocs sub key: %" PRIs_SYSTEM ".",
 			 function,
 			 name );
 
@@ -5536,14 +5538,14 @@ int report_handle_analyze_recent_docs_sub_key(
      libregf_key_t *key,
      libcerror_error_t **error )
 {
-	libcstring_system_character_t *value_name   = NULL;
-	libcstring_system_character_t *value_string = NULL;
-	libregf_value_t *value                      = NULL;
-	static char *function                       = "report_handle_analyze_recent_docs_sub_key";
-	size_t value_name_size                      = 0;
-	size_t value_string_size                    = 0;
-	int number_of_values                        = 0;
-	int value_index                             = 0;
+	system_character_t *value_name   = NULL;
+	system_character_t *value_string = NULL;
+	libregf_value_t *value           = NULL;
+	static char *function            = "report_handle_analyze_recent_docs_sub_key";
+	size_t value_name_size           = 0;
+	size_t value_string_size         = 0;
+	int number_of_values             = 0;
+	int value_index                  = 0;
 
 	if( report_handle == NULL )
 	{
@@ -5617,9 +5619,9 @@ int report_handle_analyze_recent_docs_sub_key(
 			goto on_error;
 		}
 /* TODO check if this code belongs here */
-		if( libcstring_system_string_compare(
+		if( system_string_compare(
 		     value_name,
-		     _LIBCSTRING_SYSTEM_STRING( "MRUListEx" ),
+		     _SYSTEM_STRING( "MRUListEx" ),
 		     9 ) != 0 )
 		{
 			if( report_handle_get_value_data_string(
@@ -5639,11 +5641,11 @@ int report_handle_analyze_recent_docs_sub_key(
 			}
 			fprintf(
 			 report_handle->notify_stream,
-			 "Value\t: %" PRIs_LIBCSTRING_SYSTEM "\n",
+			 "Value\t: %" PRIs_SYSTEM "\n",
 			 value_name );
 			fprintf(
 			 report_handle->notify_stream,
-			 "\tString\t\t\t\t: %" PRIs_LIBCSTRING_SYSTEM "\n",
+			 "\tString\t\t\t\t: %" PRIs_SYSTEM "\n",
 			 value_string );
 
 			memory_free(
@@ -5700,11 +5702,11 @@ int report_handle_analyze_recent_docs(
      report_handle_t *report_handle,
      libregf_error_t **error )
 {
-	libcstring_system_character_t *sub_key_path = NULL;
-	libregf_key_t *sub_key                      = NULL;
-	static char *function                       = "report_handle_analyze_recent_docs";
-	size_t sub_key_path_length                  = 0;
-	int result                                  = 0;
+	system_character_t *sub_key_path = NULL;
+	libregf_key_t *sub_key           = NULL;
+	static char *function            = "report_handle_analyze_recent_docs";
+	size_t sub_key_path_length       = 0;
+	int result                       = 0;
 
 	if( report_handle == NULL )
 	{
@@ -5717,9 +5719,9 @@ int report_handle_analyze_recent_docs(
 
 		return( -1 );
 	}
-	sub_key_path = _LIBCSTRING_SYSTEM_STRING( "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\RecentDocs" );
+	sub_key_path = _SYSTEM_STRING( "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\RecentDocs" );
 
-	sub_key_path_length = libcstring_system_string_length(
+	sub_key_path_length = system_string_length(
 	                       sub_key_path );
 
 	result = registry_file_get_key_by_path(
@@ -5744,7 +5746,7 @@ int report_handle_analyze_recent_docs(
 	{
 		fprintf(
 		 report_handle->notify_stream,
-		 "Windows Explorer RecentDocs: %" PRIs_LIBCSTRING_SYSTEM "\n",
+		 "Windows Explorer RecentDocs: %" PRIs_SYSTEM "\n",
 		 sub_key_path );
 
 		if( report_handle_analyze_recent_docs_key(
@@ -5794,13 +5796,13 @@ int report_handle_analyze_product_info(
      report_handle_t *report_handle,
      libregf_error_t **error )
 {
-	libcstring_system_character_t *sub_key_path = NULL;
-	libcstring_system_character_t *value_name   = NULL;
-	libregf_key_t *sub_key                      = NULL;
-	static char *function                       = "report_handle_analyze_product_info";
-	size_t sub_key_path_length                  = 0;
-	size_t value_name_length                    = 0;
-	int result                                  = 0;
+	system_character_t *sub_key_path = NULL;
+	system_character_t *value_name   = NULL;
+	libregf_key_t *sub_key           = NULL;
+	static char *function            = "report_handle_analyze_product_info";
+	size_t sub_key_path_length       = 0;
+	size_t value_name_length         = 0;
+	int result                       = 0;
 
 	if( report_handle == NULL )
 	{
@@ -5813,9 +5815,9 @@ int report_handle_analyze_product_info(
 
 		return( -1 );
 	}
-	sub_key_path = _LIBCSTRING_SYSTEM_STRING( "\\Microsoft\\Windows NT\\CurrentVersion" );
+	sub_key_path = _SYSTEM_STRING( "\\Microsoft\\Windows NT\\CurrentVersion" );
 
-	sub_key_path_length = libcstring_system_string_length(
+	sub_key_path_length = system_string_length(
 	                       sub_key_path );
 
 	result = registry_file_get_key_by_path(
@@ -5831,7 +5833,7 @@ int report_handle_analyze_product_info(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve sub key by path: %" PRIs_LIBCSTRING_SYSTEM ".",
+		 "%s: unable to retrieve sub key by path: %" PRIs_SYSTEM ".",
 		 function,
 		 sub_key_path );
 
@@ -5845,12 +5847,12 @@ int report_handle_analyze_product_info(
 
 		fprintf(
 		 report_handle->notify_stream,
-		 "Key\t: %" PRIs_LIBCSTRING_SYSTEM "\n",
+		 "Key\t: %" PRIs_SYSTEM "\n",
 		 sub_key_path );
 
-		value_name = _LIBCSTRING_SYSTEM_STRING( "ProductName" );
+		value_name = _SYSTEM_STRING( "ProductName" );
 
-		value_name_length = libcstring_system_string_length(
+		value_name_length = system_string_length(
 		                     value_name );
 
 		result = report_handle_analyze_key_with_string_value(
@@ -5866,16 +5868,16 @@ int report_handle_analyze_product_info(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GENERIC,
-			 "%s: unable to analyze value: %" PRIs_LIBCSTRING_SYSTEM " in sub key: %" PRIs_LIBCSTRING_SYSTEM ".",
+			 "%s: unable to analyze value: %" PRIs_SYSTEM " in sub key: %" PRIs_SYSTEM ".",
 			 function,
 			 value_name,
 			 sub_key_path );
 
 			goto on_error;
 		}
-		value_name = _LIBCSTRING_SYSTEM_STRING( "CSDVersion" );
+		value_name = _SYSTEM_STRING( "CSDVersion" );
 
-		value_name_length = libcstring_system_string_length(
+		value_name_length = system_string_length(
 		                     value_name );
 
 		result = report_handle_analyze_key_with_string_value(
@@ -5891,16 +5893,16 @@ int report_handle_analyze_product_info(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GENERIC,
-			 "%s: unable to analyze value: %" PRIs_LIBCSTRING_SYSTEM " in sub key: %" PRIs_LIBCSTRING_SYSTEM ".",
+			 "%s: unable to analyze value: %" PRIs_SYSTEM " in sub key: %" PRIs_SYSTEM ".",
 			 function,
 			 value_name,
 			 sub_key_path );
 
 			goto on_error;
 		}
-		value_name = _LIBCSTRING_SYSTEM_STRING( "CurrentVersion" );
+		value_name = _SYSTEM_STRING( "CurrentVersion" );
 
-		value_name_length = libcstring_system_string_length(
+		value_name_length = system_string_length(
 		                     value_name );
 
 		result = report_handle_analyze_key_with_string_value(
@@ -5916,16 +5918,16 @@ int report_handle_analyze_product_info(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GENERIC,
-			 "%s: unable to analyze value: %" PRIs_LIBCSTRING_SYSTEM " in sub key: %" PRIs_LIBCSTRING_SYSTEM ".",
+			 "%s: unable to analyze value: %" PRIs_SYSTEM " in sub key: %" PRIs_SYSTEM ".",
 			 function,
 			 value_name,
 			 sub_key_path );
 
 			goto on_error;
 		}
-		value_name = _LIBCSTRING_SYSTEM_STRING( "CurrentBuildNumber" );
+		value_name = _SYSTEM_STRING( "CurrentBuildNumber" );
 
-		value_name_length = libcstring_system_string_length(
+		value_name_length = system_string_length(
 		                     value_name );
 
 		result = report_handle_analyze_key_with_string_value(
@@ -5941,16 +5943,16 @@ int report_handle_analyze_product_info(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GENERIC,
-			 "%s: unable to analyze value: %" PRIs_LIBCSTRING_SYSTEM " in sub key: %" PRIs_LIBCSTRING_SYSTEM ".",
+			 "%s: unable to analyze value: %" PRIs_SYSTEM " in sub key: %" PRIs_SYSTEM ".",
 			 function,
 			 value_name,
 			 sub_key_path );
 
 			goto on_error;
 		}
-		value_name = _LIBCSTRING_SYSTEM_STRING( "CurrentType" );
+		value_name = _SYSTEM_STRING( "CurrentType" );
 
-		value_name_length = libcstring_system_string_length(
+		value_name_length = system_string_length(
 		                     value_name );
 
 		result = report_handle_analyze_key_with_string_value(
@@ -5966,16 +5968,16 @@ int report_handle_analyze_product_info(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GENERIC,
-			 "%s: unable to analyze value: %" PRIs_LIBCSTRING_SYSTEM " in sub key: %" PRIs_LIBCSTRING_SYSTEM ".",
+			 "%s: unable to analyze value: %" PRIs_SYSTEM " in sub key: %" PRIs_SYSTEM ".",
 			 function,
 			 value_name,
 			 sub_key_path );
 
 			goto on_error;
 		}
-		value_name = _LIBCSTRING_SYSTEM_STRING( "ProductId" );
+		value_name = _SYSTEM_STRING( "ProductId" );
 
-		value_name_length = libcstring_system_string_length(
+		value_name_length = system_string_length(
 		                     value_name );
 
 		result = report_handle_analyze_key_with_string_value(
@@ -5991,16 +5993,16 @@ int report_handle_analyze_product_info(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GENERIC,
-			 "%s: unable to analyze value: %" PRIs_LIBCSTRING_SYSTEM " in sub key: %" PRIs_LIBCSTRING_SYSTEM ".",
+			 "%s: unable to analyze value: %" PRIs_SYSTEM " in sub key: %" PRIs_SYSTEM ".",
 			 function,
 			 value_name,
 			 sub_key_path );
 
 			goto on_error;
 		}
-		value_name = _LIBCSTRING_SYSTEM_STRING( "RegisteredOwner" );
+		value_name = _SYSTEM_STRING( "RegisteredOwner" );
 
-		value_name_length = libcstring_system_string_length(
+		value_name_length = system_string_length(
 		                     value_name );
 
 		result = report_handle_analyze_key_with_string_value(
@@ -6016,16 +6018,16 @@ int report_handle_analyze_product_info(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GENERIC,
-			 "%s: unable to analyze value: %" PRIs_LIBCSTRING_SYSTEM " in sub key: %" PRIs_LIBCSTRING_SYSTEM ".",
+			 "%s: unable to analyze value: %" PRIs_SYSTEM " in sub key: %" PRIs_SYSTEM ".",
 			 function,
 			 value_name,
 			 sub_key_path );
 
 			goto on_error;
 		}
-		value_name = _LIBCSTRING_SYSTEM_STRING( "RegisteredOrganization" );
+		value_name = _SYSTEM_STRING( "RegisteredOrganization" );
 
-		value_name_length = libcstring_system_string_length(
+		value_name_length = system_string_length(
 		                     value_name );
 
 		result = report_handle_analyze_key_with_string_value(
@@ -6041,16 +6043,16 @@ int report_handle_analyze_product_info(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GENERIC,
-			 "%s: unable to analyze value: %" PRIs_LIBCSTRING_SYSTEM " in sub key: %" PRIs_LIBCSTRING_SYSTEM ".",
+			 "%s: unable to analyze value: %" PRIs_SYSTEM " in sub key: %" PRIs_SYSTEM ".",
 			 function,
 			 value_name,
 			 sub_key_path );
 
 			goto on_error;
 		}
-		value_name = _LIBCSTRING_SYSTEM_STRING( "PathName" );
+		value_name = _SYSTEM_STRING( "PathName" );
 
-		value_name_length = libcstring_system_string_length(
+		value_name_length = system_string_length(
 		                     value_name );
 
 		result = report_handle_analyze_key_with_string_value(
@@ -6066,16 +6068,16 @@ int report_handle_analyze_product_info(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GENERIC,
-			 "%s: unable to analyze value: %" PRIs_LIBCSTRING_SYSTEM " in sub key: %" PRIs_LIBCSTRING_SYSTEM ".",
+			 "%s: unable to analyze value: %" PRIs_SYSTEM " in sub key: %" PRIs_SYSTEM ".",
 			 function,
 			 value_name,
 			 sub_key_path );
 
 			goto on_error;
 		}
-		value_name = _LIBCSTRING_SYSTEM_STRING( "SystemRoot" );
+		value_name = _SYSTEM_STRING( "SystemRoot" );
 
-		value_name_length = libcstring_system_string_length(
+		value_name_length = system_string_length(
 		                     value_name );
 
 		result = report_handle_analyze_key_with_string_value(
@@ -6091,16 +6093,16 @@ int report_handle_analyze_product_info(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GENERIC,
-			 "%s: unable to analyze value: %" PRIs_LIBCSTRING_SYSTEM " in sub key: %" PRIs_LIBCSTRING_SYSTEM ".",
+			 "%s: unable to analyze value: %" PRIs_SYSTEM " in sub key: %" PRIs_SYSTEM ".",
 			 function,
 			 value_name,
 			 sub_key_path );
 
 			goto on_error;
 		}
-		value_name = _LIBCSTRING_SYSTEM_STRING( "InstallDate" );
+		value_name = _SYSTEM_STRING( "InstallDate" );
 
-		value_name_length = libcstring_system_string_length(
+		value_name_length = system_string_length(
 		                     value_name );
 
 		result = report_handle_analyze_key_with_posix_time_value(
@@ -6116,7 +6118,7 @@ int report_handle_analyze_product_info(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GENERIC,
-			 "%s: unable to analyze value: %" PRIs_LIBCSTRING_SYSTEM " in sub key: %" PRIs_LIBCSTRING_SYSTEM ".",
+			 "%s: unable to analyze value: %" PRIs_SYSTEM " in sub key: %" PRIs_SYSTEM ".",
 			 function,
 			 value_name,
 			 sub_key_path );
@@ -6134,7 +6136,7 @@ int report_handle_analyze_product_info(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GENERIC,
-			 "%s: unable to analyze value: DigitalProductId in sub key: %" PRIs_LIBCSTRING_SYSTEM ".",
+			 "%s: unable to analyze value: DigitalProductId in sub key: %" PRIs_SYSTEM ".",
 			 function,
 			 sub_key_path );
 
@@ -6185,17 +6187,17 @@ int report_handle_analyze_digital_product_id_value(
 		'M', 'P', 'Q', 'R', 'T', 'V', 'W', 'X',
 		'Y', '2', '3', '4', '6', '7', '8', '9' };
 
-	libcstring_system_character_t *value_name = NULL;
-	libregf_value_t *value                    = NULL;
-	uint8_t *binary_data                      = NULL;
-	static char *function                     = "report_handle_analyze_digital_product_id_value";
-	size_t binary_data_size                   = 0;
-	size_t value_name_length                  = 0;
-	uint16_t value_16bit                      = 0;
-	uint8_t remainder                         = 0;
-	int8_t byte_index                         = 0;
-	int8_t string_index                       = 0;
-	int result                                = 0;
+	system_character_t *value_name = NULL;
+	libregf_value_t *value         = NULL;
+	uint8_t *binary_data           = NULL;
+	static char *function          = "report_handle_analyze_digital_product_id_value";
+	size_t binary_data_size        = 0;
+	size_t value_name_length       = 0;
+	uint16_t value_16bit           = 0;
+	uint8_t remainder              = 0;
+	int8_t byte_index              = 0;
+	int8_t string_index            = 0;
+	int result                     = 0;
 
 	if( report_handle == NULL )
 	{
@@ -6208,12 +6210,12 @@ int report_handle_analyze_digital_product_id_value(
 
 		return( -1 );
 	}
-	value_name = _LIBCSTRING_SYSTEM_STRING( "DigitalProductId" );
+	value_name = _SYSTEM_STRING( "DigitalProductId" );
 
-	value_name_length = libcstring_system_string_length(
+	value_name_length = system_string_length(
 	                     value_name );
 
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libregf_key_get_value_by_utf16_name(
 		  key,
 		  (uint16_t *) value_name,
@@ -6234,7 +6236,7 @@ int report_handle_analyze_digital_product_id_value(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve value: %" PRIs_LIBCSTRING_SYSTEM ".",
+		 "%s: unable to retrieve value: %" PRIs_SYSTEM ".",
 		 function,
 		 value_name );
 
@@ -6257,7 +6259,7 @@ int report_handle_analyze_digital_product_id_value(
 	}
 	fprintf(
 	 report_handle->notify_stream,
-	 "%" PRIs_LIBCSTRING_SYSTEM ":\n",
+	 "%" PRIs_SYSTEM ":\n",
 	 value_name );
 
 /* TODO */
@@ -6341,7 +6343,7 @@ int report_handle_analyze_digital_product_id_value(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to free value: %" PRIs_LIBCSTRING_SYSTEM ".",
+		 "%s: unable to free value: %" PRIs_SYSTEM ".",
 		 function,
 		 value_name );
 

@@ -21,10 +21,12 @@
 
 #include <common.h>
 #include <memory.h>
+#include <narrow_string.h>
+#include <system_string.h>
 #include <types.h>
+#include <wide_string.h>
 
 #include "regftools_libcerror.h"
-#include "regftools_libcstring.h"
 #include "regftools_libregf.h"
 #include "registry_file.h"
 
@@ -261,20 +263,20 @@ int registry_file_set_ascii_codepage(
  */
 int registry_file_open(
      registry_file_t *registry_file,
-     const libcstring_system_character_t *filename,
+     const system_character_t *filename,
      libcerror_error_t **error )
 {
-	libcstring_system_character_t *name = NULL;
-	libregf_key_t *sub_key              = NULL;
-	libregf_value_t *value              = NULL;
-	static char *function               = "registry_file_open";
-	const char *sub_key_path            = NULL;
-	const char *value_name              = NULL;
-	size_t name_size                    = 0;
-	size_t sub_key_path_length          = 0;
-	size_t value_name_length            = 0;
-	int number_of_sub_keys              = 0;
-	int result                          = 0;
+	system_character_t *name   = NULL;
+	libregf_key_t *sub_key     = NULL;
+	libregf_value_t *value     = NULL;
+	static char *function      = "registry_file_open";
+	const char *sub_key_path   = NULL;
+	const char *value_name     = NULL;
+	size_t name_size           = 0;
+	size_t sub_key_path_length = 0;
+	size_t value_name_length   = 0;
+	int number_of_sub_keys     = 0;
+	int result                 = 0;
 
 	if( registry_file == NULL )
 	{
@@ -298,7 +300,7 @@ int registry_file_open(
 
 		return( -1 );
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	if( libregf_file_open_wide(
 	     registry_file->regf_file,
 	     filename,
@@ -353,7 +355,7 @@ int registry_file_open(
 
 	if( number_of_sub_keys == 1 )
 	{
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		result = libregf_key_get_utf16_name_size(
 		          registry_file->root_key,
 		          &name_size,
@@ -377,7 +379,7 @@ int registry_file_open(
 			goto on_error;
 		}
 		if( ( name_size > (size_t) SSIZE_MAX )
-		 || ( ( sizeof( libcstring_system_character_t ) * name_size ) > (size_t) SSIZE_MAX ) )
+		 || ( ( sizeof( system_character_t ) * name_size ) > (size_t) SSIZE_MAX ) )
 		{
 			libcerror_error_set(
 			 error,
@@ -388,7 +390,7 @@ int registry_file_open(
 
 			goto on_error;
 		}
-		name = libcstring_system_string_allocate(
+		name = system_string_allocate(
 			name_size );
 
 		if( name == NULL )
@@ -402,7 +404,7 @@ int registry_file_open(
 
 			goto on_error;
 		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		result = libregf_key_get_utf16_name(
 			  registry_file->root_key,
 			  (uint16_t *) name,
@@ -433,9 +435,9 @@ int registry_file_open(
 		{
 			/* Root key used by Windows 2000, XP, 2003
 			 */
-			if( libcstring_system_string_compare_no_case(
+			if( system_string_compare_no_case(
 			     name,
-			     _LIBCSTRING_SYSTEM_STRING( "$$$PROTO.HIV" ),
+			     _SYSTEM_STRING( "$$$PROTO.HIV" ),
 			     12 ) == 0 )
 			{
 				result = 1;
@@ -445,12 +447,12 @@ int registry_file_open(
 		{
 			/* Root key used by Windows Vista, 2008, 7
 			 */
-			if( libcstring_system_string_compare_no_case(
+			if( system_string_compare_no_case(
 			     name,
-			     _LIBCSTRING_SYSTEM_STRING( "CMI-CreateHive{" ),
+			     _SYSTEM_STRING( "CMI-CreateHive{" ),
 			     15 ) == 0 )
 			{
-				if( name[ 51 ] == (libcstring_system_character_t) '}' )
+				if( name[ 51 ] == (system_character_t) '}' )
 				{
 					result = 1;
 				}
@@ -460,12 +462,12 @@ int registry_file_open(
 		{
 			/* Root key used by Windows 8
 			 */
-			if( libcstring_system_string_compare_no_case(
+			if( system_string_compare_no_case(
 			     name,
-			     _LIBCSTRING_SYSTEM_STRING( "CsiTool-CreateHive-{" ),
+			     _SYSTEM_STRING( "CsiTool-CreateHive-{" ),
 			     20 ) == 0 )
 			{
-				if( name[ 56 ] == (libcstring_system_character_t) '}' )
+				if( name[ 56 ] == (system_character_t) '}' )
 				{
 					result = 1;
 				}
@@ -503,7 +505,7 @@ int registry_file_open(
 	/* Determine the registry file type based on the name of the base key
 	 */
 /* TODO refactor to separate function */
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libregf_key_get_utf16_name_size(
 		  registry_file->base_key,
 		  &name_size,
@@ -527,7 +529,7 @@ int registry_file_open(
 		goto on_error;
 	}
 	if( ( name_size > (size_t) SSIZE_MAX )
-	 || ( ( sizeof( libcstring_system_character_t ) * name_size ) > (size_t) SSIZE_MAX ) )
+	 || ( ( sizeof( system_character_t ) * name_size ) > (size_t) SSIZE_MAX ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -538,7 +540,7 @@ int registry_file_open(
 
 		goto on_error;
 	}
-	name = libcstring_system_string_allocate(
+	name = system_string_allocate(
 		name_size );
 
 	if( name == NULL )
@@ -552,7 +554,7 @@ int registry_file_open(
 
 		goto on_error;
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libregf_key_get_utf16_name(
 		  registry_file->base_key,
 		  (uint16_t *) name,
@@ -579,9 +581,9 @@ int registry_file_open(
 /* TODO add more types */
 	if( name_size == 4 )
 	{
-		if( libcstring_system_string_compare_no_case(
+		if( system_string_compare_no_case(
 		     name,
-		     _LIBCSTRING_SYSTEM_STRING( "SAM" ),
+		     _SYSTEM_STRING( "SAM" ),
 		     3 ) == 0 )
 		{
 			registry_file->type = REGISTRY_FILE_TYPE_SAM;
@@ -612,7 +614,7 @@ int registry_file_open(
 	 */
 	sub_key_path = "Select";
 
-	sub_key_path_length = libcstring_narrow_string_length(
+	sub_key_path_length = narrow_string_length(
 	                       sub_key_path );
 
 	result = libregf_key_get_sub_key_by_utf8_path(
@@ -638,7 +640,7 @@ int registry_file_open(
 	{
 		value_name = "Current";
 
-		value_name_length = libcstring_narrow_string_length(
+		value_name_length = narrow_string_length(
 		                     value_name );
 
 		result = libregf_key_get_value_by_utf8_name(
@@ -709,7 +711,7 @@ int registry_file_open(
 	 */
 	sub_key_path = "ControlSet001";
 
-	sub_key_path_length = libcstring_narrow_string_length(
+	sub_key_path_length = narrow_string_length(
 	                       sub_key_path );
 
 	result = libregf_key_get_sub_key_by_utf8_path(
@@ -735,7 +737,7 @@ int registry_file_open(
 	 */
 	sub_key_path = "ControlSet002";
 
-	sub_key_path_length = libcstring_narrow_string_length(
+	sub_key_path_length = narrow_string_length(
 	                       sub_key_path );
 
 	result = libregf_key_get_sub_key_by_utf8_path(
@@ -943,7 +945,7 @@ int registry_file_close(
  */
 int registry_file_get_key_by_path(
      registry_file_t *registry_file,
-     const libcstring_system_character_t *key_path,
+     const system_character_t *key_path,
      size_t key_path_length,
      libregf_key_t **key,
      libcerror_error_t **error )
@@ -962,7 +964,7 @@ int registry_file_get_key_by_path(
 
 		return( -1 );
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libregf_key_get_sub_key_by_utf16_path(
 	          registry_file->base_key,
 	          (uint16_t *) key_path,
@@ -983,7 +985,7 @@ int registry_file_get_key_by_path(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve key by path: %" PRIs_LIBCSTRING_SYSTEM ".",
+		 "%s: unable to retrieve key by path: %" PRIs_SYSTEM ".",
 		 function,
 		 key_path );
 

@@ -21,13 +21,15 @@
 
 #include <common.h>
 #include <memory.h>
+#include <narrow_string.h>
+#include <system_string.h>
 #include <types.h>
+#include <wide_string.h>
 
 #include "export_handle.h"
 #include "log_handle.h"
 #include "regftools_libcerror.h"
 #include "regftools_libclocale.h"
-#include "regftools_libcstring.h"
 #include "regftools_libregf.h"
 
 #define EXPORT_HANDLE_NOTIFY_STREAM	stdout
@@ -211,7 +213,7 @@ int export_handle_signal_abort(
  */
 int export_handle_set_ascii_codepage(
      export_handle_t *export_handle,
-     const libcstring_system_character_t *string,
+     const system_character_t *string,
      libcerror_error_t **error )
 {
 	static char *function  = "export_handle_set_ascii_codepage";
@@ -233,10 +235,10 @@ int export_handle_set_ascii_codepage(
 	feature_flags = LIBCLOCALE_CODEPAGE_FEATURE_FLAG_HAVE_KOI8
 	              | LIBCLOCALE_CODEPAGE_FEATURE_FLAG_HAVE_WINDOWS;
 
-	string_length = libcstring_system_string_length(
+	string_length = system_string_length(
 	                 string );
 
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libclocale_codepage_copy_from_string_wide(
 	          &( export_handle->ascii_codepage ),
 	          string,
@@ -463,7 +465,7 @@ int export_handle_print_data(
  */
 int export_handle_open_input(
      export_handle_t *export_handle,
-     const libcstring_system_character_t *filename,
+     const system_character_t *filename,
      libcerror_error_t **error )
 {
 	static char *function = "export_handle_open_input";
@@ -493,7 +495,7 @@ int export_handle_open_input(
 
 		return( -1 );
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	if( libregf_file_open_wide(
 	     export_handle->input_file,
 	     filename,
@@ -564,23 +566,23 @@ int export_handle_export_key(
      log_handle_t *log_handle,
      libcerror_error_t **error )
 {
-	libcstring_system_character_t *value_string = NULL;
-	libregf_key_t *sub_key                      = NULL;
-	libregf_value_t *value                      = NULL;
-	uint8_t *data                               = NULL;
-	static char *function                       = "export_handle_export_key";
-	size_t data_size                            = 0;
-	size_t expected_data_size                   = 0;
-	size_t value_string_size                    = 0;
-	ssize_t print_count                         = 0;
-	uint64_t value_64bit                        = 0;
-	uint32_t value_32bit                        = 0;
-	uint32_t value_type                         = 0;
-	int number_of_sub_keys                      = 0;
-	int number_of_values                        = 0;
-	int result                                  = 0;
-	int sub_key_index                           = 0;
-	int value_index                             = 0;
+	system_character_t *value_string = NULL;
+	libregf_key_t *sub_key           = NULL;
+	libregf_value_t *value           = NULL;
+	uint8_t *data                    = NULL;
+	static char *function            = "export_handle_export_key";
+	size_t data_size                 = 0;
+	size_t expected_data_size        = 0;
+	size_t value_string_size         = 0;
+	ssize_t print_count              = 0;
+	uint64_t value_64bit             = 0;
+	uint32_t value_32bit             = 0;
+	uint32_t value_type              = 0;
+	int number_of_sub_keys           = 0;
+	int number_of_values             = 0;
+	int result                       = 0;
+	int sub_key_index                = 0;
+	int value_index                  = 0;
 
 	if( export_handle == NULL )
 	{
@@ -593,7 +595,7 @@ int export_handle_export_key(
 
 		return( -1 );
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libregf_key_get_utf16_name_size(
 	          key,
 	          &value_string_size,
@@ -618,7 +620,7 @@ int export_handle_export_key(
 	if( value_string_size > 0 )
 	{
 		if( ( value_string_size > (size_t) SSIZE_MAX )
-		 || ( ( sizeof( libcstring_system_character_t ) * value_string_size ) > (size_t) SSIZE_MAX ) )
+		 || ( ( sizeof( system_character_t ) * value_string_size ) > (size_t) SSIZE_MAX ) )
 		{
 			libcerror_error_set(
 			 error,
@@ -629,7 +631,7 @@ int export_handle_export_key(
 
 			goto on_error;
 		}
-		value_string = libcstring_system_string_allocate(
+		value_string = system_string_allocate(
 		                value_string_size );
 
 		if( value_string == NULL )
@@ -643,7 +645,7 @@ int export_handle_export_key(
 
 			goto on_error;
 		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		result = libregf_key_get_utf16_name(
 		          key,
 		          (uint16_t *) value_string,
@@ -670,7 +672,7 @@ int export_handle_export_key(
 /* TODO print full key path */
 		fprintf(
 		 export_handle->notify_stream,
-		 "Key: %" PRIs_LIBCSTRING_SYSTEM "\n",
+		 "Key: %" PRIs_SYSTEM "\n",
 		 value_string );
 
 		memory_free(
@@ -680,7 +682,7 @@ int export_handle_export_key(
 	}
 #ifdef TODO
 /* TODO fix this */
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libregf_key_get_utf16_class_name_size(
 	          key,
 	          &value_string_size,
@@ -706,7 +708,7 @@ int export_handle_export_key(
 	 && ( value_string_size > 0 ) )
 	{
 		if( ( value_string_size > (size_t) SSIZE_MAX )
-		 || ( ( sizeof( libcstring_system_character_t ) * value_string_size ) > (size_t) SSIZE_MAX ) )
+		 || ( ( sizeof( system_character_t ) * value_string_size ) > (size_t) SSIZE_MAX ) )
 		{
 			libcerror_error_set(
 			 error,
@@ -717,7 +719,7 @@ int export_handle_export_key(
 
 			goto on_error;
 		}
-		value_string = libcstring_system_string_allocate(
+		value_string = system_string_allocate(
 		                value_string_size );
 
 		if( value_string == NULL )
@@ -731,7 +733,7 @@ int export_handle_export_key(
 
 			goto on_error;
 		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		result = libregf_key_get_utf16_class_name(
 		          key,
 		          (uint16_t *) value_string,
@@ -757,7 +759,7 @@ int export_handle_export_key(
 		}
 		fprintf(
 		 export_handle->notify_stream,
-		 "Class name: %" PRIs_LIBCSTRING_SYSTEM "\n",
+		 "Class name: %" PRIs_SYSTEM "\n",
 		 value_string );
 
 		memory_free(
@@ -800,7 +802,7 @@ int export_handle_export_key(
 
 			goto on_error;
 		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		result = libregf_value_get_utf16_name_size(
 		          value,
 		          &value_string_size,
@@ -825,7 +827,7 @@ int export_handle_export_key(
 		if( value_string_size > 0 )
 		{
 			if( ( value_string_size > (size_t) SSIZE_MAX )
-			 || ( ( sizeof( libcstring_system_character_t ) * value_string_size ) > (size_t) SSIZE_MAX ) )
+			 || ( ( sizeof( system_character_t ) * value_string_size ) > (size_t) SSIZE_MAX ) )
 			{
 				libcerror_error_set(
 				 error,
@@ -836,7 +838,7 @@ int export_handle_export_key(
 
 				goto on_error;
 			}
-			value_string = libcstring_system_string_allocate(
+			value_string = system_string_allocate(
 			                value_string_size );
 
 			if( value_string == NULL )
@@ -850,7 +852,7 @@ int export_handle_export_key(
 
 				goto on_error;
 			}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 			result = libregf_value_get_utf16_name(
 			          value,
 			          (uint16_t *) value_string,
@@ -876,7 +878,7 @@ int export_handle_export_key(
 			}
 			fprintf(
 			 export_handle->notify_stream,
-			 "Value: %d %" PRIs_LIBCSTRING_SYSTEM "\n",
+			 "Value: %d %" PRIs_SYSTEM "\n",
 			 value_index,
 			 value_string );
 
@@ -1010,7 +1012,7 @@ int export_handle_export_key(
 		{
 			case LIBREGF_VALUE_TYPE_STRING:
 			case LIBREGF_VALUE_TYPE_EXPANDABLE_STRING:
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 				result = libregf_value_get_value_utf16_string_size(
 					  value,
 					  &value_string_size,
@@ -1035,7 +1037,7 @@ int export_handle_export_key(
 				if( value_string_size > 0 )
 				{
 					if( ( value_string_size > (size_t) SSIZE_MAX )
-					 || ( ( sizeof( libcstring_system_character_t ) * value_string_size ) > (size_t) SSIZE_MAX ) )
+					 || ( ( sizeof( system_character_t ) * value_string_size ) > (size_t) SSIZE_MAX ) )
 					{
 						libcerror_error_set(
 						 error,
@@ -1046,7 +1048,7 @@ int export_handle_export_key(
 
 						goto on_error;
 					}
-					value_string = libcstring_system_string_allocate(
+					value_string = system_string_allocate(
 							value_string_size );
 
 					if( value_string == NULL )
@@ -1060,7 +1062,7 @@ int export_handle_export_key(
 
 						goto on_error;
 					}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 					result = libregf_value_get_value_utf16_string(
 						  value,
 						  (uint16_t *) value_string,
@@ -1086,7 +1088,7 @@ int export_handle_export_key(
 					}
 					fprintf(
 					 export_handle->notify_stream,
-					 "Data: %" PRIs_LIBCSTRING_SYSTEM "\n",
+					 "Data: %" PRIs_SYSTEM "\n",
 					 value_string );
 
 					memory_free(

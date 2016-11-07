@@ -26,7 +26,6 @@
 #include <file_stream.h>
 #include <types.h>
 
-#include "regftools_libcstring.h"
 #include "regftools_libfwsi.h"
 
 #if defined( __cplusplus )

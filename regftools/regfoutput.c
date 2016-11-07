@@ -29,7 +29,6 @@
 #include "regftools_libcerror.h"
 #include "regftools_libclocale.h"
 #include "regftools_libcnotify.h"
-#include "regftools_libcstring.h"
 #include "regftools_libcsystem.h"
 #include "regftools_libfdata.h"
 #include "regftools_libfdatetime.h"

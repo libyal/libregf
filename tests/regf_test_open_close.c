@@ -21,13 +21,14 @@
 
 #include <common.h>
 #include <file_stream.h>
+#include <system_string.h>
+#include <types.h>
 
 #if defined( HAVE_STDLIB_H ) || defined( WINAPI )
 #include <stdlib.h>
 #endif
 
 #include "regf_test_libcerror.h"
-#include "regf_test_libcstring.h"
 #include "regf_test_libcsystem.h"
 #include "regf_test_libregf.h"
 
@@ -35,12 +36,12 @@
  * Returns 1 if successful, 0 if not or -1 on error
  */
 int regf_test_single_open_close_file(
-     libcstring_system_character_t *filename,
+     system_character_t *filename,
      int access_flags,
      int expected_result )
 {
 	libcerror_error_t *error = NULL;
-	libregf_file_t *file     = NULL;
+	libregf_file_t *file      = NULL;
 	static char *function    = "regf_test_single_open_close_file";
 	char *access_string      = NULL;
 	int result               = 0;
@@ -65,7 +66,7 @@ int regf_test_single_open_close_file(
 	{
 		fprintf(
 		 stdout,
-		 "%" PRIs_LIBCSTRING_SYSTEM "",
+		 "%" PRIs_SYSTEM "",
 		 filename );
 	}
 	else
@@ -92,7 +93,7 @@ int regf_test_single_open_close_file(
 
 		goto on_error;
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libregf_file_open_wide(
 	          file,
 	          filename,
@@ -184,12 +185,12 @@ on_error:
  * Returns 1 if successful, 0 if not or -1 on error
  */
 int regf_test_multi_open_close_file(
-     libcstring_system_character_t *filename,
+     system_character_t *filename,
      int access_flags,
      int expected_result )
 {
 	libcerror_error_t *error = NULL;
-	libregf_file_t *file     = NULL;
+	libregf_file_t *file      = NULL;
 	static char *function    = "regf_test_multi_open_close_file";
 	char *access_string      = NULL;
 	int result               = 0;
@@ -214,7 +215,7 @@ int regf_test_multi_open_close_file(
 	{
 		fprintf(
 		 stdout,
-		 "%" PRIs_LIBCSTRING_SYSTEM "",
+		 "%" PRIs_SYSTEM "",
 		 filename );
 	}
 	else
@@ -241,7 +242,7 @@ int regf_test_multi_open_close_file(
 
 		goto on_error;
 	}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libregf_file_open_wide(
 	          file,
 	          filename,
@@ -269,7 +270,7 @@ int regf_test_multi_open_close_file(
 
 			goto on_error;
 		}
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		result = libregf_file_open_wide(
 		          file,
 		          filename,
@@ -360,27 +361,27 @@ on_error:
 
 /* The main program
  */
-#if defined( LIBCSTRING_HAVE_WIDE_SYSTEM_CHARACTER )
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 int wmain( int argc, wchar_t * const argv[] )
 #else
 int main( int argc, char * const argv[] )
 #endif
 {
-	libcstring_system_character_t *source = NULL;
-	libcstring_system_integer_t option    = 0;
+	system_character_t *source = NULL;
+	system_integer_t option    = 0;
 
 	while( ( option = libcsystem_getopt(
 	                   argc,
 	                   argv,
-	                   _LIBCSTRING_SYSTEM_STRING( "" ) ) ) != (libcstring_system_integer_t) -1 )
+	                   _SYSTEM_STRING( "" ) ) ) != (system_integer_t) -1 )
 	{
 		switch( option )
 		{
-			case (libcstring_system_integer_t) '?':
+			case (system_integer_t) '?':
 			default:
 				fprintf(
 				 stderr,
-				 "Invalid argument: %" PRIs_LIBCSTRING_SYSTEM ".\n",
+				 "Invalid argument: %" PRIs_SYSTEM ".\n",
 				 argv[ optind - 1 ] );
 
 				return( EXIT_FAILURE );

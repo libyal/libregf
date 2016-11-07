@@ -30,7 +30,6 @@
 #include "pyregf_file.h"
 #include "pyregf_integer.h"
 #include "pyregf_libcerror.h"
-#include "pyregf_libcstring.h"
 #include "pyregf_libregf.h"
 #include "pyregf_python.h"
 #include "pyregf_unused.h"

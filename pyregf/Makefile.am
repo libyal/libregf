@@ -2,7 +2,6 @@ if HAVE_PYTHON
 AM_CFLAGS = \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/common \
-	@LIBCSTRING_CPPFLAGS@ \
 	@LIBCERROR_CPPFLAGS@ \
 	@LIBCDATA_CPPFLAGS@ \
 	@LIBCLOCALE_CPPFLAGS@ \
@@ -28,7 +27,6 @@ pyregf_la_SOURCES = \
 	pyregf_libbfio.h \
 	pyregf_libcerror.h \
 	pyregf_libclocale.h \
-	pyregf_libcstring.h \
 	pyregf_libregf.h \
 	pyregf_python.h \
 	pyregf_unused.h \
@@ -37,15 +35,14 @@ pyregf_la_SOURCES = \
 	pyregf_values.c pyregf_values.h
 
 pyregf_la_LIBADD = \
+	@LIBCERROR_LIBADD@ \
 	../libregf/libregf.la \
 	@LIBBFIO_LIBADD@ \
 	@LIBCPATH_LIBADD@ \
 	@LIBCFILE_LIBADD@ \
 	@LIBCSPLIT_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
-	@LIBCDATA_LIBADD@ \
-	@LIBCERROR_LIBADD@ \
-	@LIBCSTRING_LIBADD@
+	@LIBCDATA_LIBADD@
 
 pyregf_la_CPPFLAGS = $(PYTHON_CPPFLAGS)
 pyregf_la_LDFLAGS  = -module -avoid-version $(PYTHON_LDFLAGS)

@@ -42,9 +42,11 @@ EXTRA_DIST = \
 
 check_PROGRAMS = \
 	regf_test_error \
+	regf_test_key \
 	regf_test_notify \
 	regf_test_open_close \
-	regf_test_support
+	regf_test_support \
+	regf_test_value
 
 regf_test_error_SOURCES = \
 	regf_test_error.c \
@@ -54,6 +56,18 @@ regf_test_error_SOURCES = \
 
 regf_test_error_LDADD = \
 	../libregf/libregf.la
+
+regf_test_key_SOURCES = \
+	regf_test_key.c \
+	regf_test_libcerror.h \
+	regf_test_libregf.h \
+	regf_test_macros.h \
+	regf_test_memory.c regf_test_memory.h \
+	regf_test_unused.h
+
+regf_test_key_LDADD = \
+	../libregf/libregf.la \
+	@LIBCERROR_LIBADD@
 
 regf_test_notify_SOURCES = \
 	regf_test_libregf.h \
@@ -78,13 +92,34 @@ regf_test_open_close_LDADD = \
 	@LIBCERROR_LIBADD@
 
 regf_test_support_SOURCES = \
-	regf_test_support.c \
+	regf_test_libcerror.h \
+	regf_test_libclocale.h \
 	regf_test_libregf.h \
+	regf_test_libcsystem.h \
+	regf_test_libuna.h \
 	regf_test_macros.h \
-	regf_test_unused.h
+	regf_test_support.c
 
 regf_test_support_LDADD = \
-	../libregf/libregf.la
+	@LIBCSYSTEM_LIBADD@ \
+	@LIBUNA_LIBADD@ \
+	@LIBCNOTIFY_LIBADD@ \
+	@LIBCLOCALE_LIBADD@ \
+	@LIBCDATA_LIBADD@ \
+	../libregf/libregf.la \
+	@LIBCERROR_LIBADD@
+
+regf_test_value_SOURCES = \
+	regf_test_libcerror.h \
+	regf_test_libregf.h \
+	regf_test_macros.h \
+	regf_test_memory.c regf_test_memory.h \
+	regf_test_unused.h \
+	regf_test_value.c
+
+regf_test_value_LDADD = \
+	../libregf/libregf.la \
+	@LIBCERROR_LIBADD@
 
 MAINTAINERCLEANFILES = \
 	Makefile.in

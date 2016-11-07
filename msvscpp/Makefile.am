@@ -22,9 +22,11 @@ MSVSCPP_FILES = \
 	libuna/libuna.vcproj \
 	pyregf/pyregf.vcproj \
 	regf_test_error/regf_test_error.vcproj \
+	regf_test_key/regf_test_key.vcproj \
 	regf_test_notify/regf_test_notify.vcproj \
 	regf_test_open_close/regf_test_open_close.vcproj \
 	regf_test_support/regf_test_support.vcproj \
+	regf_test_value/regf_test_value.vcproj \
 	regfexport/regfexport.vcproj \
 	regfinfo/regfinfo.vcproj \
 	regfmount/regfmount.vcproj \

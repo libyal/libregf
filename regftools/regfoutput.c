@@ -32,6 +32,7 @@
 #include "regftools_libcsystem.h"
 #include "regftools_libfdata.h"
 #include "regftools_libfdatetime.h"
+#include "regftools_libfwnt.h"
 #include "regftools_libregf.h"
 #include "regftools_libuna.h"
 
@@ -128,6 +129,11 @@ void regfoutput_version_detailed_fprint(
 	 stream,
 	 ", libfdatetime %s",
 	 LIBFDATETIME_VERSION_STRING );
+
+	fprintf(
+	 stream,
+	 ", libfwnt %s",
+	 LIBFWNT_VERSION_STRING );
 
         fprintf(
 	 stream,

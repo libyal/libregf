@@ -12,6 +12,7 @@ AM_CPPFLAGS = \
 	@LIBFCACHE_CPPFLAGS@ \
 	@LIBFDATA_CPPFLAGS@ \
 	@LIBFDATETIME_CPPFLAGS@ \
+	@LIBFWNT_CPPFLAGS@ \
 	@LIBCSYSTEM_CPPFLAGS@ \
 	@LIBFUSE_CPPFLAGS@ \
 	@LIBREGF_DLL_IMPORT@
@@ -35,6 +36,7 @@ regfexport_SOURCES = \
 	regftools_libcsystem.h \
 	regftools_libfdata.h \
 	regftools_libfdatetime.h \
+	regftools_libfwnt.h \
 	regftools_libregf.h \
 	regftools_libuna.h
 
@@ -57,6 +59,7 @@ regfinfo_SOURCES = \
 	regftools_libcsystem.h \
 	regftools_libfdata.h \
 	regftools_libfdatetime.h \
+	regftools_libfwnt.h \
 	regftools_libregf.h \
 	regftools_libuna.h
 
@@ -79,6 +82,7 @@ regfmount_SOURCES = \
 	regftools_libcsystem.h \
 	regftools_libfdata.h \
 	regftools_libfdatetime.h \
+	regftools_libfwnt.h \
 	regftools_libregf.h \
 	regftools_libuna.h
 

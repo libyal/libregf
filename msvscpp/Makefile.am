@@ -13,6 +13,7 @@ MSVSCPP_FILES = \
 	libfcache/libfcache.vcproj \
 	libfdata/libfdata.vcproj \
 	libfdatetime/libfdatetime.vcproj \
+	libfwnt/libfwnt.vcproj \
 	libregf/libregf.vcproj \
 	libuna/libuna.vcproj \
 	pyregf/pyregf.vcproj \

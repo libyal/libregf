@@ -149,9 +149,5 @@ stamp-h[1-9]
 /libfcache
 /libfdata
 /libfdatetime
-/libfguid
-/libfole
 /libfwnt
-/libfwps
-/libfwsi
 /libuna

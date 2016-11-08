@@ -42,6 +42,7 @@
 #include "libregf_libfcache.h"
 #include "libregf_libfdata.h"
 #include "libregf_libfdatetime.h"
+#include "libregf_libfwnt.h"
 #include "libregf_libuna.h"
 #include "libregf_unused.h"
 #include "libregf_value_item.h"
@@ -1427,17 +1428,18 @@ int libregf_key_item_read_security_key(
      uint32_t security_key_offset,
      libcerror_error_t **error )
 {
-	libregf_hive_bin_t *hive_bin           = NULL;
-	libregf_hive_bin_cell_t *hive_bin_cell = NULL;
-	uint8_t *hive_bin_cell_data            = NULL;
-	static char *function                  = "libregf_key_item_read_security_key";
-	off64_t hive_bin_data_offset           = 0;
-	size_t hive_bin_cell_size              = 0;
-	int hive_bin_index                     = 0;
+	libregf_hive_bin_cell_t *hive_bin_cell             = NULL;
+	libregf_hive_bin_t *hive_bin                       = NULL;
+	uint8_t *hive_bin_cell_data                        = NULL;
+	static char *function                              = "libregf_key_item_read_security_key";
+	size_t hive_bin_cell_size                          = 0;
+	off64_t hive_bin_data_offset                       = 0;
+	int hive_bin_index                                 = 0;
 
 #if defined( HAVE_DEBUG_OUTPUT )
-	uint32_t value_32bit                   = 0;
-	uint16_t value_16bit                   = 0;
+	libfwnt_security_descriptor_t *security_descriptor = NULL;
+	uint32_t value_32bit                               = 0;
+	uint16_t value_16bit                               = 0;
 #endif
 
 	if( key_item == NULL )
@@ -1610,6 +1612,18 @@ int libregf_key_item_read_security_key(
 	hive_bin_cell_data += sizeof( regf_security_key_t );
 	hive_bin_cell_size -= sizeof( regf_security_key_t );
 
+	if( hive_bin_cell_size < 4 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid hive bin cell size too small to contain security descriptor.",
+		 function );
+
+		goto on_error;
+	}
+/* TODO print unknown 4 bytes */
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
 	{
@@ -1617,48 +1631,106 @@ int libregf_key_item_read_security_key(
 		 "%s: security descriptor data:\n",
 		 function );
 		libcnotify_print_data(
-		 hive_bin_cell_data,
-		 hive_bin_cell_size,
+		 &( hive_bin_cell_data[ 4 ] ),
+		 hive_bin_cell_size - 4,
 		 0 );
 	}
 #endif
-	key_item->security_descriptor_size = hive_bin_cell_size;
+	key_item->security_descriptor_size = hive_bin_cell_size - 4;
 
-	key_item->security_descriptor = (uint8_t *) memory_allocate(
-	                                             sizeof( uint8_t ) * key_item->security_descriptor_size );
-
-	if( key_item->security_descriptor == NULL )
+	if( key_item->security_descriptor_size > 0 )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_MEMORY,
-		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create key security descriptor.",
-		 function );
+		key_item->security_descriptor = (uint8_t *) memory_allocate(
+		                                             sizeof( uint8_t ) * key_item->security_descriptor_size );
 
-		goto on_error;
+		if( key_item->security_descriptor == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create key security descriptor.",
+			 function );
+
+			goto on_error;
+		}
+		if( memory_copy(
+		     key_item->security_descriptor,
+		     &( hive_bin_cell_data[ 4 ] ),
+		     key_item->security_descriptor_size ) == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+			 "%s: unable to copy hive bin cell data to security descriptor.",
+			 function );
+
+			goto on_error;
+		}
+#if defined( HAVE_DEBUG_OUTPUT )
+		if( libcnotify_verbose != 0 )
+		{
+			if( libfwnt_security_descriptor_initialize(
+			     &security_descriptor,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+				 "%s: unable to create security descriptor.",
+				 function );
+
+				goto on_error;
+			}
+			if( libfwnt_security_descriptor_copy_from_byte_stream(
+			     security_descriptor,
+			     key_item->security_descriptor,
+			     key_item->security_descriptor_size,
+			     LIBFWNT_ENDIAN_LITTLE,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+				 "%s: unable to copy security descriptor from byte stream.",
+				 function );
+
+				goto on_error;
+			}
+			if( libfwnt_security_descriptor_free(
+			     &security_descriptor,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free security descriptor.",
+				 function );
+
+				goto on_error;
+			}
+			libcnotify_printf(
+			 "\n" );
+		}
+#endif
 	}
-	if( memory_copy(
-	     key_item->security_descriptor,
-	     hive_bin_cell_data,
-	     key_item->security_descriptor_size ) == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_MEMORY,
-		 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-		 "%s: unable to copy hive bin cell data to security descriptor.",
-		 function );
-
-		goto on_error;
-	}
-/* TODO print formatted security descriptor */
-
 /* TODO padding/trailing data ? */
 
 	return( 1 );
 
 on_error:
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( security_descriptor != NULL )
+	{
+		libfwnt_security_descriptor_free(
+		 &security_descriptor,
+		 NULL );
+	}
+#endif
 	if( key_item->security_descriptor != NULL )
 	{
 		memory_free(

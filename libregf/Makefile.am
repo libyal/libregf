@@ -14,6 +14,7 @@ AM_CPPFLAGS = \
 	@LIBFCACHE_CPPFLAGS@ \
 	@LIBFDATA_CPPFLAGS@ \
 	@LIBFDATETIME_CPPFLAGS@ \
+	@LIBFWNT_CPPFLAGS@ \
 	@PTHREAD_CPPFLAGS@
 
 lib_LTLIBRARIES = libregf.la
@@ -43,6 +44,7 @@ libregf_la_SOURCES = \
 	libregf_libfcache.h \
 	libregf_libfdata.h \
 	libregf_libfdatetime.h \
+	libregf_libfwnt.h \
 	libregf_libuna.h \
 	libregf_named_key.c libregf_named_key.h \
 	libregf_notify.c libregf_notify.h \
@@ -70,6 +72,7 @@ libregf_la_LIBADD = \
 	@LIBFCACHE_LIBADD@ \
 	@LIBFDATA_LIBADD@ \
 	@LIBFDATETIME_LIBADD@ \
+	@LIBFWNT_LIBADD@ \
 	@PTHREAD_LIBADD@
 
 libregf_la_LDFLAGS = -no-undefined -version-info 1:0:0

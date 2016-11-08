@@ -90,6 +90,9 @@ AX_LIBFDATA_CHECK_ENABLE
 dnl Check for enabling libfdatetime for date and time formats support
 AX_LIBFDATETIME_CHECK_ENABLE
 
+dnl Check for enabling libfwnt for file Windows NT type support
+AX_LIBFWNT_CHECK_ENABLE
+
 dnl Check for library function support
 AX_LIBREGF_CHECK_LOCAL
 
@@ -165,7 +168,7 @@ CFLAGS="$CFLAGS -Wall";
 
 dnl Check if requires and build requires should be set in spec file
 AS_IF(
- [test "x$ac_cv_libcerror" = xyes || test "x$ac_cv_libcthreads" = xyes || test "x$ac_cv_libcdata" = xyes || test "x$ac_cv_libclocale" = xyes || test "x$ac_cv_libcnotify" = xyes || test "x$ac_cv_libcsplit" = xyes || test "x$ac_cv_libuna" = xyes || test "x$ac_cv_libcfile" = xyes || test "x$ac_cv_libcpath" = xyes || test "x$ac_cv_libbfio" = xyes || test "x$ac_cv_libfcache" = xyes || test "x$ac_cv_libfdata" = xyes || test "x$ac_cv_libfdatetime" = xyes],
+ [test "x$ac_cv_libcerror" = xyes || test "x$ac_cv_libcthreads" = xyes || test "x$ac_cv_libcdata" = xyes || test "x$ac_cv_libclocale" = xyes || test "x$ac_cv_libcnotify" = xyes || test "x$ac_cv_libcsplit" = xyes || test "x$ac_cv_libuna" = xyes || test "x$ac_cv_libcfile" = xyes || test "x$ac_cv_libcpath" = xyes || test "x$ac_cv_libbfio" = xyes || test "x$ac_cv_libfcache" = xyes || test "x$ac_cv_libfdata" = xyes || test "x$ac_cv_libfdatetime" = xyes || test "x$ac_cv_libfwnt" = xyes],
  [AC_SUBST(
   [libregf_spec_requires],
   [Requires:])
@@ -213,6 +216,7 @@ AC_CONFIG_FILES([libbfio/Makefile])
 AC_CONFIG_FILES([libfcache/Makefile])
 AC_CONFIG_FILES([libfdata/Makefile])
 AC_CONFIG_FILES([libfdatetime/Makefile])
+AC_CONFIG_FILES([libfwnt/Makefile])
 AC_CONFIG_FILES([libregf/Makefile])
 AC_CONFIG_FILES([libcsystem/Makefile])
 AC_CONFIG_FILES([regftools/Makefile])
@@ -258,6 +262,7 @@ Building:
    libfcache support:                         $ac_cv_libfcache
    libfdata support:                          $ac_cv_libfdata
    libfdatetime support:                      $ac_cv_libfdatetime
+   libfwnt support:                           $ac_cv_libfwnt
    libcsystem support:                        $ac_cv_libcsystem
    FUSE support:                              $ac_cv_libfuse
 

@@ -31,6 +31,7 @@
 #include <wctype.h>
 #endif
 
+#include "libregf_debug.h"
 #include "libregf_definitions.h"
 #include "libregf_libcerror.h"
 #include "libregf_libcnotify.h"

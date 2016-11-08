@@ -1366,11 +1366,6 @@ int main(
 	         error );
 
 		REGF_TEST_RUN_WITH_ARGS(
-		 "libregf_file_open",
-		 regf_test_file_open,
-		 file );
-
-		REGF_TEST_RUN_WITH_ARGS(
 		 "libregf_file_get_ascii_codepage",
 		 regf_test_file_get_ascii_codepage,
 		 file );

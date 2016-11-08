@@ -160,7 +160,7 @@ int libregf_debug_print_filetime_value(
 		goto on_error;
 	}
 	libcnotify_printf(
-	 "%s: %s%s: %s UTC\n",
+	 "%s: %s: %s UTC\n",
 	 function_name,
 	 value_name,
 	 date_time_string );

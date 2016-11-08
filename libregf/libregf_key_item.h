@@ -184,5 +184,5 @@ int libregf_key_item_compare_name_with_utf16_string(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBREGF_KEY_ITEM_H ) */
 

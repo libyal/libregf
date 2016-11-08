@@ -63,5 +63,5 @@ int libregf_key_tree_get_sub_key_values_by_utf16_name(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBREGF_KEY_TREE_H ) */
 

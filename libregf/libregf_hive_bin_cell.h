@@ -64,5 +64,5 @@ int libregf_hive_bin_cell_free(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBREGF_HIVE_BIN_CELL_H ) */
 

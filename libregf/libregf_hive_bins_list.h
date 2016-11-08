@@ -90,5 +90,5 @@ int libregf_hive_bins_list_read_element_data(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBREGF_HIVE_BINS_LIST_H ) */
 

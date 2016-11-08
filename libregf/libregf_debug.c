@@ -21,13 +21,18 @@
 
 #include <common.h>
 #include <memory.h>
+#include <narrow_string.h>
+#include <system_string.h>
 #include <types.h>
+#include <wide_string.h>
 
 #include "libregf_debug.h"
 #include "libregf_definitions.h"
 #include "libregf_libbfio.h"
 #include "libregf_libcerror.h"
 #include "libregf_libcnotify.h"
+#include "libregf_libfdatetime.h"
+#include "libregf_libuna.h"
 
 #if defined( HAVE_DEBUG_OUTPUT )
 
@@ -90,6 +95,99 @@ void libregf_debug_print_value_key_flags(
 	}
 	libcnotify_printf(
 	 "\n" );
+}
+
+/* Prints a FILETIME value
+ * Returns 1 if successful or -1 on error
+ */
+int libregf_debug_print_filetime_value(
+     const char *function_name,
+     const char *value_name,
+     const uint8_t *byte_stream,
+     size_t byte_stream_size,
+     int byte_order,
+     uint32_t string_format_flags,
+     libcerror_error_t **error )
+{
+	char date_time_string[ 32 ];
+
+	libfdatetime_filetime_t *filetime = NULL;
+	static char *function             = "libregf_debug_print_filetime_value";
+
+	if( libfdatetime_filetime_initialize(
+	     &filetime,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create filetime.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfdatetime_filetime_copy_from_byte_stream(
+	     filetime,
+	     byte_stream,
+	     byte_stream_size,
+	     byte_order,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+		 "%s: unable to copy byte stream to filetime.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfdatetime_filetime_copy_to_utf8_string(
+	     filetime,
+	     (uint8_t *) date_time_string,
+	     32,
+	     string_format_flags,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+		 "%s: unable to copy filetime to string.",
+		 function );
+
+		goto on_error;
+	}
+	libcnotify_printf(
+	 "%s: %s%s: %s UTC\n",
+	 function_name,
+	 value_name,
+	 date_time_string );
+
+	if( libfdatetime_filetime_free(
+	     &filetime,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free filetime.",
+		 function );
+
+		goto on_error;
+	}
+	return( 1 );
+
+on_error:
+	if( filetime != NULL )
+	{
+		libfdatetime_filetime_free(
+		 &filetime,
+		 NULL );
+	}
+	return( -1 );
 }
 
 /* Prints the read offsets
@@ -168,5 +266,5 @@ int libregf_debug_print_read_offsets(
 	return( 1 );
 }
 
-#endif
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
 

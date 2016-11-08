@@ -257,5 +257,5 @@ int libregf_key_get_sub_key_by_utf16_path(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBREGF_INTERNAL_KEY_H ) */
 

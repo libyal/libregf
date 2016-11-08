@@ -88,5 +88,5 @@ int libregf_value_type_copy_to_binary_data(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBREGF_VALUE_TYPE_H ) */
 

@@ -107,5 +107,5 @@ off64_t libregf_io_handle_seek_segment_offset(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBREGF_IO_HANDLE_H ) */
 

@@ -85,5 +85,5 @@ int libregf_named_key_read(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBREGF_NAMED_KEY_ENTRY_H ) */
 

@@ -77,5 +77,5 @@ struct regf_hive_bin_header
 }
 #endif
 
-#endif
+#endif /* !defined( _REGF_HIVE_BIN_H ) */
 

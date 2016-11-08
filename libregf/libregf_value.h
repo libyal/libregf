@@ -195,5 +195,5 @@ int libregf_value_get_value_binary_data(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBREGF_INTERNAL_VALUE_H ) */
 

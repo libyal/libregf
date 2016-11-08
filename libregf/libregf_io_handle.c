@@ -22,7 +22,6 @@
 #include <common.h>
 #include <byte_stream.h>
 #include <memory.h>
-#include <system_string.h>
 #include <types.h>
 
 #include "libregf_checksum.h"
@@ -35,10 +34,7 @@
 #include "libregf_libbfio.h"
 #include "libregf_libcerror.h"
 #include "libregf_libcnotify.h"
-#include "libregf_libfcache.h"
-#include "libregf_libfdata.h"
 #include "libregf_libfdatetime.h"
-#include "libregf_libuna.h"
 #include "libregf_unused.h"
 
 #include "regf_file_header.h"
@@ -208,11 +204,7 @@ int libregf_io_handle_read_file_header(
 	uint32_t stored_xor32_checksum     = 0;
 
 #if defined( HAVE_DEBUG_OUTPUT )
-	system_character_t filetime_string[ 32 ];
-
-	libfdatetime_filetime_t *filetime  = NULL;
 	uint32_t value_32bit               = 0;
-	int result                         = 0;
 #endif
 
 	if( io_handle == NULL )
@@ -269,7 +261,7 @@ int libregf_io_handle_read_file_header(
 		 "%s: unable to seek file header offset: 0.",
 		 function );
 
-		goto on_error;
+		return( -1 );
 	}
 	read_count = libbfio_handle_read_buffer(
 	              file_io_handle,
@@ -286,7 +278,7 @@ int libregf_io_handle_read_file_header(
 		 "%s: unable to read file header data.",
 		 function );
 
-		goto on_error;
+		return( -1 );
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
@@ -312,7 +304,7 @@ int libregf_io_handle_read_file_header(
 		 "%s: invalid file signature.",
 		 function );
 
-		goto on_error;
+		return( -1 );
 	}
 	if( libregf_checksum_calculate_little_endian_xor32(
 	     &calculated_xor32_checksum,
@@ -328,7 +320,7 @@ int libregf_io_handle_read_file_header(
 		 "%s: unable to calculate XOR-32 checksum.",
 		 function );
 
-		goto on_error;
+		return( -1 );
 	}
 	byte_stream_copy_to_uint32_little_endian(
 	 file_header.checksum,
@@ -345,7 +337,7 @@ int libregf_io_handle_read_file_header(
 		 stored_xor32_checksum,
 		 calculated_xor32_checksum );
 
-		goto on_error;
+		return( -1 );
 	}
 	byte_stream_copy_to_uint32_little_endian(
 	 file_header.major_version,
@@ -393,78 +385,23 @@ int libregf_io_handle_read_file_header(
 		 function,
 		 value_32bit );
 
-		if( libfdatetime_filetime_initialize(
-		     &filetime,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create filetime.",
-			 function );
-
-			goto on_error;
-		}
-		if( libfdatetime_filetime_copy_from_byte_stream(
-		     filetime,
+		if( libregf_debug_print_filetime_value(
+		     function,
+		     "modification time\t\t\t",
 		     file_header.modification_time,
 		     8,
 		     LIBFDATETIME_ENDIAN_LITTLE,
+		     LIBFDATETIME_STRING_FORMAT_TYPE_CTIME | LIBFDATETIME_STRING_FORMAT_FLAG_DATE_TIME_NANO_SECONDS,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to copy filetime from byte stream.",
+			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to print filetime value.",
 			 function );
 
-			goto on_error;
-		}
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-		result = libfdatetime_filetime_copy_to_utf16_string(
-		          filetime,
-		          (uint16_t *) filetime_string,
-		          32,
-		          LIBFDATETIME_STRING_FORMAT_TYPE_CTIME | LIBFDATETIME_STRING_FORMAT_FLAG_DATE_TIME_NANO_SECONDS,
-		          error );
-#else
-		result = libfdatetime_filetime_copy_to_utf8_string(
-		          filetime,
-		          (uint8_t *) filetime_string,
-		          32,
-		          LIBFDATETIME_STRING_FORMAT_TYPE_CTIME | LIBFDATETIME_STRING_FORMAT_FLAG_DATE_TIME_NANO_SECONDS,
-		          error );
-#endif
-		if( result != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to copy filetime to string.",
-			 function );
-
-			goto on_error;
-		}
-		libcnotify_printf(
-		 "%s: modification time\t\t\t: %" PRIs_SYSTEM " UTC\n",
-		 function,
-		 filetime_string );
-
-		if( libfdatetime_filetime_free(
-		     &filetime,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free filetime.",
-			 function );
-
-			goto on_error;
+			return( -1 );
 		}
 		libcnotify_printf(
 		 "%s: major version\t\t\t: %" PRIu32 "\n",
@@ -534,17 +471,6 @@ int libregf_io_handle_read_file_header(
 	}
 #endif
 	return( 1 );
-
-on_error:
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( filetime != NULL )
-	{
-		libfdatetime_filetime_free(
-		 &filetime,
-		 NULL );
-	}
-#endif
-	return( -1 );
 }
 
 /* Reads the segment data into the buffer

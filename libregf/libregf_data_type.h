@@ -60,5 +60,5 @@ const char *libregf_data_type_get_description(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBREGF_DATA_TYPE_H ) */
 

@@ -156,5 +156,5 @@ int libregf_value_item_compare_name_with_utf16_string(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBREGF_VALUE_ITEM_H ) */
 

@@ -98,5 +98,5 @@ int libregf_hive_bin_get_cell_at_offset(
 }
 #endif
 
-#endif
+#endif /* !defined( _LIBREGF_HIVE_BIN_H ) */
 

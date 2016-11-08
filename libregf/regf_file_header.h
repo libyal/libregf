@@ -110,5 +110,5 @@ struct regf_file_header
 }
 #endif
 
-#endif
+#endif /* !defined( _REGF_FILE_HEADER_H ) */
 

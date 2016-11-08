@@ -254,5 +254,5 @@ struct regf_data_block_key
 }
 #endif
 
-#endif
+#endif /* !defined( _REGF_CELL_VALUES_H ) */
 

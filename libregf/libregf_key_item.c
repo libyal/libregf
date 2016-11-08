@@ -330,8 +330,9 @@ int libregf_key_item_read_named_key(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve hive bin at offset: %" PRIi64 ".",
+		 "%s: unable to retrieve hive bin at offset: %" PRIi64 " (0x%08" PRIx64 ").",
 		 function,
+		 named_key_offset,
 		 named_key_offset );
 
 		goto on_error;
@@ -346,8 +347,9 @@ int libregf_key_item_read_named_key(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve hive bin cell at offset: %" PRIi64 ".",
+		 "%s: unable to retrieve hive bin cell at offset: %" PRIi64 " (0x%08" PRIx64 ").",
 		 function,
+		 named_key_offset,
 		 named_key_offset );
 
 		goto on_error;
@@ -763,8 +765,9 @@ int libregf_key_item_read_named_key(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_IO,
 			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read class name at offset: %" PRIu32 ".",
+			 "%s: unable to read class name at offset: %" PRIu32 " (0x%08" PRIx32 ").",
 			 function,
+			 class_name_offset,
 			 class_name_offset );
 
 			goto on_error;
@@ -783,8 +786,9 @@ int libregf_key_item_read_named_key(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_IO,
 			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read security key at offset: %" PRIu32 ".",
+			 "%s: unable to read security key aat offset: %" PRIu32 " (0x%08" PRIx32 ").",
 			 function,
+			 security_key_offset,
 			 security_key_offset );
 
 			goto on_error;
@@ -918,8 +922,9 @@ int libregf_key_item_read_named_key(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_IO,
 			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read values list at offset: %" PRIu32 ".",
+			 "%s: unable to read values list at offset: %" PRIu32 " (0x%08" PRIx32 ").",
 			 function,
+			 values_list_offset,
 			 values_list_offset );
 
 			goto on_error;
@@ -1038,8 +1043,9 @@ int libregf_key_item_read_class_name(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve hive bin at offset: %" PRIi64 ".",
+		 "%s: unable to retrieve hive bin at offset: %" PRIu32 " (0x%08" PRIx32 ").",
 		 function,
+		 class_name_offset,
 		 class_name_offset );
 
 		goto on_error;
@@ -1054,8 +1060,9 @@ int libregf_key_item_read_class_name(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve hive bin cell at offset: %" PRIi64 ".",
+		 "%s: unable to retrieve hive bin cell at offset: %" PRIu32 " (0x%08" PRIx32 ").",
 		 function,
+		 class_name_offset,
 		 class_name_offset );
 
 		goto on_error;
@@ -1271,8 +1278,9 @@ int libregf_key_item_read_security_key(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve hive bin at offset: %" PRIu32 ".",
+		 "%s: unable to retrieve hive bin at offset: %" PRIu32 " (0x%08" PRIx32 ").",
 		 function,
+		 security_key_offset,
 		 security_key_offset );
 
 		goto on_error;
@@ -1287,8 +1295,9 @@ int libregf_key_item_read_security_key(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve hive bin cell at offset: %" PRIu32 ".",
+		 "%s: unable to retrieve hive bin cell at offset: %" PRIu32 " (0x%08" PRIx32 ").",
 		 function,
+		 security_key_offset,
 		 security_key_offset );
 
 		goto on_error;
@@ -1588,8 +1597,9 @@ int libregf_key_item_read_values_list(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve hive bin at offset: %" PRIu32 ".",
+		 "%s: unable to retrieve hive bin at offset: %" PRIu32 " (0x%08" PRIx32 ").",
 		 function,
+		 values_list_offset ,
 		 values_list_offset );
 
 		return( -1 );
@@ -1604,8 +1614,9 @@ int libregf_key_item_read_values_list(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve hive bin cell at offset: %" PRIu32 ".",
+		 "%s: unable to retrieve hive bin cell at offset: %" PRIu32 " (0x%08" PRIx32 ").",
 		 function,
+		 values_list_offset,
 		 values_list_offset );
 
 		return( -1 );
@@ -1782,8 +1793,9 @@ int libregf_key_item_read_node_data(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read named key at offset: %" PRIi64 ".",
+		 "%s: unable to read named key at offset: %" PRIi64 " (0x%08" PRIx64 ").",
 		 function,
+		 node_data_offset,
 		 node_data_offset );
 
 		goto on_error;
@@ -1883,8 +1895,9 @@ int libregf_key_item_read_sub_keys_list(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve hive bin at offset: %" PRIi64 ".",
+		 "%s: unable to retrieve hive bin at offset: %" PRIi64 " (0x%08" PRIx64 ").",
 		 function,
+		 sub_keys_list_offset,
 		 sub_keys_list_offset );
 
 		goto on_error;
@@ -1899,8 +1912,9 @@ int libregf_key_item_read_sub_keys_list(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve hive bin cell at offset: %" PRIi64 ".",
+		 "%s: unable to retrieve hive bin cell at offset: %" PRIi64 " (0x%08" PRIx64 ").",
 		 function,
+		 sub_keys_list_offset,
 		 sub_keys_list_offset );
 
 		goto on_error;
@@ -2139,8 +2153,9 @@ int libregf_key_item_read_sub_keys_list(
 					 error,
 					 LIBCERROR_ERROR_DOMAIN_IO,
 					 LIBCERROR_IO_ERROR_READ_FAILED,
-					 "%s: unable to read sub keys list at offset: %" PRIu32 ".",
+					 "%s: unable to read sub keys list at offset: %" PRIu32 " (0x%08" PRIx32 ").",
 					 function,
+					 sub_keys_list_element_offset,
 					 sub_keys_list_element_offset );
 
 					goto on_error;
@@ -2227,8 +2242,9 @@ int libregf_key_item_read_sub_nodes(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read sub keys list at offset: %" PRIi64 ".",
+		 "%s: unable to read sub keys list at offset: %" PRIi64 " (0x%08" PRIx64 ").",
 		 function,
+		 sub_nodes_data_offset,
 		 sub_nodes_data_offset );
 
 		return( -1 );

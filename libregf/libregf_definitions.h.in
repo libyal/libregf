@@ -104,6 +104,15 @@ enum LIBREGF_IO_HANDLE_FLAGS
 	LIBREGF_IO_HANDLE_FLAG_IS_CORRUPTED		= 0x01
 };
 
+/* The hive bins flags
+ */
+enum LIBREGF_HIVE_BINS_FLAGS
+{
+	/* The hive bins are corrupted
+	 */
+	LIBREGF_HIVE_BINS_FLAG_IS_CORRUPTED		= 0x01
+};
+
 /* The key item flags
  */
 enum LIBREGF_KEY_ITEM_FLAGS

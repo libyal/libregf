@@ -267,8 +267,9 @@ int libregf_hive_bins_list_get_index_at_offset(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve data list element index at offset: %" PRIi64 ".",
+		 "%s: unable to retrieve data list element index at offset: %" PRIi64 " (0x%08" PRIx64 ").",
 		 function,
+		 offset,
 		 offset );
 
 		return( -1 );
@@ -366,14 +367,27 @@ int libregf_hive_bins_list_read(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_IO,
 			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read hive bin header at offset: %" PRIi64 ".",
+			 "%s: unable to read hive bin header at offset: %" PRIi64 " (0x%08" PRIx64 ").",
 			 function,
+			 file_offset,
 			 file_offset );
 
 			goto on_error;
 		}
 		else if( result == 0 )
 		{
+#if defined( HAVE_DEBUG_OUTPUT )
+			if( libcnotify_verbose != 0 )
+			{
+				libcnotify_printf(
+				 "%s: missing hive bin at offset: %" PRIi64 " (0x%08" PRIx64 ").\n",
+				 function,
+				 file_offset,
+				 file_offset );
+			}
+#endif
+			hive_bins_list->flags |= LIBREGF_HIVE_BINS_FLAG_IS_CORRUPTED;
+
 			break;
 		}
 		if( hive_bin->offset != ( file_offset - 4096 ) )
@@ -393,7 +407,7 @@ int libregf_hive_bins_list_read(
 		     hive_bins_list->data_list,
 		     &hive_bin_index,
 		     0,
-		     (off64_t) hive_bin->offset,
+		     file_offset,
 		     (size64_t) hive_bin->size,
 		     0,
 		     error ) != 1 )
@@ -438,11 +452,16 @@ int libregf_hive_bins_list_read(
 		if( libcnotify_verbose != 0 )
 		{
 			libcnotify_printf(
-			 "%s: missing hive bin at offset: %" PRIi64 ".\n",
+			 "%s: missing hive bin at offset: %" PRIi64 " (0x%08" PRIx64 ").",
 			 function,
+			 file_offset,
 			 file_offset );
 		}
 #endif
+		hive_bins_list->flags |= LIBREGF_HIVE_BINS_FLAG_IS_CORRUPTED;
+	}
+	if( ( hive_bins_list->flags & LIBREGF_HIVE_BINS_FLAG_IS_CORRUPTED ) != 0 )
+	{
 		hive_bins_list->io_handle->flags |= LIBREGF_IO_HANDLE_FLAG_IS_CORRUPTED;
 	}
 	return( 1 );
@@ -500,13 +519,13 @@ int libregf_hive_bins_list_read_element_data(
 		libcnotify_printf(
 		 "%s: reading hive bin at offset: %" PRIi64 " (0x%08" PRIx64 ")\n",
 		 function,
-		 data_range_offset + 4096,
-		 data_range_offset + 4096 );
+		 data_range_offset,
+		 data_range_offset );
 	}
 #endif
 	if( libbfio_handle_seek_offset(
 	     file_io_handle,
-	     data_range_offset + 4096,
+	     data_range_offset,
 	     SEEK_SET,
 	     error ) == -1 )
 	{
@@ -516,7 +535,7 @@ int libregf_hive_bins_list_read_element_data(
 		 LIBCERROR_IO_ERROR_SEEK_FAILED,
 		 "%s: unable to seek file header offset: %" PRIi64 ".",
 		 function,
-		 data_range_offset + 4096 );
+		 data_range_offset );
 
 		goto on_error;
 	}
@@ -531,9 +550,10 @@ int libregf_hive_bins_list_read_element_data(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_IO,
 		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read hive bin header at offset: %" PRIi64 ".",
+		 "%s: unable to read hive bin header at offset: %" PRIi64 " (0x%08" PRIx64 ").",
 		 function,
-		 data_range_offset + 4096 );
+		 data_range_offset,
+		 data_range_offset );
 
 		goto on_error;
 	}

@@ -50,6 +50,10 @@ struct libregf_hive_bins_list
 	/* The data cache
 	 */
 	libfcache_cache_t *data_cache;
+
+	/* Various flags
+	 */
+	uint8_t flags;
 };
 
 int libregf_hive_bins_list_initialize(

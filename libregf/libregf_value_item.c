@@ -681,12 +681,6 @@ int libregf_value_item_read_value_key(
 			 "%s: unable to copy value name.",
 			 function );
 
-			memory_free(
-			 value_item->name );
-
-			value_item->name      = NULL;
-			value_item->name_size = 0;
-
 			goto on_error;
 		}
 		while( name_index < (size_t) value_item->name_size )
@@ -871,12 +865,6 @@ int libregf_value_item_read_value_key(
 				 "%s: unable to copy data buffer.",
 				 function );
 
-				memory_free(
-				 value_item->data_buffer );
-
-				value_item->data_buffer      = NULL;
-				value_item->data_buffer_size = 0;
-
 				goto on_error;
 			}
 		}
@@ -926,6 +914,24 @@ int libregf_value_item_read_value_key(
 	return( 1 );
 
 on_error:
+	if( value_item->data_buffer != NULL )
+	{
+		memory_free(
+		 value_item->data_buffer );
+
+		value_item->data_buffer = NULL;
+	}
+	value_item->data_buffer_size = 0;
+
+	if( value_item->name != NULL )
+	{
+		memory_free(
+		 value_item->name );
+
+		value_item->name = NULL;
+	}
+	value_item->name_size = 0;
+
 	return( -1 );
 }
 

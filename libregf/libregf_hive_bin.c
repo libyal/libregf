@@ -248,8 +248,9 @@ int libregf_hive_bin_read_header(
 		 hive_bin_header.signature[ 3 ] );
 
 		libcnotify_printf(
-		 "%s: hive bin offset\t\t\t\t: %" PRIu32 "\n",
+		 "%s: hive bin offset\t\t\t\t: %" PRIu32 " (0x%08" PRIx32 ")\n",
 		 function,
+		 hive_bin->offset,
 		 hive_bin->offset );
 		libcnotify_printf(
 		 "%s: size\t\t\t\t\t: %" PRIu32 " bytes\n",

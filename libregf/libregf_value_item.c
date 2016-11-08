@@ -21,10 +21,7 @@
 
 #include <common.h>
 #include <memory.h>
-#include <narrow_string.h>
-#include <system_string.h>
 #include <types.h>
-#include <wide_string.h>
 
 #if defined( HAVE_WCTYPE_H )
 #include <wctype.h>
@@ -444,8 +441,6 @@ int libregf_value_item_read_value_key(
 	int result                                   = 0;
 
 #if defined( HAVE_DEBUG_OUTPUT )
-	system_character_t *value_string             = NULL;
-	size_t value_string_size                     = 0;
 	uint16_t value_16bit                         = 0;
 #endif
 
@@ -735,142 +730,48 @@ int libregf_value_item_read_value_key(
 		{
 			if( ( value_item->flags & LIBREGF_VALUE_KEY_FLAG_NAME_IS_ASCII ) != 0 )
 			{
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-				result = libuna_utf16_string_size_from_byte_stream(
-					  value_item->name,
-					  (size_t) value_item->name_size,
-				          hive_bins_list->io_handle->ascii_codepage,
-					  &value_string_size,
-					  error );
-#else
-				result = libuna_utf8_string_size_from_byte_stream(
-					  value_item->name,
-					  (size_t) value_item->name_size,
-				          hive_bins_list->io_handle->ascii_codepage,
-					  &value_string_size,
-					  error );
-#endif
+				if( libregf_debug_print_string_value(
+				     function,
+				     "value name\t\t\t\t",
+				     value_item->name,
+				     (size_t) value_item->name_size,
+				     hive_bins_list->io_handle->ascii_codepage,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+					 "%s: unable to print string value.",
+					 function );
+
+					goto on_error;
+				}
 			}
 			else
 			{
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-				result = libuna_utf16_string_size_from_utf16_stream(
-					  value_item->name,
-					  (size_t) value_item->name_size,
-					  LIBUNA_ENDIAN_LITTLE,
-					  &value_string_size,
-					  error );
-#else
-				result = libuna_utf8_string_size_from_utf16_stream(
-					  value_item->name,
-					  (size_t) value_item->name_size,
-					  LIBUNA_ENDIAN_LITTLE,
-					  &value_string_size,
-					  error );
-#endif
-			}
-			if( result != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to retrieve value name size.",
-				 function );
+				if( libregf_debug_print_utf16_string_value(
+				     function,
+				     "value name\t\t\t\t",
+				     value_item->name,
+				     (size_t) value_item->name_size,
+				     LIBUNA_ENDIAN_LITTLE,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+					 "%s: unable to print UTF-16 string value.",
+					 function );
 
-				goto on_error;
+					goto on_error;
+				}
 			}
-			if( ( value_string_size > (size_t) SSIZE_MAX )
-			 || ( ( sizeof( system_character_t ) * value_string_size )  > (size_t) SSIZE_MAX ) )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
-				 "%s: invalid value string size value exceeds maximum.",
-				 function );
-
-				goto on_error;
-			}
-			value_string = system_string_allocate(
-			                value_string_size );
-
-			if( value_string == NULL )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_MEMORY,
-				 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-				 "%s: unable to create value name string.",
-				 function );
-
-				goto on_error;
-			}
-			if( ( value_item->flags & LIBREGF_VALUE_KEY_FLAG_NAME_IS_ASCII ) != 0 )
-			{
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-				result = libuna_utf16_string_copy_from_byte_stream(
-					  (libuna_utf16_character_t *) value_string,
-					  value_string_size,
-					  value_item->name,
-					  (size_t) value_item->name_size,
-				          hive_bins_list->io_handle->ascii_codepage,
-					  error );
-#else
-				result = libuna_utf8_string_copy_from_byte_stream(
-					  (libuna_utf8_character_t *) value_string,
-					  value_string_size,
-					  value_item->name,
-					  (size_t) value_item->name_size,
-				          hive_bins_list->io_handle->ascii_codepage,
-					  error );
-#endif
-			}
-			else
-			{
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-				result = libuna_utf16_string_copy_from_utf16_stream(
-					  (libuna_utf16_character_t *) value_string,
-					  value_string_size,
-					  value_item->name,
-					  (size_t) value_item->name_size,
-					  LIBUNA_ENDIAN_LITTLE,
-					  error );
-#else
-				result = libuna_utf8_string_copy_from_utf16_stream(
-					  (libuna_utf8_character_t *) value_string,
-					  value_string_size,
-					  value_item->name,
-					  (size_t) value_item->name_size,
-					  LIBUNA_ENDIAN_LITTLE,
-					  error );
-#endif
-			}
-			if( result != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to retrieve value name.",
-				 function );
-
-				goto on_error;
-			}
-			libcnotify_printf(
-			 "%s: value name\t\t\t\t: %" PRIs_SYSTEM "\n",
-			 function,
-			 value_string );
-
 			libcnotify_printf(
 			 "%s: value name hash\t\t\t: 0x%08" PRIx32 "\n",
 			 function,
 			 value_item->name_hash );
-
-			memory_free(
-			 value_string );
-
-			value_string = NULL;
 		}
 		hive_bin_cell_data += value_item->name_size;
 		hive_bin_cell_size -= value_item->name_size;
@@ -1025,13 +926,6 @@ int libregf_value_item_read_value_key(
 	return( 1 );
 
 on_error:
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( value_string != NULL )
-	{
-		memory_free(
-		 value_string );
-	}
-#endif
 	return( -1 );
 }
 

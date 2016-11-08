@@ -2,7 +2,6 @@ TODO
 * clean up
   - move named key, value key etc into separate source files
   - libregf_hive_bins_list_read_element_data remove the need for + 4096
-  - deprecate regfreport in favor of winreg-kb scripts
 * dokan add classname and values support
 * libregf:
   - add file type definitions
@@ -38,12 +37,6 @@ Tools:
   - print last part of filename stored in header?
   - print key index
   - size usage distribution
-* regfreport
-  - add log handle
-  - mru
-  - sam
-  - analyze shell bags
-  - move shell item code to separate file and reuse in liblnk
 * regfmount:
   - fix list file of specific value success withouh (values)\
   - detect key names with (classname), (values)
@@ -58,7 +51,6 @@ Tools:
 * add manuals
   - regfexport.1
   - regfmount.1
-  - regfreport.1
 
 * is the hive bins list placed correctly in the IO handle ?
   or should it be moved into file ? or other location ?

@@ -16,12 +16,7 @@ SUBDIRS = \
 	libfcache \
 	libfdata \
 	libfdatetime \
-	libfguid \
-	libfwnt \
 	libregf \
-	libfole \
-	libfwps \
-	libfwsi \
 	libcsystem \
 	regftools \
 	pyregf \
@@ -95,8 +90,6 @@ library:
 	(cd $(srcdir)/libfcache && $(MAKE) $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libfdata && $(MAKE) $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libfdatetime && $(MAKE) $(AM_MAKEFLAGS))
-	(cd $(srcdir)/libfguid && $(MAKE) $(AM_MAKEFLAGS))
-	(cd $(srcdir)/libfwnt && $(MAKE) $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libregf && $(MAKE) $(AM_MAKEFLAGS))
 	(cd $(srcdir)/po && $(MAKE) $(AM_MAKEFLAGS))
 
@@ -125,12 +118,7 @@ splint:
 	(cd $(srcdir)/libfcache && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libfdata && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libfdatetime && $(MAKE) splint $(AM_MAKEFLAGS))
-	(cd $(srcdir)/libfguid && $(MAKE) splint $(AM_MAKEFLAGS))
-	(cd $(srcdir)/libfwnt && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libregf && $(MAKE) splint $(AM_MAKEFLAGS))
-	(cd $(srcdir)/libfole && $(MAKE) splint $(AM_MAKEFLAGS))
-	(cd $(srcdir)/libfwps && $(MAKE) splint $(AM_MAKEFLAGS))
-	(cd $(srcdir)/libfwsi && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libcsystem && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/regftools && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/pyregf && $(MAKE) splint $(AM_MAKEFLAGS))

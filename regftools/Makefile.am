@@ -12,11 +12,6 @@ AM_CPPFLAGS = \
 	@LIBFCACHE_CPPFLAGS@ \
 	@LIBFDATA_CPPFLAGS@ \
 	@LIBFDATETIME_CPPFLAGS@ \
-	@LIBFGUID_CPPFLAGS@ \
-	@LIBFOLE_CPPFLAGS@ \
-	@LIBFWNT_CPPFLAGS@ \
-	@LIBFWPS_CPPFLAGS@ \
-	@LIBFWSI_CPPFLAGS@ \
 	@LIBCSYSTEM_CPPFLAGS@ \
 	@LIBFUSE_CPPFLAGS@ \
 	@LIBREGF_DLL_IMPORT@
@@ -26,8 +21,7 @@ AM_LDFLAGS = @STATIC_LDFLAGS@
 bin_PROGRAMS = \
 	regfexport \
 	regfinfo \
-	regfmount \
-	regfreport
+	regfmount
 
 regfexport_SOURCES = \
 	export_handle.c export_handle.h \
@@ -41,9 +35,6 @@ regfexport_SOURCES = \
 	regftools_libcsystem.h \
 	regftools_libfdata.h \
 	regftools_libfdatetime.h \
-	regftools_libfguid.h \
-	regftools_libfwnt.h \
-	regftools_libfwsi.h \
 	regftools_libregf.h \
 	regftools_libuna.h
 
@@ -66,9 +57,6 @@ regfinfo_SOURCES = \
 	regftools_libcsystem.h \
 	regftools_libfdata.h \
 	regftools_libfdatetime.h \
-	regftools_libfguid.h \
-	regftools_libfwnt.h \
-	regftools_libfwsi.h \
 	regftools_libregf.h \
 	regftools_libuna.h
 
@@ -91,49 +79,12 @@ regfmount_SOURCES = \
 	regftools_libcsystem.h \
 	regftools_libfdata.h \
 	regftools_libfdatetime.h \
-	regftools_libfguid.h \
-	regftools_libfwnt.h \
-	regftools_libfwsi.h \
 	regftools_libregf.h \
 	regftools_libuna.h
 
 regfmount_LDADD = \
 	@LIBFUSE_LIBADD@ \
 	@LIBCSYSTEM_LIBADD@ \
-	../libregf/libregf.la \
-	@LIBCNOTIFY_LIBADD@ \
-	@LIBCLOCALE_LIBADD@ \
-	@LIBCERROR_LIBADD@ \
-	@LIBINTL@
-
-regfreport_SOURCES = \
-	regfreport.c \
-	regfoutput.c regfoutput.h \
-	regftools_libbfio.h \
-	regftools_libcerror.h \
-	regftools_libclocale.h \
-	regftools_libcnotify.h \
-	regftools_libcsystem.h \
-	regftools_libfdata.h \
-	regftools_libfdatetime.h \
-	regftools_libfguid.h \
-	regftools_libfwnt.h \
-	regftools_libfwsi.h \
-	regftools_libregf.h \
-	regftools_libuna.h \
-	registry_file.c registry_file.h \
-	report_handle.c report_handle.h \
-	shell_items.c shell_items.h
-
-regfreport_LDADD = \
-	@LIBCSYSTEM_LIBADD@ \
-	@LIBFWSI_LIBADD@ \
-	@LIBFWPS_LIBADD@ \
-	@LIBFOLE_LIBADD@ \
-	@LIBFGUID_LIBADD@ \
-	@LIBFDATETIME_LIBADD@ \
-	@LIBUNA_LIBADD@ \
-	@LIBCDATA_LIBADD@ \
 	../libregf/libregf.la \
 	@LIBCNOTIFY_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
@@ -153,6 +104,4 @@ splint:
 	-splint -preproc -redef $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(regfinfo_SOURCES)
 	@echo "Running splint on regfmount ..."
 	-splint -preproc -redef $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(regfmount_SOURCES)
-	@echo "Running splint on regfreport ..."
-	-splint -preproc -redef $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(regfreport_SOURCES)
 

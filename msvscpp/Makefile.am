@@ -13,11 +13,6 @@ MSVSCPP_FILES = \
 	libfcache/libfcache.vcproj \
 	libfdata/libfdata.vcproj \
 	libfdatetime/libfdatetime.vcproj \
-	libfguid/libfguid.vcproj \
-	libfole/libfole.vcproj \
-	libfwnt/libfwnt.vcproj \
-	libfwps/libfwps.vcproj \
-	libfwsi/libfwsi.vcproj \
 	libregf/libregf.vcproj \
 	libuna/libuna.vcproj \
 	pyregf/pyregf.vcproj \
@@ -30,7 +25,6 @@ MSVSCPP_FILES = \
 	regfexport/regfexport.vcproj \
 	regfinfo/regfinfo.vcproj \
 	regfmount/regfmount.vcproj \
-	regfreport/regfreport.vcproj \
 	libregf.sln
 
 EXTRA_DIST = \

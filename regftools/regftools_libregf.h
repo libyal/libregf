@@ -27,13 +27,11 @@
 /* If Cygwin libtool DLL support is enabled set LIBREGF_DLL_IMPORT
  * before including libregf.h
  */
-#if defined( _WIN32 ) && defined( DLL_EXPORT )
-#if !defined( HAVE_STATIC_EXECUTABLES )
+#if defined( _WIN32 ) && defined( DLL_IMPORT ) && !defined( HAVE_STATIC_EXECUTABLES )
 #define LIBREGF_DLL_IMPORT
-#endif
 #endif
 
 #include <libregf.h>
 
-#endif
+#endif /* !defined( _REGFTOOLS_LIBREGF_H ) */
 

@@ -192,7 +192,11 @@ Matches the secondary sequence number if the hive was properly synchronized
 | 40 | 4 | | Hive bins data size
 | 44 | 4 | | [yellow-background]*Unknown (Clustering factor)* +
 [yellow-background]*Logical sector size of the underlying disk in bytes divided by 512* +
+<<<<<<< Updated upstream
 [yellow-background]*Seen: 0x0001*
+=======
+[yellow-background]*Seen: 0x0001* 
+>>>>>>> Stashed changes
 | 48 | 64 | | [yellow-background]*Unknown* +
 [yellow-background]*Sometimes contains the last part of the filename in UTF-16 LE most of the time with an end-of-string character, but not always. Unused bytes are 0.*
 | 112 | 396 | | [yellow-background]*Unknown* +
@@ -207,7 +211,11 @@ Remainder of the header block:
 [cols="1,1,1,5",options="header"]
 |===
 | Offset | Size | Value | Description
+<<<<<<< Updated upstream
 | 512 | 3576 | | Reserved
+=======
+| 512 | 3576 | | Reserved		
+>>>>>>> Stashed changes
 | 4088 | 4 | | [yellow-background]*Unknown (Boot type)* +
 [yellow-background]*This field has no meaning on a disk*
 | 4092 | 4 | | [yellow-background]*Unknown (Boot recover)* +
@@ -933,6 +941,7 @@ key name                               : Class
 key name hash                          : 0x07b82c9a
 ....
 
+<<<<<<< Updated upstream
 === Unaligned hive bins
 In a SOFTWARE regf file a scenario was encountered that between hive bins a 512
 byte block of 0xff byte values was stored.
@@ -940,10 +949,17 @@ byte block of 0xff byte values was stored.
 The hive bin offset of the hive bin aftert the block of 0xff byte values the
 is aligned with that of the offset of the 0xff byte values.
 
+=======
+=== Misaligned hive bins
+In a SOFTWARE regf file a scenario was encountered that between hive bins a 512
+byte block of 0xff byte values was stored.
+
+>>>>>>> Stashed changes
 ....
 000e4000  68 62 69 6e 00 30 0e 00  00 10 00 00 00 00 00 00  |hbin.0..........|
 ...
 000e4ff0  f0 ff ff ff d8 50 16 00  c8 59 16 00 e8 59 16 00  |.....P...Y...Y..|
+<<<<<<< Updated upstream
 
 signature                                 : hbin
 hive bin offset                           : 929792 (0x000e3000)
@@ -978,6 +994,23 @@ Which appears to be repeated every 0x00200000 bytes:
 ....
 
 Further in the file the hive bin offsets suddenly make a jump of 8192 bytes.
+=======
+000e5000  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff  |................|
+*
+000e5200  68 62 69 6e 00 40 0e 00  00 10 00 00 00 00 00 00  |hbin.@..........|
+....
+
+Repeated every 0x00200000 bytes:
+....
+002e5200  68 62 69 6e 00 40 4e 00  00 10 00 00 00 00 00 00  |hbin.@N.........|
+...
+002e4ff0  36 2e 33 2e 39 36 30 30  2e 31 36 33 38 34 00 00  |6.3.9600.16384..|
+002e5000  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff  |................|
+*
+002e5200  68 62 69 6e 00 40 4e 00  00 10 00 00 00 00 00 00  |hbin.@N.........|
+....
+
+>>>>>>> Stashed changes
 ....
 hive bin header:
 00000000: 68 62 69 6e 00 e0 0e 00  00 10 00 00 00 00 00 00   hbin.... ........
@@ -1012,6 +1045,11 @@ unknown time                              : Jan 01, 1601 00:00:00.000000000 UTC
 unknown spare                             : 0x00000000 (0)
 
 mismatch in hive bin offset (stored: 983040 != calculated: 978944).
+<<<<<<< Updated upstream
+=======
+
+8192 bytes jump in the hive bin offset
+>>>>>>> Stashed changes
 ....
 
 === Truncated Registry file

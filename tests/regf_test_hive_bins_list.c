@@ -1,5 +1,5 @@
 /*
- * Library value type test program
+ * Library hive_bins_list type test program
  *
  * Copyright (C) 2009-2016, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -33,12 +33,14 @@
 #include "regf_test_memory.h"
 #include "regf_test_unused.h"
 
-#include "../libregf/libregf_value.h"
+#include "../libregf/libregf_hive_bins_list.h"
 
-/* Tests the libregf_value_free function
+#if defined( __GNUC__ )
+
+/* Tests the libregf_hive_bins_list_free function
  * Returns 1 if successful or 0 if not
  */
-int regf_test_value_free(
+int regf_test_hive_bins_list_free(
      void )
 {
 	libcerror_error_t *error = NULL;
@@ -46,7 +48,7 @@ int regf_test_value_free(
 
 	/* Test error cases
 	 */
-	result = libregf_value_free(
+	result = libregf_hive_bins_list_free(
 	          NULL,
 	          &error );
 
@@ -73,8 +75,6 @@ on_error:
 	return( 0 );
 }
 
-#if defined( __GNUC__ )
-
 #endif /* defined( __GNUC__ ) */
 
 /* The main program
@@ -94,53 +94,17 @@ int main(
 
 #if defined( __GNUC__ )
 
-	/* TODO: add tests for libregf_value_initialize */
-
-#endif /* defined( __GNUC__ ) */
+	/* TODO: add tests for libregf_hive_bins_list_initialize */
 
 	REGF_TEST_RUN(
-	 "libregf_value_free",
-	 regf_test_value_free );
+	 "libregf_hive_bins_list_free",
+	 regf_test_hive_bins_list_free );
 
-#if defined( __GNUC__ )
+	/* TODO: add tests for libregf_hive_bins_list_get_index_at_offset */
 
-	/* TODO: add tests for libregf_value_is_corrupted */
+	/* TODO: add tests for libregf_hive_bins_list_read */
 
-	/* TODO: add tests for libregf_value_get_offset */
-
-	/* TODO: add tests for libregf_value_get_name_size */
-
-	/* TODO: add tests for libregf_value_get_name */
-
-	/* TODO: add tests for libregf_value_get_utf8_name_size */
-
-	/* TODO: add tests for libregf_value_get_utf8_name */
-
-	/* TODO: add tests for libregf_value_get_utf16_name_size */
-
-	/* TODO: add tests for libregf_value_get_utf16_name */
-
-	/* TODO: add tests for libregf_value_get_value_type */
-
-	/* TODO: add tests for libregf_value_get_value_data_size */
-
-	/* TODO: add tests for libregf_value_get_value_data */
-
-	/* TODO: add tests for libregf_value_get_value_32bit */
-
-	/* TODO: add tests for libregf_value_get_value_64bit */
-
-	/* TODO: add tests for libregf_value_get_value_utf8_string_size */
-
-	/* TODO: add tests for libregf_value_get_value_utf8_string */
-
-	/* TODO: add tests for libregf_value_get_value_utf16_string_size */
-
-	/* TODO: add tests for libregf_value_get_value_utf16_string */
-
-	/* TODO: add tests for libregf_value_get_value_binary_data_size */
-
-	/* TODO: add tests for libregf_value_get_value_binary_data */
+	/* TODO: add tests for libregf_hive_bins_list_read_element_data */
 
 #endif /* defined( __GNUC__ ) */
 

@@ -1,5 +1,5 @@
 /*
- * Log handle
+ * GetOpt functions
  *
  * Copyright (C) 2009-2016, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -19,53 +19,50 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LOG_HANDLE_H )
-#define _LOG_HANDLE_H
+#if !defined( _REGF_TEST_GETOPT_H )
+#define _REGF_TEST_GETOPT_H
 
 #include <common.h>
-#include <file_stream.h>
 #include <types.h>
 
-#include "regftools_libcerror.h"
+/* unistd.h is included here to export getopt, optarg, optind and optopt
+ */
+#if defined( HAVE_UNISTD_H )
+#include <unistd.h>
+#endif
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
-typedef struct log_handle log_handle_t;
+#if defined( HAVE_GETOPT )
+#define regf_test_getopt( argument_count, argument_values, options_string ) \
+	getopt( argument_count, argument_values, options_string )
 
-struct log_handle
-{
-	/* The log stream
-	 */
-	FILE *log_stream;
-};
+#else
 
-int log_handle_initialize(
-     log_handle_t **log_handle,
-     libcerror_error_t **error );
+#if !defined( __CYGWIN__ )
+extern int optind;
+extern system_character_t *optarg;
+extern system_integer_t optopt;
 
-int log_handle_free(
-     log_handle_t **log_handle,
-     libcerror_error_t **error );
+#else
+int optind;
+system_character_t *optarg;
+system_integer_t optopt;
 
-int log_handle_open(
-     log_handle_t *log_handle,
-     const system_character_t *filename,
-     libcerror_error_t **error );
+#endif /* !defined( __CYGWIN__ ) */
 
-int log_handle_close(
-     log_handle_t *log_handle,
-     libcerror_error_t **error );
+system_integer_t regf_test_getopt(
+                  int argument_count,
+                  system_character_t * const argument_values[],
+                  const system_character_t *options_string );
 
-void log_handle_printf(
-      log_handle_t *log_handle,
-      char *format,
-      ... );
+#endif /* defined( HAVE_GETOPT ) */
 
 #if defined( __cplusplus )
 }
 #endif
 
-#endif /* !defined( _LOG_HANDLE_H ) */
+#endif /* !defined( _REGF_TEST_GETOPT_H ) */
 

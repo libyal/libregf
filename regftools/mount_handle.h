@@ -116,5 +116,5 @@ int mount_handle_get_sanitized_filename(
 }
 #endif
 
-#endif
+#endif /* !defined( _MOUNT_HANDLE_H ) */
 

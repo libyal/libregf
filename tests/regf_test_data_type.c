@@ -1,5 +1,5 @@
 /*
- * Library notification functions test program
+ * Library data_type type test program
  *
  * Copyright (C) 2009-2016, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -27,67 +27,11 @@
 #include <stdlib.h>
 #endif
 
+#include "regf_test_libcerror.h"
 #include "regf_test_libregf.h"
 #include "regf_test_macros.h"
+#include "regf_test_memory.h"
 #include "regf_test_unused.h"
-
-/* Tests the libregf_notify_set_verbose function
- * Returns 1 if successful or 0 if not
- */
-int regf_test_notify_set_verbose(
-     void )
-{
-	/* Test invocation of function only
-	 */
-	libregf_notify_set_verbose(
-	 0 );
-
-	return( 1 );
-}
-
-/* Tests the libregf_notify_set_stream function
- * Returns 1 if successful or 0 if not
- */
-int regf_test_notify_set_stream(
-     void )
-{
-	/* Test invocation of function only
-	 */
-	libregf_notify_set_stream(
-	 NULL,
-	 NULL );
-
-	return( 1 );
-}
-
-/* Tests the libregf_notify_stream_open function
- * Returns 1 if successful or 0 if not
- */
-int regf_test_notify_stream_open(
-     void )
-{
-	/* Test invocation of function only
-	 */
-	libregf_notify_stream_open(
-	 NULL,
-	 NULL );
-
-	return( 1 );
-}
-
-/* Tests the libregf_notify_stream_close function
- * Returns 1 if successful or 0 if not
- */
-int regf_test_notify_stream_close(
-     void )
-{
-	/* Test invocation of function only
-	 */
-	libregf_notify_stream_close(
-	 NULL );
-
-	return( 1 );
-}
 
 /* The main program
  */
@@ -104,21 +48,13 @@ int main(
 	REGF_TEST_UNREFERENCED_PARAMETER( argc )
 	REGF_TEST_UNREFERENCED_PARAMETER( argv )
 
-	REGF_TEST_RUN(
-	 "libregf_notify_set_verbose",
-	 regf_test_notify_set_verbose )
+#if defined( __GNUC__ )
 
-	REGF_TEST_RUN(
-	 "libregf_notify_set_stream",
-	 regf_test_notify_set_stream )
+	/* TODO: add tests for libregf_data_type_get_identifier */
 
-	REGF_TEST_RUN(
-	 "libregf_notify_stream_open",
-	 regf_test_notify_stream_open )
+	/* TODO: add tests for libregf_data_type_get_description */
 
-	REGF_TEST_RUN(
-	 "libregf_notify_stream_close",
-	 regf_test_notify_stream_close )
+#endif /* defined( __GNUC__ ) */
 
 	return( EXIT_SUCCESS );
 

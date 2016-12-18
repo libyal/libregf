@@ -206,6 +206,16 @@ int libregf_debug_print_string_value(
 	size_t string_size         = 0;
 	int result                 = 0;
 
+	if( ( byte_stream == NULL )
+	 || ( byte_stream_size == 0 ) )
+	{
+		libcnotify_printf(
+		 "%s: %s: \n",
+		 function_name,
+		 value_name );
+
+		return( 1 );
+	}
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libuna_utf16_string_size_from_byte_stream(
 		  byte_stream,
@@ -322,6 +332,16 @@ int libregf_debug_print_utf16_string_value(
 	size_t string_size         = 0;
 	int result                 = 0;
 
+	if( ( byte_stream == NULL )
+	 || ( byte_stream_size == 0 ) )
+	{
+		libcnotify_printf(
+		 "%s: %s: \n",
+		 function_name,
+		 value_name );
+
+		return( 1 );
+	}
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libuna_utf16_string_size_from_utf16_stream(
 		  byte_stream,

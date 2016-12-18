@@ -108,5 +108,5 @@ int export_handle_export_file(
 }
 #endif
 
-#endif
+#endif /* !defined( _EXPORT_HANDLE_H ) */
 

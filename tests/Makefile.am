@@ -2,6 +2,7 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/common \
 	@LIBCERROR_CPPFLAGS@ \
+	@LIBCTHREADS_CPPFLAGS@ \
 	@LIBCDATA_CPPFLAGS@ \
 	@LIBCLOCALE_CPPFLAGS@ \
 	@LIBCNOTIFY_CPPFLAGS@ \
@@ -10,28 +11,29 @@ AM_CPPFLAGS = \
 	@LIBCFILE_CPPFLAGS@ \
 	@LIBCPATH_CPPFLAGS@ \
 	@LIBBFIO_CPPFLAGS@ \
-	@LIBCSYSTEM_CPPFLAGS@ \
+	@LIBFCACHE_CPPFLAGS@ \
+	@LIBFDATA_CPPFLAGS@ \
+	@LIBFDATETIME_CPPFLAGS@ \
+	@LIBFWNT_CPPFLAGS@ \
 	@PTHREAD_CPPFLAGS@ \
 	@LIBREGF_DLL_IMPORT@
 
-if HAVE_PYTHON
+if HAVE_PYTHON_TESTS
 TESTS_PYREGF = \
-	test_python_functions.sh \
-	test_pyregf_set_ascii_codepage.sh
+	test_python_functions.sh
 endif
 
 TESTS = \
 	test_api_functions.sh \
+	test_api_types.sh \
 	test_regfinfo.sh \
 	test_regfexport.sh \
 	$(TESTS_PYREGF)
 
 check_SCRIPTS = \
-	pyregf_test_get_version.py \
-	pyregf_test_open_close.py \
-	pyregf_test_set_ascii_codepage.py \
+	pyregf_test_support.py \
 	test_api_functions.sh \
-	test_pyregf_set_ascii_codepage.sh \
+	test_api_types.sh \
 	test_python_functions.sh \
 	test_regfexport.sh \
 	test_regfinfo.sh \
@@ -41,12 +43,32 @@ EXTRA_DIST = \
 	$(check_SCRIPTS)
 
 check_PROGRAMS = \
+	regf_test_data_type \
 	regf_test_error \
+	regf_test_file \
+	regf_test_hive_bin \
+	regf_test_hive_bin_cell \
+	regf_test_hive_bins_list \
+	regf_test_io_handle \
 	regf_test_key \
+	regf_test_key_item \
+	regf_test_named_key \
 	regf_test_notify \
-	regf_test_open_close \
 	regf_test_support \
-	regf_test_value
+	regf_test_value \
+	regf_test_value_item
+
+regf_test_data_type_SOURCES = \
+	regf_test_data_type.c \
+	regf_test_libcerror.h \
+	regf_test_libregf.h \
+	regf_test_macros.h \
+	regf_test_memory.c regf_test_memory.h \
+	regf_test_unused.h
+
+regf_test_data_type_LDADD = \
+	../libregf/libregf.la \
+	@LIBCERROR_LIBADD@
 
 regf_test_error_SOURCES = \
 	regf_test_error.c \
@@ -56,6 +78,75 @@ regf_test_error_SOURCES = \
 
 regf_test_error_LDADD = \
 	../libregf/libregf.la
+
+regf_test_file_SOURCES = \
+	regf_test_file.c \
+	regf_test_getopt.c regf_test_getopt.h \
+	regf_test_libcerror.h \
+	regf_test_libclocale.h \
+	regf_test_libcnotify.h \
+	regf_test_libregf.h \
+	regf_test_libuna.h \
+	regf_test_macros.h \
+	regf_test_memory.c regf_test_memory.h
+
+regf_test_file_LDADD = \
+	@LIBUNA_LIBADD@ \
+	@LIBCNOTIFY_LIBADD@ \
+	@LIBCLOCALE_LIBADD@ \
+	@LIBCDATA_LIBADD@ \
+	../libregf/libregf.la \
+	@LIBCTHREADS_LIBADD@ \
+	@LIBCERROR_LIBADD@ \
+	@PTHREAD_LIBADD@
+
+regf_test_hive_bin_SOURCES = \
+	regf_test_hive_bin.c \
+	regf_test_libcerror.h \
+	regf_test_libregf.h \
+	regf_test_macros.h \
+	regf_test_memory.c regf_test_memory.h \
+	regf_test_unused.h
+
+regf_test_hive_bin_LDADD = \
+	../libregf/libregf.la \
+	@LIBCERROR_LIBADD@
+
+regf_test_hive_bin_cell_SOURCES = \
+	regf_test_hive_bin_cell.c \
+	regf_test_libcerror.h \
+	regf_test_libregf.h \
+	regf_test_macros.h \
+	regf_test_memory.c regf_test_memory.h \
+	regf_test_unused.h
+
+regf_test_hive_bin_cell_LDADD = \
+	../libregf/libregf.la \
+	@LIBCERROR_LIBADD@
+
+regf_test_hive_bins_list_SOURCES = \
+	regf_test_hive_bins_list.c \
+	regf_test_libcerror.h \
+	regf_test_libregf.h \
+	regf_test_macros.h \
+	regf_test_memory.c regf_test_memory.h \
+	regf_test_unused.h
+
+regf_test_hive_bins_list_LDADD = \
+	../libregf/libregf.la \
+	@LIBCERROR_LIBADD@
+
+regf_test_io_handle_SOURCES = \
+	regf_test_io_handle.c \
+	regf_test_libcerror.h \
+	regf_test_libregf.h \
+	regf_test_macros.h \
+	regf_test_memory.c regf_test_memory.h \
+	regf_test_unused.h
+
+regf_test_io_handle_LDADD = \
+	../libregf/libregf.la \
+	@LIBCERROR_LIBADD@
 
 regf_test_key_SOURCES = \
 	regf_test_key.c \
@@ -69,6 +160,30 @@ regf_test_key_LDADD = \
 	../libregf/libregf.la \
 	@LIBCERROR_LIBADD@
 
+regf_test_key_item_SOURCES = \
+	regf_test_key_item.c \
+	regf_test_libcerror.h \
+	regf_test_libregf.h \
+	regf_test_macros.h \
+	regf_test_memory.c regf_test_memory.h \
+	regf_test_unused.h
+
+regf_test_key_item_LDADD = \
+	../libregf/libregf.la \
+	@LIBCERROR_LIBADD@
+
+regf_test_named_key_SOURCES = \
+	regf_test_libcerror.h \
+	regf_test_libregf.h \
+	regf_test_macros.h \
+	regf_test_memory.c regf_test_memory.h \
+	regf_test_named_key.c \
+	regf_test_unused.h
+
+regf_test_named_key_LDADD = \
+	../libregf/libregf.la \
+	@LIBCERROR_LIBADD@
+
 regf_test_notify_SOURCES = \
 	regf_test_libregf.h \
 	regf_test_macros.h \
@@ -78,30 +193,21 @@ regf_test_notify_SOURCES = \
 regf_test_notify_LDADD = \
 	../libregf/libregf.la
 
-regf_test_open_close_SOURCES = \
-	regf_test_libcerror.h \
-	regf_test_libregf.h \
-	regf_test_libcsystem.h \
-	regf_test_open_close.c
-
-regf_test_open_close_LDADD = \
-	@LIBCSYSTEM_LIBADD@ \
-	../libregf/libregf.la \
-	@LIBCTHREADS_LIBADD@ \
-	@LIBCDATA_LIBADD@ \
-	@LIBCERROR_LIBADD@
-
 regf_test_support_SOURCES = \
+	regf_test_getopt.c regf_test_getopt.h \
+	regf_test_libbfio.h \
 	regf_test_libcerror.h \
 	regf_test_libclocale.h \
+	regf_test_libcnotify.h \
 	regf_test_libregf.h \
-	regf_test_libcsystem.h \
 	regf_test_libuna.h \
 	regf_test_macros.h \
 	regf_test_support.c
 
 regf_test_support_LDADD = \
-	@LIBCSYSTEM_LIBADD@ \
+	@LIBBFIO_LIBADD@ \
+	@LIBCPATH_LIBADD@ \
+	@LIBCFILE_LIBADD@ \
 	@LIBUNA_LIBADD@ \
 	@LIBCNOTIFY_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
@@ -118,6 +224,18 @@ regf_test_value_SOURCES = \
 	regf_test_value.c
 
 regf_test_value_LDADD = \
+	../libregf/libregf.la \
+	@LIBCERROR_LIBADD@
+
+regf_test_value_item_SOURCES = \
+	regf_test_libcerror.h \
+	regf_test_libregf.h \
+	regf_test_macros.h \
+	regf_test_memory.c regf_test_memory.h \
+	regf_test_unused.h \
+	regf_test_value_item.c
+
+regf_test_value_item_LDADD = \
 	../libregf/libregf.la \
 	@LIBCERROR_LIBADD@
 

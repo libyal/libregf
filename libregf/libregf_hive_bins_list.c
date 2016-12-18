@@ -289,6 +289,7 @@ int libregf_hive_bins_list_read(
 {
 	libregf_hive_bin_t *hive_bin = NULL;
 	static char *function        = "libregf_hive_bins_list_read";
+	off64_t alignment_size       = 0;
 	int hive_bin_index           = 0;
 	int result                   = 0;
 
@@ -388,20 +389,39 @@ int libregf_hive_bins_list_read(
 #endif
 			hive_bins_list->flags |= LIBREGF_HIVE_BINS_FLAG_IS_CORRUPTED;
 
-			break;
-		}
-		if( hive_bin->offset != ( file_offset - 4096 ) )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-			 "%s: mismatch in hive bin offset (stored: %" PRIu32 " != calculated: %" PRIi64 ").",
-			 function,
-			 hive_bin->offset,
-			 file_offset - 4096 );
+			alignment_size += 512;
+			file_offset    += 512;
+			hive_bins_size -= 512;
 
-			goto on_error;
+			continue;
+		}
+		if( hive_bin->offset != ( file_offset - ( 4096 + alignment_size ) ) )
+		{
+			if( ( hive_bins_list->flags & LIBREGF_HIVE_BINS_FLAG_IS_CORRUPTED ) == 0 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+				 "%s: mismatch in hive bin offset (stored: %" PRIu32 " != calculated: %" PRIi64 ").",
+				 function,
+				 hive_bin->offset,
+				 file_offset - ( 4096 + alignment_size ) );
+
+				goto on_error;
+			}
+#if defined( HAVE_DEBUG_OUTPUT )
+			if( libcnotify_verbose != 0 )
+			{
+				libcnotify_printf(
+				 "%s: mismatch in hive bin offset (stored: %" PRIu32 " != calculated: %" PRIi64 ") difference: %" PRIi64 ".\n",
+				 function,
+				 hive_bin->offset,
+				 file_offset - ( 4096 + alignment_size ),
+				 file_offset - ( 4096 + hive_bin->offset ) );
+			}
+#endif
+			alignment_size = file_offset - ( 4096 + hive_bin->offset );
 		}
 		if( libfdata_list_append_element(
 		     hive_bins_list->data_list,

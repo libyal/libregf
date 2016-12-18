@@ -94,5 +94,5 @@ int info_handle_file_fprint(
 }
 #endif
 
-#endif
+#endif /* !defined( _INFO_HANDLE_H ) */
 

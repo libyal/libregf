@@ -126,13 +126,20 @@ stamp-h[1-9]
 /regftools/regfmount
 /regftools/regfreport
 /tests/input
+/tests/regf_test_data_type
 /tests/regf_test_error
 /tests/regf_test_file
+/tests/regf_test_hive_bin
+/tests/regf_test_hive_bin_cell
+/tests/regf_test_hive_bins_list
+/tests/regf_test_io_handle
 /tests/regf_test_key
+/tests/regf_test_key_item
+/tests/regf_test_named_key
 /tests/regf_test_notify
-/tests/regf_test_open_close
 /tests/regf_test_support
 /tests/regf_test_value
+/tests/regf_test_value_item
 /tests/tmp*
 
 # Local library dependencies specific files

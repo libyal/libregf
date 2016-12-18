@@ -1,5 +1,5 @@
 /*
- * Library key type testing program
+ * Library key type test program
  *
  * Copyright (C) 2009-2016, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -32,6 +32,8 @@
 #include "regf_test_macros.h"
 #include "regf_test_memory.h"
 #include "regf_test_unused.h"
+
+#include "../libregf/libregf_key.h"
 
 /* Tests the libregf_key_free function
  * Returns 1 if successful or 0 if not
@@ -71,6 +73,10 @@ on_error:
 	return( 0 );
 }
 
+#if defined( __GNUC__ )
+
+#endif /* defined( __GNUC__ ) */
+
 /* The main program
  */
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
@@ -86,9 +92,73 @@ int main(
 	REGF_TEST_UNREFERENCED_PARAMETER( argc )
 	REGF_TEST_UNREFERENCED_PARAMETER( argv )
 
+#if defined( __GNUC__ )
+
+	/* TODO: add tests for libregf_key_initialize */
+
+#endif /* defined( __GNUC__ ) */
+
 	REGF_TEST_RUN(
 	 "libregf_key_free",
 	 regf_test_key_free );
+
+#if defined( __GNUC__ )
+
+	/* TODO: add tests for libregf_key_is_corrupted */
+
+	/* TODO: add tests for libregf_key_get_offset */
+
+	/* TODO: add tests for libregf_key_get_name_size */
+
+	/* TODO: add tests for libregf_key_get_name */
+
+	/* TODO: add tests for libregf_key_get_utf8_name_size */
+
+	/* TODO: add tests for libregf_key_get_utf8_name */
+
+	/* TODO: add tests for libregf_key_get_utf16_name_size */
+
+	/* TODO: add tests for libregf_key_get_utf16_name */
+
+	/* TODO: add tests for libregf_key_get_class_name_size */
+
+	/* TODO: add tests for libregf_key_get_class_name */
+
+	/* TODO: add tests for libregf_key_get_utf8_class_name_size */
+
+	/* TODO: add tests for libregf_key_get_utf8_class_name */
+
+	/* TODO: add tests for libregf_key_get_utf16_class_name_size */
+
+	/* TODO: add tests for libregf_key_get_utf16_class_name */
+
+	/* TODO: add tests for libregf_key_get_last_written_time */
+
+	/* TODO: add tests for libregf_key_get_security_descriptor_size */
+
+	/* TODO: add tests for libregf_key_get_security_descriptor */
+
+	/* TODO: add tests for libregf_key_get_number_of_values */
+
+	/* TODO: add tests for libregf_key_get_value */
+
+	/* TODO: add tests for libregf_key_get_value_by_utf8_name */
+
+	/* TODO: add tests for libregf_key_get_value_by_utf16_name */
+
+	/* TODO: add tests for libregf_key_get_number_of_sub_keys */
+
+	/* TODO: add tests for libregf_key_get_sub_key */
+
+	/* TODO: add tests for libregf_key_get_sub_key_by_utf8_name */
+
+	/* TODO: add tests for libregf_key_get_sub_key_by_utf8_path */
+
+	/* TODO: add tests for libregf_key_get_sub_key_by_utf16_name */
+
+	/* TODO: add tests for libregf_key_get_sub_key_by_utf16_path */
+
+#endif /* defined( __GNUC__ ) */
 
 	return( EXIT_SUCCESS );
 

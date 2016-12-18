@@ -1,5 +1,5 @@
 /*
- * The internal extern definition
+ * The internal libcnotify header
  *
  * Copyright (C) 2009-2016, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -19,28 +19,32 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBREGF_INTERNAL_EXTERN_H )
-#define _LIBREGF_INTERNAL_EXTERN_H
+#if !defined( _REGF_TEST_LIBCNOTIFY_H )
+#define _REGF_TEST_LIBCNOTIFY_H
 
 #include <common.h>
 
-/* Define HAVE_LOCAL_LIBREGF for local use of libregf
+/* Define HAVE_LOCAL_LIBCNOTIFY for local use of libcnotify
  */
-#if !defined( HAVE_LOCAL_LIBREGF )
+#if defined( HAVE_LOCAL_LIBCNOTIFY )
 
-/* If libtool DLL support is enabled set LIBREGF_DLL_EXPORT
- * before including libregf/extern.h
- */
-#if defined( _WIN32 ) && defined( DLL_EXPORT )
-#define LIBREGF_DLL_EXPORT
-#endif
-
-#include <libregf/extern.h>
+#include <libcnotify_definitions.h>
+#include <libcnotify_print.h>
+#include <libcnotify_stream.h>
+#include <libcnotify_verbose.h>
 
 #else
-#define LIBREGF_EXTERN	/* extern */
 
-#endif /* !defined( HAVE_LOCAL_LIBREGF ) */
+/* If libtool DLL support is enabled set LIBCNOTIFY_DLL_IMPORT
+ * before including libcnotify.h
+ */
+#if defined( _WIN32 ) && defined( DLL_IMPORT )
+#define LIBCNOTIFY_DLL_IMPORT
+#endif
 
-#endif /* !defined( _LIBREGF_INTERNAL_EXTERN_H ) */
+#include <libcnotify.h>
+
+#endif /* defined( HAVE_LOCAL_LIBCNOTIFY ) */
+
+#endif /* !defined( _REGF_TEST_LIBCNOTIFY_H ) */
 

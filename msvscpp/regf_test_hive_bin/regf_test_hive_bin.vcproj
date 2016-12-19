@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="regf_test_key"
-	ProjectGUID="{CC08C23A-8764-4605-B2FE-5A41A05EE82D}"
-	RootNamespace="regf_test_key"
+	Name="regf_test_hive_bin"
+	ProjectGUID="{D3AD3380-8DAA-4516-B951-6E878AC2C480}"
+	RootNamespace="regf_test_hive_bin"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -176,7 +176,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\tests\regf_test_key.c"
+				RelativePath="..\..\tests\regf_test_hive_bin.c"
 				>
 			</File>
 			<File

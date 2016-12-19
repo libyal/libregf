@@ -31,6 +31,7 @@ TESTS = \
 	$(TESTS_PYREGF)
 
 check_SCRIPTS = \
+	pyregf_test_file.py \
 	pyregf_test_support.py \
 	test_api_functions.sh \
 	test_api_types.sh \

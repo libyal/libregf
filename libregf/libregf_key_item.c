@@ -192,7 +192,7 @@ int libregf_key_item_free(
 		memory_free(
 		 *key_item );
 
-		key_item = NULL;
+		*key_item = NULL;
 	}
 	return( result );
 }

@@ -1,4 +1,6 @@
 TODO
+* fix:
+  - multiple successive open of transaction regf file
 * clean up
   - move named key, value key etc into separate source files
   - libregf_hive_bins_list_read_element_data remove the need for + 4096

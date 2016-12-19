@@ -412,11 +412,9 @@ int main(
 
 #if defined( __GNUC__ )
 
-/* TODO
 	REGF_TEST_RUN(
 	 "libregf_key_item_initialize",
 	 regf_test_key_item_initialize );
-*/
 
 	REGF_TEST_RUN(
 	 "libregf_key_item_free",

@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="regf_test_key"
-	ProjectGUID="{CC08C23A-8764-4605-B2FE-5A41A05EE82D}"
-	RootNamespace="regf_test_key"
+	Name="regf_test_file"
+	ProjectGUID="{343AA7DC-39DD-4D22-AC62-5BBA7D7E462B}"
+	RootNamespace="regf_test_file"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -176,7 +176,11 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\tests\regf_test_key.c"
+				RelativePath="..\..\tests\regf_test_file.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\tests\regf_test_getopt.c"
 				>
 			</File>
 			<File
@@ -190,11 +194,27 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath="..\..\tests\regf_test_getopt.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\tests\regf_test_libcerror.h"
 				>
 			</File>
 			<File
+				RelativePath="..\..\tests\regf_test_libclocale.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\tests\regf_test_libcnotify.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\tests\regf_test_libregf.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\tests\regf_test_libuna.h"
 				>
 			</File>
 			<File
@@ -203,10 +223,6 @@
 			</File>
 			<File
 				RelativePath="..\..\tests\regf_test_memory.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\tests\regf_test_unused.h"
 				>
 			</File>
 		</Filter>

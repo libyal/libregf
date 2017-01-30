@@ -1,7 +1,7 @@
 /*
  * Python object definition of the libregf file types
  *
- * Copyright (C) 2009-2016, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2009-2017, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -50,14 +50,14 @@ PyObject *pyregf_file_types_new(
            void );
 
 int pyregf_file_types_init(
-     pyregf_file_types_t *pyregf_file_types );
+     pyregf_file_types_t *definitions_object );
 
 void pyregf_file_types_free(
-      pyregf_file_types_t *pyregf_file_types );
+      pyregf_file_types_t *definitions_object );
 
 #if defined( __cplusplus )
 }
 #endif
 
-#endif
+#endif /* !defined( _PYREGF_FILE_TYPES_H ) */
 

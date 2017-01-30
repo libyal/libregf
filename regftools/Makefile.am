@@ -13,7 +13,6 @@ AM_CPPFLAGS = \
 	@LIBFDATA_CPPFLAGS@ \
 	@LIBFDATETIME_CPPFLAGS@ \
 	@LIBFWNT_CPPFLAGS@ \
-	@LIBCSYSTEM_CPPFLAGS@ \
 	@LIBFUSE_CPPFLAGS@ \
 	@LIBREGF_DLL_IMPORT@
 
@@ -28,70 +27,76 @@ regfexport_SOURCES = \
 	export_handle.c export_handle.h \
 	log_handle.c log_handle.h \
 	regfexport.c \
-	regfoutput.c regfoutput.h \
+	regftools_getopt.c regftools_getopt.h \
+	regftools_i18n.h \
 	regftools_libbfio.h \
 	regftools_libcerror.h \
 	regftools_libclocale.h \
 	regftools_libcnotify.h \
-	regftools_libcsystem.h \
 	regftools_libfdata.h \
 	regftools_libfdatetime.h \
 	regftools_libfwnt.h \
 	regftools_libregf.h \
-	regftools_libuna.h
+	regftools_libuna.h \
+	regftools_output.c regftools_output.h \
+	regftools_signal.c regftools_signal.h \
+	regftools_unused.h
 
 regfexport_LDADD = \
-	@LIBCSYSTEM_LIBADD@ \
-	../libregf/libregf.la \
 	@LIBCNOTIFY_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
+	../libregf/libregf.la \
 	@LIBCERROR_LIBADD@ \
 	@LIBINTL@
 
 regfinfo_SOURCES = \
 	info_handle.c info_handle.h \
 	regfinfo.c \
-	regfoutput.c regfoutput.h \
+	regftools_getopt.c regftools_getopt.h \
+	regftools_i18n.h \
 	regftools_libbfio.h \
 	regftools_libcerror.h \
 	regftools_libclocale.h \
 	regftools_libcnotify.h \
-	regftools_libcsystem.h \
 	regftools_libfdata.h \
 	regftools_libfdatetime.h \
 	regftools_libfwnt.h \
 	regftools_libregf.h \
-	regftools_libuna.h
+	regftools_libuna.h \
+	regftools_output.c regftools_output.h \
+	regftools_signal.c regftools_signal.h \
+	regftools_unused.h
 
 regfinfo_LDADD = \
-	@LIBCSYSTEM_LIBADD@ \
-	../libregf/libregf.la \
 	@LIBCNOTIFY_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
+	../libregf/libregf.la \
 	@LIBCERROR_LIBADD@ \
 	@LIBINTL@
 
 regfmount_SOURCES = \
 	mount_handle.c mount_handle.h \
 	regfmount.c \
-	regfoutput.c regfoutput.h \
+	regftools_getopt.c regftools_getopt.h \
+	regftools_i18n.h \
 	regftools_libbfio.h \
 	regftools_libcerror.h \
 	regftools_libclocale.h \
 	regftools_libcnotify.h \
-	regftools_libcsystem.h \
 	regftools_libfdata.h \
 	regftools_libfdatetime.h \
 	regftools_libfwnt.h \
 	regftools_libregf.h \
-	regftools_libuna.h
+	regftools_libuna.h \
+	regftools_output.c regftools_output.h \
+	regftools_signal.c regftools_signal.h \
+	regftools_unused.h
 
 regfmount_LDADD = \
 	@LIBFUSE_LIBADD@ \
-	@LIBCSYSTEM_LIBADD@ \
-	../libregf/libregf.la \
 	@LIBCNOTIFY_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
+	../libregf/libregf.la \
 	@LIBCERROR_LIBADD@ \
 	@LIBINTL@
 

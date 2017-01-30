@@ -1,7 +1,7 @@
 /*
  * Error functions
  *
- * Copyright (C) 2009-2016, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2009-2017, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -267,7 +267,7 @@ void VARARGS(
 	 &exception_traceback );
 
 	string_object = PyObject_Repr(
-			    exception_value );
+	                 exception_value );
 
 #if PY_MAJOR_VERSION >= 3
 	utf8_string_object = PyUnicode_AsUTF8String(

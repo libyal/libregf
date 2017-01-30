@@ -1,7 +1,7 @@
 /*
  * Common output functions for the regftools
  *
- * Copyright (C) 2009-2016, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2009-2017, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -19,16 +19,22 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _REGFOUTPUT_H )
-#define _REGFOUTPUT_H
+#if !defined( _REGFTOOLS_OUTPUT_H )
+#define _REGFTOOLS_OUTPUT_H
 
 #include <common.h>
 #include <file_stream.h>
 #include <types.h>
 
+#include "regftools_libcerror.h"
+
 #if defined( __cplusplus )
 extern "C" {
 #endif
+
+int regftools_output_initialize(
+     int stdio_mode,
+     libcerror_error_t **error );
 
 void regfoutput_copyright_fprint(
       FILE *stream );
@@ -45,5 +51,5 @@ void regfoutput_version_detailed_fprint(
 }
 #endif
 
-#endif /* !defined( _REGFOUTPUT_H ) */
+#endif /* !defined( _REGFTOOLS_OUTPUT_H ) */
 

@@ -1,7 +1,7 @@
 /*
  * Shows information obtained from a Windows NT Registry File (REGF)
  *
- * Copyright (C) 2009-2016, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2009-2017, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -35,12 +35,14 @@
 #endif
 
 #include "info_handle.h"
-#include "regfoutput.h"
+#include "regftools_getopt.h"
 #include "regftools_libcerror.h"
 #include "regftools_libclocale.h"
 #include "regftools_libcnotify.h"
-#include "regftools_libcsystem.h"
 #include "regftools_libregf.h"
+#include "regftools_output.h"
+#include "regftools_signal.h"
+#include "regftools_unused.h"
 
 info_handle_t *regfinfo_info_handle = NULL;
 int regfinfo_abort                  = 0;
@@ -74,12 +76,12 @@ void usage_fprint(
 /* Signal handler for regfinfo
  */
 void regfinfo_signal_handler(
-      libcsystem_signal_t signal LIBCSYSTEM_ATTRIBUTE_UNUSED )
+      regftools_signal_t signal REGFTOOLS_ATTRIBUTE_UNUSED )
 {
 	libcerror_error_t *error = NULL;
 	static char *function   = "regfinfo_signal_handler";
 
-	LIBCSYSTEM_UNREFERENCED_PARAMETER( signal )
+	REGFTOOLS_UNREFERENCED_PARAMETER( signal )
 
 	regfinfo_abort = 1;
 
@@ -101,8 +103,13 @@ void regfinfo_signal_handler(
 	}
 	/* Force stdin to close otherwise any function reading it will remain blocked
 	 */
-	if( libcsystem_file_io_close(
+#if defined( WINAPI ) && !defined( __CYGWIN__ )
+	if( _close(
 	     0 ) != 0 )
+#else
+	if( close(
+	     0 ) != 0 )
+#endif
 	{
 		libcnotify_printf(
 		 "%s: unable to close stdin.\n",
@@ -142,13 +149,13 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-	if( libcsystem_initialize(
+	if( regftools_output_initialize(
 	     _IONBF,
 	     &error ) != 1 )
 	{
 		fprintf(
 		 stderr,
-		 "Unable to initialize system values.\n" );
+		 "Unable to initialize output settings.\n" );
 
 		goto on_error;
 	}
@@ -156,7 +163,7 @@ int main( int argc, char * const argv[] )
 	 stdout,
 	 program );
 
-	while( ( option = libcsystem_getopt(
+	while( ( option = regftools_getopt(
 	                   argc,
 	                   argv,
 	                   _SYSTEM_STRING( "c:hvV" ) ) ) != (system_integer_t) -1 )

@@ -1,7 +1,7 @@
 /*
- * Python object definition of the libregf key
+ * Python object wrapper of libregf_key_t
  *
- * Copyright (C) 2009-2016, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2009-2017, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -92,7 +92,7 @@ PyObject *pyregf_key_get_number_of_sub_keys(
            PyObject *arguments );
 
 PyObject *pyregf_key_get_sub_key_by_index(
-           pyregf_key_t *pyregf_key,
+           PyObject *pyregf_key,
            int sub_key_index );
 
 PyObject *pyregf_key_get_sub_key(
@@ -119,7 +119,7 @@ PyObject *pyregf_key_get_number_of_values(
            PyObject *arguments );
 
 PyObject *pyregf_key_get_value_by_index(
-           pyregf_key_t *pyregf_key,
+           PyObject *pyregf_key,
            int value_index );
 
 PyObject *pyregf_key_get_value(

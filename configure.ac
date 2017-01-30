@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libregf],
- [20161219],
+ [20170130],
  [joachim.metz@gmail.com])
 
 AC_CONFIG_SRCDIR(
@@ -96,11 +96,11 @@ AX_LIBFWNT_CHECK_ENABLE
 dnl Check for library function support
 AX_LIBREGF_CHECK_LOCAL
 
-dnl Check for enabling libcsystem for cross-platform C generic system functions
-AX_LIBCSYSTEM_CHECK_ENABLE
-
 dnl Check for libfuse Filesystem in Userspace (FUSE) support
 AX_LIBFUSE_CHECK_ENABLE
+
+dnl Check for regftools function support
+AX_REGFTOOLS_CHECK_LOCAL
 
 dnl Check for functions
 AS_IF(
@@ -178,7 +178,7 @@ AS_IF(
  ])
 
 AS_IF(
- [test "x$ac_cv_libcsystem" = xyes || test "x$ac_cv_libfuse" != xno],
+ [test "x$ac_cv_libfuse" != xno],
  [AC_SUBST(
   [libregf_spec_tools_build_requires],
   [BuildRequires:])
@@ -218,7 +218,6 @@ AC_CONFIG_FILES([libfdata/Makefile])
 AC_CONFIG_FILES([libfdatetime/Makefile])
 AC_CONFIG_FILES([libfwnt/Makefile])
 AC_CONFIG_FILES([libregf/Makefile])
-AC_CONFIG_FILES([libcsystem/Makefile])
 AC_CONFIG_FILES([regftools/Makefile])
 AC_CONFIG_FILES([pyregf/Makefile])
 AC_CONFIG_FILES([pyregf-python2/Makefile])
@@ -263,7 +262,6 @@ Building:
    libfdata support:                          $ac_cv_libfdata
    libfdatetime support:                      $ac_cv_libfdatetime
    libfwnt support:                           $ac_cv_libfwnt
-   libcsystem support:                        $ac_cv_libcsystem
    FUSE support:                              $ac_cv_libfuse
 
 Features:

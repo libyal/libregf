@@ -18,7 +18,6 @@ SUBDIRS = \
 	libfdatetime \
 	libfwnt \
 	libregf \
-	libcsystem \
 	regftools \
 	pyregf \
 	pyregf-python2 \
@@ -122,7 +121,6 @@ splint:
 	(cd $(srcdir)/libfdatetime && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libfwnt && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/libregf && $(MAKE) splint $(AM_MAKEFLAGS))
-	(cd $(srcdir)/libcsystem && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/regftools && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/pyregf && $(MAKE) splint $(AM_MAKEFLAGS))
 	(cd $(srcdir)/po && $(MAKE) splint $(AM_MAKEFLAGS))

@@ -1,7 +1,7 @@
 /*
  * Python object definition of the libregf value types
  *
- * Copyright (C) 2009-2016, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2009-2017, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -50,14 +50,14 @@ PyObject *pyregf_value_types_new(
            void );
 
 int pyregf_value_types_init(
-     pyregf_value_types_t *pyregf_value_types );
+     pyregf_value_types_t *definitions_object );
 
 void pyregf_value_types_free(
-      pyregf_value_types_t *pyregf_value_types );
+      pyregf_value_types_t *definitions_object );
 
 #if defined( __cplusplus )
 }
 #endif
 
-#endif
+#endif /* !defined( _PYREGF_VALUE_TYPES_H ) */
 

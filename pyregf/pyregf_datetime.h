@@ -1,7 +1,7 @@
 /*
  * Date and time functions
  *
- * Copyright (c) 2009-2019, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2009-2017, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -37,6 +37,9 @@ PyObject *pyregf_datetime_new_from_fat_date_time(
 PyObject *pyregf_datetime_new_from_filetime(
            uint64_t filetime );
 
+PyObject *pyregf_datetime_new_from_floatingtime(
+           uint64_t floatingtime );
+
 PyObject *pyregf_datetime_new_from_posix_time(
            uint32_t posix_time );
 
@@ -44,5 +47,5 @@ PyObject *pyregf_datetime_new_from_posix_time(
 }
 #endif
 
-#endif
+#endif /* !defined( _PYREGF_DATETIME_H ) */
 

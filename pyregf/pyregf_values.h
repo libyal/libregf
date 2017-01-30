@@ -1,7 +1,7 @@
 /*
- * Python object definition of the values sequence and iterator
+ * Python object definition of the sequence and iterator object of values
  *
- * Copyright (C) 2009-2016, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2009-2017, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -25,7 +25,6 @@
 #include <common.h>
 #include <types.h>
 
-#include "pyregf_key.h"
 #include "pyregf_libregf.h"
 #include "pyregf_python.h"
 
@@ -41,56 +40,56 @@ struct pyregf_values
 	 */
 	PyObject_HEAD
 
-	/* The pyregf key object
+	/* The parent object
 	 */
-	pyregf_key_t *key_object;
+	PyObject *parent_object;
 
-	/* The get value by index callback function
+	/* The get item by index callback function
 	 */
-	PyObject* (*get_value_by_index)(
-	             pyregf_key_t *key_object,
-	             int value_index );
+	PyObject* (*get_item_by_index)(
+	             PyObject *parent_object,
+	             int index );
 
-	/* The (current) value index
+	/* The current index
 	 */
-	int value_index;
+	int current_index;
 
-	/* The number of values
+	/* The number of items
 	 */
-	int number_of_values;
+	int number_of_items;
 };
 
 extern PyTypeObject pyregf_values_type_object;
 
 PyObject *pyregf_values_new(
-           pyregf_key_t *key_object,
-           PyObject* (*get_value_by_index)(
-                        pyregf_key_t *key_object,
-                        int value_index ),
-           int number_of_values );
+           PyObject *parent_object,
+           PyObject* (*get_item_by_index)(
+                        PyObject *parent_object,
+                        int index ),
+           int number_of_items );
 
 int pyregf_values_init(
-     pyregf_values_t *pyregf_values );
+     pyregf_values_t *values_object );
 
 void pyregf_values_free(
-      pyregf_values_t *pyregf_values );
+      pyregf_values_t *values_object );
 
 Py_ssize_t pyregf_values_len(
-            pyregf_values_t *pyregf_values );
+            pyregf_values_t *values_object );
 
 PyObject *pyregf_values_getitem(
-           pyregf_values_t *pyregf_values,
+           pyregf_values_t *values_object,
            Py_ssize_t item_index );
 
 PyObject *pyregf_values_iter(
-           pyregf_values_t *pyregf_values );
+           pyregf_values_t *values_object );
 
 PyObject *pyregf_values_iternext(
-           pyregf_values_t *pyregf_values );
+           pyregf_values_t *values_object );
 
 #if defined( __cplusplus )
 }
 #endif
 
-#endif
+#endif /* !defined( _PYREGF_VALUES_H ) */
 

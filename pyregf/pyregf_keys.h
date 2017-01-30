@@ -1,7 +1,7 @@
 /*
- * Python object definition of the keys sequence and iterator
+ * Python object definition of the sequence and iterator object of keys
  *
- * Copyright (C) 2009-2016, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2009-2017, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -25,7 +25,6 @@
 #include <common.h>
 #include <types.h>
 
-#include "pyregf_key.h"
 #include "pyregf_libregf.h"
 #include "pyregf_python.h"
 
@@ -41,56 +40,56 @@ struct pyregf_keys
 	 */
 	PyObject_HEAD
 
-	/* The pyregf key object
+	/* The parent object
 	 */
-	pyregf_key_t *key_object;
+	PyObject *parent_object;
 
-	/* The get sub key by index callback function
+	/* The get item by index callback function
 	 */
-	PyObject* (*get_sub_key_by_index)(
-	             pyregf_key_t *key_object,
-	             int sub_key_index );
+	PyObject* (*get_item_by_index)(
+	             PyObject *parent_object,
+	             int index );
 
-	/* The (current) sub key index
+	/* The current index
 	 */
-	int sub_key_index;
+	int current_index;
 
-	/* The number of sub keys
+	/* The number of items
 	 */
-	int number_of_sub_keys;
+	int number_of_items;
 };
 
 extern PyTypeObject pyregf_keys_type_object;
 
 PyObject *pyregf_keys_new(
-           pyregf_key_t *key_object,
-           PyObject* (*get_sub_key_by_index)(
-                        pyregf_key_t *key_object,
-                        int sub_key_index ),
-           int number_of_sub_keys );
+           PyObject *parent_object,
+           PyObject* (*get_item_by_index)(
+                        PyObject *parent_object,
+                        int index ),
+           int number_of_items );
 
 int pyregf_keys_init(
-     pyregf_keys_t *pyregf_keys );
+     pyregf_keys_t *keys_object );
 
 void pyregf_keys_free(
-      pyregf_keys_t *pyregf_keys );
+      pyregf_keys_t *keys_object );
 
 Py_ssize_t pyregf_keys_len(
-            pyregf_keys_t *pyregf_keys );
+            pyregf_keys_t *keys_object );
 
 PyObject *pyregf_keys_getitem(
-           pyregf_keys_t *pyregf_keys,
+           pyregf_keys_t *keys_object,
            Py_ssize_t item_index );
 
 PyObject *pyregf_keys_iter(
-           pyregf_keys_t *pyregf_keys );
+           pyregf_keys_t *keys_object );
 
 PyObject *pyregf_keys_iternext(
-           pyregf_keys_t *pyregf_keys );
+           pyregf_keys_t *keys_object );
 
 #if defined( __cplusplus )
 }
 #endif
 
-#endif
+#endif /* !defined( _PYREGF_KEYS_H ) */
 

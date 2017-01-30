@@ -1,7 +1,7 @@
 /*
  * The libbfio header wrapper
  *
- * Copyright (C) 2009-2016, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2009-2017, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -48,7 +48,7 @@
 
 #include <libbfio.h>
 
-#endif
+#endif /* defined( HAVE_LOCAL_LIBBFIO ) */
 
-#endif
+#endif /* !defined( _PYREGF_LIBBFIO_H ) */
 

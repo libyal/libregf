@@ -1,7 +1,7 @@
 /*
- * Python object definition of the libregf file
+ * Python object wrapper of libregf_file_t
  *
- * Copyright (C) 2009-2016, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2009-2017, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -40,13 +40,15 @@
 #include "pyregf_unused.h"
 
 #if !defined( LIBREGF_HAVE_BFIO )
+
 LIBREGF_EXTERN \
 int libregf_file_open_file_io_handle(
      libregf_file_t *file,
      libbfio_handle_t *file_io_handle,
      int access_flags,
      libregf_error_t **error );
-#endif
+
+#endif /* !defined( LIBREGF_HAVE_BFIO ) */
 
 PyMethodDef pyregf_file_object_methods[] = {
 
@@ -766,6 +768,16 @@ PyObject *pyregf_file_open_file_object(
 		 mode );
 
 		return( NULL );
+	}
+	if( pyregf_file->file_io_handle != NULL )
+	{
+		pyregf_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: invalid file - file IO handle already set.",
+		 function );
+
+		goto on_error;
 	}
 	if( pyregf_file_object_initialize(
 	     &( pyregf_file->file_io_handle ),

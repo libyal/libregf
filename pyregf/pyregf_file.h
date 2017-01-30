@@ -1,7 +1,7 @@
 /*
- * Python object definition of the libregf file
+ * Python object wrapper of libregf_file_t
  *
- * Copyright (C) 2009-2016, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2009-2017, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -133,5 +133,5 @@ PyObject *pyregf_file_get_key_by_path(
 }
 #endif
 
-#endif
+#endif /* !defined( _PYREGF_FILE_H ) */
 

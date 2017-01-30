@@ -1,7 +1,7 @@
 /*
  * Python object definition of the libregf value types
  *
- * Copyright (C) 2009-2016, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2009-2017, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -26,10 +26,10 @@
 #include <stdlib.h>
 #endif
 
+#include "pyregf_value_types.h"
 #include "pyregf_libregf.h"
 #include "pyregf_python.h"
 #include "pyregf_unused.h"
-#include "pyregf_value_types.h"
 
 PyTypeObject pyregf_value_types_type_object = {
 	PyVarObject_HEAD_INIT( NULL, 0 )
@@ -70,7 +70,7 @@ PyTypeObject pyregf_value_types_type_object = {
 	0,
 	/* tp_as_buffer */
 	0,
-	/* tp_types */
+	/* tp_flags */
 	Py_TPFLAGS_DEFAULT,
 	/* tp_doc */
 	"pyregf value types object (wraps LIBREGF_VALUE_TYPES)",
@@ -300,10 +300,10 @@ int pyregf_value_types_init_type(
 	}
 #if PY_MAJOR_VERSION >= 3
 	value_object = PyLong_FromLong(
-	                LIBREGF_VALUE_TYPE_INTEGER_32BIT_LITTLE_ENDIAN );
+	                LIBREGF_VALUE_TYPE_INTEGER_64BIT_LITTLE_ENDIAN );
 #else
 	value_object = PyInt_FromLong(
-	                LIBREGF_VALUE_TYPE_INTEGER_32BIT_LITTLE_ENDIAN );
+	                LIBREGF_VALUE_TYPE_INTEGER_64BIT_LITTLE_ENDIAN );
 #endif
 	if( PyDict_SetItemString(
 	     type_object->tp_dict,
@@ -331,39 +331,39 @@ on_error:
 PyObject *pyregf_value_types_new(
            void )
 {
-	pyregf_value_types_t *pyregf_value_types = NULL;
+	pyregf_value_types_t *definitions_object = NULL;
 	static char *function                    = "pyregf_value_types_new";
 
-	pyregf_value_types = PyObject_New(
+	definitions_object = PyObject_New(
 	                      struct pyregf_value_types,
 	                      &pyregf_value_types_type_object );
 
-	if( pyregf_value_types == NULL )
+	if( definitions_object == NULL )
 	{
 		PyErr_Format(
 		 PyExc_MemoryError,
-		 "%s: unable to initialize value types.",
+		 "%s: unable to create definitions object.",
 		 function );
 
 		goto on_error;
 	}
 	if( pyregf_value_types_init(
-	     pyregf_value_types ) != 0 )
+	     definitions_object ) != 0 )
 	{
 		PyErr_Format(
 		 PyExc_MemoryError,
-		 "%s: unable to initialize value types.",
+		 "%s: unable to initialize definitions object.",
 		 function );
 
 		goto on_error;
 	}
-	return( (PyObject *) pyregf_value_types );
+	return( (PyObject *) definitions_object );
 
 on_error:
-	if( pyregf_value_types != NULL )
+	if( definitions_object != NULL )
 	{
 		Py_DecRef(
-		 (PyObject *) pyregf_value_types );
+		 (PyObject *) definitions_object );
 	}
 	return( NULL );
 }
@@ -372,15 +372,15 @@ on_error:
  * Returns 0 if successful or -1 on error
  */
 int pyregf_value_types_init(
-     pyregf_value_types_t *pyregf_value_types )
+     pyregf_value_types_t *definitions_object )
 {
 	static char *function = "pyregf_value_types_init";
 
-	if( pyregf_value_types == NULL )
+	if( definitions_object == NULL )
 	{
 		PyErr_Format(
 		 PyExc_TypeError,
-		 "%s: invalid value types.",
+		 "%s: invalid definitions object.",
 		 function );
 
 		return( -1 );
@@ -391,22 +391,22 @@ int pyregf_value_types_init(
 /* Frees a value types object
  */
 void pyregf_value_types_free(
-      pyregf_value_types_t *pyregf_value_types )
+      pyregf_value_types_t *definitions_object )
 {
 	struct _typeobject *ob_type = NULL;
 	static char *function       = "pyregf_value_types_free";
 
-	if( pyregf_value_types == NULL )
+	if( definitions_object == NULL )
 	{
 		PyErr_Format(
 		 PyExc_TypeError,
-		 "%s: invalid value types.",
+		 "%s: invalid definitions object.",
 		 function );
 
 		return;
 	}
 	ob_type = Py_TYPE(
-	           pyregf_value_types );
+	           definitions_object );
 
 	if( ob_type == NULL )
 	{
@@ -427,6 +427,6 @@ void pyregf_value_types_free(
 		return;
 	}
 	ob_type->tp_free(
-	 (PyObject*) pyregf_value_types );
+	 (PyObject*) definitions_object );
 }
 

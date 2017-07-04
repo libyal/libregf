@@ -33,13 +33,12 @@ DPKG_FILES = \
 	dpkg/compat \
 	dpkg/control \
 	dpkg/copyright \
-	dpkg/copyright.in \
 	dpkg/rules \
-	dpkg/libregf.docs \
-	dpkg/libregf-dev.docs \
-	dpkg/libregf-python.docs \
-	dpkg/libregf-python3.docs \
-	dpkg/libregf-tools.docs \
+	dpkg/libregf.install \
+	dpkg/libregf-dev.install \
+	dpkg/libregf-python.install \
+	dpkg/libregf-python3.install \
+	dpkg/libregf-tools.install \
 	dpkg/source/format
 
 GETTEXT_FILES = \

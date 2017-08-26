@@ -526,6 +526,19 @@ int libregf_file_open_file_io_handle(
 
 		return( -1 );
 	}
+	internal_file = (libregf_internal_file_t *) file;
+
+	if( internal_file->file_io_handle != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid file - file IO handle already set.",
+		 function );
+
+		return( -1 );
+	}
 	if( file_io_handle == NULL )
 	{
 		libcerror_error_set(
@@ -560,8 +573,6 @@ int libregf_file_open_file_io_handle(
 
 		return( -1 );
 	}
-	internal_file = (libregf_internal_file_t *) file;
-
 	if( ( access_flags & LIBREGF_ACCESS_FLAG_READ ) != 0 )
 	{
 		bfio_access_flags = LIBBFIO_ACCESS_FLAG_READ;

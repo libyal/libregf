@@ -48,13 +48,13 @@ int main(
 	REGF_TEST_UNREFERENCED_PARAMETER( argc )
 	REGF_TEST_UNREFERENCED_PARAMETER( argv )
 
-#if defined( __GNUC__ )
+#if defined( __GNUC__ ) && !defined( LIBREGF_DLL_IMPORT )
 
 	/* TODO: add tests for libregf_data_type_get_identifier */
 
 	/* TODO: add tests for libregf_data_type_get_description */
 
-#endif /* defined( __GNUC__ ) */
+#endif /* defined( __GNUC__ ) && !defined( LIBREGF_DLL_IMPORT ) */
 
 	return( EXIT_SUCCESS );
 

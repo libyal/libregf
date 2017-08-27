@@ -35,7 +35,7 @@
 
 #include "../libregf/libregf_hive_bins_list.h"
 
-#if defined( __GNUC__ )
+#if defined( __GNUC__ ) && !defined( LIBREGF_DLL_IMPORT )
 
 /* Tests the libregf_hive_bins_list_free function
  * Returns 1 if successful or 0 if not
@@ -75,7 +75,7 @@ on_error:
 	return( 0 );
 }
 
-#endif /* defined( __GNUC__ ) */
+#endif /* defined( __GNUC__ ) && !defined( LIBREGF_DLL_IMPORT ) */
 
 /* The main program
  */
@@ -92,7 +92,7 @@ int main(
 	REGF_TEST_UNREFERENCED_PARAMETER( argc )
 	REGF_TEST_UNREFERENCED_PARAMETER( argv )
 
-#if defined( __GNUC__ )
+#if defined( __GNUC__ ) && !defined( LIBREGF_DLL_IMPORT )
 
 	/* TODO: add tests for libregf_hive_bins_list_initialize */
 
@@ -106,7 +106,7 @@ int main(
 
 	/* TODO: add tests for libregf_hive_bins_list_read_element_data */
 
-#endif /* defined( __GNUC__ ) */
+#endif /* defined( __GNUC__ ) && !defined( LIBREGF_DLL_IMPORT ) */
 
 	return( EXIT_SUCCESS );
 

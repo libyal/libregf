@@ -73,9 +73,9 @@ on_error:
 	return( 0 );
 }
 
-#if defined( __GNUC__ )
+#if defined( __GNUC__ ) && !defined( LIBREGF_DLL_IMPORT )
 
-#endif /* defined( __GNUC__ ) */
+#endif /* defined( __GNUC__ ) && !defined( LIBREGF_DLL_IMPORT ) */
 
 /* The main program
  */
@@ -92,17 +92,17 @@ int main(
 	REGF_TEST_UNREFERENCED_PARAMETER( argc )
 	REGF_TEST_UNREFERENCED_PARAMETER( argv )
 
-#if defined( __GNUC__ )
+#if defined( __GNUC__ ) && !defined( LIBREGF_DLL_IMPORT )
 
 	/* TODO: add tests for libregf_key_initialize */
 
-#endif /* defined( __GNUC__ ) */
+#endif /* defined( __GNUC__ ) && !defined( LIBREGF_DLL_IMPORT ) */
 
 	REGF_TEST_RUN(
 	 "libregf_key_free",
 	 regf_test_key_free );
 
-#if defined( __GNUC__ )
+#if defined( __GNUC__ ) && !defined( LIBREGF_DLL_IMPORT )
 
 	/* TODO: add tests for libregf_key_is_corrupted */
 
@@ -158,7 +158,7 @@ int main(
 
 	/* TODO: add tests for libregf_key_get_sub_key_by_utf16_path */
 
-#endif /* defined( __GNUC__ ) */
+#endif /* defined( __GNUC__ ) && !defined( LIBREGF_DLL_IMPORT ) */
 
 	return( EXIT_SUCCESS );
 

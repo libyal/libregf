@@ -35,7 +35,7 @@
 
 #include "../libregf/libregf_key_item.h"
 
-#if defined( __GNUC__ )
+#if defined( __GNUC__ ) && !defined( LIBREGF_DLL_IMPORT )
 
 /* Tests the libregf_key_item_initialize function
  * Returns 1 if successful or 0 if not
@@ -393,7 +393,7 @@ on_error:
 	return( 0 );
 }
 
-#endif /* defined( __GNUC__ ) */
+#endif /* defined( __GNUC__ ) && !defined( LIBREGF_DLL_IMPORT ) */
 
 /* The main program
  */
@@ -410,7 +410,7 @@ int main(
 	REGF_TEST_UNREFERENCED_PARAMETER( argc )
 	REGF_TEST_UNREFERENCED_PARAMETER( argv )
 
-#if defined( __GNUC__ )
+#if defined( __GNUC__ ) && !defined( LIBREGF_DLL_IMPORT )
 
 	REGF_TEST_RUN(
 	 "libregf_key_item_initialize",
@@ -440,7 +440,7 @@ int main(
 
 	/* TODO: add tests for libregf_key_item_compare_name_with_utf16_string */
 
-#endif /* defined( __GNUC__ ) */
+#endif /* defined( __GNUC__ ) && !defined( LIBREGF_DLL_IMPORT ) */
 
 	return( EXIT_SUCCESS );
 

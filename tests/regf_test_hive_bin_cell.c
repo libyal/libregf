@@ -64,13 +64,13 @@ int regf_test_hive_bin_cell_initialize(
 	 result,
 	 1 );
 
-        REGF_TEST_ASSERT_IS_NOT_NULL(
-         "hive_bin_cell",
-         hive_bin_cell );
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "hive_bin_cell",
+	 hive_bin_cell );
 
-        REGF_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	REGF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	result = libregf_hive_bin_cell_free(
 	          &hive_bin_cell,
@@ -81,13 +81,13 @@ int regf_test_hive_bin_cell_initialize(
 	 result,
 	 1 );
 
-        REGF_TEST_ASSERT_IS_NULL(
-         "hive_bin_cell",
-         hive_bin_cell );
+	REGF_TEST_ASSERT_IS_NULL(
+	 "hive_bin_cell",
+	 hive_bin_cell );
 
-        REGF_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	REGF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test error cases
 	 */
@@ -100,9 +100,9 @@ int regf_test_hive_bin_cell_initialize(
 	 result,
 	 -1 );
 
-        REGF_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -118,9 +118,9 @@ int regf_test_hive_bin_cell_initialize(
 	 result,
 	 -1 );
 
-        REGF_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -252,9 +252,9 @@ int regf_test_hive_bin_cell_free(
 	 result,
 	 -1 );
 
-        REGF_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );

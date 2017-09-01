@@ -55,9 +55,9 @@ int regf_test_key_free(
 	 result,
 	 -1 );
 
-        REGF_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );

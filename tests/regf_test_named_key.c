@@ -64,13 +64,13 @@ int regf_test_named_key_initialize(
 	 result,
 	 1 );
 
-        REGF_TEST_ASSERT_IS_NOT_NULL(
-         "named_key",
-         named_key );
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "named_key",
+	 named_key );
 
-        REGF_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	REGF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	result = libregf_named_key_free(
 	          &named_key,
@@ -81,13 +81,13 @@ int regf_test_named_key_initialize(
 	 result,
 	 1 );
 
-        REGF_TEST_ASSERT_IS_NULL(
-         "named_key",
-         named_key );
+	REGF_TEST_ASSERT_IS_NULL(
+	 "named_key",
+	 named_key );
 
-        REGF_TEST_ASSERT_IS_NULL(
-         "error",
-         error );
+	REGF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test error cases
 	 */
@@ -100,9 +100,9 @@ int regf_test_named_key_initialize(
 	 result,
 	 -1 );
 
-        REGF_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -118,9 +118,9 @@ int regf_test_named_key_initialize(
 	 result,
 	 -1 );
 
-        REGF_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );
@@ -252,9 +252,9 @@ int regf_test_named_key_free(
 	 result,
 	 -1 );
 
-        REGF_TEST_ASSERT_IS_NOT_NULL(
-         "error",
-         error );
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
 	libcerror_error_free(
 	 &error );

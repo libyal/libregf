@@ -53,6 +53,25 @@ AC_DEFUN([AX_REGFTOOLS_CHECK_LOCAL],
      [1])
   ])
 
+  dnl Headers included in regftools/log_handle.c
+  AC_CHECK_HEADERS([stdarg.h varargs.h])
+
+  AS_IF(
+    [test "x$ac_cv_header_stdarg_h" != xyes && test "x$ac_cv_header_varargs_h" != xyes],
+    [AC_MSG_FAILURE(
+      [Missing headers: stdarg.h and varargs.h],
+      [1])
+  ])
+
+  dnl Headers included in regftools/regfmount.c
+  AC_CHECK_HEADERS([errno.h])
+
+  dnl Functions included in regftools/regfmount.c
+  AS_IF(
+    [test "x$ac_cv_enable_winapi" = xno],
+    [AC_CHECK_FUNCS([getegid geteuid])
+  ])
+
   dnl Check if tools should be build as static executables
   AX_COMMON_CHECK_ENABLE_STATIC_EXECUTABLES
 

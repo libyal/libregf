@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libregf],
- [20170912],
+ [20170917],
  [joachim.metz@gmail.com])
 
 AC_CONFIG_SRCDIR(
@@ -122,11 +122,11 @@ AM_CONDITIONAL(
   HAVE_PYTHON_TESTS,
   [test "x${ac_cv_enable_python}" != xno || test "x${ac_cv_enable_python2}" != xno || test "x${ac_cv_enable_python3}" != xno])
 
+dnl Check if libfuse or required headers and functions are available
+AX_LIBFUSE_CHECK_ENABLE
+
 dnl Check if regftools required headers and functions are available
 AX_REGFTOOLS_CHECK_LOCAL
-
-dnl Check for libfuse Filesystem in Userspace (FUSE) support
-AX_LIBFUSE_CHECK_ENABLE
 
 dnl Check if libregf should be build with verbose output
 AX_COMMON_CHECK_ENABLE_VERBOSE_OUTPUT
@@ -175,7 +175,7 @@ AS_IF(
 AS_IF(
  [test "x$ac_cv_libfuse" != xno],
  [AC_SUBST(
-  [libcreg_spec_tools_build_requires],
+  [libregf_spec_tools_build_requires],
   [BuildRequires:])
  ])
 

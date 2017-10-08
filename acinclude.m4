@@ -1,3 +1,7 @@
+dnl Checks for required headers and functions
+dnl
+dnl Version: 20170917
+
 dnl Function to detect if libregf dependencies are available
 AC_DEFUN([AX_LIBREGF_CHECK_LOCAL],
   [dnl Headers included in libregf/libregf_file.h, libregf/libregf_key.h

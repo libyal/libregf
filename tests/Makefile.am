@@ -80,17 +80,24 @@ regf_test_error_LDADD = \
 
 regf_test_file_SOURCES = \
 	regf_test_file.c \
+	regf_test_functions.c regf_test_functions.h \
 	regf_test_getopt.c regf_test_getopt.h \
+	regf_test_libbfio.h \
 	regf_test_libcerror.h \
 	regf_test_libclocale.h \
 	regf_test_libcnotify.h \
 	regf_test_libregf.h \
 	regf_test_libuna.h \
 	regf_test_macros.h \
-	regf_test_memory.c regf_test_memory.h
+	regf_test_memory.c regf_test_memory.h \
+	regf_test_unused.h
 
 regf_test_file_LDADD = \
+	@LIBBFIO_LIBADD@ \
+	@LIBCPATH_LIBADD@ \
+	@LIBCFILE_LIBADD@ \
 	@LIBUNA_LIBADD@ \
+	@LIBCSPLIT_LIBADD@ \
 	@LIBCNOTIFY_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
 	@LIBCDATA_LIBADD@ \
@@ -193,6 +200,7 @@ regf_test_notify_LDADD = \
 	../libregf/libregf.la
 
 regf_test_support_SOURCES = \
+	regf_test_functions.c regf_test_functions.h \
 	regf_test_getopt.c regf_test_getopt.h \
 	regf_test_libbfio.h \
 	regf_test_libcerror.h \
@@ -201,7 +209,8 @@ regf_test_support_SOURCES = \
 	regf_test_libregf.h \
 	regf_test_libuna.h \
 	regf_test_macros.h \
-	regf_test_support.c
+	regf_test_support.c \
+	regf_test_unused.h
 
 regf_test_support_LDADD = \
 	@LIBBFIO_LIBADD@ \

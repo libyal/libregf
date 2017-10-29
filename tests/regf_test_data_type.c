@@ -33,6 +33,8 @@
 #include "regf_test_memory.h"
 #include "regf_test_unused.h"
 
+#include "../libregf/libregf_data_type.h"
+
 /* The main program
  */
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )

@@ -337,31 +337,27 @@ The offset value is in bytes and relative from the start of the hive bin data
 The offset value is in bytes and relative from the start of the hive bin data +
 Refers to a sub keys list or contains -1 (0xffffffff) if empty. +
 See section: <<sub_key_list,Sub key list>>
-| 32 | 4 | | Volatile sub keys list offset +
-The offset value is in bytes and relative from the start of the hive bin data +
-Refers to a sub keys list or contains -1 (0xffffffff) if empty. +
-See section: <<sub_key_list,Sub key list>>
-| 36 | 4 | | number of values
-| 40 | 4 | | Values list offset +
+| 32 | 4 | | number of values
+| 36 | 4 | | Values list offset +
 The offset value is in bytes and relative from the start of the hive bin data +
 Refers to a values list or -1 (0xffffffff) if empty. +
 See section: <<values_list,Values list>>
-| 44 | 4 | | Security key offset +
+| 40 | 4 | | Security key offset +
 The offset value is in bytes and relative from the start of the hive bin data +
 Refers to a security key or -1 (0xffffffff) if empty. +
 See section: <<security_key,Security key>>
-| 48 | 4 | | Class name offset +
+| 44 | 4 | | Class name offset +
 The offset value is in bytes and relative from the start of the hive bin data +
 Refers to a class name or -1 (0xffffffff) if empty.
-| 52 | 4 | | Largest sub key name size
-| 56 | 4 | | Largest sub key class name size
-| 60 | 4 | | Largest value name size
-| 64 | 4 | | Largest value data size
-| 68 | 4 | | [yellow-background]*Unknown* +
+| 48 | 4 | | Largest sub key name size
+| 52 | 4 | | Largest sub key class name size
+| 56 | 4 | | Largest value name size
+| 60 | 4 | | Largest value data size
+| 64 | 4 | | [yellow-background]*Unknown* +
 [yellow-background]*Some run-time caching index or hash?*
-| 72 | 2 | | Key name size
-| 74 | 2 | | Class name size
-| 76 | ... | | Key name string +
+| 68 | 2 | | Key name size
+| 70 | 2 | | Class name size
+| 72 | ... | | Key name string +
 ASCII or Unicode string not terminated by an end-of-string character +
 Maximum of 255 characters
 | ... | ... | | Padding +

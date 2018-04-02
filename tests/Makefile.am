@@ -191,13 +191,15 @@ regf_test_named_key_LDADD = \
 	@LIBCERROR_LIBADD@
 
 regf_test_notify_SOURCES = \
+	regf_test_libcerror.h \
 	regf_test_libregf.h \
 	regf_test_macros.h \
 	regf_test_notify.c \
 	regf_test_unused.h
 
 regf_test_notify_LDADD = \
-	../libregf/libregf.la
+	../libregf/libregf.la \
+	@LIBCERROR_LIBADD@
 
 regf_test_support_SOURCES = \
 	regf_test_functions.c regf_test_functions.h \
@@ -209,6 +211,7 @@ regf_test_support_SOURCES = \
 	regf_test_libregf.h \
 	regf_test_libuna.h \
 	regf_test_macros.h \
+	regf_test_memory.c regf_test_memory.h \
 	regf_test_support.c \
 	regf_test_unused.h
 

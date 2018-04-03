@@ -79,6 +79,7 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "regf_test_notify", "regf_test_notify\regf_test_notify.vcproj", "{34D36749-307F-4135-B3A1-E6F51BBD23E1}"
 	ProjectSection(ProjectDependencies) = postProject
 		{B0C26EAB-22AD-49ED-88A2-D05E54FA17A9} = {B0C26EAB-22AD-49ED-88A2-D05E54FA17A9}
+		{BD3A95FA-A3DE-4B79-A889-A7E5ECA4B69C} = {BD3A95FA-A3DE-4B79-A889-A7E5ECA4B69C}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "regf_test_support", "regf_test_support\regf_test_support.vcproj", "{C1CC8360-2373-4969-95F1-5B7E39098CC7}"

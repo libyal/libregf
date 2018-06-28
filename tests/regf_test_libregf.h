@@ -1,5 +1,5 @@
 /*
- * The internal libregf header
+ * The libregf header wrapper
  *
  * Copyright (C) 2009-2018, Joachim Metz <joachim.metz@gmail.com>
  *

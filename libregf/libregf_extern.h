@@ -28,17 +28,13 @@
  */
 #if !defined( HAVE_LOCAL_LIBREGF )
 
-/* If libtool DLL support is enabled set LIBREGF_DLL_EXPORT
- * before including libregf/extern.h
- */
-#if defined( _WIN32 ) && defined( DLL_EXPORT )
-#define LIBREGF_DLL_EXPORT
-#endif
-
 #include <libregf/extern.h>
 
+#define LIBREGF_EXTERN_VARIABLE	LIBREGF_EXTERN
+
 #else
-#define LIBREGF_EXTERN	/* extern */
+#define LIBREGF_EXTERN		/* extern */
+#define LIBREGF_EXTERN_VARIABLE	extern
 
 #endif /* !defined( HAVE_LOCAL_LIBREGF ) */
 

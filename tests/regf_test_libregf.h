@@ -24,13 +24,6 @@
 
 #include <common.h>
 
-/* If Cygwin libtool DLL support is enabled and do not want to create static
- * executables set LIBREGF_DLL_IMPORT before including libregf.h
- */
-#if defined( _WIN32 ) && defined( DLL_EXPORT ) && !defined( HAVE_STATIC_EXECUTABLES )
-#define LIBREGF_DLL_IMPORT
-#endif
-
 #include <libregf.h>
 
 #endif /* !defined( _REGF_TEST_LIBREGF_H ) */

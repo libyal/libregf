@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libregf],
- [20180812],
+ [20181024],
  [joachim.metz@gmail.com])
 
 AC_CONFIG_SRCDIR(
@@ -163,9 +163,6 @@ AS_IF(
  [AC_SUBST(
   [libregf_spec_requires],
   [Requires:])
- AC_SUBST(
-  [libregf_spec_build_requires],
-  [BuildRequires:])
  ])
 
 AS_IF(

@@ -318,7 +318,7 @@ int libregf_key_item_read_named_key(
 	if( libfdata_list_get_element_value_at_offset(
 	     hive_bins_list->data_list,
 	     (intptr_t *) file_io_handle,
-	     hive_bins_list->data_cache,
+	     (libfdata_cache_t *) hive_bins_list->data_cache,
 	     named_key_offset,
 	     &hive_bin_index,
 	     &hive_bin_data_offset,
@@ -859,7 +859,7 @@ int libregf_key_item_read_named_key(
 	     (intptr_t *) hive_bins_list,
 	     NULL,
 	     NULL,
-	     (int (*)(intptr_t *, intptr_t *, libfdata_list_element_t *, libfcache_cache_t *, int, off64_t, size64_t, uint32_t, uint8_t, libcerror_error_t **)) &libregf_value_item_read_element_data,
+	     (int (*)(intptr_t *, intptr_t *, libfdata_list_element_t *, libfdata_cache_t *, int, off64_t, size64_t, uint32_t, uint8_t, libcerror_error_t **)) &libregf_value_item_read_element_data,
 	     NULL,
 	     LIBFDATA_DATA_HANDLE_FLAG_NON_MANAGED,
 	     error ) != 1 )
@@ -1031,7 +1031,7 @@ int libregf_key_item_read_class_name(
 	if( libfdata_list_get_element_value_at_offset(
 	     hive_bins_list->data_list,
 	     (intptr_t *) file_io_handle,
-	     hive_bins_list->data_cache,
+	     (libfdata_cache_t *) hive_bins_list->data_cache,
 	     (off64_t) class_name_offset,
 	     &hive_bin_index,
 	     &hive_bin_data_offset,
@@ -1266,7 +1266,7 @@ int libregf_key_item_read_security_key(
 	if( libfdata_list_get_element_value_at_offset(
 	     hive_bins_list->data_list,
 	     (intptr_t *) file_io_handle,
-	     hive_bins_list->data_cache,
+	     (libfdata_cache_t *) hive_bins_list->data_cache,
 	     (off64_t) security_key_offset,
 	     &hive_bin_index,
 	     &hive_bin_data_offset,
@@ -1585,7 +1585,7 @@ int libregf_key_item_read_values_list(
 	if( libfdata_list_get_element_value_at_offset(
 	     hive_bins_list->data_list,
 	     (intptr_t *) file_io_handle,
-	     hive_bins_list->data_cache,
+	     (libfdata_cache_t *) hive_bins_list->data_cache,
 	     (off64_t) values_list_offset,
 	     &hive_bin_index,
 	     &hive_bin_data_offset,
@@ -1739,7 +1739,7 @@ int libregf_key_item_read_node_data(
      libregf_hive_bins_list_t *hive_bins_list,
      libbfio_handle_t *file_io_handle,
      libfdata_tree_node_t *node,
-     libfcache_cache_t *cache,
+     libfdata_cache_t *cache,
      int node_data_file_index LIBREGF_ATTRIBUTE_UNUSED,
      off64_t node_data_offset,
      size64_t node_data_size,
@@ -1883,7 +1883,7 @@ int libregf_key_item_read_sub_keys_list(
 	if( libfdata_list_get_element_value_at_offset(
 	     hive_bins_list->data_list,
 	     (intptr_t *) file_io_handle,
-	     hive_bins_list->data_cache,
+	     (libfdata_cache_t *) hive_bins_list->data_cache,
 	     sub_keys_list_offset,
 	     &hive_bin_index,
 	     &hive_bin_data_offset,
@@ -2212,7 +2212,7 @@ int libregf_key_item_read_sub_nodes(
      libregf_hive_bins_list_t *hive_bins_list,
      libbfio_handle_t *file_io_handle,
      libfdata_tree_node_t *node,
-     libfcache_cache_t *cache LIBREGF_ATTRIBUTE_UNUSED,
+     libfdata_cache_t *cache LIBREGF_ATTRIBUTE_UNUSED,
      int sub_nodes_data_file_index LIBREGF_ATTRIBUTE_UNUSED,
      off64_t sub_nodes_data_offset,
      size64_t sub_nodes_data_size LIBREGF_ATTRIBUTE_UNUSED,

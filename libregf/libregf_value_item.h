@@ -128,7 +128,7 @@ int libregf_value_item_read_element_data(
      libregf_hive_bins_list_t *hive_bins_list,
      libbfio_handle_t *file_io_handle,
      libfdata_list_element_t *element,
-     libfcache_cache_t *cache,
+     libfdata_cache_t *cache,
      int data_range_file_index,
      off64_t data_range_offset,
      size64_t data_range_size,

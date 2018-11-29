@@ -192,7 +192,7 @@ int libregf_value_is_corrupted(
 	if( libfdata_list_element_get_element_value(
 	     internal_value->values_list_element,
 	     (intptr_t *) internal_value->file_io_handle,
-	     internal_value->values_cache,
+	     (libfdata_cache_t *) internal_value->values_cache,
 	     (intptr_t **) &value_item,
 	     0,
 	     error ) != 1 )
@@ -337,7 +337,7 @@ int libregf_value_get_name_size(
 	if( libfdata_list_element_get_element_value(
 	     internal_value->values_list_element,
 	     (intptr_t *) internal_value->file_io_handle,
-	     internal_value->values_cache,
+	     (libfdata_cache_t *) internal_value->values_cache,
 	     (intptr_t **) &value_item,
 	     0,
 	     error ) != 1 )
@@ -418,7 +418,7 @@ int libregf_value_get_name(
 	if( libfdata_list_element_get_element_value(
 	     internal_value->values_list_element,
 	     (intptr_t *) internal_value->file_io_handle,
-	     internal_value->values_cache,
+	     (libfdata_cache_t *) internal_value->values_cache,
 	     (intptr_t **) &value_item,
 	     0,
 	     error ) != 1 )
@@ -512,7 +512,7 @@ int libregf_value_get_utf8_name_size(
 	if( libfdata_list_element_get_element_value(
 	     internal_value->values_list_element,
 	     (intptr_t *) internal_value->file_io_handle,
-	     internal_value->values_cache,
+	     (libfdata_cache_t *) internal_value->values_cache,
 	     (intptr_t **) &value_item,
 	     0,
 	     error ) != 1 )
@@ -630,7 +630,7 @@ int libregf_value_get_utf8_name(
 	if( libfdata_list_element_get_element_value(
 	     internal_value->values_list_element,
 	     (intptr_t *) internal_value->file_io_handle,
-	     internal_value->values_cache,
+	     (libfdata_cache_t *) internal_value->values_cache,
 	     (intptr_t **) &value_item,
 	     0,
 	     error ) != 1 )
@@ -741,7 +741,7 @@ int libregf_value_get_utf16_name_size(
 	if( libfdata_list_element_get_element_value(
 	     internal_value->values_list_element,
 	     (intptr_t *) internal_value->file_io_handle,
-	     internal_value->values_cache,
+	     (libfdata_cache_t *) internal_value->values_cache,
 	     (intptr_t **) &value_item,
 	     0,
 	     error ) != 1 )
@@ -859,7 +859,7 @@ int libregf_value_get_utf16_name(
 	if( libfdata_list_element_get_element_value(
 	     internal_value->values_list_element,
 	     (intptr_t *) internal_value->file_io_handle,
-	     internal_value->values_cache,
+	     (libfdata_cache_t *) internal_value->values_cache,
 	     (intptr_t **) &value_item,
 	     0,
 	     error ) != 1 )
@@ -968,7 +968,7 @@ int libregf_value_get_value_type(
 	if( libfdata_list_element_get_element_value(
 	     internal_value->values_list_element,
 	     (intptr_t *) internal_value->file_io_handle,
-	     internal_value->values_cache,
+	     (libfdata_cache_t *) internal_value->values_cache,
 	     (intptr_t **) &value_item,
 	     0,
 	     error ) != 1 )
@@ -1026,7 +1026,7 @@ int libregf_value_get_value_data_size(
 	if( libfdata_list_element_get_element_value(
 	     internal_value->values_list_element,
 	     (intptr_t *) internal_value->file_io_handle,
-	     internal_value->values_cache,
+	     (libfdata_cache_t *) internal_value->values_cache,
 	     (intptr_t **) &value_item,
 	     0,
 	     error ) != 1 )
@@ -1139,7 +1139,7 @@ int libregf_value_get_value_data(
 	if( libfdata_list_element_get_element_value(
 	     internal_value->values_list_element,
 	     (intptr_t *) internal_value->file_io_handle,
-	     internal_value->values_cache,
+	     (libfdata_cache_t *) internal_value->values_cache,
 	     (intptr_t **) &value_item,
 	     0,
 	     error ) != 1 )
@@ -1228,7 +1228,7 @@ int libregf_value_get_value_32bit(
 	if( libfdata_list_element_get_element_value(
 	     internal_value->values_list_element,
 	     (intptr_t *) internal_value->file_io_handle,
-	     internal_value->values_cache,
+	     (libfdata_cache_t *) internal_value->values_cache,
 	     (intptr_t **) &value_item,
 	     0,
 	     error ) != 1 )
@@ -1347,7 +1347,7 @@ int libregf_value_get_value_64bit(
 	if( libfdata_list_element_get_element_value(
 	     internal_value->values_list_element,
 	     (intptr_t *) internal_value->file_io_handle,
-	     internal_value->values_cache,
+	     (libfdata_cache_t *) internal_value->values_cache,
 	     (intptr_t **) &value_item,
 	     0,
 	     error ) != 1 )
@@ -1469,7 +1469,7 @@ int libregf_value_get_value_utf8_string_size(
 	if( libfdata_list_element_get_element_value(
 	     internal_value->values_list_element,
 	     (intptr_t *) internal_value->file_io_handle,
-	     internal_value->values_cache,
+	     (libfdata_cache_t *) internal_value->values_cache,
 	     (intptr_t **) &value_item,
 	     0,
 	     error ) != 1 )
@@ -1586,7 +1586,7 @@ int libregf_value_get_value_utf8_string(
 	if( libfdata_list_element_get_element_value(
 	     internal_value->values_list_element,
 	     (intptr_t *) internal_value->file_io_handle,
-	     internal_value->values_cache,
+	     (libfdata_cache_t *) internal_value->values_cache,
 	     (intptr_t **) &value_item,
 	     0,
 	     error ) != 1 )
@@ -1702,7 +1702,7 @@ int libregf_value_get_value_utf16_string_size(
 	if( libfdata_list_element_get_element_value(
 	     internal_value->values_list_element,
 	     (intptr_t *) internal_value->file_io_handle,
-	     internal_value->values_cache,
+	     (libfdata_cache_t *) internal_value->values_cache,
 	     (intptr_t **) &value_item,
 	     0,
 	     error ) != 1 )
@@ -1819,7 +1819,7 @@ int libregf_value_get_value_utf16_string(
 	if( libfdata_list_element_get_element_value(
 	     internal_value->values_list_element,
 	     (intptr_t *) internal_value->file_io_handle,
-	     internal_value->values_cache,
+	     (libfdata_cache_t *) internal_value->values_cache,
 	     (intptr_t **) &value_item,
 	     0,
 	     error ) != 1 )
@@ -1921,7 +1921,7 @@ int libregf_value_get_value_binary_data_size(
 	if( libfdata_list_element_get_element_value(
 	     internal_value->values_list_element,
 	     (intptr_t *) internal_value->file_io_handle,
-	     internal_value->values_cache,
+	     (libfdata_cache_t *) internal_value->values_cache,
 	     (intptr_t **) &value_item,
 	     0,
 	     error ) != 1 )
@@ -2006,7 +2006,7 @@ int libregf_value_get_value_binary_data(
 	if( libfdata_list_element_get_element_value(
 	     internal_value->values_list_element,
 	     (intptr_t *) internal_value->file_io_handle,
-	     internal_value->values_cache,
+	     (libfdata_cache_t *) internal_value->values_cache,
 	     (intptr_t **) &value_item,
 	     0,
 	     error ) != 1 )

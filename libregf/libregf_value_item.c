@@ -481,7 +481,7 @@ int libregf_value_item_read_value_key(
 	if( libfdata_list_get_element_value_at_offset(
 	     hive_bins_list->data_list,
 	     (intptr_t *) file_io_handle,
-	     hive_bins_list->data_cache,
+	     (libfdata_cache_t *) hive_bins_list->data_cache,
 	     (off64_t) value_key_offset,
 	     &hive_bin_index,
 	     &hive_bin_data_offset,
@@ -996,7 +996,7 @@ int libregf_value_item_read_value_data(
 	if( libfdata_list_get_element_value_at_offset(
 	     hive_bins_list->data_list,
 	     (intptr_t *) file_io_handle,
-	     hive_bins_list->data_cache,
+	     (libfdata_cache_t *) hive_bins_list->data_cache,
 	     (off64_t) value_data_offset,
 	     &hive_bin_index,
 	     &hive_bin_data_offset,
@@ -1357,7 +1357,7 @@ int libregf_value_item_read_data_block_list(
 	if( libfdata_list_get_element_value_at_offset(
 	     hive_bins_list->data_list,
 	     (intptr_t *) file_io_handle,
-	     hive_bins_list->data_cache,
+	     (libfdata_cache_t *) hive_bins_list->data_cache,
 	     (off64_t) data_block_list_offset,
 	     &hive_bin_index,
 	     &hive_bin_data_offset,
@@ -1484,7 +1484,7 @@ int libregf_value_item_read_data_block_list(
 			if( libfdata_list_get_element_value_at_offset(
 			     hive_bins_list->data_list,
 			     (intptr_t *) file_io_handle,
-			     hive_bins_list->data_cache,
+			     (libfdata_cache_t *) hive_bins_list->data_cache,
 			     (off64_t) element_offset,
 			     &hive_bin_index,
 			     &hive_bin_data_offset,
@@ -1571,7 +1571,7 @@ int libregf_value_item_read_data_block_list(
 			if( libfdata_list_get_element_value_at_offset(
 			     hive_bins_list->data_list,
 			     (intptr_t *) file_io_handle,
-			     hive_bins_list->data_cache,
+			     (libfdata_cache_t *) hive_bins_list->data_cache,
 			     (off64_t) data_block_list_offset,
 			     &hive_bin_index,
 			     &hive_bin_data_offset,
@@ -1647,7 +1647,7 @@ int libregf_value_item_read_element_data(
      libregf_hive_bins_list_t *hive_bins_list,
      libbfio_handle_t *file_io_handle,
      libfdata_list_element_t *list_element,
-     libfcache_cache_t *cache,
+     libfdata_cache_t *cache,
      int data_range_file_index LIBREGF_ATTRIBUTE_UNUSED,
      off64_t data_range_offset,
      size64_t data_range_size LIBREGF_ATTRIBUTE_UNUSED,

@@ -74,7 +74,7 @@ int libregf_key_tree_get_sub_key_values_by_utf8_name(
 	if( libfdata_tree_node_get_number_of_sub_nodes(
 	     key_tree_node,
 	     (intptr_t *) file_io_handle,
-	     key_cache,
+	     (libfdata_cache_t *) key_cache,
 	     &number_of_sub_keys,
 	     0,
 	     error ) != 1 )
@@ -95,7 +95,7 @@ int libregf_key_tree_get_sub_key_values_by_utf8_name(
 		if( libfdata_tree_node_get_sub_node_by_index(
 		     key_tree_node,
 		     (intptr_t *) file_io_handle,
-		     key_cache,
+		     (libfdata_cache_t *) key_cache,
 		     sub_key_index,
 		     key_tree_sub_node,
 		     0,
@@ -114,7 +114,7 @@ int libregf_key_tree_get_sub_key_values_by_utf8_name(
 		if( libfdata_tree_node_get_node_value(
 		     *key_tree_sub_node,
 		     (intptr_t *) file_io_handle,
-		     key_cache,
+		     (libfdata_cache_t *) key_cache,
 		     (intptr_t **) sub_key_item,
 		     0,
 		     error ) != 1 )
@@ -204,7 +204,7 @@ int libregf_key_tree_get_sub_key_values_by_utf16_name(
 	if( libfdata_tree_node_get_number_of_sub_nodes(
 	     key_tree_node,
 	     (intptr_t *) file_io_handle,
-	     key_cache,
+	     (libfdata_cache_t *) key_cache,
 	     &number_of_sub_keys,
 	     0,
 	     error ) != 1 )
@@ -225,7 +225,7 @@ int libregf_key_tree_get_sub_key_values_by_utf16_name(
 		if( libfdata_tree_node_get_sub_node_by_index(
 		     key_tree_node,
 		     (intptr_t *) file_io_handle,
-		     key_cache,
+		     (libfdata_cache_t *) key_cache,
 		     sub_key_index,
 		     key_tree_sub_node,
 		     0,
@@ -244,7 +244,7 @@ int libregf_key_tree_get_sub_key_values_by_utf16_name(
 		if( libfdata_tree_node_get_node_value(
 		     *key_tree_sub_node,
 		     (intptr_t *) file_io_handle,
-		     key_cache,
+		     (libfdata_cache_t *) key_cache,
 		     (intptr_t **) sub_key_item,
 		     0,
 		     error ) != 1 )

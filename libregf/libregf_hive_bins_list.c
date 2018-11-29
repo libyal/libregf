@@ -116,7 +116,7 @@ int libregf_hive_bins_list_initialize(
 	     NULL,
 	     NULL,
 	     NULL,
-	     (int (*)(intptr_t *, intptr_t *, libfdata_list_element_t *, libfcache_cache_t *, int, off64_t, size64_t, uint32_t, uint8_t, libcerror_error_t **)) &libregf_hive_bins_list_read_element_data,
+	     (int (*)(intptr_t *, intptr_t *, libfdata_list_element_t *, libfdata_cache_t *, int, off64_t, size64_t, uint32_t, uint8_t, libcerror_error_t **)) &libregf_hive_bins_list_read_element_data,
 	     NULL,
 	     0,
 	     error ) != 1 )
@@ -503,7 +503,7 @@ int libregf_hive_bins_list_read_element_data(
      intptr_t *data_handle LIBREGF_ATTRIBUTE_UNUSED,
      libbfio_handle_t *file_io_handle,
      libfdata_list_element_t *element,
-     libfcache_cache_t *cache,
+     libfdata_cache_t *cache,
      int data_range_file_index LIBREGF_ATTRIBUTE_UNUSED,
      off64_t data_range_offset,
      size64_t data_range_size,

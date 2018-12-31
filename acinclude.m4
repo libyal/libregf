@@ -1,6 +1,6 @@
 dnl Checks for required headers and functions
 dnl
-dnl Version: 20170917
+dnl Version: 20181231
 
 dnl Function to detect if libregf dependencies are available
 AC_DEFUN([AX_LIBREGF_CHECK_LOCAL],
@@ -70,10 +70,12 @@ AC_DEFUN([AX_REGFTOOLS_CHECK_LOCAL],
   dnl Headers included in regftools/regfmount.c
   AC_CHECK_HEADERS([errno.h])
 
-  dnl Functions included in regftools/regfmount.c
+  AC_HEADER_TIME
+
+  dnl Functions included in regftools/mount_file_system.c and regftools/mount_file_entry.c
   AS_IF(
     [test "x$ac_cv_enable_winapi" = xno],
-    [AC_CHECK_FUNCS([getegid geteuid])
+    [AC_CHECK_FUNCS([clock_gettime getegid geteuid time])
   ])
 
   dnl Check if tools should be build as static executables

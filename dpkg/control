@@ -9,6 +9,8 @@ Homepage: https://github.com/libyal/libregf
 Package: libregf
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
+Conflicts: libregf1
+Replaces: libregf1
 Suggests: libregf-dbg
 Description: Library to access the Windows NT Registry File (REGF) format
  libregf is a library to access the Windows NT Registry File (REGF) format.
@@ -31,6 +33,8 @@ Package: libregf-tools
 Section: utils
 Architecture: any
 Depends: libregf (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Conflicts: libregf-utils
+Replaces: libregf-utils
 Description: Several tools for reading Windows NT Registry Files (REGF)
  Several tools for reading Windows NT Registry Files (REGF).
 
@@ -45,6 +49,8 @@ Package: libregf-python
 Section: python
 Architecture: any
 Depends: libregf (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Conflicts: python-libregf
+Replaces: python-libregf
 Suggests: libregf-python-dbg
 Description: Python 2 bindings for libregf
  Python 2 bindings for libregf.
@@ -60,6 +66,8 @@ Package: libregf-python3
 Section: python
 Architecture: any
 Depends: libregf (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Conflicts: python3-libregf
+Replaces: python3-libregf
 Suggests: libregf-python3-dbg
 Description: Python 3 bindings for libregf
  Python 3 bindings for libregf.

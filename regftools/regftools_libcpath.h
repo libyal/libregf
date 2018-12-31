@@ -1,5 +1,5 @@
 /*
- * Common output functions for the regftools
+ * The libcpath header wrapper
  *
  * Copyright (C) 2009-2018, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -19,37 +19,30 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _REGFTOOLS_OUTPUT_H )
-#define _REGFTOOLS_OUTPUT_H
+#if !defined( _REGFTOOLS_LIBCPATH_H )
+#define _REGFTOOLS_LIBCPATH_H
 
 #include <common.h>
-#include <file_stream.h>
-#include <types.h>
 
-#include "regftools_libcerror.h"
+/* Define HAVE_LOCAL_LIBCPATH for local use of libcpath
+ */
+#if defined( HAVE_LOCAL_LIBCPATH )
 
-#if defined( __cplusplus )
-extern "C" {
+#include <libcpath_definitions.h>
+#include <libcpath_path.h>
+
+#else
+
+/* If libtool DLL support is enabled set LIBCPATH_DLL_IMPORT
+ * before including libcpath.h
+ */
+#if defined( _WIN32 ) && defined( DLL_IMPORT ) && !defined( HAVE_STATIC_EXECUTABLES )
+#define LIBCPATH_DLL_IMPORT
 #endif
 
-int regftools_output_initialize(
-     int stdio_mode,
-     libcerror_error_t **error );
+#include <libcpath.h>
 
-void regftools_output_copyright_fprint(
-      FILE *stream );
+#endif /* defined( HAVE_LOCAL_LIBCPATH ) */
 
-void regftools_output_version_fprint(
-      FILE *stream,
-      const char *program );
-
-void regftools_output_version_detailed_fprint(
-      FILE *stream,
-      const char *program );
-
-#if defined( __cplusplus )
-}
-#endif
-
-#endif /* !defined( _REGFTOOLS_OUTPUT_H ) */
+#endif /* !defined( _REGFTOOLS_LIBCPATH_H ) */
 

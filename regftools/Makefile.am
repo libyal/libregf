@@ -75,6 +75,10 @@ regfinfo_LDADD = \
 	@LIBINTL@
 
 regfmount_SOURCES = \
+	mount_dokan.c mount_dokan.h \
+	mount_file_entry.c mount_file_entry.h \
+	mount_file_system.c mount_file_system.h \
+	mount_fuse.c mount_fuse.h \
 	mount_handle.c mount_handle.h \
 	regfmount.c \
 	regftools_getopt.c regftools_getopt.h \
@@ -83,6 +87,7 @@ regfmount_SOURCES = \
 	regftools_libcerror.h \
 	regftools_libclocale.h \
 	regftools_libcnotify.h \
+	regftools_libcpath.h \
 	regftools_libfdata.h \
 	regftools_libfdatetime.h \
 	regftools_libfwnt.h \
@@ -94,6 +99,9 @@ regfmount_SOURCES = \
 
 regfmount_LDADD = \
 	@LIBFUSE_LIBADD@ \
+	@LIBCPATH_LIBADD@ \
+	@LIBCSPLIT_LIBADD@ \
+	@LIBUNA_LIBADD@ \
 	@LIBCNOTIFY_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
 	../libregf/libregf.la \

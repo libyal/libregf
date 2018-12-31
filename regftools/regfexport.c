@@ -168,7 +168,7 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-	regfoutput_version_fprint(
+	regftools_output_version_fprint(
 	 stdout,
 	 program );
 
@@ -213,7 +213,7 @@ int main( int argc, char * const argv[] )
 				break;
 
 			case (system_integer_t) 'V':
-				regfoutput_copyright_fprint(
+				regftools_output_copyright_fprint(
 				 stdout );
 
 				return( EXIT_SUCCESS );

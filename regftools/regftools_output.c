@@ -96,7 +96,7 @@ int regftools_output_initialize(
 
 /* Prints the copyright information
  */
-void regfoutput_copyright_fprint(
+void regftools_output_copyright_fprint(
       FILE *stream )
 {
 	if( stream == NULL )
@@ -128,7 +128,7 @@ void regfoutput_copyright_fprint(
 
 /* Prints the version information
  */
-void regfoutput_version_fprint(
+void regftools_output_version_fprint(
       FILE *stream,
       const char *program )
 {
@@ -149,7 +149,7 @@ void regfoutput_version_fprint(
 
 /* Prints the detailed version information
  */
-void regfoutput_version_detailed_fprint(
+void regftools_output_version_detailed_fprint(
       FILE *stream,
       const char *program )
 {

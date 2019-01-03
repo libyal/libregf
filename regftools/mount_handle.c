@@ -1,7 +1,7 @@
 /*
  * Mount handle
  *
- * Copyright (C) 2009-2018, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2009-2019, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -269,9 +269,9 @@ int mount_handle_open(
      const system_character_t *filename,
      libcerror_error_t **error )
 {
-	libregf_file_t *file  = NULL;
-	static char *function = "mount_handle_open";
-	int result            = 0;
+	libregf_file_t *regf_file = NULL;
+	static char *function     = "mount_handle_open";
+	int result                = 0;
 
 	if( mount_handle == NULL )
 	{
@@ -296,7 +296,7 @@ int mount_handle_open(
 		return( -1 );
 	}
 	if( libregf_file_initialize(
-	     &file,
+	     &regf_file,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -310,13 +310,13 @@ int mount_handle_open(
 	}
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libregf_file_open_wide(
-	          file,
+	          regf_file,
 	          filename,
 	          LIBREGF_OPEN_READ,
 	          error );
 #else
 	result = libregf_file_open(
-	          file,
+	          regf_file,
 	          filename,
 	          LIBREGF_OPEN_READ,
 	          error );
@@ -334,7 +334,7 @@ int mount_handle_open(
 	}
 	if( mount_file_system_set_file(
 	     mount_handle->file_system,
-	     file,
+	     regf_file,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -349,10 +349,10 @@ int mount_handle_open(
 	return( 1 );
 
 on_error:
-	if( file != NULL )
+	if( regf_file != NULL )
 	{
 		libregf_file_free(
-		 &file,
+		 &regf_file,
 		 NULL );
 	}
 	return( -1 );
@@ -365,8 +365,8 @@ int mount_handle_close(
      mount_handle_t *mount_handle,
      libcerror_error_t **error )
 {
-	libregf_file_t *file  = NULL;
-	static char *function = "mount_handle_close";
+	libregf_file_t *regf_file = NULL;
+	static char *function     = "mount_handle_close";
 
 	if( mount_handle == NULL )
 	{
@@ -381,7 +381,7 @@ int mount_handle_close(
 	}
 	if( mount_file_system_get_file(
 	     mount_handle->file_system,
-	     &file,
+	     &regf_file,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -405,12 +405,12 @@ int mount_handle_close(
 		 "%s: unable to set file in file system.",
 		 function );
 
-		file = NULL;
+		regf_file = NULL;
 
 		goto on_error;
 	}
 	if( libregf_file_close(
-	     file,
+	     regf_file,
 	     error ) != 0 )
 	{
 		libcerror_error_set(
@@ -423,7 +423,7 @@ int mount_handle_close(
 		goto on_error;
 	}
 	if( libregf_file_free(
-	     &file,
+	     &regf_file,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -438,10 +438,10 @@ int mount_handle_close(
 	return( 0 );
 
 on_error:
-	if( file != NULL )
+	if( regf_file != NULL )
 	{
 		libregf_file_free(
-		 &file,
+		 &regf_file,
 		 NULL );
 	}
 	return( -1 );
@@ -456,8 +456,8 @@ int mount_handle_get_file_entry_by_path(
      mount_file_entry_t **file_entry,
      libcerror_error_t **error )
 {
-	libregf_key_t *key                 = NULL;
-	libregf_value_t *value             = NULL;
+	libregf_key_t *regf_key            = NULL;
+	libregf_value_t *regf_value        = NULL;
 	const system_character_t *filename = NULL;
 	static char *function              = "mount_handle_get_file_entry_by_path";
 	size_t filename_length             = 0;
@@ -613,7 +613,7 @@ int mount_handle_get_file_entry_by_path(
 	          mount_handle->file_system,
 	          path,
 	          key_path_length,
-	          &key,
+	          &regf_key,
 	          error );
 
 	if( result == -1 )
@@ -633,10 +633,10 @@ int mount_handle_get_file_entry_by_path(
 		{
 			result = mount_file_system_get_value_by_filename(
 			          mount_handle->file_system,
-			          key,
+			          regf_key,
 			          filename,
 			          filename_length,
-			          &value,
+			          &regf_value,
 			          error );
 
 			if( result == -1 )
@@ -659,8 +659,8 @@ int mount_handle_get_file_entry_by_path(
 			     filename,
 			     filename_length,
 			     file_entry_type,
-			     key,
-			     value,
+			     regf_key,
+			     regf_value,
 			     error ) != 1 )
 			{
 				libcerror_error_set(
@@ -677,16 +677,16 @@ int mount_handle_get_file_entry_by_path(
 	return( result );
 
 on_error:
-	if( value != NULL )
+	if( regf_value != NULL )
 	{
 		libregf_value_free(
-		 &value,
+		 &regf_value,
 		 NULL );
 	}
-	if( key != NULL )
+	if( regf_key != NULL )
 	{
 		libregf_key_free(
-		 &key,
+		 &regf_key,
 		 NULL );
 	}
 	return( -1 );

@@ -1,7 +1,7 @@
 /*
  * Mount file entry
  *
- * Copyright (C) 2009-2018, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2009-2019, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -64,11 +64,11 @@ struct mount_file_entry
 
 	/* The key
 	 */
-	libregf_key_t *key;
+	libregf_key_t *regf_key;
 
 	/* The value
 	 */
-	libregf_value_t *value;
+	libregf_value_t *regf_value;
 
 	/* The value data
 	 */
@@ -85,8 +85,8 @@ int mount_file_entry_initialize(
      const system_character_t *name,
      size_t name_length,
      int type,
-     libregf_key_t *key,
-     libregf_value_t *value,
+     libregf_key_t *regf_key,
+     libregf_value_t *regf_value,
      libcerror_error_t **error );
 
 int mount_file_entry_free(

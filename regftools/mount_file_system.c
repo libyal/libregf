@@ -1,7 +1,7 @@
 /*
  * Mount file system
  *
- * Copyright (C) 2009-2018, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2009-2019, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -262,10 +262,10 @@ int mount_file_system_signal_abort(
 
 		return( -1 );
 	}
-	if( file_system->file != NULL )
+	if( file_system->regf_file != NULL )
 	{
 		if( libregf_file_signal_abort(
-		     file_system->file,
+		     file_system->regf_file,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -286,7 +286,7 @@ int mount_file_system_signal_abort(
  */
 int mount_file_system_set_file(
      mount_file_system_t *file_system,
-     libregf_file_t *file,
+     libregf_file_t *regf_file,
      libcerror_error_t **error )
 {
 	static char *function = "mount_file_system_set_file";
@@ -302,7 +302,7 @@ int mount_file_system_set_file(
 
 		return( -1 );
 	}
-	file_system->file = file;
+	file_system->regf_file = regf_file;
 
 	return( 1 );
 }
@@ -312,7 +312,7 @@ int mount_file_system_set_file(
  */
 int mount_file_system_get_file(
      mount_file_system_t *file_system,
-     libregf_file_t **file,
+     libregf_file_t **regf_file,
      libcerror_error_t **error )
 {
 	static char *function = "mount_file_system_get_file";
@@ -328,7 +328,7 @@ int mount_file_system_get_file(
 
 		return( -1 );
 	}
-	if( file == NULL )
+	if( regf_file == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -339,7 +339,7 @@ int mount_file_system_get_file(
 
 		return( -1 );
 	}
-	*file = file_system->file;
+	*regf_file = file_system->regf_file;
 
 	return( 1 );
 }
@@ -800,7 +800,7 @@ int mount_file_system_get_key_by_path(
      mount_file_system_t *file_system,
      const system_character_t *path,
      size_t path_length,
-     libregf_key_t **key,
+     libregf_key_t **regf_key,
      libcerror_error_t **error )
 {
 	system_character_t *key_path = NULL;
@@ -853,17 +853,17 @@ int mount_file_system_get_key_by_path(
 
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libregf_file_get_key_by_utf16_path(
-	          file_system->file,
+	          file_system->regf_file,
 	          (uint16_t *) key_path,
 	          key_path_length,
-	          key,
+	          regf_key,
 	          error );
 #else
 	result = libregf_file_get_key_by_utf8_path(
-	          file_system->file,
+	          file_system->regf_file,
 	          (uint8_t *) key_path,
 	          key_path_length,
-	          key,
+	          regf_key,
 	          error );
 #endif
 	if( result == -1 )
@@ -1277,10 +1277,10 @@ on_error:
  */
 int mount_file_system_get_value_by_filename(
      mount_file_system_t *file_system,
-     libregf_key_t *key,
+     libregf_key_t *regf_key,
      const system_character_t *filename,
      size_t filename_length,
-     libregf_value_t **value,
+     libregf_value_t **regf_value,
      libcerror_error_t **error )
 {
 	system_character_t *value_name = NULL;
@@ -1351,17 +1351,17 @@ int mount_file_system_get_value_by_filename(
 	}
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libregf_key_get_value_by_utf16_name(
-	          key,
+	          regf_key,
 	          (uint16_t *) value_name,
 	          value_name_length,
-	          value,
+	          regf_value,
 	          error );
 #else
 	result = libregf_key_get_value_by_utf8_name(
-	          key,
+	          regf_key,
 	          (uint8_t *) value_name,
 	          value_name_length,
-	          value,
+	          regf_value,
 	          error );
 #endif
 	if( result == -1 )
@@ -1668,7 +1668,7 @@ on_error:
  */
 int mount_file_system_get_filename_from_key(
      mount_file_system_t *file_system,
-     libregf_key_t *key,
+     libregf_key_t *regf_key,
      system_character_t **filename,
      size_t *filename_size,
      libcerror_error_t **error )
@@ -1691,12 +1691,12 @@ int mount_file_system_get_filename_from_key(
 	}
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libregf_key_get_utf16_name_size(
-	          key,
+	          regf_key,
 	          &key_name_size,
 	          error );
 #else
 	result = libregf_key_get_utf8_name_size(
-	          key,
+	          regf_key,
 	          &key_name_size,
 	          error );
 #endif
@@ -1739,13 +1739,13 @@ int mount_file_system_get_filename_from_key(
 	}
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libregf_key_get_utf16_name(
-	          key,
+	          regf_key,
 	          (uint16_t *) key_name,
 	          key_name_size,
 	          error );
 #else
 	result = libregf_key_get_utf8_name(
-	          key,
+	          regf_key,
 	          (uint8_t *) key_name,
 	          key_name_size,
 	          error );
@@ -1797,7 +1797,7 @@ on_error:
  */
 int mount_file_system_get_filename_from_value(
      mount_file_system_t *file_system,
-     libregf_value_t *value,
+     libregf_value_t *regf_value,
      system_character_t **filename,
      size_t *filename_size,
      libcerror_error_t **error )
@@ -1821,12 +1821,12 @@ int mount_file_system_get_filename_from_value(
 	}
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libregf_value_get_utf16_name_size(
-	          value,
+	          regf_value,
 	          &value_name_size,
 	          error );
 #else
 	result = libregf_value_get_utf8_name_size(
-	          value,
+	          regf_value,
 	          &value_name_size,
 	          error );
 #endif
@@ -1875,13 +1875,13 @@ int mount_file_system_get_filename_from_value(
 		}
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		result = libregf_value_get_utf16_name(
-		          value,
+		          regf_value,
 		          (uint16_t *) value_name,
 		          value_name_size,
 		          error );
 #else
 		result = libregf_value_get_utf8_name(
-		          value,
+		          regf_value,
 		          (uint8_t *) value_name,
 		          value_name_size,
 		          error );

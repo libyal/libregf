@@ -1,7 +1,7 @@
 /*
  * Mount file entry
  *
- * Copyright (C) 2009-2018, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2009-2019, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -53,8 +53,8 @@ int mount_file_entry_initialize(
      const system_character_t *name,
      size_t name_length,
      int type,
-     libregf_key_t *key,
-     libregf_value_t *value,
+     libregf_key_t *regf_key,
+     libregf_value_t *regf_value,
      libcerror_error_t **error )
 {
 	static char *function = "mount_file_entry_initialize";
@@ -189,9 +189,9 @@ int mount_file_entry_initialize(
 
 		( *file_entry )->name_size = name_length + 1;
 	}
-	( *file_entry )->type  = type;
-	( *file_entry )->key   = key;
-	( *file_entry )->value = value;
+	( *file_entry )->type       = type;
+	( *file_entry )->regf_key   = regf_key;
+	( *file_entry )->regf_value = regf_value;
 
 	return( 1 );
 
@@ -239,13 +239,13 @@ int mount_file_entry_free(
 			memory_free(
 			 ( *file_entry )->name );
 		}
-		if( ( *file_entry )->key != NULL )
+		if( ( *file_entry )->regf_key != NULL )
 		{
 			if( ( ( *file_entry )->type != MOUNT_FILE_ENTRY_TYPE_CLASS_NAME )
 			 && ( ( *file_entry )->type != MOUNT_FILE_ENTRY_TYPE_VALUE ) )
 			{
 				if( libregf_key_free(
-				     &( ( *file_entry )->key ),
+				     &( ( *file_entry )->regf_key ),
 				     error ) != 1 )
 				{
 					libcerror_error_set(
@@ -259,10 +259,10 @@ int mount_file_entry_free(
 				}
 			}
 		}
-		if( ( *file_entry )->value != NULL )
+		if( ( *file_entry )->regf_value != NULL )
 		{
 			if( libregf_value_free(
-			     &( ( *file_entry )->value ),
+			     &( ( *file_entry )->regf_value ),
 			     error ) != 1 )
 			{
 				libcerror_error_set(
@@ -444,7 +444,7 @@ int mount_file_entry_get_modification_time(
 
 		return( -1 );
 	}
-	if( file_entry->key == NULL )
+	if( file_entry->regf_key == NULL )
 	{
 		if( mount_file_system_get_mounted_timestamp(
 		     file_entry->file_system,
@@ -475,7 +475,7 @@ int mount_file_entry_get_modification_time(
 			return( -1 );
 		}
 		if( libregf_key_get_last_written_time(
-		     file_entry->key,
+		     file_entry->regf_key,
 		     &filetime,
 		     error ) != 1 )
 		{
@@ -755,7 +755,7 @@ int mount_file_entry_get_number_of_sub_file_entries(
 		return( 1 );
 	}
 	if( libregf_key_get_number_of_values(
-	     file_entry->key,
+	     file_entry->regf_key,
 	     &number_of_values,
 	     error ) != 1 )
 	{
@@ -775,7 +775,7 @@ int mount_file_entry_get_number_of_sub_file_entries(
 		return( 1 );
 	}
 	if( libregf_key_get_number_of_sub_keys(
-	     file_entry->key,
+	     file_entry->regf_key,
 	     &number_of_sub_keys,
 	     error ) != 1 )
 	{
@@ -793,7 +793,7 @@ int mount_file_entry_get_number_of_sub_file_entries(
 		number_of_sub_keys += 1;
 	}
 	result = libregf_key_get_class_name_size(
-	          file_entry->key,
+	          file_entry->regf_key,
 	          &class_name_size,
 	          error );
 
@@ -826,8 +826,8 @@ int mount_file_entry_get_sub_file_entry_by_index(
      mount_file_entry_t **sub_file_entry,
      libcerror_error_t **error )
 {
-	libregf_key_t *sub_key                       = NULL;
-	libregf_value_t *value                       = NULL;
+	libregf_key_t *sub_regf_key                  = NULL;
+	libregf_value_t *regf_value                  = NULL;
 	const system_character_t *classname_filename = _SYSTEM_STRING( "(classname)" );
 	system_character_t *filename                 = NULL;
 	const system_character_t *values_filename    = _SYSTEM_STRING( "(values)" );
@@ -901,9 +901,9 @@ int mount_file_entry_get_sub_file_entry_by_index(
 	{
 /* TODO refactor to libregf_key_get_sub_value_by_index */
 		if( libregf_key_get_value(
-		     file_entry->key,
+		     file_entry->regf_key,
 		     sub_file_entry_index,
-		     &value,
+		     &regf_value,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -918,7 +918,7 @@ int mount_file_entry_get_sub_file_entry_by_index(
 		}
 		if( mount_file_system_get_filename_from_value(
 		     file_entry->file_system,
-		     value,
+		     regf_value,
 		     &filename,
 		     &filename_size,
 		     error ) != 1 )
@@ -938,7 +938,7 @@ int mount_file_entry_get_sub_file_entry_by_index(
 	else
 	{
 		if( libregf_key_get_number_of_sub_keys(
-		     file_entry->key,
+		     file_entry->regf_key,
 		     &number_of_sub_keys,
 		     error ) != 1 )
 		{
@@ -955,9 +955,9 @@ int mount_file_entry_get_sub_file_entry_by_index(
 		{
 /* TODO refactor to libregf_key_get_sub_key_by_index */
 			if( libregf_key_get_sub_key(
-			     file_entry->key,
+			     file_entry->regf_key,
 			     sub_file_entry_index,
-			     &sub_key,
+			     &sub_regf_key,
 			     error ) != 1 )
 			{
 				libcerror_error_set(
@@ -972,7 +972,7 @@ int mount_file_entry_get_sub_file_entry_by_index(
 			}
 			if( mount_file_system_get_filename_from_key(
 			     file_entry->file_system,
-			     sub_key,
+			     sub_regf_key,
 			     &filename,
 			     &filename_size,
 			     error ) != 1 )
@@ -992,7 +992,7 @@ int mount_file_entry_get_sub_file_entry_by_index(
 		else
 		{
 			if( libregf_key_get_number_of_values(
-			     file_entry->key,
+			     file_entry->regf_key,
 			     &number_of_values,
 			     error ) != 1 )
 			{
@@ -1010,7 +1010,7 @@ int mount_file_entry_get_sub_file_entry_by_index(
 				values_sub_file_entry_index = number_of_sub_keys;
 			}
 			result = libregf_key_get_class_name_size(
-			          file_entry->key,
+			          file_entry->regf_key,
 			          &class_name_size,
 			          error );
 
@@ -1057,7 +1057,7 @@ int mount_file_entry_get_sub_file_entry_by_index(
 
 				goto on_error;
 			}
-			sub_key = file_entry->key;
+			sub_regf_key = file_entry->regf_key;
 		}
 	}
 	if( mount_file_entry_initialize(
@@ -1066,8 +1066,8 @@ int mount_file_entry_get_sub_file_entry_by_index(
 	     filename,
 	     filename_size - 1,
 	     sub_file_entry_type,
-	     sub_key,
-	     value,
+	     sub_regf_key,
+	     regf_value,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -1097,16 +1097,17 @@ on_error:
 		memory_free(
 		 filename );
 	}
-	if( value != NULL )
+	if( regf_value != NULL )
 	{
 		libregf_value_free(
-		 &value,
+		 &regf_value,
 		 NULL );
 	}
-	if( sub_key != NULL )
+	if( ( sub_regf_key != NULL )
+	 && ( sub_regf_key != file_entry->regf_key ) )
 	{
 		libregf_key_free(
-		 &sub_key,
+		 &sub_regf_key,
 		 NULL );
 	}
 	return( -1 );
@@ -1175,7 +1176,7 @@ ssize_t mount_file_entry_read_buffer_at_offset(
 		if( file_entry->type == MOUNT_FILE_ENTRY_TYPE_CLASS_NAME )
 		{
 			if( libregf_key_get_class_name_size(
-			     file_entry->key,
+			     file_entry->regf_key,
 			     &( file_entry->value_data_size ),
 			     error ) != 1 )
 			{
@@ -1192,7 +1193,7 @@ ssize_t mount_file_entry_read_buffer_at_offset(
 		else if( file_entry->type == MOUNT_FILE_ENTRY_TYPE_VALUE )
 		{
 			if( libregf_value_get_value_data_size(
-			     file_entry->value,
+			     file_entry->regf_value,
 			     &( file_entry->value_data_size ),
 			     error ) != 1 )
 			{
@@ -1241,7 +1242,7 @@ ssize_t mount_file_entry_read_buffer_at_offset(
 		if( file_entry->type == MOUNT_FILE_ENTRY_TYPE_CLASS_NAME )
 		{
 			if( libregf_key_get_class_name(
-			     file_entry->key,
+			     file_entry->regf_key,
 			     file_entry->value_data,
 			     file_entry->value_data_size,
 			     error ) != 1 )
@@ -1264,7 +1265,7 @@ ssize_t mount_file_entry_read_buffer_at_offset(
 		else if( file_entry->type == MOUNT_FILE_ENTRY_TYPE_VALUE )
 		{
 			if( libregf_value_get_value_data(
-			     file_entry->value,
+			     file_entry->regf_value,
 			     file_entry->value_data,
 			     file_entry->value_data_size,
 			     error ) != 1 )
@@ -1350,7 +1351,7 @@ int mount_file_entry_get_size(
 		if( file_entry->type == MOUNT_FILE_ENTRY_TYPE_CLASS_NAME )
 		{
 			if( libregf_key_get_class_name_size(
-			     file_entry->key,
+			     file_entry->regf_key,
 			     &( file_entry->value_data_size ),
 			     error ) != 1 )
 			{
@@ -1367,7 +1368,7 @@ int mount_file_entry_get_size(
 		else if( file_entry->type == MOUNT_FILE_ENTRY_TYPE_VALUE )
 		{
 			if( libregf_value_get_value_data_size(
-			     file_entry->value,
+			     file_entry->regf_value,
 			     &( file_entry->value_data_size ),
 			     error ) != 1 )
 			{

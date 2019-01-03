@@ -1,7 +1,7 @@
 /*
  * Mount file system
  *
- * Copyright (C) 2009-2018, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2009-2019, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -42,7 +42,7 @@ struct mount_file_system
 
 	/* The file
 	 */
-	libregf_file_t *file;
+	libregf_file_t *regf_file;
 };
 
 int mount_file_system_initialize(
@@ -59,12 +59,12 @@ int mount_file_system_signal_abort(
 
 int mount_file_system_set_file(
      mount_file_system_t *file_system,
-     libregf_file_t *file,
+     libregf_file_t *regf_file,
      libcerror_error_t **error );
 
 int mount_file_system_get_file(
      mount_file_system_t *file_system,
-     libregf_file_t **file,
+     libregf_file_t **regf_file,
      libcerror_error_t **error );
 
 int mount_file_system_get_mounted_timestamp(
@@ -84,7 +84,7 @@ int mount_file_system_get_key_by_path(
      mount_file_system_t *file_system,
      const system_character_t *path,
      size_t path_length,
-     libregf_key_t **key,
+     libregf_key_t **regf_key,
      libcerror_error_t **error );
 
 int mount_file_system_get_value_name_from_filename(
@@ -97,10 +97,10 @@ int mount_file_system_get_value_name_from_filename(
 
 int mount_file_system_get_value_by_filename(
      mount_file_system_t *file_system,
-     libregf_key_t *key,
+     libregf_key_t *regf_key,
      const system_character_t *filename,
      size_t filename_length,
-     libregf_value_t **value,
+     libregf_value_t **regf_value,
      libcerror_error_t **error );
 
 int mount_file_system_get_filename_from_name(
@@ -113,14 +113,14 @@ int mount_file_system_get_filename_from_name(
 
 int mount_file_system_get_filename_from_key(
      mount_file_system_t *file_system,
-     libregf_key_t *key,
+     libregf_key_t *regf_key,
      system_character_t **filename,
      size_t *filename_size,
      libcerror_error_t **error );
 
 int mount_file_system_get_filename_from_value(
      mount_file_system_t *file_system,
-     libregf_value_t *value,
+     libregf_value_t *regf_value,
      system_character_t **filename,
      size_t *filename_size,
      libcerror_error_t **error );

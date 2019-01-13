@@ -1663,7 +1663,7 @@ on_error:
 	return( -1 );
 }
 
-/* Retrieves the filename from an key
+/* Retrieves the filename from a key
  * Returns 1 if successful or -1 on error
  */
 int mount_file_system_get_filename_from_key(

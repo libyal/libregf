@@ -13,6 +13,14 @@ BuildRequires: gcc @ax_libbfio_spec_build_requires@ @ax_libcdata_spec_build_requ
 %description -n libregf
 Library to access the Windows NT Registry File (REGF) format
 
+%package -n libregf-static
+Summary: Library to access the Windows NT Registry File (REGF) format
+Group: Development/Libraries
+Requires: libregf = %{version}-%{release}
+
+%description -n libregf-static
+Static library version of libregf.
+
 %package -n libregf-devel
 Summary: Header files and libraries for developing applications for libregf
 Group: Development/Libraries
@@ -74,11 +82,16 @@ rm -rf %{buildroot}
 %doc AUTHORS README
 %attr(755,root,root) %{_libdir}/*.so.*
 
+%files -n libregf-static
+%defattr(644,root,root,755)
+%license COPYING
+%doc AUTHORS README
+%attr(755,root,root) %{_libdir}/*.a
+
 %files -n libregf-devel
 %defattr(644,root,root,755)
 %license COPYING
 %doc AUTHORS README
-%{_libdir}/*.a
 %{_libdir}/*.la
 %{_libdir}/*.so
 %{_libdir}/pkgconfig/libregf.pc

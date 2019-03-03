@@ -1162,8 +1162,8 @@ int libregf_key_get_utf8_class_name_size(
 	if( key_item->class_name != NULL )
 	{
 		result = libuna_utf8_string_size_from_utf16_stream(
-			  key_item->name,
-			  (size_t) key_item->name_size,
+			  key_item->class_name,
+			  (size_t) key_item->class_name_size,
 			  LIBUNA_ENDIAN_LITTLE,
 			  utf8_class_name_size,
 			  error );
@@ -1245,8 +1245,8 @@ int libregf_key_get_utf8_class_name(
 		result = libuna_utf8_string_copy_from_utf16_stream(
 			  utf8_class_name,
 			  utf8_class_name_size,
-			  key_item->name,
-			  (size_t) key_item->name_size,
+			  key_item->class_name,
+			  (size_t) key_item->class_name_size,
 			  LIBUNA_ENDIAN_LITTLE,
 			  error );
 
@@ -1323,8 +1323,8 @@ int libregf_key_get_utf16_class_name_size(
 	if( key_item->class_name != NULL )
 	{
 		result = libuna_utf16_string_size_from_utf16_stream(
-			  key_item->name,
-			  (size_t) key_item->name_size,
+			  key_item->class_name,
+			  (size_t) key_item->class_name_size,
 			  LIBUNA_ENDIAN_LITTLE,
 			  utf16_class_name_size,
 			  error );
@@ -1406,8 +1406,8 @@ int libregf_key_get_utf16_class_name(
 		result = libuna_utf16_string_copy_from_utf16_stream(
 			  utf16_class_name,
 			  utf16_class_name_size,
-			  key_item->name,
-			  (size_t) key_item->name_size,
+			  key_item->class_name,
+			  (size_t) key_item->class_name_size,
 			  LIBUNA_ENDIAN_LITTLE,
 			  error );
 

@@ -463,6 +463,7 @@ int libregf_hive_bin_read_cells(
 #endif
 		hive_bin_cell->offset = (uint32_t) hive_bin_cells_offset;
 
+/* TODO check bounds ?*/
 		byte_stream_copy_to_uint32_little_endian(
 		 hive_bin_cells_data,
 		 hive_bin_cell_size );

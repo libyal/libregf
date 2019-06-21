@@ -913,73 +913,73 @@ int export_handle_export_key(
 			case LIBREGF_VALUE_TYPE_UNDEFINED:
 				fprintf(
 				 export_handle->notify_stream,
-				 "Type: undefined (none)\n" );
+				 "Type: undefined (REG_NONE)\n" );
 				break;
 
 			case LIBREGF_VALUE_TYPE_STRING:
 				fprintf(
 				 export_handle->notify_stream,
-				 "Type: string\n" );
+				 "Type: string (REG_SZ)\n" );
 				break;
 
 			case LIBREGF_VALUE_TYPE_EXPANDABLE_STRING:
 				fprintf(
 				 export_handle->notify_stream,
-				 "Type: expandable string\n" );
+				 "Type: expandable string (REG_EXPAND_SZ)\n" );
 				break;
 
 			case LIBREGF_VALUE_TYPE_BINARY_DATA:
 				fprintf(
 				 export_handle->notify_stream,
-				 "Type: binary data\n" );
+				 "Type: binary data (REG_BINARY)\n" );
 				break;
 
 			case LIBREGF_VALUE_TYPE_INTEGER_32BIT_LITTLE_ENDIAN:
 				fprintf(
 				 export_handle->notify_stream,
-				 "Type: 32-bit integer little-endian\n" );
+				 "Type: 32-bit integer little-endian (REG_DWORD_LITTLE_ENDIAN)\n" );
 				break;
 
 			case LIBREGF_VALUE_TYPE_INTEGER_32BIT_BIG_ENDIAN:
 				fprintf(
 				 export_handle->notify_stream,
-				 "Type: 32-bit integer big-endian\n" );
+				 "Type: 32-bit integer big-endian (REG_DWORD_BIG_ENDIAN)\n" );
 				break;
 
 			case LIBREGF_VALUE_TYPE_SYMBOLIC_LINK:
 				fprintf(
 				 export_handle->notify_stream,
-				 "Type: symbolic link\n" );
+				 "Type: symbolic link (REG_LINK)\n" );
 				break;
 
 			case LIBREGF_VALUE_TYPE_MULTI_VALUE_STRING:
 				fprintf(
 				 export_handle->notify_stream,
-				 "Type: multi-value string\n" );
+				 "Type: multi-value string (REG_MULTI_SZ)\n" );
 				break;
 
 			case LIBREGF_VALUE_TYPE_RESOURCE_LIST:
 				fprintf(
 				 export_handle->notify_stream,
-				 "Type: resource list\n" );
+				 "Type: resource list (REG_RESOURCE_LIST)\n" );
 				break;
 
 			case LIBREGF_VALUE_TYPE_FULL_RESOURCE_DESCRIPTOR:
 				fprintf(
 				 export_handle->notify_stream,
-				 "Type: full resource descriptor\n" );
+				 "Type: full resource descriptor (REG_FULL_RESOURCE_DESCRIPTOR)\n" );
 				break;
 
 			case LIBREGF_VALUE_TYPE_RESOURCE_REQUIREMENTS_LIST:
 				fprintf(
 				 export_handle->notify_stream,
-				 "Type: resource requirements list\n" );
+				 "Type: resource requirements list (REG_RESOURCE_REQUIREMENTS_LIST)\n" );
 				break;
 
 			case LIBREGF_VALUE_TYPE_INTEGER_64BIT_LITTLE_ENDIAN:
 				fprintf(
 				 export_handle->notify_stream,
-				 "Type: 64-bit integer little-endian\n" );
+				 "Type: 64-bit integer little-endian (REG_QWORD_LITTLE_ENDIAN)\n" );
 				break;
 
 			default:

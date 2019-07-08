@@ -19,8 +19,8 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBREGF_CRC_H )
-#define _LIBREGF_CRC_H
+#if !defined( _LIBREGF_CHECKSUM_H )
+#define _LIBREGF_CHECKSUM_H
 
 #include <common.h>
 #include <types.h>
@@ -42,5 +42,5 @@ int libregf_checksum_calculate_little_endian_xor32(
 }
 #endif
 
-#endif /* !defined( _LIBREGF_CRC_H ) */
+#endif /* !defined( _LIBREGF_CHECKSUM_H ) */
 

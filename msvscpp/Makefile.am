@@ -15,6 +15,7 @@ MSVSCPP_FILES = \
 	libregf/libregf.vcproj \
 	libuna/libuna.vcproj \
 	pyregf/pyregf.vcproj \
+	regf_test_checksum/regf_test_checksum.vcproj \
 	regf_test_data_type/regf_test_data_type.vcproj \
 	regf_test_error/regf_test_error.vcproj \
 	regf_test_file/regf_test_file.vcproj \

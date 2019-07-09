@@ -69,6 +69,7 @@ in the section entitled "GNU Free Documentation License".
 | 0.0.22 | J.B. Metz | November 2016 | Additional information regarding corruption scenario.
 | 0.0.23 | J.B. Metz | February 2018 | Textual changes.
 | 0.0.24 | J.B. Metz | June 2019 | Formatting changes.
+| 0.0.25 | J.B. Metz | July 2019 | Textual changes.
 |===
 
 :numbered:
@@ -136,7 +137,9 @@ document:
 * Windows 7
 * Windows 8
 * [yellow-background]*TODO: Windows 2012*
+* [yellow-background]*TODO: Windows 2016*
 * Windows 10
+* [yellow-background]*TODO: Windows 2019*
 
 === Registy files
 
@@ -189,16 +192,15 @@ Matches the secondary sequence number if the hive was properly synchronized
 Matches the primary sequence number if the hive was properly synchronized
 | 12 | 8 | | Last modification date and time +
 Contains a FILETIME in UTC
-| 20 | 4 | | Major version
-| 24 | 4 | | Minor version
+| 20 | 4 | | Major format version
+| 24 | 4 | | Minor format version
 | 28 | 4 | | [yellow-background]*Unknown (File type)* +
 [yellow-background]*0x0000 => normal* +
 [yellow-background]*0x0001 => transaction log*
 | 32 | 4 | | [yellow-background]*Unknown (file format)* +
 [yellow-background]*0x0001 => 1 means direct memory load*
 | 36 | 4 | | The root key offset +
-Primary sequence number +
-Matches the secondary sequence number if the hive was properly synchronized
+Value in bytes and relative from the start of the hive bin data
 | 40 | 4 | | Hive bins data size
 | 44 | 4 | | [yellow-background]*Unknown (Clustering factor)* +
 [yellow-background]*Logical sector size of the underlying disk in bytes divided by 512* +

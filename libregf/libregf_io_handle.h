@@ -77,13 +77,6 @@ int libregf_io_handle_clear(
      libregf_io_handle_t *io_handle,
      libcerror_error_t **error );
 
-int libregf_io_handle_read_file_header(
-     libregf_io_handle_t *io_handle,
-     libbfio_handle_t *file_io_handle,
-     uint32_t *root_key_offset,
-     uint32_t *hive_bins_size,
-     libcerror_error_t **error );
-
 ssize_t libregf_io_handle_read_segment_data(
          intptr_t *data_handle,
          libbfio_handle_t *file_io_handle,

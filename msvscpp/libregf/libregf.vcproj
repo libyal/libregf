@@ -194,6 +194,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libregf\libregf_file_header.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libregf\libregf_hive_bin.c"
 				>
 			</File>
@@ -281,6 +285,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libregf\libregf_file.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libregf\libregf_file_header.h"
 				>
 			</File>
 			<File

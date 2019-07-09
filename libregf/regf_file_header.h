@@ -55,15 +55,15 @@ struct regf_file_header
 	 */
 	uint8_t modification_time[ 8 ];
 
-	/* The major version
+	/* The major format version
 	 * Consists of 4 bytes
 	 */
-	uint8_t major_version[ 4 ];
+	uint8_t major_format_version[ 4 ];
 
-	/* The minor version
+	/* The minor format version
 	 * Consists of 4 bytes
 	 */
-	uint8_t minor_version[ 4 ];
+	uint8_t minor_format_version[ 4 ];
 
 	/* The file type
 	 * Consists of 4 bytes
@@ -73,7 +73,7 @@ struct regf_file_header
 	/* Unknown
 	 * Consists of 4 bytes
 	 */
-	uint8_t unknown3[ 4 ];
+	uint8_t unknown1[ 4 ];
 
 	/* The root key offset
 	 * Consists of 4 bytes
@@ -88,17 +88,17 @@ struct regf_file_header
 	/* Unknown
 	 * Consists of 4 bytes
 	 */
-	uint8_t unknown4[ 4 ];
+	uint8_t unknown2[ 4 ];
 
 	/* Unknown
 	 * Consists of 64 bytes
 	 */
-	uint8_t unknown5[ 64 ];
+	uint8_t unknown3[ 64 ];
 
 	/* Unknown
 	 * Consists of 396 bytes
 	 */
-	uint8_t unknown6[ 396 ];
+	uint8_t unknown4[ 396 ];
 
 	/* The XOR-32 checksum of the previous 508 bytes
 	 * Consists of 4 bytes

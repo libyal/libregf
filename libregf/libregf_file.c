@@ -33,6 +33,7 @@
 #include "libregf_debug.h"
 #include "libregf_definitions.h"
 #include "libregf_file.h"
+#include "libregf_file_header.h"
 #include "libregf_hive_bin.h"
 #include "libregf_hive_bins_list.h"
 #include "libregf_io_handle.h"
@@ -746,6 +747,22 @@ int libregf_file_close(
 
 		result = -1;
 	}
+	if( internal_file->file_header != NULL )
+	{
+		if( libregf_file_header_free(
+		     &( internal_file->file_header ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free file header.",
+			 function );
+
+			result = -1;
+		}
+	}
 	if( internal_file->hive_bins_list != NULL )
 	{
 		if( libregf_hive_bins_list_free(
@@ -805,11 +822,9 @@ int libregf_file_open_read(
      libbfio_handle_t *file_io_handle,
      libcerror_error_t **error )
 {
-	static char *function    = "libregf_file_open_read";
-	size64_t file_size       = 0;
-	uint32_t hive_bins_size  = 0;
-	uint32_t root_key_offset = 0;
-	int result               = 0;
+	static char *function = "libregf_file_open_read";
+	size64_t file_size    = 0;
+	int result            = 0;
 
 	if( internal_file == NULL )
 	{
@@ -829,6 +844,17 @@ int libregf_file_open_read(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid file - missing IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_file->file_header != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid file - file header already set.",
 		 function );
 
 		return( -1 );
@@ -876,11 +902,22 @@ int libregf_file_open_read(
 		 "Reading file header:\n" );
 	}
 #endif
-	if( libregf_io_handle_read_file_header(
-	     internal_file->io_handle,
+	if( libregf_file_header_initialize(
+	     &( internal_file->file_header ),
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create file header.",
+		 function );
+
+		goto on_error;
+	}
+	if( libregf_file_header_read_file_io_handle(
+	     internal_file->file_header,
 	     file_io_handle,
-	     &root_key_offset,
-	     &hive_bins_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -892,7 +929,10 @@ int libregf_file_open_read(
 
 		goto on_error;
 	}
-	if( ( internal_file->io_handle->file_type == LIBREGF_FILE_TYPE_REGISTRY )
+	internal_file->io_handle->major_version = internal_file->file_header->major_format_version;
+	internal_file->io_handle->minor_version = internal_file->file_header->minor_format_version;
+
+	if( ( internal_file->file_header->file_type == LIBREGF_FILE_TYPE_REGISTRY )
 	 && ( file_size > 4096 ) )
 	{
 /* TODO print data between header and hive bins list offset ? */
@@ -923,7 +963,7 @@ int libregf_file_open_read(
 		          internal_file->hive_bins_list,
 		          file_io_handle,
 		          internal_file->io_handle->hive_bins_list_offset,
-		          hive_bins_size,
+		          internal_file->file_header->hive_bins_size,
 		          error );
 
 		if( result == -1 )
@@ -976,7 +1016,7 @@ int libregf_file_open_read(
 			if( libfdata_tree_set_root_node(
 			     internal_file->key_tree,
 			     0,
-			     (off64_t) root_key_offset,
+			     (off64_t) internal_file->file_header->root_key_offset,
 			     0,
 			     0,
 			     error ) != 1 )
@@ -1011,6 +1051,12 @@ on_error:
 	{
 		libregf_hive_bins_list_free(
 		 &( internal_file->hive_bins_list ),
+		 NULL );
+	}
+	if( internal_file->file_header != NULL )
+	{
+		libregf_file_header_free(
+		 &( internal_file->file_header ),
 		 NULL );
 	}
 	return( -1 );
@@ -1198,13 +1244,13 @@ int libregf_file_get_format_version(
 	}
 	internal_file = (libregf_internal_file_t *) file;
 
-	if( internal_file->io_handle == NULL )
+	if( internal_file->file_header == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file - missing IO handle.",
+		 "%s: invalid file - missing file header.",
 		 function );
 
 		return( -1 );
@@ -1215,7 +1261,7 @@ int libregf_file_get_format_version(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid major version.",
+		 "%s: invalid major format version.",
 		 function );
 
 		return( -1 );
@@ -1226,13 +1272,13 @@ int libregf_file_get_format_version(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid minor version.",
+		 "%s: invalid minor format version.",
 		 function );
 
 		return( -1 );
 	}
-	*major_version = internal_file->io_handle->major_version;
-	*minor_version = internal_file->io_handle->minor_version;
+	*major_version = internal_file->file_header->major_format_version;
+	*minor_version = internal_file->file_header->minor_format_version;
 
 	return( 1 );
 }
@@ -1261,13 +1307,13 @@ int libregf_file_get_type(
 	}
 	internal_file = (libregf_internal_file_t *) file;
 
-	if( internal_file->io_handle == NULL )
+	if( internal_file->file_header == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file - missing IO handle.",
+		 "%s: invalid file - missing file header.",
 		 function );
 
 		return( -1 );
@@ -1283,7 +1329,7 @@ int libregf_file_get_type(
 
 		return( -1 );
 	}
-	*file_type = internal_file->io_handle->file_type;
+	*file_type = internal_file->file_header->file_type;
 
 	return( 1 );
 }
@@ -1313,13 +1359,13 @@ int libregf_file_get_root_key(
 	}
 	internal_file = (libregf_internal_file_t *) file;
 
-	if( internal_file->io_handle == NULL )
+	if( internal_file->file_header == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file - missing IO handle.",
+		 "%s: invalid file - missing file header.",
 		 function );
 
 		return( -1 );
@@ -1346,7 +1392,7 @@ int libregf_file_get_root_key(
 
 		return( -1 );
 	}
-	if( ( internal_file->io_handle->file_type != LIBREGF_FILE_TYPE_REGISTRY )
+	if( ( internal_file->file_header->file_type != LIBREGF_FILE_TYPE_REGISTRY )
 	 || ( internal_file->key_tree == NULL ) )
 	{
 		return( 0 );

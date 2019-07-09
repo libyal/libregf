@@ -30,6 +30,7 @@ libregf_la_SOURCES = \
 	libregf_error.c libregf_error.h \
 	libregf_extern.h \
 	libregf_file.c libregf_file.h \
+	libregf_file_header.c libregf_file_header.h \
 	libregf_hive_bin.c libregf_hive_bin.h \
 	libregf_hive_bin_cell.c libregf_hive_bin_cell.h \
 	libregf_hive_bins_list.c libregf_hive_bins_list.h \

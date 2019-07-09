@@ -19,6 +19,7 @@ MSVSCPP_FILES = \
 	regf_test_data_type/regf_test_data_type.vcproj \
 	regf_test_error/regf_test_error.vcproj \
 	regf_test_file/regf_test_file.vcproj \
+	regf_test_file_header/regf_test_file_header.vcproj \
 	regf_test_hive_bin/regf_test_hive_bin.vcproj \
 	regf_test_hive_bin_cell/regf_test_hive_bin_cell.vcproj \
 	regf_test_hive_bins_list/regf_test_hive_bins_list.vcproj \

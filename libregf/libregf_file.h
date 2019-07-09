@@ -26,6 +26,7 @@
 #include <types.h>
 
 #include "libregf_extern.h"
+#include "libregf_file_header.h"
 #include "libregf_hive_bins_list.h"
 #include "libregf_io_handle.h"
 #include "libregf_libbfio.h"
@@ -49,6 +50,10 @@ struct libregf_internal_file
 	/* The IO handle
 	 */
 	libregf_io_handle_t *io_handle;
+
+	/* The file header
+	 */
+	libregf_file_header_t *file_header;
 
 	/* The hive bins list
 	 */

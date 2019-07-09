@@ -1,0 +1,112 @@
+name: regf
+type: format
+description: Windows NT Registry File (REGF) format
+urls: ['https://github.com/libyal/libregf/blob/master/documentation/Windows%20NT%20Registry%20File%20(REGF)%20format.asciidoc']
+metadata:
+  authors: ['Joachim Metz <joachim.metz@gmail.com>']
+  year: 2009
+attributes:
+  byte_order: little-endian
+layout:
+- data_type: file_header
+---
+name: byte
+type: integer
+attributes:
+  format: unsigned
+  size: 1
+  units: bytes
+---
+name: uint16
+type: integer
+attributes:
+  format: unsigned
+  size: 2
+  units: bytes
+---
+name: uint32
+type: integer
+attributes:
+  format: unsigned
+  size: 4
+  units: bytes
+---
+name: wchar16
+type: character
+attributes:
+  size: 2
+  units: bytes
+---
+name: filetime
+aliases: [FILETIME]
+type: structure
+description: FILETIME structure
+urls: ['https://msdn.microsoft.com/en-us/library/windows/desktop/ms724284(v=vs.85).aspx']
+members:
+- name: lower_part
+  data_type: uint32
+- name: upper_part
+  data_type: uint32
+---
+name: file_header
+type: structure
+description: File header
+members:
+- name: signature
+  type: stream
+  element_data_type: byte
+  elements_data_size: 4
+  value: "regf"
+- name: primary_sequence_number
+  data_type: uint32
+- name: secondary_sequence_number
+  data_type: uint32
+- name: modification_time
+  description: Last modification date and time
+  data_type: filetime
+- name: major_format_version
+  data_type: uint32
+- name: minor_format_version
+  data_type: uint32
+- name: file_type
+  data_type: uint32
+- name: unknown1
+  data_type: uint32
+- name: root_key_offset
+  data_type: uint32
+- name: hive_bins_data_size
+  data_type: uint32
+- name: unknown2
+  data_type: uint32
+- name: unknown3
+  type: stream
+  element_data_type: byte
+  elements_data_size: 64
+- name: unknown4
+  type: stream
+  element_data_type: byte
+  elements_data_size: 396
+- name: checksum
+  data_type: uint32
+---
+name: hive_bin_header
+type: structure
+description: Hive bin header
+members:
+- name: signature
+  type: stream
+  element_data_type: byte
+  elements_data_size: 4
+  value: "hbin"
+- name: hive_bin_offset
+  data_type: uint32
+- name: size
+  data_type: uint32
+- name: unknown1
+  data_type: uint32
+- name: unknown2
+  data_type: uint32
+- name: unknown_time
+  data_type: filetime
+- name: unknown_spare
+  data_type: uint32

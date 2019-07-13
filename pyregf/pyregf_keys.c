@@ -59,7 +59,7 @@ PyTypeObject pyregf_keys_type_object = {
 	PyVarObject_HEAD_INIT( NULL, 0 )
 
 	/* tp_name */
-	"pyregf._keys",
+	"pyregf.keys",
 	/* tp_basicsize */
 	sizeof( pyregf_keys_t ),
 	/* tp_itemsize */
@@ -97,7 +97,7 @@ PyTypeObject pyregf_keys_type_object = {
 	/* tp_flags */
 	Py_TPFLAGS_DEFAULT | Py_TPFLAGS_HAVE_ITER,
 	/* tp_doc */
-	"pyregf internal sequence and iterator object of keys",
+	"pyregf sequence and iterator object of keys",
 	/* tp_traverse */
 	0,
 	/* tp_clear */
@@ -150,7 +150,7 @@ PyTypeObject pyregf_keys_type_object = {
 	0
 };
 
-/* Creates a new keys object
+/* Creates a new keys sequence and iterator object
  * Returns a Python object if successful or NULL on error
  */
 PyObject *pyregf_keys_new(
@@ -160,8 +160,8 @@ PyObject *pyregf_keys_new(
                         int index ),
            int number_of_items )
 {
-	pyregf_keys_t *keys_object = NULL;
-	static char *function      = "pyregf_keys_new";
+	pyregf_keys_t *sequence_object = NULL;
+	static char *function          = "pyregf_keys_new";
 
 	if( parent_object == NULL )
 	{
@@ -183,93 +183,89 @@ PyObject *pyregf_keys_new(
 	}
 	/* Make sure the keys values are initialized
 	 */
-	keys_object = PyObject_New(
-	               struct pyregf_keys,
-	               &pyregf_keys_type_object );
+	sequence_object = PyObject_New(
+	                   struct pyregf_keys,
+	                   &pyregf_keys_type_object );
 
-	if( keys_object == NULL )
+	if( sequence_object == NULL )
 	{
 		PyErr_Format(
 		 PyExc_MemoryError,
-		 "%s: unable to create keys object.",
+		 "%s: unable to create sequence object.",
 		 function );
 
 		goto on_error;
 	}
-	if( pyregf_keys_init(
-	     keys_object ) != 0 )
-	{
-		PyErr_Format(
-		 PyExc_MemoryError,
-		 "%s: unable to initialize keys object.",
-		 function );
-
-		goto on_error;
-	}
-	keys_object->parent_object     = parent_object;
-	keys_object->get_item_by_index = get_item_by_index;
-	keys_object->number_of_items   = number_of_items;
+	sequence_object->parent_object     = parent_object;
+	sequence_object->get_item_by_index = get_item_by_index;
+	sequence_object->current_index     = 0;
+	sequence_object->number_of_items   = number_of_items;
 
 	Py_IncRef(
-	 (PyObject *) keys_object->parent_object );
+	 (PyObject *) sequence_object->parent_object );
 
-	return( (PyObject *) keys_object );
+	return( (PyObject *) sequence_object );
 
 on_error:
-	if( keys_object != NULL )
+	if( sequence_object != NULL )
 	{
 		Py_DecRef(
-		 (PyObject *) keys_object );
+		 (PyObject *) sequence_object );
 	}
 	return( NULL );
 }
 
-/* Intializes a keys object
+/* Intializes a keys sequence and iterator object
  * Returns 0 if successful or -1 on error
  */
 int pyregf_keys_init(
-     pyregf_keys_t *keys_object )
+     pyregf_keys_t *sequence_object )
 {
 	static char *function = "pyregf_keys_init";
 
-	if( keys_object == NULL )
+	if( sequence_object == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid keys object.",
+		 "%s: invalid sequence object.",
 		 function );
 
 		return( -1 );
 	}
 	/* Make sure the keys values are initialized
 	 */
-	keys_object->parent_object     = NULL;
-	keys_object->get_item_by_index = NULL;
-	keys_object->current_index     = 0;
-	keys_object->number_of_items   = 0;
+	sequence_object->parent_object     = NULL;
+	sequence_object->get_item_by_index = NULL;
+	sequence_object->current_index     = 0;
+	sequence_object->number_of_items   = 0;
 
-	return( 0 );
+	PyErr_Format(
+	 PyExc_NotImplementedError,
+	 "%s: initialize of keys not supported.",
+	 function );
+
+	return( -1 );
 }
 
-/* Frees a keys object
+/* Frees a keys sequence object
  */
 void pyregf_keys_free(
-      pyregf_keys_t *keys_object )
+      pyregf_keys_t *sequence_object )
 {
 	struct _typeobject *ob_type = NULL;
 	static char *function       = "pyregf_keys_free";
 
-	if( keys_object == NULL )
+	if( sequence_object == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid keys object.",
+		 "%s: invalid sequence object.",
 		 function );
 
 		return;
 	}
 	ob_type = Py_TYPE(
-	           keys_object );
+	           sequence_object );
 
 	if( ob_type == NULL )
 	{
@@ -289,72 +285,72 @@ void pyregf_keys_free(
 
 		return;
 	}
-	if( keys_object->parent_object != NULL )
+	if( sequence_object->parent_object != NULL )
 	{
 		Py_DecRef(
-		 (PyObject *) keys_object->parent_object );
+		 (PyObject *) sequence_object->parent_object );
 	}
 	ob_type->tp_free(
-	 (PyObject*) keys_object );
+	 (PyObject*) sequence_object );
 }
 
 /* The keys len() function
  */
 Py_ssize_t pyregf_keys_len(
-            pyregf_keys_t *keys_object )
+            pyregf_keys_t *sequence_object )
 {
 	static char *function = "pyregf_keys_len";
 
-	if( keys_object == NULL )
+	if( sequence_object == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid keys object.",
+		 "%s: invalid sequence object.",
 		 function );
 
 		return( -1 );
 	}
-	return( (Py_ssize_t) keys_object->number_of_items );
+	return( (Py_ssize_t) sequence_object->number_of_items );
 }
 
 /* The keys getitem() function
  */
 PyObject *pyregf_keys_getitem(
-           pyregf_keys_t *keys_object,
+           pyregf_keys_t *sequence_object,
            Py_ssize_t item_index )
 {
 	PyObject *key_object  = NULL;
 	static char *function = "pyregf_keys_getitem";
 
-	if( keys_object == NULL )
+	if( sequence_object == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid keys object.",
+		 "%s: invalid sequence object.",
 		 function );
 
 		return( NULL );
 	}
-	if( keys_object->get_item_by_index == NULL )
+	if( sequence_object->get_item_by_index == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid keys object - missing get item by index function.",
+		 "%s: invalid sequence object - missing get item by index function.",
 		 function );
 
 		return( NULL );
 	}
-	if( keys_object->number_of_items < 0 )
+	if( sequence_object->number_of_items < 0 )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid keys object - invalid number of items.",
+		 "%s: invalid sequence object - invalid number of items.",
 		 function );
 
 		return( NULL );
 	}
 	if( ( item_index < 0 )
-	 || ( item_index >= (Py_ssize_t) keys_object->number_of_items ) )
+	 || ( item_index >= (Py_ssize_t) sequence_object->number_of_items ) )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
@@ -363,8 +359,8 @@ PyObject *pyregf_keys_getitem(
 
 		return( NULL );
 	}
-	key_object = keys_object->get_item_by_index(
-	              keys_object->parent_object,
+	key_object = sequence_object->get_item_by_index(
+	              sequence_object->parent_object,
 	              (int) item_index );
 
 	return( key_object );
@@ -373,83 +369,83 @@ PyObject *pyregf_keys_getitem(
 /* The keys iter() function
  */
 PyObject *pyregf_keys_iter(
-           pyregf_keys_t *keys_object )
+           pyregf_keys_t *sequence_object )
 {
 	static char *function = "pyregf_keys_iter";
 
-	if( keys_object == NULL )
+	if( sequence_object == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid keys object.",
+		 "%s: invalid sequence object.",
 		 function );
 
 		return( NULL );
 	}
 	Py_IncRef(
-	 (PyObject *) keys_object );
+	 (PyObject *) sequence_object );
 
-	return( (PyObject *) keys_object );
+	return( (PyObject *) sequence_object );
 }
 
 /* The keys iternext() function
  */
 PyObject *pyregf_keys_iternext(
-           pyregf_keys_t *keys_object )
+           pyregf_keys_t *sequence_object )
 {
 	PyObject *key_object  = NULL;
 	static char *function = "pyregf_keys_iternext";
 
-	if( keys_object == NULL )
+	if( sequence_object == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid keys object.",
+		 "%s: invalid sequence object.",
 		 function );
 
 		return( NULL );
 	}
-	if( keys_object->get_item_by_index == NULL )
+	if( sequence_object->get_item_by_index == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid keys object - missing get item by index function.",
+		 "%s: invalid sequence object - missing get item by index function.",
 		 function );
 
 		return( NULL );
 	}
-	if( keys_object->current_index < 0 )
+	if( sequence_object->current_index < 0 )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid keys object - invalid current index.",
+		 "%s: invalid sequence object - invalid current index.",
 		 function );
 
 		return( NULL );
 	}
-	if( keys_object->number_of_items < 0 )
+	if( sequence_object->number_of_items < 0 )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid keys object - invalid number of items.",
+		 "%s: invalid sequence object - invalid number of items.",
 		 function );
 
 		return( NULL );
 	}
-	if( keys_object->current_index >= keys_object->number_of_items )
+	if( sequence_object->current_index >= sequence_object->number_of_items )
 	{
 		PyErr_SetNone(
 		 PyExc_StopIteration );
 
 		return( NULL );
 	}
-	key_object = keys_object->get_item_by_index(
-	              keys_object->parent_object,
-	              keys_object->current_index );
+	key_object = sequence_object->get_item_by_index(
+	              sequence_object->parent_object,
+	              sequence_object->current_index );
 
 	if( key_object != NULL )
 	{
-		keys_object->current_index++;
+		sequence_object->current_index++;
 	}
 	return( key_object );
 }

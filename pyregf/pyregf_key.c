@@ -61,14 +61,14 @@ PyMethodDef pyregf_key_object_methods[] = {
 	{ "get_name",
 	  (PyCFunction) pyregf_key_get_name,
 	  METH_NOARGS,
-	  "get_name -> Unicode string or None\n"
+	  "get_name() -> Unicode string\n"
 	  "\n"
 	  "Retrieves the name." },
 
 	{ "get_class_name",
 	  (PyCFunction) pyregf_key_get_class_name,
 	  METH_NOARGS,
-	  "get_class_name -> Unicode string or None\n"
+	  "get_class_name() -> Unicode string\n"
 	  "\n"
 	  "Retrieves the class name." },
 
@@ -98,7 +98,7 @@ PyMethodDef pyregf_key_object_methods[] = {
 	{ "get_sub_key",
 	  (PyCFunction) pyregf_key_get_sub_key,
 	  METH_VARARGS | METH_KEYWORDS,
-	  "get_sub_key(index) -> Object or None\n"
+	  "get_sub_key(index) -> Object\n"
 	  "\n"
 	  "Retrieves a specific sub key." },
 
@@ -128,7 +128,7 @@ PyMethodDef pyregf_key_object_methods[] = {
 	{ "get_value",
 	  (PyCFunction) pyregf_key_get_value,
 	  METH_VARARGS | METH_KEYWORDS,
-	  "get_value(index) -> Object or None\n"
+	  "get_value(index) -> Object\n"
 	  "\n"
 	  "Retrieves a specific value." },
 
@@ -303,7 +303,7 @@ PyTypeObject pyregf_key_type_object = {
  */
 PyObject *pyregf_key_new(
            libregf_key_t *key,
-           pyregf_file_t *file_object )
+           PyObject *parent_object )
 {
 	pyregf_key_t *pyregf_key = NULL;
 	static char *function    = "pyregf_key_new";
@@ -311,12 +311,14 @@ PyObject *pyregf_key_new(
 	if( key == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid key.",
 		 function );
 
 		return( NULL );
 	}
+	/* PyObject_New does not invoke tp_init
+	 */
 	pyregf_key = PyObject_New(
 	              struct pyregf_key,
 	              &pyregf_key_type_object );
@@ -330,21 +332,11 @@ PyObject *pyregf_key_new(
 
 		goto on_error;
 	}
-	if( pyregf_key_init(
-	     pyregf_key ) != 0 )
-	{
-		PyErr_Format(
-		 PyExc_MemoryError,
-		 "%s: unable to initialize key.",
-		 function );
-
-		goto on_error;
-	}
-	pyregf_key->key         = key;
-	pyregf_key->file_object = file_object;
+	pyregf_key->key           = key;
+	pyregf_key->parent_object = parent_object;
 
 	Py_IncRef(
-	 (PyObject *) pyregf_key->file_object );
+	 (PyObject *) pyregf_key->parent_object );
 
 	return( (PyObject *) pyregf_key );
 
@@ -357,7 +349,7 @@ on_error:
 	return( NULL );
 }
 
-/* Intializes an key object
+/* Intializes a key object
  * Returns 0 if successful or -1 on error
  */
 int pyregf_key_init(
@@ -368,7 +360,7 @@ int pyregf_key_init(
 	if( pyregf_key == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid key.",
 		 function );
 
@@ -378,32 +370,29 @@ int pyregf_key_init(
 	 */
 	pyregf_key->key = NULL;
 
-	return( 0 );
+	PyErr_Format(
+	 PyExc_NotImplementedError,
+	 "%s: initialize of key not supported.",
+	 function );
+
+	return( -1 );
 }
 
-/* Frees an key object
+/* Frees a key object
  */
 void pyregf_key_free(
       pyregf_key_t *pyregf_key )
 {
-	libcerror_error_t *error    = NULL;
 	struct _typeobject *ob_type = NULL;
+	libcerror_error_t *error    = NULL;
 	static char *function       = "pyregf_key_free";
+	int result                  = 0;
 
 	if( pyregf_key == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid key.",
-		 function );
-
-		return;
-	}
-	if( pyregf_key->key == NULL )
-	{
-		PyErr_Format(
-		 PyExc_TypeError,
-		 "%s: invalid key - missing libregf key.",
 		 function );
 
 		return;
@@ -429,23 +418,32 @@ void pyregf_key_free(
 
 		return;
 	}
-	if( libregf_key_free(
-	     &( pyregf_key->key ),
-	     &error ) != 1 )
+	if( pyregf_key->key != NULL )
 	{
-		pyregf_error_raise(
-		 error,
-		 PyExc_IOError,
-		 "%s: unable to free libregf key.",
-		 function );
+		Py_BEGIN_ALLOW_THREADS
 
-		libcerror_error_free(
-		 &error );
+		result = libregf_key_free(
+		          &( pyregf_key->key ),
+		          &error );
+
+		Py_END_ALLOW_THREADS
+
+		if( result != 1 )
+		{
+			pyregf_error_raise(
+			 error,
+			 PyExc_MemoryError,
+			 "%s: unable to free libregf key.",
+			 function );
+
+			libcerror_error_free(
+			 &error );
+		}
 	}
-	if( pyregf_key->file_object != NULL )
+	if( pyregf_key->parent_object != NULL )
 	{
 		Py_DecRef(
-		 (PyObject *) pyregf_key->file_object );
+		 pyregf_key->parent_object );
 	}
 	ob_type->tp_free(
 	 (PyObject*) pyregf_key );
@@ -525,7 +523,7 @@ PyObject *pyregf_key_get_offset(
 	if( pyregf_key == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid key.",
 		 function );
 
@@ -569,9 +567,9 @@ PyObject *pyregf_key_get_name(
 	libcerror_error_t *error = NULL;
 	PyObject *string_object  = NULL;
 	const char *errors       = NULL;
-	uint8_t *name            = NULL;
+	uint8_t *utf8_string     = NULL;
 	static char *function    = "pyregf_key_get_name";
-	size_t name_size         = 0;
+	size_t utf8_string_size  = 0;
 	int result               = 0;
 
 	PYREGF_UNREFERENCED_PARAMETER( arguments )
@@ -579,7 +577,7 @@ PyObject *pyregf_key_get_name(
 	if( pyregf_key == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid key.",
 		 function );
 
@@ -589,7 +587,7 @@ PyObject *pyregf_key_get_name(
 
 	result = libregf_key_get_utf8_name_size(
 	          pyregf_key->key,
-	          &name_size,
+	          &utf8_string_size,
 	          &error );
 
 	Py_END_ALLOW_THREADS
@@ -608,17 +606,17 @@ PyObject *pyregf_key_get_name(
 		goto on_error;
 	}
 	else if( ( result == 0 )
-	      || ( name_size == 0 ) )
+	      || ( utf8_string_size == 0 ) )
 	{
 		Py_IncRef(
 		 Py_None );
 
 		return( Py_None );
 	}
-	name = (uint8_t *) PyMem_Malloc(
-	                    sizeof( uint8_t ) * name_size );
+	utf8_string = (uint8_t *) PyMem_Malloc(
+	                           sizeof( uint8_t ) * utf8_string_size );
 
-	if( name == NULL )
+	if( utf8_string == NULL )
 	{
 		PyErr_Format(
 		 PyExc_IOError,
@@ -631,8 +629,8 @@ PyObject *pyregf_key_get_name(
 
 	result = libregf_key_get_utf8_name(
 		  pyregf_key->key,
-		  name,
-		  name_size,
+		  utf8_string,
+		  utf8_string_size,
 		  &error );
 
 	Py_END_ALLOW_THREADS
@@ -655,20 +653,20 @@ PyObject *pyregf_key_get_name(
 	 * of the string
 	 */
 	string_object = PyUnicode_DecodeUTF8(
-			 (char *) name,
-			 (Py_ssize_t) name_size - 1,
+			 (char *) utf8_string,
+			 (Py_ssize_t) utf8_string_size - 1,
 			 errors );
 
 	PyMem_Free(
-	 name );
+	 utf8_string );
 
 	return( string_object );
 
 on_error:
-	if( name != NULL )
+	if( utf8_string != NULL )
 	{
 		PyMem_Free(
-		 name );
+		 utf8_string );
 	}
 	return( NULL );
 }
@@ -683,9 +681,9 @@ PyObject *pyregf_key_get_class_name(
 	libcerror_error_t *error = NULL;
 	PyObject *string_object  = NULL;
 	const char *errors       = NULL;
-	uint8_t *class_name      = NULL;
+	uint8_t *utf8_string     = NULL;
 	static char *function    = "pyregf_key_get_class_name";
-	size_t class_name_size   = 0;
+	size_t utf8_string_size  = 0;
 	int result               = 0;
 
 	PYREGF_UNREFERENCED_PARAMETER( arguments )
@@ -693,7 +691,7 @@ PyObject *pyregf_key_get_class_name(
 	if( pyregf_key == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid key.",
 		 function );
 
@@ -703,7 +701,7 @@ PyObject *pyregf_key_get_class_name(
 
 	result = libregf_key_get_utf8_class_name_size(
 	          pyregf_key->key,
-	          &class_name_size,
+	          &utf8_string_size,
 	          &error );
 
 	Py_END_ALLOW_THREADS
@@ -722,17 +720,17 @@ PyObject *pyregf_key_get_class_name(
 		goto on_error;
 	}
 	else if( ( result == 0 )
-	      || ( class_name_size == 0 ) )
+	      || ( utf8_string_size == 0 ) )
 	{
 		Py_IncRef(
 		 Py_None );
 
 		return( Py_None );
 	}
-	class_name = (uint8_t *) PyMem_Malloc(
-	                          sizeof( uint8_t ) * class_name_size );
+	utf8_string = (uint8_t *) PyMem_Malloc(
+	                           sizeof( uint8_t ) * utf8_string_size );
 
-	if( class_name == NULL )
+	if( utf8_string == NULL )
 	{
 		PyErr_Format(
 		 PyExc_IOError,
@@ -745,8 +743,8 @@ PyObject *pyregf_key_get_class_name(
 
 	result = libregf_key_get_utf8_class_name(
 		  pyregf_key->key,
-		  class_name,
-		  class_name_size,
+		  utf8_string,
+		  utf8_string_size,
 		  &error );
 
 	Py_END_ALLOW_THREADS
@@ -769,20 +767,20 @@ PyObject *pyregf_key_get_class_name(
 	 * of the string
 	 */
 	string_object = PyUnicode_DecodeUTF8(
-			 (char *) class_name,
-			 (Py_ssize_t) class_name_size - 1,
+			 (char *) utf8_string,
+			 (Py_ssize_t) utf8_string_size - 1,
 			 errors );
 
 	PyMem_Free(
-	 class_name );
+	 utf8_string );
 
 	return( string_object );
 
 on_error:
-	if( class_name != NULL )
+	if( utf8_string != NULL )
 	{
 		PyMem_Free(
-		 class_name );
+		 utf8_string );
 	}
 	return( NULL );
 }
@@ -909,7 +907,7 @@ PyObject *pyregf_key_get_number_of_sub_keys(
 	if( pyregf_key == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid key.",
 		 function );
 
@@ -963,7 +961,7 @@ PyObject *pyregf_key_get_sub_key_by_index(
 	if( pyregf_key == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid key.",
 		 function );
 
@@ -995,7 +993,7 @@ PyObject *pyregf_key_get_sub_key_by_index(
 	}
 	key_object = pyregf_key_new(
 	              sub_key,
-	              ( (pyregf_key_t *) pyregf_key )->file_object );
+	              ( (pyregf_key_t *) pyregf_key )->parent_object );
 
 	if( key_object == NULL )
 	{
@@ -1064,7 +1062,7 @@ PyObject *pyregf_key_get_sub_keys(
 	if( pyregf_key == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid key.",
 		 function );
 
@@ -1129,7 +1127,7 @@ PyObject *pyregf_key_get_sub_key_by_name(
 	if( pyregf_key == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid key.",
 		 function );
 
@@ -1182,7 +1180,7 @@ PyObject *pyregf_key_get_sub_key_by_name(
 	}
 	key_object = pyregf_key_new(
 	              sub_key,
-	              pyregf_key->file_object );
+	              pyregf_key->parent_object );
 
 	if( key_object == NULL )
 	{
@@ -1225,7 +1223,7 @@ PyObject *pyregf_key_get_sub_key_by_path(
 	if( pyregf_key == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid key.",
 		 function );
 
@@ -1278,7 +1276,7 @@ PyObject *pyregf_key_get_sub_key_by_path(
 	}
 	key_object = pyregf_key_new(
 	              sub_key,
-	              pyregf_key->file_object );
+	              pyregf_key->parent_object );
 
 	if( key_object == NULL )
 	{
@@ -1319,7 +1317,7 @@ PyObject *pyregf_key_get_number_of_values(
 	if( pyregf_key == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid key.",
 		 function );
 
@@ -1373,7 +1371,7 @@ PyObject *pyregf_key_get_value_by_index(
 	if( pyregf_key == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid key.",
 		 function );
 
@@ -1405,7 +1403,7 @@ PyObject *pyregf_key_get_value_by_index(
 	}
 	value_object = pyregf_value_new(
 	                value,
-	                ( (pyregf_key_t *) pyregf_key )->file_object );
+	                ( (pyregf_key_t *) pyregf_key )->parent_object );
 
 	if( value_object == NULL )
 	{
@@ -1474,7 +1472,7 @@ PyObject *pyregf_key_get_values(
 	if( pyregf_key == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid key.",
 		 function );
 
@@ -1539,7 +1537,7 @@ PyObject *pyregf_key_get_value_by_name(
 	if( pyregf_key == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid key.",
 		 function );
 
@@ -1596,7 +1594,7 @@ PyObject *pyregf_key_get_value_by_name(
 	}
 	value_object = pyregf_value_new(
 	                value,
-	                pyregf_key->file_object );
+	                pyregf_key->parent_object );
 
 	if( value_object == NULL )
 	{

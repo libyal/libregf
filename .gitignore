@@ -139,6 +139,7 @@ stamp-h[1-9]
 /tests/regf_test_io_handle
 /tests/regf_test_key
 /tests/regf_test_key_item
+/tests/regf_test_multi_string
 /tests/regf_test_named_key
 /tests/regf_test_notify
 /tests/regf_test_support

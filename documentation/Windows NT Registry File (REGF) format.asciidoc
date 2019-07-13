@@ -557,20 +557,17 @@ the data value.
 | Value | Identifier | Description
 | 0x00000000 | REG_NONE | Undefined type
 | 0x00000001 | REG_SZ | String +
-`[MSDN]` states that this is either in ASCII or Unicode with an end-of-string character +
-Although the string seems to be always stored as UTF-16 little-endian and sometimes the end-of-string character is not included. +
-Also see: <<corruption_scenarios,Corruption scenarios>>
+UTF-16 little-endian string with optional end-of-string character
 | 0x00000002 | REG_EXPAND_SZ | String that contains expandable (environment) variables like %PATH% +
 Either in ASCII or Unicode with an end-of-string character
 | 0x00000003 | REG_BINARY | Binary data
 | 0x00000004 | REG_DWORD +
-REG_DWORD_LITTLE_ENDIAN | 32-bit integer (double word) little-endian
-| 0x00000005 | REG_DWORD_BIG_ENDIAN | Integer 32-bit signed little-endian +
-(double word)
+REG_DWORD_LITTLE_ENDIAN | Integer 32-bit signed little-endian (double word)
+| 0x00000005 | REG_DWORD_BIG_ENDIAN | Integer 32-bit signed big-endian (double word)
 | 0x00000006 | REG_LINK | String that contains a symbolic link +
-Either in ASCII or Unicode with an end-of-string character
+UTF-16 little-endian string with end-of-string character
 | 0x00000007 | REG_MULTI_SZ | Array of strings +
-Either in ASCII or Unicode with an end-of-string character
+Array of UTF-16 little-endian strings with end-of-string character, where the array is terminated by an empyt string
 | 0x00000008 | REG_RESOURCE_LIST | [yellow-background]*Unknown (List of hardware resources of used by a physical device driver)*
 | 0x00000009 | REG_FULL_RESOURCE_DESCRIPTOR | [yellow-background]*Unknown (List of hardware resources of controlled by a physical device driver)*
 | 0x0000000a | REG_RESOURCE_REQUIREMENTS_LIST | [yellow-background]*Unknown (List of hardware resources of available to a physical device driver)*

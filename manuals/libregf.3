@@ -1,4 +1,4 @@
-.Dd March  3, 2019
+.Dd July 13, 2019
 .Dt libregf 3
 .Os libregf
 .Sh NAME
@@ -97,27 +97,27 @@ Key functions
 .Ft int
 .Fn libregf_key_get_name "libregf_key_t *key" "uint8_t *name" "size_t name_size" "libregf_error_t **error"
 .Ft int
-.Fn libregf_key_get_utf8_name_size "libregf_key_t *key" "size_t *utf8_name_size" "libregf_error_t **error"
+.Fn libregf_key_get_utf8_name_size "libregf_key_t *key" "size_t *utf8_string_size" "libregf_error_t **error"
 .Ft int
-.Fn libregf_key_get_utf8_name "libregf_key_t *key" "uint8_t *utf8_name" "size_t utf8_name_size" "libregf_error_t **error"
+.Fn libregf_key_get_utf8_name "libregf_key_t *key" "uint8_t *utf8_string" "size_t utf8_string_size" "libregf_error_t **error"
 .Ft int
-.Fn libregf_key_get_utf16_name_size "libregf_key_t *key" "size_t *utf16_name_size" "libregf_error_t **error"
+.Fn libregf_key_get_utf16_name_size "libregf_key_t *key" "size_t *utf16_string_size" "libregf_error_t **error"
 .Ft int
-.Fn libregf_key_get_utf16_name "libregf_key_t *key" "uint16_t *utf16_name" "size_t utf16_name_size" "libregf_error_t **error"
+.Fn libregf_key_get_utf16_name "libregf_key_t *key" "uint16_t *utf16_string" "size_t utf16_string_size" "libregf_error_t **error"
 .Ft int
 .Fn libregf_key_get_class_name_size "libregf_key_t *key" "size_t *class_name_size" "libregf_error_t **error"
 .Ft int
 .Fn libregf_key_get_class_name "libregf_key_t *key" "uint8_t *class_name" "size_t class_name_size" "libregf_error_t **error"
 .Ft int
-.Fn libregf_key_get_utf8_class_name_size "libregf_key_t *key" "size_t *utf8_class_name_size" "libregf_error_t **error"
+.Fn libregf_key_get_utf8_class_name_size "libregf_key_t *key" "size_t *utf8_string_size" "libregf_error_t **error"
 .Ft int
-.Fn libregf_key_get_utf8_class_name "libregf_key_t *key" "uint8_t *utf8_class_name" "size_t utf8_class_name_size" "libregf_error_t **error"
+.Fn libregf_key_get_utf8_class_name "libregf_key_t *key" "uint8_t *utf8_string" "size_t utf8_string_size" "libregf_error_t **error"
 .Ft int
-.Fn libregf_key_get_utf16_class_name_size "libregf_key_t *key" "size_t *utf16_class_name_size" "libregf_error_t **error"
+.Fn libregf_key_get_utf16_class_name_size "libregf_key_t *key" "size_t *utf16_string_size" "libregf_error_t **error"
 .Ft int
-.Fn libregf_key_get_utf16_class_name "libregf_key_t *key" "uint16_t *utf16_class_name" "size_t utf16_class_name_size" "libregf_error_t **error"
+.Fn libregf_key_get_utf16_class_name "libregf_key_t *key" "uint16_t *utf16_string" "size_t utf16_string_size" "libregf_error_t **error"
 .Ft int
-.Fn libregf_key_get_last_written_time "libregf_key_t *key" "uint64_t *last_written_time" "libregf_error_t **error"
+.Fn libregf_key_get_last_written_time "libregf_key_t *key" "uint64_t *filetime" "libregf_error_t **error"
 .Ft int
 .Fn libregf_key_get_security_descriptor_size "libregf_key_t *key" "size_t *security_descriptor_size" "libregf_error_t **error"
 .Ft int
@@ -155,13 +155,13 @@ Value functions
 .Ft int
 .Fn libregf_value_get_name "libregf_value_t *value" "uint8_t *name" "size_t name_size" "libregf_error_t **error"
 .Ft int
-.Fn libregf_value_get_utf8_name_size "libregf_value_t *value" "size_t *utf8_name_size" "libregf_error_t **error"
+.Fn libregf_value_get_utf8_name_size "libregf_value_t *value" "size_t *utf8_string_size" "libregf_error_t **error"
 .Ft int
-.Fn libregf_value_get_utf8_name "libregf_value_t *value" "uint8_t *utf8_name" "size_t utf8_name_size" "libregf_error_t **error"
+.Fn libregf_value_get_utf8_name "libregf_value_t *value" "uint8_t *utf8_string" "size_t utf8_string_size" "libregf_error_t **error"
 .Ft int
-.Fn libregf_value_get_utf16_name_size "libregf_value_t *value" "size_t *utf16_name_size" "libregf_error_t **error"
+.Fn libregf_value_get_utf16_name_size "libregf_value_t *value" "size_t *utf16_string_size" "libregf_error_t **error"
 .Ft int
-.Fn libregf_value_get_utf16_name "libregf_value_t *value" "uint16_t *utf16_name" "size_t utf16_name_size" "libregf_error_t **error"
+.Fn libregf_value_get_utf16_name "libregf_value_t *value" "uint16_t *utf16_string" "size_t utf16_string_size" "libregf_error_t **error"
 .Ft int
 .Fn libregf_value_get_value_type "libregf_value_t *value" "uint32_t *value_type" "libregf_error_t **error"
 .Ft int
@@ -184,6 +184,22 @@ Value functions
 .Fn libregf_value_get_value_binary_data_size "libregf_value_t *value" "size_t *size" "libregf_error_t **error"
 .Ft int
 .Fn libregf_value_get_value_binary_data "libregf_value_t *value" "uint8_t *binary_data" "size_t size" "libregf_error_t **error"
+.Ft int
+.Fn libregf_value_get_value_multi_string "libregf_value_t *value" "libregf_multi_string_t **multi_string" "libregf_error_t **error"
+.Pp
+Multi string functions
+.Ft int
+.Fn libregf_multi_string_free "libregf_multi_string_t **multi_string" "libregf_error_t **error"
+.Ft int
+.Fn libregf_multi_string_get_number_of_strings "libregf_multi_string_t *multi_string" "int *number_of_strings" "libregf_error_t **error"
+.Ft int
+.Fn libregf_multi_string_get_utf8_string_size "libregf_multi_string_t *multi_string" "int string_index" "size_t *utf8_string_size" "libregf_error_t **error"
+.Ft int
+.Fn libregf_multi_string_get_utf8_string "libregf_multi_string_t *multi_string" "int string_index" "uint8_t *utf8_string" "size_t utf8_string_size" "libregf_error_t **error"
+.Ft int
+.Fn libregf_multi_string_get_utf16_string_size "libregf_multi_string_t *multi_string" "int string_index" "size_t *utf16_string_size" "libregf_error_t **error"
+.Ft int
+.Fn libregf_multi_string_get_utf16_string "libregf_multi_string_t *multi_string" "int string_index" "uint16_t *utf16_string" "size_t utf16_string_size" "libregf_error_t **error"
 .Sh DESCRIPTION
 The
 .Fn libregf_get_version

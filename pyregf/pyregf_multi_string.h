@@ -1,5 +1,5 @@
 /*
- * Python object definition of the sequence and iterator object of values
+ * Python object definition of the sequence and iterator object of a multi string
  *
  * Copyright (C) 2009-2019, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -19,8 +19,8 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _PYREGF_VALUES_H )
-#define _PYREGF_VALUES_H
+#if !defined( _PYREGF_MULTI_STRING_H )
+#define _PYREGF_MULTI_STRING_H
 
 #include <common.h>
 #include <types.h>
@@ -32,23 +32,21 @@
 extern "C" {
 #endif
 
-typedef struct pyregf_values pyregf_values_t;
+typedef struct pyregf_multi_string pyregf_multi_string_t;
 
-struct pyregf_values
+struct pyregf_multi_string
 {
 	/* Python object initialization
 	 */
 	PyObject_HEAD
 
+	/* The libregf multi string
+	 */
+	libregf_multi_string_t *multi_string;
+
 	/* The parent object
 	 */
 	PyObject *parent_object;
-
-	/* The get item by index callback function
-	 */
-	PyObject* (*get_item_by_index)(
-	             PyObject *parent_object,
-	             int index );
 
 	/* The current index
 	 */
@@ -59,37 +57,34 @@ struct pyregf_values
 	int number_of_items;
 };
 
-extern PyTypeObject pyregf_values_type_object;
+extern PyTypeObject pyregf_multi_string_type_object;
 
-PyObject *pyregf_values_new(
-           PyObject *parent_object,
-           PyObject* (*get_item_by_index)(
-                        PyObject *parent_object,
-                        int index ),
-           int number_of_items );
+PyObject *pyregf_multi_string_new(
+           libregf_multi_string_t *multi_string,
+           PyObject *parent_object );
 
-int pyregf_values_init(
-     pyregf_values_t *sequence_object );
+int pyregf_multi_string_init(
+     pyregf_multi_string_t *sequence_object );
 
-void pyregf_values_free(
-      pyregf_values_t *sequence_object );
+void pyregf_multi_string_free(
+      pyregf_multi_string_t *sequence_object );
 
-Py_ssize_t pyregf_values_len(
-            pyregf_values_t *sequence_object );
+Py_ssize_t pyregf_multi_string_len(
+            pyregf_multi_string_t *sequence_object );
 
-PyObject *pyregf_values_getitem(
-           pyregf_values_t *sequence_object,
+PyObject *pyregf_multi_string_getitem(
+           pyregf_multi_string_t *sequence_object,
            Py_ssize_t item_index );
 
-PyObject *pyregf_values_iter(
-           pyregf_values_t *sequence_object );
+PyObject *pyregf_multi_string_iter(
+           pyregf_multi_string_t *sequence_object );
 
-PyObject *pyregf_values_iternext(
-           pyregf_values_t *sequence_object );
+PyObject *pyregf_multi_string_iternext(
+           pyregf_multi_string_t *sequence_object );
 
 #if defined( __cplusplus )
 }
 #endif
 
-#endif /* !defined( _PYREGF_VALUES_H ) */
+#endif /* !defined( _PYREGF_MULTI_STRING_H ) */
 

@@ -69,23 +69,23 @@ PyObject *pyregf_keys_new(
            int number_of_items );
 
 int pyregf_keys_init(
-     pyregf_keys_t *keys_object );
+     pyregf_keys_t *sequence_object );
 
 void pyregf_keys_free(
-      pyregf_keys_t *keys_object );
+      pyregf_keys_t *sequence_object );
 
 Py_ssize_t pyregf_keys_len(
-            pyregf_keys_t *keys_object );
+            pyregf_keys_t *sequence_object );
 
 PyObject *pyregf_keys_getitem(
-           pyregf_keys_t *keys_object,
+           pyregf_keys_t *sequence_object,
            Py_ssize_t item_index );
 
 PyObject *pyregf_keys_iter(
-           pyregf_keys_t *keys_object );
+           pyregf_keys_t *sequence_object );
 
 PyObject *pyregf_keys_iternext(
-           pyregf_keys_t *keys_object );
+           pyregf_keys_t *sequence_object );
 
 #if defined( __cplusplus )
 }

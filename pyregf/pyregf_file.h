@@ -53,19 +53,6 @@ struct pyregf_file
 extern PyMethodDef pyregf_file_object_methods[];
 extern PyTypeObject pyregf_file_type_object;
 
-PyObject *pyregf_file_new(
-           void );
-
-PyObject *pyregf_file_new_open(
-           PyObject *self,
-           PyObject *arguments,
-           PyObject *keywords );
-
-PyObject *pyregf_file_new_open_file_object(
-           PyObject *self,
-           PyObject *arguments,
-           PyObject *keywords );
-
 int pyregf_file_init(
      pyregf_file_t *pyregf_file );
 

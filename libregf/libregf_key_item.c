@@ -29,7 +29,6 @@
 
 #include "libregf_debug.h"
 #include "libregf_definitions.h"
-#include "libregf_hive_bin.h"
 #include "libregf_hive_bins_list.h"
 #include "libregf_io_handle.h"
 #include "libregf_key_item.h"
@@ -248,13 +247,11 @@ int libregf_key_item_read_named_key(
      libcerror_error_t **error )
 {
 	libregf_hive_bin_cell_t *hive_bin_cell       = NULL;
-	libregf_hive_bin_t *hive_bin                 = NULL;
 	uint8_t *hive_bin_cell_data                  = NULL;
 	static char *function                        = "libregf_key_item_read_named_key";
 	libuna_unicode_character_t unicode_character = 0;
 	size_t hive_bin_cell_size                    = 0;
 	size_t name_index                            = 0;
-	off64_t hive_bin_data_offset                 = 0;
 	uint32_t class_name_offset                   = 0;
 	uint32_t number_of_sub_keys                  = 0;
 	uint32_t number_of_values_list_elements      = 0;
@@ -315,30 +312,9 @@ int libregf_key_item_read_named_key(
 		 named_key_offset );
 	}
 #endif
-	if( libfdata_list_get_element_value_at_offset(
-	     hive_bins_list->data_list,
-	     (intptr_t *) file_io_handle,
-	     (libfdata_cache_t *) hive_bins_list->data_cache,
-	     named_key_offset,
-	     &hive_bin_index,
-	     &hive_bin_data_offset,
-	     (intptr_t **) &hive_bin,
-	     0,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve hive bin at offset: %" PRIi64 " (0x%08" PRIx64 ").",
-		 function,
-		 named_key_offset,
-		 named_key_offset );
-
-		goto on_error;
-	}
-	if( libregf_hive_bin_get_cell_at_offset(
-	     hive_bin,
+	if( libregf_hive_bins_list_get_cell_at_offset(
+	     hive_bins_list,
+	     file_io_handle,
 	     (uint32_t) named_key_offset,
 	     &hive_bin_cell,
 	     error ) != 1 )
@@ -970,13 +946,10 @@ int libregf_key_item_read_class_name(
      uint16_t class_name_size,
      libcerror_error_t **error )
 {
-	libregf_hive_bin_t *hive_bin           = NULL;
 	libregf_hive_bin_cell_t *hive_bin_cell = NULL;
 	uint8_t *hive_bin_cell_data            = NULL;
 	static char *function                  = "libregf_key_item_read_class_name";
-	off64_t hive_bin_data_offset           = 0;
 	size_t hive_bin_cell_size              = 0;
-	int hive_bin_index                     = 0;
 
 	if( key_item == NULL )
 	{
@@ -1028,30 +1001,9 @@ int libregf_key_item_read_class_name(
 
 		return( -1 );
 	}
-	if( libfdata_list_get_element_value_at_offset(
-	     hive_bins_list->data_list,
-	     (intptr_t *) file_io_handle,
-	     (libfdata_cache_t *) hive_bins_list->data_cache,
-	     (off64_t) class_name_offset,
-	     &hive_bin_index,
-	     &hive_bin_data_offset,
-	     (intptr_t **) &hive_bin,
-	     0,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve hive bin at offset: %" PRIu32 " (0x%08" PRIx32 ").",
-		 function,
-		 class_name_offset,
-		 class_name_offset );
-
-		goto on_error;
-	}
-	if( libregf_hive_bin_get_cell_at_offset(
-	     hive_bin,
+	if( libregf_hive_bins_list_get_cell_at_offset(
+	     hive_bins_list,
+	     file_io_handle,
 	     class_name_offset,
 	     &hive_bin_cell,
 	     error ) != 1 )
@@ -1060,7 +1012,7 @@ int libregf_key_item_read_class_name(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve hive bin cell at offset: %" PRIu32 " (0x%08" PRIx32 ").",
+		 "%s: unable to retrieve hive bin at offset: %" PRIu32 " (0x%08" PRIx32 ").",
 		 function,
 		 class_name_offset,
 		 class_name_offset );
@@ -1205,12 +1157,9 @@ int libregf_key_item_read_security_key(
      libcerror_error_t **error )
 {
 	libregf_hive_bin_cell_t *hive_bin_cell             = NULL;
-	libregf_hive_bin_t *hive_bin                       = NULL;
 	uint8_t *hive_bin_cell_data                        = NULL;
 	static char *function                              = "libregf_key_item_read_security_key";
 	size_t hive_bin_cell_size                          = 0;
-	off64_t hive_bin_data_offset                       = 0;
-	int hive_bin_index                                 = 0;
 
 #if defined( HAVE_DEBUG_OUTPUT )
 	libfwnt_security_descriptor_t *security_descriptor = NULL;
@@ -1263,30 +1212,9 @@ int libregf_key_item_read_security_key(
 
 		return( -1 );
 	}
-	if( libfdata_list_get_element_value_at_offset(
-	     hive_bins_list->data_list,
-	     (intptr_t *) file_io_handle,
-	     (libfdata_cache_t *) hive_bins_list->data_cache,
-	     (off64_t) security_key_offset,
-	     &hive_bin_index,
-	     &hive_bin_data_offset,
-	     (intptr_t **) &hive_bin,
-	     0,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve hive bin at offset: %" PRIu32 " (0x%08" PRIx32 ").",
-		 function,
-		 security_key_offset,
-		 security_key_offset );
-
-		goto on_error;
-	}
-	if( libregf_hive_bin_get_cell_at_offset(
-	     hive_bin,
+	if( libregf_hive_bins_list_get_cell_at_offset(
+	     hive_bins_list,
+	     file_io_handle,
 	     security_key_offset,
 	     &hive_bin_cell,
 	     error ) != 1 )
@@ -1295,7 +1223,7 @@ int libregf_key_item_read_security_key(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve hive bin cell at offset: %" PRIu32 " (0x%08" PRIx32 ").",
+		 "%s: unable to retrieve hive bin at offset: %" PRIu32 " (0x%08" PRIx32 ").",
 		 function,
 		 security_key_offset,
 		 security_key_offset );
@@ -1532,11 +1460,9 @@ int libregf_key_item_read_values_list(
      uint32_t number_of_values_list_elements,
      libcerror_error_t **error )
 {
-	libregf_hive_bin_t *hive_bin           = NULL;
 	libregf_hive_bin_cell_t *hive_bin_cell = NULL;
 	uint8_t *hive_bin_cell_data            = NULL;
 	static char *function                  = "libregf_key_item_read_values_list";
-	off64_t hive_bin_data_offset           = 0;
 	size_t hive_bin_cell_size              = 0;
 	uint32_t values_list_element_iterator  = 0;
 	uint32_t values_list_element_offset    = 0;
@@ -1582,15 +1508,11 @@ int libregf_key_item_read_values_list(
 
 		return( -1 );
 	}
-	if( libfdata_list_get_element_value_at_offset(
-	     hive_bins_list->data_list,
-	     (intptr_t *) file_io_handle,
-	     (libfdata_cache_t *) hive_bins_list->data_cache,
-	     (off64_t) values_list_offset,
-	     &hive_bin_index,
-	     &hive_bin_data_offset,
-	     (intptr_t **) &hive_bin,
-	     0,
+	if( libregf_hive_bins_list_get_cell_at_offset(
+	     hive_bins_list,
+	     file_io_handle,
+	     values_list_offset,
+	     &hive_bin_cell,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -1600,23 +1522,6 @@ int libregf_key_item_read_values_list(
 		 "%s: unable to retrieve hive bin at offset: %" PRIu32 " (0x%08" PRIx32 ").",
 		 function,
 		 values_list_offset ,
-		 values_list_offset );
-
-		return( -1 );
-	}
-	if( libregf_hive_bin_get_cell_at_offset(
-	     hive_bin,
-	     values_list_offset,
-	     &hive_bin_cell,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve hive bin cell at offset: %" PRIu32 " (0x%08" PRIx32 ").",
-		 function,
-		 values_list_offset,
 		 values_list_offset );
 
 		return( -1 );
@@ -1839,12 +1744,10 @@ int libregf_key_item_read_sub_keys_list(
      off64_t sub_keys_list_offset,
      libcerror_error_t **error )
 {
-	libregf_hive_bin_t *hive_bin              = NULL;
 	libregf_hive_bin_cell_t *hive_bin_cell    = NULL;
 	uint8_t *hive_bin_cell_data               = NULL;
 	uint8_t *sub_keys_list_data               = NULL;
 	static char *function                     = "libregf_key_item_read_sub_keys_list";
-	off64_t hive_bin_data_offset              = 0;
 	size_t hive_bin_cell_size                 = 0;
 	uint32_t element_hash                     = 0;
 	uint32_t sub_keys_list_element_offset     = 0;
@@ -1880,30 +1783,9 @@ int libregf_key_item_read_sub_keys_list(
 
 		return( -1 );
 	}
-	if( libfdata_list_get_element_value_at_offset(
-	     hive_bins_list->data_list,
-	     (intptr_t *) file_io_handle,
-	     (libfdata_cache_t *) hive_bins_list->data_cache,
-	     sub_keys_list_offset,
-	     &hive_bin_index,
-	     &hive_bin_data_offset,
-	     (intptr_t **) &hive_bin,
-	     0,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve hive bin at offset: %" PRIi64 " (0x%08" PRIx64 ").",
-		 function,
-		 sub_keys_list_offset,
-		 sub_keys_list_offset );
-
-		goto on_error;
-	}
-	if( libregf_hive_bin_get_cell_at_offset(
-	     hive_bin,
+	if( libregf_hive_bins_list_get_cell_at_offset(
+	     hive_bins_list,
+	     file_io_handle,
 	     (uint32_t) sub_keys_list_offset,
 	     &hive_bin_cell,
 	     error ) != 1 )
@@ -1912,7 +1794,7 @@ int libregf_key_item_read_sub_keys_list(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve hive bin cell at offset: %" PRIi64 " (0x%08" PRIx64 ").",
+		 "%s: unable to retrieve hive bin at offset: %" PRIi64 " (0x%08" PRIx64 ").",
 		 function,
 		 sub_keys_list_offset,
 		 sub_keys_list_offset );

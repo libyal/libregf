@@ -1,5 +1,5 @@
 /*
- * Python bindings for libregf (pyregf)
+ * Python bindings module for libregf (pyregf)
  *
  * Copyright (C) 2009-2019, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -41,6 +41,16 @@ PyObject *pyregf_check_file_signature(
            PyObject *keywords );
 
 PyObject *pyregf_check_file_signature_file_object(
+           PyObject *self,
+           PyObject *arguments,
+           PyObject *keywords );
+
+PyObject *pyregf_open_new_file(
+           PyObject *self,
+           PyObject *arguments,
+           PyObject *keywords );
+
+PyObject *pyregf_open_new_file_with_file_object(
            PyObject *self,
            PyObject *arguments,
            PyObject *keywords );

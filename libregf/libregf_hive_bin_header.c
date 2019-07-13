@@ -228,7 +228,7 @@ int libregf_hive_bin_header_read_data(
 	if( libcnotify_verbose != 0 )
 	{
 		libcnotify_printf(
-		 "%s: signature\t\t\t\t\t: %c%c%c%c\n",
+		 "%s: signature\t\t\t\t: %c%c%c%c\n",
 		 function,
 		 ( (regf_hive_bin_header_t *) data )->signature[ 0 ],
 		 ( (regf_hive_bin_header_t *) data )->signature[ 1 ],
@@ -236,10 +236,11 @@ int libregf_hive_bin_header_read_data(
 		 ( (regf_hive_bin_header_t *) data )->signature[ 3 ] );
 
 		libcnotify_printf(
-		 "%s: hive bin offset\t\t\t\t: %" PRIu32 " (0x%08" PRIx32 ")\n",
+		 "%s: hive bin offset\t\t\t: %" PRIu32 " (0x%08" PRIx32 ")\n",
 		 function,
 		 hive_bin_header->offset,
 		 hive_bin_header->offset );
+
 		libcnotify_printf(
 		 "%s: size\t\t\t\t\t: %" PRIu32 " bytes\n",
 		 function,
@@ -249,7 +250,7 @@ int libregf_hive_bin_header_read_data(
 		 ( (regf_hive_bin_header_t *) data )->unknown1,
 		 value_32bit );
 		libcnotify_printf(
-		 "%s: unknown1\t\t\t\t\t: 0x%08" PRIx32 " (%" PRIu32 ")\n",
+		 "%s: unknown1\t\t\t\t: 0x%08" PRIx32 " (%" PRIu32 ")\n",
 		 function,
 		 value_32bit,
 		 value_32bit );
@@ -258,7 +259,7 @@ int libregf_hive_bin_header_read_data(
 		 ( (regf_hive_bin_header_t *) data )->unknown2,
 		 value_32bit );
 		libcnotify_printf(
-		 "%s: unknown2\t\t\t\t\t: 0x%08" PRIx32 " (%" PRIu32 ")\n",
+		 "%s: unknown2\t\t\t\t: 0x%08" PRIx32 " (%" PRIu32 ")\n",
 		 function,
 		 value_32bit,
 		 value_32bit );
@@ -285,7 +286,7 @@ int libregf_hive_bin_header_read_data(
 		 ( (regf_hive_bin_header_t *) data )->unknown_spare,
 		 value_32bit );
 		libcnotify_printf(
-		 "%s: unknown spare\t\t\t\t: 0x%08" PRIx32 " (%" PRIu32 ")\n",
+		 "%s: unknown spare\t\t\t: 0x%08" PRIx32 " (%" PRIu32 ")\n",
 		 function,
 		 value_32bit,
 		 value_32bit );

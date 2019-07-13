@@ -44,11 +44,13 @@ libregf_la_SOURCES = \
 	libregf_libcerror.h \
 	libregf_libclocale.h \
 	libregf_libcnotify.h \
+	libregf_libcthreads.h \
 	libregf_libfcache.h \
 	libregf_libfdata.h \
 	libregf_libfdatetime.h \
 	libregf_libfwnt.h \
 	libregf_libuna.h \
+	libregf_multi_string.c libregf_multi_string.h \
 	libregf_named_key.c libregf_named_key.h \
 	libregf_notify.c libregf_notify.h \
 	libregf_support.c libregf_support.h \

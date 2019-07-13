@@ -45,9 +45,9 @@ struct pyregf_value
 	 */
 	libregf_value_t *value;
 
-	/* The pyregf file object
+	/* The parent object
 	 */
-	pyregf_file_t *file_object;
+	PyObject *parent_object;
 };
 
 extern PyMethodDef pyregf_value_object_methods[];
@@ -55,7 +55,7 @@ extern PyTypeObject pyregf_value_type_object;
 
 PyObject *pyregf_value_new(
            libregf_value_t *value,
-           pyregf_file_t *file_object );
+           PyObject *parent_object );
 
 int pyregf_value_init(
      pyregf_value_t *pyregf_value );
@@ -95,9 +95,12 @@ PyObject *pyregf_value_get_data_as_string(
            pyregf_value_t *pyregf_value,
            PyObject *arguments );
 
+PyObject *pyregf_value_get_data_as_multi_string(
+           pyregf_value_t *pyregf_value,
+           PyObject *arguments );
+
 #if defined( __cplusplus )
 }
 #endif
 
-#endif
-
+#endif /* !defined( _PYREGF_VALUE_H ) */

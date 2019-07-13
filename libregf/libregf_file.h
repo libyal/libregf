@@ -19,8 +19,8 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBREGF_INTERNAL_FILE_H )
-#define _LIBREGF_INTERNAL_FILE_H
+#if !defined( _LIBREGF_FILE_H )
+#define _LIBREGF_FILE_H
 
 #include <common.h>
 #include <types.h>
@@ -31,6 +31,7 @@
 #include "libregf_io_handle.h"
 #include "libregf_libbfio.h"
 #include "libregf_libcerror.h"
+#include "libregf_libcthreads.h"
 #include "libregf_libfcache.h"
 #include "libregf_libfdata.h"
 #include "libregf_types.h"
@@ -78,6 +79,12 @@ struct libregf_internal_file
 	/* Value to indicate if abort was signalled
 	 */
 	int abort;
+
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	/* The read/write lock
+	 */
+	libcthreads_read_write_lock_t *read_write_lock;
+#endif
 };
 
 LIBREGF_EXTERN \
@@ -125,7 +132,7 @@ int libregf_file_close(
      libregf_file_t *file,
      libcerror_error_t **error );
 
-int libregf_file_open_read(
+int libregf_internal_file_open_read(
      libregf_internal_file_t *internal_file,
      libbfio_handle_t *file_io_handle,
      libcerror_error_t **error );
@@ -186,5 +193,5 @@ int libregf_file_get_key_by_utf16_path(
 }
 #endif
 
-#endif /* !defined( _LIBREGF_INTERNAL_FILE_H ) */
+#endif /* !defined( _LIBREGF_FILE_H ) */
 

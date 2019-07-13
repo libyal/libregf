@@ -203,6 +203,7 @@ typedef int64_t off64_t;
  */
 typedef intptr_t libregf_file_t;
 typedef intptr_t libregf_key_t;
+typedef intptr_t libregf_multi_string_t;
 typedef intptr_t libregf_value_t;
 
 #ifdef __cplusplus

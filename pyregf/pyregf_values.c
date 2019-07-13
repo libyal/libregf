@@ -59,7 +59,7 @@ PyTypeObject pyregf_values_type_object = {
 	PyVarObject_HEAD_INIT( NULL, 0 )
 
 	/* tp_name */
-	"pyregf._values",
+	"pyregf.values",
 	/* tp_basicsize */
 	sizeof( pyregf_values_t ),
 	/* tp_itemsize */
@@ -97,7 +97,7 @@ PyTypeObject pyregf_values_type_object = {
 	/* tp_flags */
 	Py_TPFLAGS_DEFAULT | Py_TPFLAGS_HAVE_ITER,
 	/* tp_doc */
-	"pyregf internal sequence and iterator object of values",
+	"pyregf sequence and iterator object of values",
 	/* tp_traverse */
 	0,
 	/* tp_clear */
@@ -150,7 +150,7 @@ PyTypeObject pyregf_values_type_object = {
 	0
 };
 
-/* Creates a new values object
+/* Creates a new values sequence and iterator object
  * Returns a Python object if successful or NULL on error
  */
 PyObject *pyregf_values_new(
@@ -160,8 +160,8 @@ PyObject *pyregf_values_new(
                         int index ),
            int number_of_items )
 {
-	pyregf_values_t *values_object = NULL;
-	static char *function          = "pyregf_values_new";
+	pyregf_values_t *sequence_object = NULL;
+	static char *function            = "pyregf_values_new";
 
 	if( parent_object == NULL )
 	{
@@ -183,93 +183,89 @@ PyObject *pyregf_values_new(
 	}
 	/* Make sure the values values are initialized
 	 */
-	values_object = PyObject_New(
-	                 struct pyregf_values,
-	                 &pyregf_values_type_object );
+	sequence_object = PyObject_New(
+	                   struct pyregf_values,
+	                   &pyregf_values_type_object );
 
-	if( values_object == NULL )
+	if( sequence_object == NULL )
 	{
 		PyErr_Format(
 		 PyExc_MemoryError,
-		 "%s: unable to create values object.",
+		 "%s: unable to create sequence object.",
 		 function );
 
 		goto on_error;
 	}
-	if( pyregf_values_init(
-	     values_object ) != 0 )
-	{
-		PyErr_Format(
-		 PyExc_MemoryError,
-		 "%s: unable to initialize values object.",
-		 function );
-
-		goto on_error;
-	}
-	values_object->parent_object     = parent_object;
-	values_object->get_item_by_index = get_item_by_index;
-	values_object->number_of_items   = number_of_items;
+	sequence_object->parent_object     = parent_object;
+	sequence_object->get_item_by_index = get_item_by_index;
+	sequence_object->current_index     = 0;
+	sequence_object->number_of_items   = number_of_items;
 
 	Py_IncRef(
-	 (PyObject *) values_object->parent_object );
+	 (PyObject *) sequence_object->parent_object );
 
-	return( (PyObject *) values_object );
+	return( (PyObject *) sequence_object );
 
 on_error:
-	if( values_object != NULL )
+	if( sequence_object != NULL )
 	{
 		Py_DecRef(
-		 (PyObject *) values_object );
+		 (PyObject *) sequence_object );
 	}
 	return( NULL );
 }
 
-/* Intializes a values object
+/* Intializes a values sequence and iterator object
  * Returns 0 if successful or -1 on error
  */
 int pyregf_values_init(
-     pyregf_values_t *values_object )
+     pyregf_values_t *sequence_object )
 {
 	static char *function = "pyregf_values_init";
 
-	if( values_object == NULL )
+	if( sequence_object == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid values object.",
+		 "%s: invalid sequence object.",
 		 function );
 
 		return( -1 );
 	}
 	/* Make sure the values values are initialized
 	 */
-	values_object->parent_object     = NULL;
-	values_object->get_item_by_index = NULL;
-	values_object->current_index     = 0;
-	values_object->number_of_items   = 0;
+	sequence_object->parent_object     = NULL;
+	sequence_object->get_item_by_index = NULL;
+	sequence_object->current_index     = 0;
+	sequence_object->number_of_items   = 0;
 
-	return( 0 );
+	PyErr_Format(
+	 PyExc_NotImplementedError,
+	 "%s: initialize of values not supported.",
+	 function );
+
+	return( -1 );
 }
 
-/* Frees a values object
+/* Frees a values sequence object
  */
 void pyregf_values_free(
-      pyregf_values_t *values_object )
+      pyregf_values_t *sequence_object )
 {
 	struct _typeobject *ob_type = NULL;
 	static char *function       = "pyregf_values_free";
 
-	if( values_object == NULL )
+	if( sequence_object == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid values object.",
+		 "%s: invalid sequence object.",
 		 function );
 
 		return;
 	}
 	ob_type = Py_TYPE(
-	           values_object );
+	           sequence_object );
 
 	if( ob_type == NULL )
 	{
@@ -289,72 +285,72 @@ void pyregf_values_free(
 
 		return;
 	}
-	if( values_object->parent_object != NULL )
+	if( sequence_object->parent_object != NULL )
 	{
 		Py_DecRef(
-		 (PyObject *) values_object->parent_object );
+		 (PyObject *) sequence_object->parent_object );
 	}
 	ob_type->tp_free(
-	 (PyObject*) values_object );
+	 (PyObject*) sequence_object );
 }
 
 /* The values len() function
  */
 Py_ssize_t pyregf_values_len(
-            pyregf_values_t *values_object )
+            pyregf_values_t *sequence_object )
 {
 	static char *function = "pyregf_values_len";
 
-	if( values_object == NULL )
+	if( sequence_object == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid values object.",
+		 "%s: invalid sequence object.",
 		 function );
 
 		return( -1 );
 	}
-	return( (Py_ssize_t) values_object->number_of_items );
+	return( (Py_ssize_t) sequence_object->number_of_items );
 }
 
 /* The values getitem() function
  */
 PyObject *pyregf_values_getitem(
-           pyregf_values_t *values_object,
+           pyregf_values_t *sequence_object,
            Py_ssize_t item_index )
 {
 	PyObject *value_object = NULL;
 	static char *function  = "pyregf_values_getitem";
 
-	if( values_object == NULL )
+	if( sequence_object == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid values object.",
+		 "%s: invalid sequence object.",
 		 function );
 
 		return( NULL );
 	}
-	if( values_object->get_item_by_index == NULL )
+	if( sequence_object->get_item_by_index == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid values object - missing get item by index function.",
+		 "%s: invalid sequence object - missing get item by index function.",
 		 function );
 
 		return( NULL );
 	}
-	if( values_object->number_of_items < 0 )
+	if( sequence_object->number_of_items < 0 )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid values object - invalid number of items.",
+		 "%s: invalid sequence object - invalid number of items.",
 		 function );
 
 		return( NULL );
 	}
 	if( ( item_index < 0 )
-	 || ( item_index >= (Py_ssize_t) values_object->number_of_items ) )
+	 || ( item_index >= (Py_ssize_t) sequence_object->number_of_items ) )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
@@ -363,8 +359,8 @@ PyObject *pyregf_values_getitem(
 
 		return( NULL );
 	}
-	value_object = values_object->get_item_by_index(
-	                values_object->parent_object,
+	value_object = sequence_object->get_item_by_index(
+	                sequence_object->parent_object,
 	                (int) item_index );
 
 	return( value_object );
@@ -373,83 +369,83 @@ PyObject *pyregf_values_getitem(
 /* The values iter() function
  */
 PyObject *pyregf_values_iter(
-           pyregf_values_t *values_object )
+           pyregf_values_t *sequence_object )
 {
 	static char *function = "pyregf_values_iter";
 
-	if( values_object == NULL )
+	if( sequence_object == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid values object.",
+		 "%s: invalid sequence object.",
 		 function );
 
 		return( NULL );
 	}
 	Py_IncRef(
-	 (PyObject *) values_object );
+	 (PyObject *) sequence_object );
 
-	return( (PyObject *) values_object );
+	return( (PyObject *) sequence_object );
 }
 
 /* The values iternext() function
  */
 PyObject *pyregf_values_iternext(
-           pyregf_values_t *values_object )
+           pyregf_values_t *sequence_object )
 {
 	PyObject *value_object = NULL;
 	static char *function  = "pyregf_values_iternext";
 
-	if( values_object == NULL )
+	if( sequence_object == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid values object.",
+		 "%s: invalid sequence object.",
 		 function );
 
 		return( NULL );
 	}
-	if( values_object->get_item_by_index == NULL )
+	if( sequence_object->get_item_by_index == NULL )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid values object - missing get item by index function.",
+		 "%s: invalid sequence object - missing get item by index function.",
 		 function );
 
 		return( NULL );
 	}
-	if( values_object->current_index < 0 )
+	if( sequence_object->current_index < 0 )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid values object - invalid current index.",
+		 "%s: invalid sequence object - invalid current index.",
 		 function );
 
 		return( NULL );
 	}
-	if( values_object->number_of_items < 0 )
+	if( sequence_object->number_of_items < 0 )
 	{
 		PyErr_Format(
 		 PyExc_ValueError,
-		 "%s: invalid values object - invalid number of items.",
+		 "%s: invalid sequence object - invalid number of items.",
 		 function );
 
 		return( NULL );
 	}
-	if( values_object->current_index >= values_object->number_of_items )
+	if( sequence_object->current_index >= sequence_object->number_of_items )
 	{
 		PyErr_SetNone(
 		 PyExc_StopIteration );
 
 		return( NULL );
 	}
-	value_object = values_object->get_item_by_index(
-	                values_object->parent_object,
-	                values_object->current_index );
+	value_object = sequence_object->get_item_by_index(
+	                sequence_object->parent_object,
+	                sequence_object->current_index );
 
 	if( value_object != NULL )
 	{
-		values_object->current_index++;
+		sequence_object->current_index++;
 	}
 	return( value_object );
 }

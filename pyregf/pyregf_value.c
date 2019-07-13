@@ -31,6 +31,7 @@
 #include "pyregf_integer.h"
 #include "pyregf_libcerror.h"
 #include "pyregf_libregf.h"
+#include "pyregf_multi_string.h"
 #include "pyregf_python.h"
 #include "pyregf_unused.h"
 #include "pyregf_value.h"
@@ -56,44 +57,51 @@ PyMethodDef pyregf_value_object_methods[] = {
 	{ "get_name",
 	  (PyCFunction) pyregf_value_get_name,
 	  METH_NOARGS,
-	  "get_name -> Unicode string or None\n"
+	  "get_name() -> Unicode string\n"
 	  "\n"
 	  "Retrieves the name." },
 
 	{ "get_type",
 	  (PyCFunction) pyregf_value_get_type,
 	  METH_NOARGS,
-	  "get_type -> Integer or None\n"
+	  "get_type() -> Integer or None\n"
 	  "\n"
 	  "Retrieves the type." },
 
 	{ "get_data_size",
 	  (PyCFunction) pyregf_value_get_data_size,
 	  METH_NOARGS,
-	  "get_data -> String or None\n"
+	  "get_data_size() -> Integer or None\n"
 	  "\n"
 	  "Retrieves the size of the data as a binary string." },
 
 	{ "get_data",
 	  (PyCFunction) pyregf_value_get_data,
 	  METH_NOARGS,
-	  "get_data -> String or None\n"
+	  "get_data() -> String or None\n"
 	  "\n"
 	  "Retrieves the data as a binary string." },
 
 	{ "get_data_as_integer",
 	  (PyCFunction) pyregf_value_get_data_as_integer,
 	  METH_NOARGS,
-	  "get_data_as_integer -> Integer\n"
+	  "get_data_as_integer() -> Integer\n"
 	  "\n"
 	  "Retrieves the data as an integer ." },
 
 	{ "get_data_as_string",
 	  (PyCFunction) pyregf_value_get_data_as_string,
 	  METH_NOARGS,
-	  "get_data_as_string -> Unicode string or None\n"
+	  "get_data_as_string() -> Unicode string or None\n"
 	  "\n"
 	  "Retrieves the data as a string." },
+
+	{ "get_data_as_multi_string",
+	  (PyCFunction) pyregf_value_get_data_as_multi_string,
+	  METH_NOARGS,
+	  "get_data_as_multi_string() -> Object\n"
+	  "\n"
+	  "Retrieves the data as a multi string." },
 
 	/* Sentinel */
 	{ NULL, NULL, 0, NULL }
@@ -147,6 +155,12 @@ PyGetSetDef pyregf_value_object_get_set_definitions[] = {
 	  (getter) pyregf_value_get_data_as_string,
 	  (setter) 0,
 	  "The data represented as a string.",
+	  NULL },
+
+	{ "data_as_multi_string",
+	  (getter) pyregf_value_get_data_as_multi_string,
+	  (setter) 0,
+	  "The data represented as a multi string.",
 	  NULL },
 
 	/* Sentinel */
@@ -253,7 +267,7 @@ PyTypeObject pyregf_value_type_object = {
  */
 PyObject *pyregf_value_new(
            libregf_value_t *value,
-           pyregf_file_t *file_object )
+           PyObject *parent_object )
 {
 	pyregf_value_t *pyregf_value = NULL;
 	static char *function        = "pyregf_value_new";
@@ -261,15 +275,17 @@ PyObject *pyregf_value_new(
 	if( value == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid value.",
 		 function );
 
 		return( NULL );
 	}
+	/* PyObject_New does not invoke tp_init
+	 */
 	pyregf_value = PyObject_New(
-	              struct pyregf_value,
-	              &pyregf_value_type_object );
+	                struct pyregf_value,
+	                &pyregf_value_type_object );
 
 	if( pyregf_value == NULL )
 	{
@@ -280,21 +296,11 @@ PyObject *pyregf_value_new(
 
 		goto on_error;
 	}
-	if( pyregf_value_init(
-	     pyregf_value ) != 0 )
-	{
-		PyErr_Format(
-		 PyExc_MemoryError,
-		 "%s: unable to initialize value.",
-		 function );
-
-		goto on_error;
-	}
-	pyregf_value->value       = value;
-	pyregf_value->file_object = file_object;
+	pyregf_value->value         = value;
+	pyregf_value->parent_object = parent_object;
 
 	Py_IncRef(
-	 (PyObject *) pyregf_value->file_object );
+	 (PyObject *) pyregf_value->parent_object );
 
 	return( (PyObject *) pyregf_value );
 
@@ -307,7 +313,7 @@ on_error:
 	return( NULL );
 }
 
-/* Intializes an value object
+/* Intializes a value object
  * Returns 0 if successful or -1 on error
  */
 int pyregf_value_init(
@@ -318,7 +324,7 @@ int pyregf_value_init(
 	if( pyregf_value == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid value.",
 		 function );
 
@@ -328,32 +334,29 @@ int pyregf_value_init(
 	 */
 	pyregf_value->value = NULL;
 
-	return( 0 );
+	PyErr_Format(
+	 PyExc_NotImplementedError,
+	 "%s: initialize of value not supported.",
+	 function );
+
+	return( -1 );
 }
 
-/* Frees an value object
+/* Frees a value object
  */
 void pyregf_value_free(
       pyregf_value_t *pyregf_value )
 {
-	libcerror_error_t *error    = NULL;
 	struct _typeobject *ob_type = NULL;
+	libcerror_error_t *error    = NULL;
 	static char *function       = "pyregf_value_free";
+	int result                  = 0;
 
 	if( pyregf_value == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid value.",
-		 function );
-
-		return;
-	}
-	if( pyregf_value->value == NULL )
-	{
-		PyErr_Format(
-		 PyExc_TypeError,
-		 "%s: invalid value - missing libregf value.",
 		 function );
 
 		return;
@@ -379,23 +382,32 @@ void pyregf_value_free(
 
 		return;
 	}
-	if( libregf_value_free(
-	     &( pyregf_value->value ),
-	     &error ) != 1 )
+	if( pyregf_value->value != NULL )
 	{
-		pyregf_error_raise(
-		 error,
-		 PyExc_IOError,
-		 "%s: unable to free libregf value.",
-		 function );
+		Py_BEGIN_ALLOW_THREADS
 
-		libcerror_error_free(
-		 &error );
+		result = libregf_value_free(
+		          &( pyregf_value->value ),
+		          &error );
+
+		Py_END_ALLOW_THREADS
+
+		if( result != 1 )
+		{
+			pyregf_error_raise(
+			 error,
+			 PyExc_MemoryError,
+			 "%s: unable to free libregf value.",
+			 function );
+
+			libcerror_error_free(
+			 &error );
+		}
 	}
-	if( pyregf_value->file_object != NULL )
+	if( pyregf_value->parent_object != NULL )
 	{
 		Py_DecRef(
-		 (PyObject *) pyregf_value->file_object );
+		 pyregf_value->parent_object );
 	}
 	ob_type->tp_free(
 	 (PyObject*) pyregf_value );
@@ -475,7 +487,7 @@ PyObject *pyregf_value_get_offset(
 	if( pyregf_value == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid value.",
 		 function );
 
@@ -519,9 +531,9 @@ PyObject *pyregf_value_get_name(
 	libcerror_error_t *error = NULL;
 	PyObject *string_object  = NULL;
 	const char *errors       = NULL;
-	uint8_t *name            = NULL;
+	uint8_t *utf8_string     = NULL;
 	static char *function    = "pyregf_value_get_name";
-	size_t name_size         = 0;
+	size_t utf8_string_size  = 0;
 	int result               = 0;
 
 	PYREGF_UNREFERENCED_PARAMETER( arguments )
@@ -529,7 +541,7 @@ PyObject *pyregf_value_get_name(
 	if( pyregf_value == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid value.",
 		 function );
 
@@ -539,7 +551,7 @@ PyObject *pyregf_value_get_name(
 
 	result = libregf_value_get_utf8_name_size(
 	          pyregf_value->value,
-	          &name_size,
+	          &utf8_string_size,
 	          &error );
 
 	Py_END_ALLOW_THREADS
@@ -558,17 +570,17 @@ PyObject *pyregf_value_get_name(
 		goto on_error;
 	}
 	else if( ( result == 0 )
-	      || ( name_size == 0 ) )
+	      || ( utf8_string_size == 0 ) )
 	{
 		Py_IncRef(
 		 Py_None );
 
 		return( Py_None );
 	}
-	name = (uint8_t *) PyMem_Malloc(
-	                    sizeof( uint8_t ) * name_size );
+	utf8_string = (uint8_t *) PyMem_Malloc(
+	                           sizeof( uint8_t ) * utf8_string_size );
 
-	if( name == NULL )
+	if( utf8_string == NULL )
 	{
 		PyErr_Format(
 		 PyExc_IOError,
@@ -581,8 +593,8 @@ PyObject *pyregf_value_get_name(
 
 	result = libregf_value_get_utf8_name(
 		  pyregf_value->value,
-		  name,
-		  name_size,
+		  utf8_string,
+		  utf8_string_size,
 		  &error );
 
 	Py_END_ALLOW_THREADS
@@ -605,20 +617,20 @@ PyObject *pyregf_value_get_name(
 	 * of the string
 	 */
 	string_object = PyUnicode_DecodeUTF8(
-			 (char *) name,
-			 (Py_ssize_t) name_size - 1,
+			 (char *) utf8_string,
+			 (Py_ssize_t) utf8_string_size - 1,
 			 errors );
 
 	PyMem_Free(
-	 name );
+	 utf8_string );
 
 	return( string_object );
 
 on_error:
-	if( name != NULL )
+	if( utf8_string != NULL )
 	{
 		PyMem_Free(
-		 name );
+		 utf8_string );
 	}
 	return( NULL );
 }
@@ -641,7 +653,7 @@ PyObject *pyregf_value_get_type(
 	if( pyregf_value == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid value.",
 		 function );
 
@@ -693,7 +705,7 @@ PyObject *pyregf_value_get_data_size(
 	if( pyregf_value == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid value.",
 		 function );
 
@@ -746,7 +758,7 @@ PyObject *pyregf_value_get_data(
 	if( pyregf_value == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid value.",
 		 function );
 
@@ -861,7 +873,7 @@ PyObject *pyregf_value_get_data_as_integer(
 	if( pyregf_value == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid value.",
 		 function );
 
@@ -972,7 +984,7 @@ PyObject *pyregf_value_get_data_as_string(
 	if( pyregf_value == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid value.",
 		 function );
 
@@ -1095,6 +1107,109 @@ on_error:
 	{
 		PyMem_Free(
 		 value_string );
+	}
+	return( NULL );
+}
+
+/* Retrieves the data represented as a multi string
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyregf_value_get_data_as_multi_string(
+           pyregf_value_t *pyregf_value,
+           PyObject *arguments PYREGF_ATTRIBUTE_UNUSED )
+{
+	PyObject *multi_string_object        = NULL;
+	libcerror_error_t *error             = NULL;
+	libregf_multi_string_t *multi_string = NULL;
+	static char *function                = "pyregf_value_get_data_as_multi_string";
+	uint32_t value_type                  = 0;
+	int result                           = 0;
+
+	PYREGF_UNREFERENCED_PARAMETER( arguments )
+
+	if( pyregf_value == NULL )
+	{
+		PyErr_Format(
+		 PyExc_ValueError,
+		 "%s: invalid value.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libregf_value_get_value_type(
+	          pyregf_value->value,
+	          &value_type,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
+	{
+		pyregf_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve value type.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		return( NULL );
+	}
+	if( value_type != LIBREGF_VALUE_TYPE_MULTI_VALUE_STRING )
+	{
+		PyErr_Format(
+		 PyExc_IOError,
+		 "%s: value is not a multi value string type.",
+		 function );
+
+		return( NULL );
+	}
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libregf_value_get_value_multi_string(
+	          pyregf_value->value,
+	          &multi_string,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
+	{
+		pyregf_error_raise(
+		 error,
+		 PyExc_IOError,
+		 "%s: unable to retrieve value multi string.",
+		 function );
+
+		libcerror_error_free(
+		 &error );
+
+		goto on_error;
+	}
+	multi_string_object = pyregf_multi_string_new(
+	                       multi_string,
+	                       pyregf_value->parent_object );
+
+	if( multi_string_object == NULL )
+	{
+		PyErr_Format(
+		 PyExc_MemoryError,
+		 "%s: unable to create multi string object.",
+		 function );
+
+		goto on_error;
+	}
+	return( multi_string_object );
+
+on_error:
+	if( multi_string != NULL )
+	{
+		libregf_multi_string_free(
+		 &multi_string,
+		 NULL );
 	}
 	return( NULL );
 }

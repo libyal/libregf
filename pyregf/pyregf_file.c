@@ -31,11 +31,11 @@
 #include "pyregf_error.h"
 #include "pyregf_file.h"
 #include "pyregf_file_object_io_handle.h"
+#include "pyregf_key.h"
 #include "pyregf_libbfio.h"
 #include "pyregf_libcerror.h"
 #include "pyregf_libclocale.h"
 #include "pyregf_libregf.h"
-#include "pyregf_key.h"
 #include "pyregf_python.h"
 #include "pyregf_unused.h"
 
@@ -96,27 +96,27 @@ PyMethodDef pyregf_file_object_methods[] = {
 	  METH_NOARGS,
 	  "get_ascii_codepage() -> String\n"
 	  "\n"
-	  "Returns the codepage used for ASCII strings in the file." },
+	  "Retrieves the codepage for ASCII strings used in the file." },
 
 	{ "set_ascii_codepage",
 	  (PyCFunction) pyregf_file_set_ascii_codepage,
 	  METH_VARARGS | METH_KEYWORDS,
 	  "set_ascii_codepage(codepage) -> None\n"
 	  "\n"
-	  "Set the codepage used for ASCII strings in the file.\n"
-	  "Expects the codepage to be a String containing a Python codec definition." },
+	  "Sets the codepage for ASCII strings used in the file.\n"
+	  "Expects the codepage to be a string containing a Python codec definition." },
 
 	{ "get_format_version",
 	  (PyCFunction) pyregf_file_get_format_version,
 	  METH_NOARGS,
-	  "get_format_version -> String\n"
+	  "get_format_version() -> Unicode string\n"
 	  "\n"
 	  "Retrieves the format version." },
 
 	{ "get_type",
 	  (PyCFunction) pyregf_file_get_type,
 	  METH_NOARGS,
-	  "get_type -> Integer\n"
+	  "get_type() -> Integer\n"
 	  "\n"
 	  "Retrieves the type." },
 
@@ -125,7 +125,7 @@ PyMethodDef pyregf_file_object_methods[] = {
 	{ "get_root_key",
 	  (PyCFunction) pyregf_file_get_root_key,
 	  METH_NOARGS,
-	  "get_root_key -> Object or None\n"
+	  "get_root_key() -> Object or None\n"
 	  "\n"
 	  "Retrieves the root key." },
 
@@ -271,111 +271,26 @@ PyTypeObject pyregf_file_type_object = {
 	0
 };
 
-/* Creates a new file object
- * Returns a Python object if successful or NULL on error
- */
-PyObject *pyregf_file_new(
-           void )
-{
-	pyregf_file_t *pyregf_file = NULL;
-	static char *function      = "pyregf_file_new";
-
-	pyregf_file = PyObject_New(
-	               struct pyregf_file,
-	               &pyregf_file_type_object );
-
-	if( pyregf_file == NULL )
-	{
-		PyErr_Format(
-		 PyExc_MemoryError,
-		 "%s: unable to initialize file.",
-		 function );
-
-		goto on_error;
-	}
-	if( pyregf_file_init(
-	     pyregf_file ) != 0 )
-	{
-		PyErr_Format(
-		 PyExc_MemoryError,
-		 "%s: unable to initialize file.",
-		 function );
-
-		goto on_error;
-	}
-	return( (PyObject *) pyregf_file );
-
-on_error:
-	if( pyregf_file != NULL )
-	{
-		Py_DecRef(
-		 (PyObject *) pyregf_file );
-	}
-	return( NULL );
-}
-
-/* Creates a new file object and opens it
- * Returns a Python object if successful or NULL on error
- */
-PyObject *pyregf_file_new_open(
-           PyObject *self PYREGF_ATTRIBUTE_UNUSED,
-           PyObject *arguments,
-           PyObject *keywords )
-{
-	PyObject *pyregf_file = NULL;
-
-	PYREGF_UNREFERENCED_PARAMETER( self )
-
-	pyregf_file = pyregf_file_new();
-
-	pyregf_file_open(
-	 (pyregf_file_t *) pyregf_file,
-	 arguments,
-	 keywords );
-
-	return( pyregf_file );
-}
-
-/* Creates a new file object and opens it
- * Returns a Python object if successful or NULL on error
- */
-PyObject *pyregf_file_new_open_file_object(
-           PyObject *self PYREGF_ATTRIBUTE_UNUSED,
-           PyObject *arguments,
-           PyObject *keywords )
-{
-	PyObject *pyregf_file = NULL;
-
-	PYREGF_UNREFERENCED_PARAMETER( self )
-
-	pyregf_file = pyregf_file_new();
-
-	pyregf_file_open_file_object(
-	 (pyregf_file_t *) pyregf_file,
-	 arguments,
-	 keywords );
-
-	return( pyregf_file );
-}
-
 /* Intializes a file object
  * Returns 0 if successful or -1 on error
  */
 int pyregf_file_init(
      pyregf_file_t *pyregf_file )
 {
-	static char *function    = "pyregf_file_init";
 	libcerror_error_t *error = NULL;
+	static char *function    = "pyregf_file_init";
 
 	if( pyregf_file == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid file.",
 		 function );
 
 		return( -1 );
 	}
+	/* Make sure libregf file is set to NULL
+	 */
 	pyregf_file->file           = NULL;
 	pyregf_file->file_io_handle = NULL;
 
@@ -402,25 +317,16 @@ int pyregf_file_init(
 void pyregf_file_free(
       pyregf_file_t *pyregf_file )
 {
-	libcerror_error_t *error    = NULL;
 	struct _typeobject *ob_type = NULL;
+	libcerror_error_t *error    = NULL;
 	static char *function       = "pyregf_file_free";
 	int result                  = 0;
 
 	if( pyregf_file == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid file.",
-		 function );
-
-		return;
-	}
-	if( pyregf_file->file == NULL )
-	{
-		PyErr_Format(
-		 PyExc_TypeError,
-		 "%s: invalid file - missing libregf file.",
 		 function );
 
 		return;
@@ -446,24 +352,27 @@ void pyregf_file_free(
 
 		return;
 	}
-	Py_BEGIN_ALLOW_THREADS
-
-	result = libregf_file_free(
-	          &( pyregf_file->file ),
-	          &error );
-
-	Py_END_ALLOW_THREADS
-
-	if( result != 1 )
+	if( pyregf_file->file != NULL )
 	{
-		pyregf_error_raise(
-		 error,
-		 PyExc_IOError,
-		 "%s: unable to free libregf file.",
-		 function );
+		Py_BEGIN_ALLOW_THREADS
 
-		libcerror_error_free(
-		 &error );
+		result = libregf_file_free(
+		          &( pyregf_file->file ),
+		          &error );
+
+		Py_END_ALLOW_THREADS
+
+		if( result != 1 )
+		{
+			pyregf_error_raise(
+			 error,
+			 PyExc_MemoryError,
+			 "%s: unable to free libregf file.",
+			 function );
+
+			libcerror_error_free(
+			 &error );
+		}
 	}
 	ob_type->tp_free(
 	 (PyObject*) pyregf_file );
@@ -485,7 +394,7 @@ PyObject *pyregf_file_signal_abort(
 	if( pyregf_file == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid file.",
 		 function );
 
@@ -528,9 +437,9 @@ PyObject *pyregf_file_open(
 {
 	PyObject *string_object      = NULL;
 	libcerror_error_t *error     = NULL;
+	const char *filename_narrow  = NULL;
 	static char *function        = "pyregf_file_open";
 	static char *keyword_list[]  = { "filename", "mode", NULL };
-	const char *filename_narrow  = NULL;
 	char *mode                   = NULL;
 	int result                   = 0;
 
@@ -584,8 +493,8 @@ PyObject *pyregf_file_open(
 	if( result == -1 )
 	{
 		pyregf_error_fetch_and_raise(
-	         PyExc_RuntimeError,
-		 "%s: unable to determine if string object is of type unicode.",
+		 PyExc_RuntimeError,
+		 "%s: unable to determine if string object is of type Unicode.",
 		 function );
 
 		return( NULL );
@@ -601,7 +510,7 @@ PyObject *pyregf_file_open(
 
 		result = libregf_file_open_wide(
 		          pyregf_file->file,
-	                  filename_wide,
+		          filename_wide,
 		          LIBREGF_OPEN_READ,
 		          &error );
 
@@ -614,23 +523,23 @@ PyObject *pyregf_file_open(
 		{
 			pyregf_error_fetch_and_raise(
 			 PyExc_RuntimeError,
-			 "%s: unable to convert unicode string to UTF-8.",
+			 "%s: unable to convert Unicode string to UTF-8.",
 			 function );
 
 			return( NULL );
 		}
 #if PY_MAJOR_VERSION >= 3
 		filename_narrow = PyBytes_AsString(
-				   utf8_string_object );
+		                   utf8_string_object );
 #else
 		filename_narrow = PyString_AsString(
-				   utf8_string_object );
+		                   utf8_string_object );
 #endif
 		Py_BEGIN_ALLOW_THREADS
 
 		result = libregf_file_open(
 		          pyregf_file->file,
-	                  filename_narrow,
+		          filename_narrow,
 		          LIBREGF_OPEN_READ,
 		          &error );
 
@@ -661,17 +570,17 @@ PyObject *pyregf_file_open(
 
 #if PY_MAJOR_VERSION >= 3
 	result = PyObject_IsInstance(
-		  string_object,
-		  (PyObject *) &PyBytes_Type );
+	          string_object,
+	          (PyObject *) &PyBytes_Type );
 #else
 	result = PyObject_IsInstance(
-		  string_object,
-		  (PyObject *) &PyString_Type );
+	          string_object,
+	          (PyObject *) &PyString_Type );
 #endif
 	if( result == -1 )
 	{
 		pyregf_error_fetch_and_raise(
-	         PyExc_RuntimeError,
+		 PyExc_RuntimeError,
 		 "%s: unable to determine if string object is of type string.",
 		 function );
 
@@ -683,16 +592,16 @@ PyObject *pyregf_file_open(
 
 #if PY_MAJOR_VERSION >= 3
 		filename_narrow = PyBytes_AsString(
-				   string_object );
+		                   string_object );
 #else
 		filename_narrow = PyString_AsString(
-				   string_object );
+		                   string_object );
 #endif
 		Py_BEGIN_ALLOW_THREADS
 
 		result = libregf_file_open(
 		          pyregf_file->file,
-	                  filename_narrow,
+		          filename_narrow,
 		          LIBREGF_OPEN_READ,
 		          &error );
 
@@ -734,9 +643,9 @@ PyObject *pyregf_file_open_file_object(
 {
 	PyObject *file_object       = NULL;
 	libcerror_error_t *error    = NULL;
-	char *mode                  = NULL;
-	static char *keyword_list[] = { "file_object", "mode", NULL };
 	static char *function       = "pyregf_file_open_file_object";
+	static char *keyword_list[] = { "file_object", "mode", NULL };
+	char *mode                  = NULL;
 	int result                  = 0;
 
 	if( pyregf_file == NULL )
@@ -849,7 +758,7 @@ PyObject *pyregf_file_close(
 	if( pyregf_file == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid file.",
 		 function );
 
@@ -890,7 +799,7 @@ PyObject *pyregf_file_close(
 		{
 			pyregf_error_raise(
 			 error,
-			 PyExc_IOError,
+			 PyExc_MemoryError,
 			 "%s: unable to free libbfio file IO handle.",
 			 function );
 
@@ -969,11 +878,12 @@ PyObject *pyregf_file_get_ascii_codepage(
            pyregf_file_t *pyregf_file,
            PyObject *arguments PYREGF_ATTRIBUTE_UNUSED )
 {
-	libcerror_error_t *error    = NULL;
 	PyObject *string_object     = NULL;
+	libcerror_error_t *error    = NULL;
 	const char *codepage_string = NULL;
 	static char *function       = "pyregf_file_get_ascii_codepage";
 	int ascii_codepage          = 0;
+	int result                  = 0;
 
 	PYREGF_UNREFERENCED_PARAMETER( arguments )
 
@@ -986,10 +896,16 @@ PyObject *pyregf_file_get_ascii_codepage(
 
 		return( NULL );
 	}
-	if( libregf_file_get_ascii_codepage(
-	     pyregf_file->file,
-	     &ascii_codepage,
-	     &error ) != 1 )
+	Py_BEGIN_ALLOW_THREADS
+
+	result = libregf_file_get_ascii_codepage(
+	          pyregf_file->file,
+	          &ascii_codepage,
+	          &error );
+
+	Py_END_ALLOW_THREADS
+
+	if( result != 1 )
 	{
 		pyregf_error_raise(
 		 error,
@@ -1122,8 +1038,8 @@ PyObject *pyregf_file_set_ascii_codepage(
            PyObject *arguments,
            PyObject *keywords )
 {
-	static char *keyword_list[] = { "codepage", NULL };
 	char *codepage_string       = NULL;
+	static char *keyword_list[] = { "codepage", NULL };
 	int result                  = 0;
 
 	if( PyArg_ParseTupleAndKeywords(
@@ -1158,8 +1074,8 @@ int pyregf_file_set_ascii_codepage_setter(
      void *closure PYREGF_ATTRIBUTE_UNUSED )
 {
 	PyObject *utf8_string_object = NULL;
-	static char *function        = "pyregf_file_set_ascii_codepage_setter";
 	char *codepage_string        = NULL;
+	static char *function        = "pyregf_file_set_ascii_codepage_setter";
 	int result                   = 0;
 
 	PYREGF_UNREFERENCED_PARAMETER( closure )
@@ -1173,8 +1089,8 @@ int pyregf_file_set_ascii_codepage_setter(
 	if( result == -1 )
 	{
 		pyregf_error_fetch_and_raise(
-	         PyExc_RuntimeError,
-		 "%s: unable to determine if string object is of type unicode.",
+		 PyExc_RuntimeError,
+		 "%s: unable to determine if string object is of type Unicode.",
 		 function );
 
 		return( -1 );
@@ -1190,17 +1106,17 @@ int pyregf_file_set_ascii_codepage_setter(
 		{
 			pyregf_error_fetch_and_raise(
 			 PyExc_RuntimeError,
-			 "%s: unable to convert unicode string to UTF-8.",
+			 "%s: unable to convert Unicode string to UTF-8.",
 			 function );
 
 			return( -1 );
 		}
 #if PY_MAJOR_VERSION >= 3
 		codepage_string = PyBytes_AsString(
-				   utf8_string_object );
+		                   utf8_string_object );
 #else
 		codepage_string = PyString_AsString(
-				   utf8_string_object );
+		                   utf8_string_object );
 #endif
 		if( codepage_string == NULL )
 		{
@@ -1220,17 +1136,17 @@ int pyregf_file_set_ascii_codepage_setter(
 
 #if PY_MAJOR_VERSION >= 3
 	result = PyObject_IsInstance(
-		  string_object,
-		  (PyObject *) &PyBytes_Type );
+	          string_object,
+	          (PyObject *) &PyBytes_Type );
 #else
 	result = PyObject_IsInstance(
-		  string_object,
-		  (PyObject *) &PyString_Type );
+	          string_object,
+	          (PyObject *) &PyString_Type );
 #endif
 	if( result == -1 )
 	{
 		pyregf_error_fetch_and_raise(
-	         PyExc_RuntimeError,
+		 PyExc_RuntimeError,
 		 "%s: unable to determine if string object is of type string.",
 		 function );
 
@@ -1250,8 +1166,8 @@ int pyregf_file_set_ascii_codepage_setter(
 			return( -1 );
 		}
 		result = pyregf_file_set_ascii_codepage_from_string(
-			  pyregf_file,
-			  codepage_string );
+		          pyregf_file,
+		          codepage_string );
 
 		if( result != 1 )
 		{
@@ -1274,8 +1190,9 @@ PyObject *pyregf_file_get_format_version(
            pyregf_file_t *pyregf_file,
            PyObject *arguments PYREGF_ATTRIBUTE_UNUSED )
 {
-	char version_string[ 4 ];
+	char utf8_string[ 4 ];
 
+	PyObject *string_object  = NULL;
 	libcerror_error_t *error = NULL;
 	const char *errors       = NULL;
 	static char *function    = "pyregf_file_get_format_version";
@@ -1288,7 +1205,7 @@ PyObject *pyregf_file_get_format_version(
 	if( pyregf_file == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid file.",
 		 function );
 
@@ -1309,7 +1226,7 @@ PyObject *pyregf_file_get_format_version(
 		pyregf_error_raise(
 		 error,
 		 PyExc_IOError,
-		 "%s: unable to determine format version.",
+		 "%s: unable to retrieve format version.",
 		 function );
 
 		libcerror_error_free(
@@ -1320,8 +1237,8 @@ PyObject *pyregf_file_get_format_version(
 	if( major_version > 9 )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
-		 "%s: invalid major version value out of bounds.",
+		 PyExc_ValueError,
+		 "%s: major version out of bounds.",
 		 function );
 
 		return( NULL );
@@ -1329,25 +1246,35 @@ PyObject *pyregf_file_get_format_version(
 	if( minor_version > 9 )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
-		 "%s: invalid minor version value out of bounds.",
+		 PyExc_ValueError,
+		 "%s: minor version out of bounds.",
 		 function );
 
 		return( NULL );
 	}
-	version_string[ 0 ] = '0' + (char) major_version;
-	version_string[ 1 ] = '.';
-	version_string[ 2 ] = '0' + (char) minor_version;
-	version_string[ 3 ] = 0;
+	utf8_string[ 0 ] = '0' + (char) major_version;
+	utf8_string[ 1 ] = '.';
+	utf8_string[ 2 ] = '0' + (char) minor_version;
+	utf8_string[ 3 ] = 0;
 
-	/* Pass the string length to PyUnicode_DecodeUTF8
-	 * otherwise it makes the end of string character is part
-	 * of the string
+	/* Pass the string length to PyUnicode_DecodeUTF8 otherwise it makes
+	 * the end of string character is part of the string.
 	 */
-	return( PyUnicode_DecodeUTF8(
-	         version_string,
-	         (Py_ssize_t) 3,
-	         errors ) );
+	string_object = PyUnicode_DecodeUTF8(
+	                 utf8_string,
+	                 (Py_ssize_t) 3,
+	                 errors );
+
+	if( string_object == NULL )
+	{
+		PyErr_Format(
+		 PyExc_IOError,
+		 "%s: unable to convert UTF-8 string into Unicode object.",
+		 function );
+
+		return( NULL );
+	}
+	return( string_object );
 }
 
 /* Retrieves the file type
@@ -1368,7 +1295,7 @@ PyObject *pyregf_file_get_type(
 	if( pyregf_file == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid file.",
 		 function );
 
@@ -1424,7 +1351,7 @@ PyObject *pyregf_file_get_root_key(
 	if( pyregf_file == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid file.",
 		 function );
 
@@ -1461,7 +1388,7 @@ PyObject *pyregf_file_get_root_key(
 	}
 	key_object = pyregf_key_new(
 	              root_key,
-	              pyregf_file );
+	              (PyObject *) pyregf_file );
 
 	if( key_object == NULL )
 	{
@@ -1504,7 +1431,7 @@ PyObject *pyregf_file_get_key_by_path(
 	if( pyregf_file == NULL )
 	{
 		PyErr_Format(
-		 PyExc_TypeError,
+		 PyExc_ValueError,
 		 "%s: invalid file.",
 		 function );
 
@@ -1557,7 +1484,7 @@ PyObject *pyregf_file_get_key_by_path(
 	}
 	key_object = pyregf_key_new(
 	              key,
-	              pyregf_file );
+	              (PyObject *) pyregf_file );
 
 	if( key_object == NULL )
 	{

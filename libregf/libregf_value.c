@@ -30,6 +30,7 @@
 #include "libregf_libfcache.h"
 #include "libregf_libfdata.h"
 #include "libregf_libuna.h"
+#include "libregf_multi_string.h"
 #include "libregf_value.h"
 #include "libregf_value_item.h"
 #include "libregf_value_type.h"
@@ -113,6 +114,21 @@ int libregf_value_initialize(
 
 		return( -1 );
 	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_initialize(
+	     &( internal_value->read_write_lock ),
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to initialize read/write lock.",
+		 function );
+
+		goto on_error;
+	}
+#endif
 	internal_value->file_io_handle      = file_io_handle;
 	internal_value->io_handle           = io_handle;
 	internal_value->values_list_element = values_list_element;
@@ -140,6 +156,7 @@ int libregf_value_free(
 {
 	libregf_internal_value_t *internal_value = NULL;
 	static char *function                    = "libregf_value_free";
+	int result                               = 1;
 
 	if( value == NULL )
 	{
@@ -157,12 +174,27 @@ int libregf_value_free(
 		internal_value = (libregf_internal_value_t *) *value;
 		*value         = NULL;
 
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+		if( libcthreads_read_write_lock_free(
+		     &( internal_value->read_write_lock ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free read/write lock.",
+			 function );
+
+			result = -1;
+		}
+#endif
 		/* The io_handle, file_io_handle and values_list_element references are freed elsewhere
 		 */
 		memory_free(
 		 internal_value );
 	}
-	return( 1 );
+	return( result );
 }
 
 /* Determine if the value corrupted
@@ -2077,5 +2109,151 @@ int libregf_value_get_value_binary_data(
 		return( -1 );
 	}
 	return( 1 );
+}
+
+/* Retrieves the multi string value
+ * Creates a new multi string
+ * Returns 1 if successful or -1 on error
+ */
+int libregf_value_get_value_multi_string(
+     libregf_value_t *value,
+     libregf_multi_string_t **multi_string,
+     libcerror_error_t **error )
+{
+	libregf_internal_value_t *internal_value = NULL;
+	libregf_value_item_t *value_item         = NULL;
+	uint8_t *value_data                      = NULL;
+	static char *function                    = "libregf_value_get_value_multi_string";
+	size_t value_data_size                   = 0;
+
+	if( value == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid value.",
+		 function );
+
+		return( -1 );
+	}
+	internal_value = (libregf_internal_value_t *) value;
+
+	if( internal_value->io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid value - missing IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( multi_string == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid multi string.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfdata_list_element_get_element_value(
+	     internal_value->values_list_element,
+	     (intptr_t *) internal_value->file_io_handle,
+	     (libfdata_cache_t *) internal_value->values_cache,
+	     (intptr_t **) &value_item,
+	     0,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve value item.",
+		 function );
+
+		return( -1 );
+	}
+	if( value_item == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: missing value item.",
+		 function );
+
+		return( -1 );
+	}
+	if( value_item->type != LIBREGF_VALUE_TYPE_MULTI_VALUE_STRING )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported string value type: 0x%04" PRIx32 ".",
+		 function,
+		 value_item->type );
+
+		return( -1 );
+	}
+	if( libregf_value_item_get_data(
+	     value_item,
+	     internal_value->file_io_handle,
+	     &value_data,
+	     &value_data_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve value data.",
+		 function );
+
+		return( -1 );
+	}
+	if( libregf_multi_string_initialize(
+	     multi_string,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create multi string.",
+		 function );
+
+		return( -1 );
+	}
+	if( libregf_internal_multi_string_read_data(
+	     (libregf_internal_multi_string_t *) *multi_string,
+	     value_data,
+	     value_data_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read multi string from value data.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+
+on_error:
+	if( *multi_string != NULL )
+	{
+		libregf_multi_string_free(
+		 multi_string,
+		 NULL );
+	}
+	return( -1 );
 }
 

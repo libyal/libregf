@@ -121,6 +121,21 @@ int libregf_file_initialize(
 
 		goto on_error;
 	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_initialize(
+	     &( internal_file->read_write_lock ),
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to initialize read/write lock.",
+		 function );
+
+		goto on_error;
+	}
+#endif
 	*file = (libregf_file_t *) internal_file;
 
 	return( 1 );
@@ -178,6 +193,21 @@ int libregf_file_free(
 		}
 		*file = NULL;
 
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+		if( libcthreads_read_write_lock_free(
+		     &( internal_file->read_write_lock ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free read/write lock.",
+			 function );
+
+			result = -1;
+		}
+#endif
 		if( libregf_io_handle_free(
 		     &( internal_file->io_handle ),
 		     error ) != 1 )
@@ -346,8 +376,40 @@ int libregf_file_open(
 
 		goto on_error;
 	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_file->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		goto on_error;
+	}
+#endif
 	internal_file->file_io_handle_created_in_library = 1;
 
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_file->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
+		internal_file->file_io_handle_created_in_library = 0;
+
+		goto on_error;
+	}
+#endif
 	return( 1 );
 
 on_error:
@@ -486,8 +548,40 @@ int libregf_file_open_wide(
 
 		goto on_error;
 	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_file->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		goto on_error;
+	}
+#endif
 	internal_file->file_io_handle_created_in_library = 1;
 
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_file->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
+		internal_file->file_io_handle_created_in_library = 0;
+
+		goto on_error;
+	}
+#endif
 	return( 1 );
 
 on_error:
@@ -515,6 +609,7 @@ int libregf_file_open_file_io_handle(
 	static char *function                  = "libregf_file_open_file_io_handle";
 	int bfio_access_flags                  = 0;
 	int file_io_handle_is_open             = 0;
+	int file_io_handle_opened_in_library   = 0;
 
 	if( file == NULL )
 	{
@@ -609,9 +704,9 @@ int libregf_file_open_file_io_handle(
 
 			goto on_error;
 		}
-		internal_file->file_io_handle_opened_in_library = 1;
+		file_io_handle_opened_in_library = 1;
 	}
-	if( libregf_file_open_read(
+	if( libregf_internal_file_open_read(
 	     internal_file,
 	     file_io_handle,
 	     error ) != 1 )
@@ -625,22 +720,51 @@ int libregf_file_open_file_io_handle(
 
 		goto on_error;
 	}
-	internal_file->file_io_handle = file_io_handle;
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_file->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
 
+		goto on_error;
+	}
+#endif
+	internal_file->file_io_handle                   = file_io_handle;
+	internal_file->file_io_handle_opened_in_library = file_io_handle_opened_in_library;
+
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_file->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
+		internal_file->file_io_handle                   = NULL;
+		internal_file->file_io_handle_opened_in_library = 0;
+
+		goto on_error;
+	}
+#endif
 	return( 1 );
 
 on_error:
-	if( ( file_io_handle_is_open == 0 )
-	 && ( internal_file->file_io_handle_opened_in_library != 0 ) )
+	if( file_io_handle_opened_in_library != 0 )
 	{
 		libbfio_handle_close(
 		 file_io_handle,
 		 error );
-
-		internal_file->file_io_handle_opened_in_library = 0;
 	}
-	internal_file->file_io_handle = NULL;
-
 	return( -1 );
 }
 
@@ -679,6 +803,21 @@ int libregf_file_close(
 
 		return( -1 );
 	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_file->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
 	{
@@ -811,18 +950,33 @@ int libregf_file_close(
 			result = -1;
 		}
 	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_file->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	return( result );
 }
 
 /* Opens a file for reading
  * Returns 1 if successful or -1 on error
  */
-int libregf_file_open_read(
+int libregf_internal_file_open_read(
      libregf_internal_file_t *internal_file,
      libbfio_handle_t *file_io_handle,
      libcerror_error_t **error )
 {
-	static char *function = "libregf_file_open_read";
+	static char *function = "libregf_internal_file_open_read";
 	size64_t file_size    = 0;
 	int result            = 0;
 
@@ -1071,6 +1225,7 @@ int libregf_file_is_corrupted(
 {
 	libregf_internal_file_t *internal_file = NULL;
 	static char *function                  = "libregf_file_is_corrupted";
+	int result                             = 0;
 
 	if( file == NULL )
 	{
@@ -1096,11 +1251,41 @@ int libregf_file_is_corrupted(
 
 		return( -1 );
 	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( ( internal_file->io_handle->flags & LIBREGF_IO_HANDLE_FLAG_IS_CORRUPTED ) != 0 )
 	{
-		return( 1 );
+		result = 1;
 	}
-	return( 0 );
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
 }
 
 /* Retrieves the file ASCII codepage
@@ -1149,8 +1334,38 @@ int libregf_file_get_ascii_codepage(
 
 		return( -1 );
 	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	*ascii_codepage = internal_file->io_handle->ascii_codepage;
 
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	return( 1 );
 }
 
@@ -1214,8 +1429,38 @@ int libregf_file_set_ascii_codepage(
 
 		return( -1 );
 	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_file->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	internal_file->io_handle->ascii_codepage = ascii_codepage;
 
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_file->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	return( 1 );
 }
 
@@ -1277,9 +1522,39 @@ int libregf_file_get_format_version(
 
 		return( -1 );
 	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	*major_version = internal_file->file_header->major_format_version;
 	*minor_version = internal_file->file_header->minor_format_version;
 
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	return( 1 );
 }
 
@@ -1329,12 +1604,43 @@ int libregf_file_get_type(
 
 		return( -1 );
 	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_read(
+	     internal_file->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	*file_type = internal_file->file_header->file_type;
 
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_read(
+	     internal_file->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for reading.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	return( 1 );
 }
 
 /* Retrieves the root key
+ * Creates a new key
  * Returns 1 if successful, 0 if no such key or -1 on error
  */
 int libregf_file_get_root_key(
@@ -1397,6 +1703,7 @@ int libregf_file_get_root_key(
 	{
 		return( 0 );
 	}
+/* TODO add thread RW lock */
 	if( libfdata_tree_get_root_node(
 	     internal_file->key_tree,
 	     &key_tree_root_node,
@@ -1433,6 +1740,7 @@ int libregf_file_get_root_key(
 
 /* Retrieves the key for the specific UTF-8 encoded path
  * The path separator is the \ character
+ * Creates a new key
  * Returns 1 if successful, 0 if no such key or -1 on error
  */
 int libregf_file_get_key_by_utf8_path(
@@ -1523,6 +1831,7 @@ int libregf_file_get_key_by_utf8_path(
 
 		return( -1 );
 	}
+/* TODO add thread RW lock */
 	if( utf8_string_length > 0 )
 	{
 		/* Ignore a leading separator
@@ -1674,6 +1983,7 @@ int libregf_file_get_key_by_utf8_path(
 
 /* Retrieves the key for the specific UTF-16 encoded path
  * The path separator is the \ character
+ * Creates a new key
  * Returns 1 if successful, 0 if no such key or -1 on error
  */
 int libregf_file_get_key_by_utf16_path(
@@ -1764,6 +2074,7 @@ int libregf_file_get_key_by_utf16_path(
 
 		return( -1 );
 	}
+/* TODO add thread RW lock */
 	if( utf16_string_length > 0 )
 	{
 		/* Ignore a leading separator

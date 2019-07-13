@@ -120,6 +120,21 @@ int libregf_key_initialize(
 
 		return( -1 );
 	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_initialize(
+	     &( internal_key->read_write_lock ),
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to initialize read/write lock.",
+		 function );
+
+		goto on_error;
+	}
+#endif
 	internal_key->file_io_handle = file_io_handle;
 	internal_key->io_handle      = io_handle;
 	internal_key->key_tree_node  = key_tree_node;
@@ -165,6 +180,21 @@ int libregf_key_free(
 		internal_key = (libregf_internal_key_t *) *key;
 		*key         = NULL;
 
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+		if( libcthreads_read_write_lock_free(
+		     &( internal_key->read_write_lock ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free read/write lock.",
+			 function );
+
+			result = -1;
+		}
+#endif
 		/* The io_handle, file_io_handle, key_tree_node and key_cache references are freed elsewhere
 		 */
 		memory_free(
@@ -485,7 +515,7 @@ int libregf_key_get_name(
  */
 int libregf_key_get_utf8_name_size(
      libregf_key_t *key,
-     size_t *utf8_name_size,
+     size_t *utf8_string_size,
      libcerror_error_t **error )
 {
 	libregf_internal_key_t *internal_key = NULL;
@@ -562,7 +592,7 @@ int libregf_key_get_utf8_name_size(
 			  key_item->name,
 			  (size_t) key_item->name_size,
 			  internal_key->io_handle->ascii_codepage,
-			  utf8_name_size,
+			  utf8_string_size,
 			  error );
 	}
 	else
@@ -571,7 +601,7 @@ int libregf_key_get_utf8_name_size(
 			  key_item->name,
 			  (size_t) key_item->name_size,
 			  LIBUNA_ENDIAN_LITTLE,
-			  utf8_name_size,
+			  utf8_string_size,
 			  error );
 	}
 	if( result != 1 )
@@ -595,8 +625,8 @@ int libregf_key_get_utf8_name_size(
  */
 int libregf_key_get_utf8_name(
      libregf_key_t *key,
-     uint8_t *utf8_name,
-     size_t utf8_name_size,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
      libcerror_error_t **error )
 {
 	libregf_internal_key_t *internal_key = NULL;
@@ -670,8 +700,8 @@ int libregf_key_get_utf8_name(
 	if( ( key_item->flags & LIBREGF_NAMED_KEY_FLAG_NAME_IS_ASCII ) != 0 )
 	{
 		result = libuna_utf8_string_copy_from_byte_stream(
-			  utf8_name,
-			  utf8_name_size,
+			  utf8_string,
+			  utf8_string_size,
 			  key_item->name,
 			  (size_t) key_item->name_size,
 			  internal_key->io_handle->ascii_codepage,
@@ -680,8 +710,8 @@ int libregf_key_get_utf8_name(
 	else
 	{
 		result = libuna_utf8_string_copy_from_utf16_stream(
-			  utf8_name,
-			  utf8_name_size,
+			  utf8_string,
+			  utf8_string_size,
 			  key_item->name,
 			  (size_t) key_item->name_size,
 			  LIBUNA_ENDIAN_LITTLE,
@@ -707,7 +737,7 @@ int libregf_key_get_utf8_name(
  */
 int libregf_key_get_utf16_name_size(
      libregf_key_t *key,
-     size_t *utf16_name_size,
+     size_t *utf16_string_size,
      libcerror_error_t **error )
 {
 	libregf_internal_key_t *internal_key = NULL;
@@ -784,7 +814,7 @@ int libregf_key_get_utf16_name_size(
 			  key_item->name,
 			  (size_t) key_item->name_size,
 			  internal_key->io_handle->ascii_codepage,
-			  utf16_name_size,
+			  utf16_string_size,
 			  error );
 	}
 	else
@@ -793,7 +823,7 @@ int libregf_key_get_utf16_name_size(
 			  key_item->name,
 			  (size_t) key_item->name_size,
 			  LIBUNA_ENDIAN_LITTLE,
-			  utf16_name_size,
+			  utf16_string_size,
 			  error );
 	}
 	if( result != 1 )
@@ -817,8 +847,8 @@ int libregf_key_get_utf16_name_size(
  */
 int libregf_key_get_utf16_name(
      libregf_key_t *key,
-     uint16_t *utf16_name,
-     size_t utf16_name_size,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
      libcerror_error_t **error )
 {
 	libregf_internal_key_t *internal_key = NULL;
@@ -892,8 +922,8 @@ int libregf_key_get_utf16_name(
 	if( ( key_item->flags & LIBREGF_NAMED_KEY_FLAG_NAME_IS_ASCII ) != 0 )
 	{
 		result = libuna_utf16_string_copy_from_byte_stream(
-			  utf16_name,
-			  utf16_name_size,
+			  utf16_string,
+			  utf16_string_size,
 			  key_item->name,
 			  (size_t) key_item->name_size,
 			  internal_key->io_handle->ascii_codepage,
@@ -902,8 +932,8 @@ int libregf_key_get_utf16_name(
 	else
 	{
 		result = libuna_utf16_string_copy_from_utf16_stream(
-			  utf16_name,
-			  utf16_name_size,
+			  utf16_string,
+			  utf16_string_size,
 			  key_item->name,
 			  (size_t) key_item->name_size,
 			  LIBUNA_ENDIAN_LITTLE,
@@ -1110,7 +1140,7 @@ int libregf_key_get_class_name(
  */
 int libregf_key_get_utf8_class_name_size(
      libregf_key_t *key,
-     size_t *utf8_class_name_size,
+     size_t *utf8_string_size,
      libcerror_error_t **error )
 {
 	libregf_internal_key_t *internal_key = NULL;
@@ -1165,7 +1195,7 @@ int libregf_key_get_utf8_class_name_size(
 			  key_item->class_name,
 			  (size_t) key_item->class_name_size,
 			  LIBUNA_ENDIAN_LITTLE,
-			  utf8_class_name_size,
+			  utf8_string_size,
 			  error );
 
 		if( result != 1 )
@@ -1190,8 +1220,8 @@ int libregf_key_get_utf8_class_name_size(
  */
 int libregf_key_get_utf8_class_name(
      libregf_key_t *key,
-     uint8_t *utf8_class_name,
-     size_t utf8_class_name_size,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
      libcerror_error_t **error )
 {
 	libregf_internal_key_t *internal_key = NULL;
@@ -1243,8 +1273,8 @@ int libregf_key_get_utf8_class_name(
 	if( key_item->class_name != NULL )
 	{
 		result = libuna_utf8_string_copy_from_utf16_stream(
-			  utf8_class_name,
-			  utf8_class_name_size,
+			  utf8_string,
+			  utf8_string_size,
 			  key_item->class_name,
 			  (size_t) key_item->class_name_size,
 			  LIBUNA_ENDIAN_LITTLE,
@@ -1271,7 +1301,7 @@ int libregf_key_get_utf8_class_name(
  */
 int libregf_key_get_utf16_class_name_size(
      libregf_key_t *key,
-     size_t *utf16_class_name_size,
+     size_t *utf16_string_size,
      libcerror_error_t **error )
 {
 	libregf_internal_key_t *internal_key = NULL;
@@ -1326,7 +1356,7 @@ int libregf_key_get_utf16_class_name_size(
 			  key_item->class_name,
 			  (size_t) key_item->class_name_size,
 			  LIBUNA_ENDIAN_LITTLE,
-			  utf16_class_name_size,
+			  utf16_string_size,
 			  error );
 
 		if( result != 1 )
@@ -1351,8 +1381,8 @@ int libregf_key_get_utf16_class_name_size(
  */
 int libregf_key_get_utf16_class_name(
      libregf_key_t *key,
-     uint16_t *utf16_class_name,
-     size_t utf16_class_name_size,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
      libcerror_error_t **error )
 {
 	libregf_internal_key_t *internal_key = NULL;
@@ -1404,8 +1434,8 @@ int libregf_key_get_utf16_class_name(
 	if( key_item->class_name != NULL )
 	{
 		result = libuna_utf16_string_copy_from_utf16_stream(
-			  utf16_class_name,
-			  utf16_class_name_size,
+			  utf16_string,
+			  utf16_string_size,
 			  key_item->class_name,
 			  (size_t) key_item->class_name_size,
 			  LIBUNA_ENDIAN_LITTLE,
@@ -1426,13 +1456,12 @@ int libregf_key_get_utf16_class_name(
 	return( result );
 }
 
-/* Retrieves the last written date and time
- * The returned time is a 64-bit version of a filetime value
+/* Retrieves the 64-bit FILETIME value of the last written date and time
  * Returns 1 if successful or -1 on error
  */
 int libregf_key_get_last_written_time(
      libregf_key_t *key,
-     uint64_t *last_written_time,
+     uint64_t *filetime,
      libcerror_error_t **error )
 {
 	libregf_internal_key_t *internal_key = NULL;
@@ -1480,18 +1509,18 @@ int libregf_key_get_last_written_time(
 
 		return( -1 );
 	}
-	if( last_written_time == NULL )
+	if( filetime == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid last written time.",
+		 "%s: invalid filetime.",
 		 function );
 
 		return( -1 );
 	}
-	*last_written_time = key_item->last_written_time;
+	*filetime = key_item->last_written_time;
 
 	return( 1 );
 }
@@ -1680,7 +1709,6 @@ int libregf_key_get_security_descriptor(
 }
 
 /* Retrieves the number of values of the referenced key
- * All sets in a key contain the same number of values
  * Returns 1 if successful or -1 on error
  */
 int libregf_key_get_number_of_values(
@@ -1740,6 +1768,7 @@ int libregf_key_get_number_of_values(
 }
 
 /* Retrieves the value
+ * Creates a new value
  * Returns 1 if successful or -1 on error
  */
 int libregf_key_get_value(
@@ -1853,8 +1882,8 @@ int libregf_key_get_value(
 }
 
 /* Retrieves the value for the specific UTF-8 encoded name
- * To retrieve the default value specify value name as NULL
- * and its length as 0
+ * To retrieve the default value specify value name as NULL and its length as 0
+ * Creates a new value
  * Returns 1 if successful, 0 if no such value or -1 on error
  */
 int libregf_key_get_value_by_utf8_name(
@@ -2126,8 +2155,8 @@ int libregf_key_get_value_by_utf8_name(
 }
 
 /* Retrieves the value for the specific UTF-16 encoded name
- * To retrieve the default value specify string as NULL
- * and its length as 0
+ * To retrieve the default value specify string as NULL and its length as 0
+ * Creates a new value
  * Returns 1 if successful, 0 if no such value or -1 on error
  */
 int libregf_key_get_value_by_utf16_name(
@@ -2443,6 +2472,7 @@ int libregf_key_get_number_of_sub_keys(
 }
 
 /* Retrieves the sub key for the specific index
+ * Creates a new key
  * Returns 1 if successful or -1 on error
  */
 int libregf_key_get_sub_key(
@@ -2541,6 +2571,7 @@ int libregf_key_get_sub_key(
 }
 
 /* Retrieves the sub key for the specific UTF-8 encoded name
+ * Creates a new key
  * Returns 1 if successful, 0 if no such sub key or -1 on error
  */
 int libregf_key_get_sub_key_by_utf8_name(
@@ -2696,6 +2727,7 @@ int libregf_key_get_sub_key_by_utf8_name(
 
 /* Retrieves the sub key for the specific UTF-8 encoded path
  * The path separator is the \ character
+ * Creates a new key
  * Returns 1 if successful, 0 if no such key or -1 on error
  */
 int libregf_key_get_sub_key_by_utf8_path(
@@ -2926,6 +2958,7 @@ int libregf_key_get_sub_key_by_utf8_path(
 }
 
 /* Retrieves the sub key for the specific UTF-16 encoded name
+ * Creates a new key
  * Returns 1 if successful, 0 if no such sub key or -1 on error
  */
 int libregf_key_get_sub_key_by_utf16_name(
@@ -3081,6 +3114,7 @@ int libregf_key_get_sub_key_by_utf16_name(
 
 /* Retrieves the sub key for the specific UTF-16 encoded path
  * The path separator is the \ character
+ * Creates a new key
  * Returns 1 if successful, 0 if no such key or -1 on error
  */
 int libregf_key_get_sub_key_by_utf16_path(

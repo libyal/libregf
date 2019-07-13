@@ -45,9 +45,9 @@ struct pyregf_key
 	 */
 	libregf_key_t *key;
 
-	/* The pyregf file object
+	/* The parent object
 	 */
-	pyregf_file_t *file_object;
+	PyObject *parent_object;
 };
 
 extern PyMethodDef pyregf_key_object_methods[];
@@ -55,7 +55,7 @@ extern PyTypeObject pyregf_key_type_object;
 
 PyObject *pyregf_key_new(
            libregf_key_t *key,
-           pyregf_file_t *file_object );
+           PyObject *parent_object );
 
 int pyregf_key_init(
      pyregf_key_t *pyregf_key );
@@ -140,5 +140,5 @@ PyObject *pyregf_key_get_value_by_name(
 }
 #endif
 
-#endif
+#endif /* !defined( _PYREGF_KEY_H ) */
 

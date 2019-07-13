@@ -34,13 +34,15 @@
 /* The following type definitions hide internal data structures
  */
 #if defined( HAVE_DEBUG_OUTPUT ) && !defined( WINAPI )
-typedef struct libregf_file {}	libregf_file_t;
-typedef struct libregf_key {}	libregf_key_t;
-typedef struct libregf_value {}	libregf_value_t;
+typedef struct libregf_file {}		libregf_file_t;
+typedef struct libregf_key {}		libregf_key_t;
+typedef struct libregf_multi_string {}	libregf_multi_string_t;
+typedef struct libregf_value {}		libregf_value_t;
 
 #else
 typedef intptr_t libregf_file_t;
 typedef intptr_t libregf_key_t;
+typedef intptr_t libregf_multi_string_t;
 typedef intptr_t libregf_value_t;
 
 #endif /* defined( HAVE_DEBUG_OUTPUT ) && !defined( WINAPI ) */

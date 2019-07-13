@@ -19,8 +19,8 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBREGF_INTERNAL_VALUE_H )
-#define _LIBREGF_INTERNAL_VALUE_H
+#if !defined( _LIBREGF_VALUE_H )
+#define _LIBREGF_VALUE_H
 
 #include <common.h>
 #include <types.h>
@@ -29,6 +29,7 @@
 #include "libregf_io_handle.h"
 #include "libregf_libbfio.h"
 #include "libregf_libcerror.h"
+#include "libregf_libcthreads.h"
 #include "libregf_libfcache.h"
 #include "libregf_libfdata.h"
 #include "libregf_types.h"
@@ -56,6 +57,12 @@ struct libregf_internal_value
 	/* The values cache
 	 */
 	libfcache_cache_t *values_cache;
+
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	/* The read/write lock
+	 */
+	libcthreads_read_write_lock_t *read_write_lock;
+#endif
 };
 
 int libregf_value_initialize(
@@ -98,27 +105,27 @@ int libregf_value_get_name(
 LIBREGF_EXTERN \
 int libregf_value_get_utf8_name_size(
      libregf_value_t *value,
-     size_t *utf8_name_size,
+     size_t *utf8_string_size,
      libcerror_error_t **error );
 
 LIBREGF_EXTERN \
 int libregf_value_get_utf8_name(
      libregf_value_t *value,
-     uint8_t *utf8_name,
-     size_t utf8_name_size,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
      libcerror_error_t **error );
 
 LIBREGF_EXTERN \
 int libregf_value_get_utf16_name_size(
      libregf_value_t *value,
-     size_t *utf16_name_size,
+     size_t *utf16_string_size,
      libcerror_error_t **error );
 
 LIBREGF_EXTERN \
 int libregf_value_get_utf16_name(
      libregf_value_t *value,
-     uint16_t *utf16_name,
-     size_t utf16_name_size,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
      libcerror_error_t **error );
 
 LIBREGF_EXTERN \
@@ -191,9 +198,15 @@ int libregf_value_get_value_binary_data(
      size_t size,
      libcerror_error_t **error );
 
+LIBREGF_EXTERN \
+int libregf_value_get_value_multi_string(
+     libregf_value_t *value,
+     libregf_multi_string_t **multi_string,
+     libcerror_error_t **error );
+
 #if defined( __cplusplus )
 }
 #endif
 
-#endif /* !defined( _LIBREGF_INTERNAL_VALUE_H ) */
+#endif /* !defined( _LIBREGF_VALUE_H ) */
 

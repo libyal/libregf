@@ -35,6 +35,7 @@ BUILT_SOURCES = \
 	pyregf_libcerror.h \
 	pyregf_libclocale.h \
 	pyregf_libregf.h \
+	pyregf_multi_string.c pyregf_multi_string.h \
 	pyregf_python.h \
 	pyregf_unused.h \
 	pyregf_value.c pyregf_value.h \

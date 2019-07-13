@@ -29,6 +29,7 @@
 #include "libregf_io_handle.h"
 #include "libregf_libbfio.h"
 #include "libregf_libcerror.h"
+#include "libregf_libcthreads.h"
 #include "libregf_libfcache.h"
 #include "libregf_libfdata.h"
 #include "libregf_types.h"
@@ -56,6 +57,12 @@ struct libregf_internal_key
 	/* The key cache
 	 */
 	libfcache_cache_t *key_cache;
+
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	/* The read/write lock
+	 */
+	libcthreads_read_write_lock_t *read_write_lock;
+#endif
 };
 
 int libregf_key_initialize(
@@ -98,27 +105,27 @@ int libregf_key_get_name(
 LIBREGF_EXTERN \
 int libregf_key_get_utf8_name_size(
      libregf_key_t *key,
-     size_t *utf8_name_size,
+     size_t *utf8_string_size,
      libcerror_error_t **error );
 
 LIBREGF_EXTERN \
 int libregf_key_get_utf8_name(
      libregf_key_t *key,
-     uint8_t *utf8_name,
-     size_t utf8_name_size,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
      libcerror_error_t **error );
 
 LIBREGF_EXTERN \
 int libregf_key_get_utf16_name_size(
      libregf_key_t *key,
-     size_t *utf16_name_size,
+     size_t *utf16_string_size,
      libcerror_error_t **error );
 
 LIBREGF_EXTERN \
 int libregf_key_get_utf16_name(
      libregf_key_t *key,
-     uint16_t *utf16_name,
-     size_t utf16_name_size,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
      libcerror_error_t **error );
 
 LIBREGF_EXTERN \
@@ -137,33 +144,33 @@ int libregf_key_get_class_name(
 LIBREGF_EXTERN \
 int libregf_key_get_utf8_class_name_size(
      libregf_key_t *key,
-     size_t *utf8_class_name_size,
+     size_t *utf8_string_size,
      libcerror_error_t **error );
 
 LIBREGF_EXTERN \
 int libregf_key_get_utf8_class_name(
      libregf_key_t *key,
-     uint8_t *utf8_class_name,
-     size_t utf8_class_name_size,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
      libcerror_error_t **error );
 
 LIBREGF_EXTERN \
 int libregf_key_get_utf16_class_name_size(
      libregf_key_t *key,
-     size_t *utf16_class_name_size,
+     size_t *utf16_string_size,
      libcerror_error_t **error );
 
 LIBREGF_EXTERN \
 int libregf_key_get_utf16_class_name(
      libregf_key_t *key,
-     uint16_t *utf16_class_name,
-     size_t utf16_class_name_size,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
      libcerror_error_t **error );
 
 LIBREGF_EXTERN \
 int libregf_key_get_last_written_time(
      libregf_key_t *key,
-     uint64_t *last_written_time,
+     uint64_t *filetime,
      libcerror_error_t **error );
 
 LIBREGF_EXTERN \

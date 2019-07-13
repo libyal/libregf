@@ -7,7 +7,7 @@ EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
 EXIT_IGNORE=77;
 
-LIBRARY_TESTS="checksum data_type error file_header hive_bin hive_bin_cell hive_bin_header hive_bins_list io_handle key key_item named_key notify value value_item";
+LIBRARY_TESTS="checksum data_type error file_header hive_bin hive_bin_cell hive_bin_header hive_bins_list io_handle key key_item multi_string named_key notify value value_item";
 LIBRARY_TESTS_WITH_INPUT="file support";
 OPTION_SETS="";
 

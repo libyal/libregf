@@ -105,6 +105,22 @@ int regf_test_checksum_calculate_little_endian_xor32(
 
 	result = libregf_checksum_calculate_little_endian_xor32(
 	          &checksum_value,
+	          &( regf_test_checksum_file_header_data[ 1 ] ),
+	          512 - 5,
+	          0,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libregf_checksum_calculate_little_endian_xor32(
+	          &checksum_value,
 	          regf_test_checksum_file_header_data,
 	          512 - 5,
 	          0,

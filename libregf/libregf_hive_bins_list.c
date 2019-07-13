@@ -25,6 +25,7 @@
 
 #include "libregf_definitions.h"
 #include "libregf_hive_bin.h"
+#include "libregf_hive_bin_cell.h"
 #include "libregf_hive_bin_header.h"
 #include "libregf_hive_bins_list.h"
 #include "libregf_io_handle.h"
@@ -469,6 +470,74 @@ on_error:
 		 NULL );
 	}
 	return( -1 );
+}
+
+/* Retrives a hive bin cell at a specific offset
+ * Returns 1 if successful or -1 on error
+ */
+int libregf_hive_bins_list_get_cell_at_offset(
+     libregf_hive_bins_list_t *hive_bins_list,
+     libbfio_handle_t *file_io_handle,
+     uint32_t hive_bin_cell_offset,
+     libregf_hive_bin_cell_t **hive_bin_cell,
+     libcerror_error_t **error )
+{
+	libregf_hive_bin_t *hive_bin = NULL;
+	static char *function        = "libregf_hive_bins_list_get_cell_at_offset";
+	off64_t hive_bin_data_offset = 0;
+	int hive_bin_index           = 0;
+
+	if( hive_bins_list == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid hive bins list.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfdata_list_get_element_value_at_offset(
+	     hive_bins_list->data_list,
+	     (intptr_t *) file_io_handle,
+	     (libfdata_cache_t *) hive_bins_list->data_cache,
+	     (off64_t) hive_bin_cell_offset,
+	     &hive_bin_index,
+	     &hive_bin_data_offset,
+	     (intptr_t **) &hive_bin,
+	     0,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve hive bin at offset: %" PRIi64 " (0x%08" PRIx64 ").",
+		 function,
+		 hive_bin_cell_offset,
+		 hive_bin_cell_offset );
+
+		return( -1 );
+	}
+	if( libregf_hive_bin_get_cell_at_offset(
+	     hive_bin,
+	     hive_bin_cell_offset,
+	     hive_bin_cell,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve hive bin cell at offset: %" PRIi64 " (0x%08" PRIx64 ").",
+		 function,
+		 hive_bin_cell_offset,
+		 hive_bin_cell_offset );
+
+		return( -1 );
+	}
+	return( 1 );
 }
 
 /* Reads a hive bin

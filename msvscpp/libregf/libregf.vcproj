@@ -230,6 +230,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libregf\libregf_multi_string.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libregf\libregf_named_key.c"
 				>
 			</File>
@@ -348,6 +352,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libregf\libregf_libcthreads.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libregf\libregf_libfcache.h"
 				>
 			</File>
@@ -365,6 +373,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libregf\libregf_libuna.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libregf\libregf_multi_string.h"
 				>
 			</File>
 			<File

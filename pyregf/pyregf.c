@@ -36,6 +36,7 @@
 #include "pyregf_keys.h"
 #include "pyregf_libcerror.h"
 #include "pyregf_libregf.h"
+#include "pyregf_multi_string.h"
 #include "pyregf_python.h"
 #include "pyregf_unused.h"
 #include "pyregf_value.h"
@@ -43,11 +44,13 @@
 #include "pyregf_values.h"
 
 #if !defined( LIBREGF_HAVE_BFIO )
+
 LIBREGF_EXTERN \
 int libregf_check_file_signature_file_io_handle(
      libbfio_handle_t *file_io_handle,
      libregf_error_t **error );
-#endif
+
+#endif /* !defined( LIBREGF_HAVE_BFIO ) */
 
 /* The pyregf module methods
  */
@@ -74,24 +77,21 @@ PyMethodDef pyregf_module_methods[] = {
 	  "Checks if a file has a Windows NT Registry File (REGF) signature using a file-like object." },
 
 	{ "open",
-	  (PyCFunction) pyregf_file_new_open,
+	  (PyCFunction) pyregf_open_new_file,
 	  METH_VARARGS | METH_KEYWORDS,
 	  "open(filename, mode='r') -> Object\n"
 	  "\n"
 	  "Opens a file." },
 
 	{ "open_file_object",
-	  (PyCFunction) pyregf_file_new_open_file_object,
+	  (PyCFunction) pyregf_open_new_file_with_file_object,
 	  METH_VARARGS | METH_KEYWORDS,
-	  "open_file_object(file_boject, mode='r') -> Object\n"
+	  "open_file_object(file_object, mode='r') -> Object\n"
 	  "\n"
 	  "Opens a file using a file-like object." },
 
 	/* Sentinel */
-	{ NULL,
-	  NULL,
-	  0,
-	  NULL}
+	{ NULL, NULL, 0, NULL }
 };
 
 /* Retrieves the pyregf/libregf version
@@ -127,7 +127,7 @@ PyObject *pyregf_get_version(
 	         errors ) );
 }
 
-/* Checks if the file has a Windows NT Registry File (REGF) signature
+/* Checks if a file has a Windows NT Registry File (REGF) signature
  * Returns a Python object if successful or NULL on error
  */
 PyObject *pyregf_check_file_signature(
@@ -158,7 +158,7 @@ PyObject *pyregf_check_file_signature(
 	if( PyArg_ParseTupleAndKeywords(
 	     arguments,
 	     keywords,
-	     "|O",
+	     "O|",
 	     keyword_list,
 	     &string_object ) == 0 )
 	{
@@ -174,7 +174,7 @@ PyObject *pyregf_check_file_signature(
 	{
 		pyregf_error_fetch_and_raise(
 	         PyExc_RuntimeError,
-		 "%s: unable to determine if string object is of type unicode.",
+		 "%s: unable to determine if string object is of type Unicode.",
 		 function );
 
 		return( NULL );
@@ -201,7 +201,7 @@ PyObject *pyregf_check_file_signature(
 		{
 			pyregf_error_fetch_and_raise(
 			 PyExc_RuntimeError,
-			 "%s: unable to convert unicode string to UTF-8.",
+			 "%s: unable to convert Unicode string to UTF-8.",
 			 function );
 
 			return( NULL );
@@ -223,7 +223,9 @@ PyObject *pyregf_check_file_signature(
 
 		Py_DecRef(
 		 utf8_string_object );
-#endif
+
+#endif /* defined( HAVE_WIDE_SYSTEM_CHARACTER ) */
+
 		if( result == -1 )
 		{
 			pyregf_error_raise(
@@ -321,7 +323,7 @@ PyObject *pyregf_check_file_signature(
 	return( NULL );
 }
 
-/* Checks if the file has a Windows NT Registry File (REGF) signature using a file-like object
+/* Checks if a file has a Windows NT Registry File (REGF) signature using a file-like object
  * Returns a Python object if successful or NULL on error
  */
 PyObject *pyregf_check_file_signature_file_object(
@@ -421,6 +423,52 @@ on_error:
 	return( NULL );
 }
 
+/* Creates a new file object and opens it
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyregf_open_new_file(
+           PyObject *self PYREGF_ATTRIBUTE_UNUSED,
+           PyObject *arguments,
+           PyObject *keywords )
+{
+	PyObject *pyregf_file = NULL;
+
+	PYREGF_UNREFERENCED_PARAMETER( self )
+
+	pyregf_file_init(
+	 (pyregf_file_t *) pyregf_file );
+
+	pyregf_file_open(
+	 (pyregf_file_t *) pyregf_file,
+	 arguments,
+	 keywords );
+
+	return( pyregf_file );
+}
+
+/* Creates a new file object and opens it using a file-like object
+ * Returns a Python object if successful or NULL on error
+ */
+PyObject *pyregf_open_new_file_with_file_object(
+           PyObject *self PYREGF_ATTRIBUTE_UNUSED,
+           PyObject *arguments,
+           PyObject *keywords )
+{
+	PyObject *pyregf_file = NULL;
+
+	PYREGF_UNREFERENCED_PARAMETER( self )
+
+	pyregf_file_init(
+	 (pyregf_file_t *) pyregf_file );
+
+	pyregf_file_open_file_object(
+	 (pyregf_file_t *) pyregf_file,
+	 arguments,
+	 keywords );
+
+	return( pyregf_file );
+}
+
 #if PY_MAJOR_VERSION >= 3
 
 /* The pyregf module definition
@@ -458,15 +506,8 @@ PyMODINIT_FUNC initpyregf(
                 void )
 #endif
 {
-	PyObject *module                      = NULL;
-	PyTypeObject *file_type_object        = NULL;
-	PyTypeObject *file_types_type_object  = NULL;
-	PyTypeObject *key_type_object         = NULL;
-	PyTypeObject *keys_type_object        = NULL;
-	PyTypeObject *value_type_object       = NULL;
-	PyTypeObject *value_types_type_object = NULL;
-	PyTypeObject *values_type_object      = NULL;
-	PyGILState_STATE gil_state            = 0;
+	PyObject *module           = NULL;
+	PyGILState_STATE gil_state = 0;
 
 #if defined( HAVE_DEBUG_OUTPUT )
 	libregf_notify_set_stream(
@@ -513,31 +554,27 @@ PyMODINIT_FUNC initpyregf(
 	Py_IncRef(
 	 (PyObject *) &pyregf_file_type_object );
 
-	file_type_object = &pyregf_file_type_object;
-
 	PyModule_AddObject(
 	 module,
 	 "file",
-	 (PyObject *) file_type_object );
+	 (PyObject *) &pyregf_file_type_object );
 
-	/* Setup the keys type object
+	/* Setup the file_types type object
 	 */
-	pyregf_keys_type_object.tp_new = PyType_GenericNew;
+	pyregf_file_types_type_object.tp_new = PyType_GenericNew;
 
 	if( PyType_Ready(
-	     &pyregf_keys_type_object ) < 0 )
+	     &pyregf_file_types_type_object ) < 0 )
 	{
 		goto on_error;
 	}
 	Py_IncRef(
-	 (PyObject *) &pyregf_keys_type_object );
-
-	keys_type_object = &pyregf_keys_type_object;
+	 (PyObject *) &pyregf_file_types_type_object );
 
 	PyModule_AddObject(
 	 module,
-	 "_keys",
-	 (PyObject *) keys_type_object );
+	 "file_types",
+	 (PyObject *) &pyregf_file_types_type_object );
 
 	/* Setup the key type object
 	 */
@@ -551,31 +588,44 @@ PyMODINIT_FUNC initpyregf(
 	Py_IncRef(
 	 (PyObject *) &pyregf_key_type_object );
 
-	key_type_object = &pyregf_key_type_object;
-
 	PyModule_AddObject(
 	 module,
 	 "key",
-	 (PyObject *) key_type_object );
+	 (PyObject *) &pyregf_key_type_object );
 
-	/* Setup the values type object
+	/* Setup the keys type object
 	 */
-	pyregf_values_type_object.tp_new = PyType_GenericNew;
+	pyregf_keys_type_object.tp_new = PyType_GenericNew;
 
 	if( PyType_Ready(
-	     &pyregf_values_type_object ) < 0 )
+	     &pyregf_keys_type_object ) < 0 )
 	{
 		goto on_error;
 	}
 	Py_IncRef(
-	 (PyObject *) &pyregf_values_type_object );
-
-	values_type_object = &pyregf_values_type_object;
+	 (PyObject *) &pyregf_keys_type_object );
 
 	PyModule_AddObject(
 	 module,
-	 "_values",
-	 (PyObject *) values_type_object );
+	 "keys",
+	 (PyObject *) &pyregf_keys_type_object );
+
+	/* Setup the multi_string type object
+	 */
+	pyregf_multi_string_type_object.tp_new = PyType_GenericNew;
+
+	if( PyType_Ready(
+	     &pyregf_multi_string_type_object ) < 0 )
+	{
+		goto on_error;
+	}
+	Py_IncRef(
+	 (PyObject *) &pyregf_multi_string_type_object );
+
+	PyModule_AddObject(
+	 module,
+	 "multi_string",
+	 (PyObject *) &pyregf_multi_string_type_object );
 
 	/* Setup the value type object
 	 */
@@ -589,46 +639,15 @@ PyMODINIT_FUNC initpyregf(
 	Py_IncRef(
 	 (PyObject *) &pyregf_value_type_object );
 
-	value_type_object = &pyregf_value_type_object;
-
 	PyModule_AddObject(
 	 module,
 	 "value",
-	 (PyObject *) value_type_object );
+	 (PyObject *) &pyregf_value_type_object );
 
-	/* Setup the file types type object
-	 */
-	pyregf_file_types_type_object.tp_new = PyType_GenericNew;
-
-	if( pyregf_file_types_init_type(
-	     &pyregf_file_types_type_object ) != 1 )
-	{
-		goto on_error;
-	}
-	if( PyType_Ready(
-	     &pyregf_file_types_type_object ) < 0 )
-	{
-		goto on_error;
-	}
-	Py_IncRef(
-	 (PyObject *) &pyregf_file_types_type_object );
-
-	file_types_type_object = &pyregf_file_types_type_object;
-
-	PyModule_AddObject(
-	 module,
-	 "file_types",
-	 (PyObject *) file_types_type_object );
-
-	/* Setup the value types type object
+	/* Setup the value_types type object
 	 */
 	pyregf_value_types_type_object.tp_new = PyType_GenericNew;
 
-	if( pyregf_value_types_init_type(
-	     &pyregf_value_types_type_object ) != 1 )
-	{
-		goto on_error;
-	}
 	if( PyType_Ready(
 	     &pyregf_value_types_type_object ) < 0 )
 	{
@@ -637,12 +656,27 @@ PyMODINIT_FUNC initpyregf(
 	Py_IncRef(
 	 (PyObject *) &pyregf_value_types_type_object );
 
-	value_types_type_object = &pyregf_value_types_type_object;
-
 	PyModule_AddObject(
 	 module,
 	 "value_types",
-	 (PyObject *) value_types_type_object );
+	 (PyObject *) &pyregf_value_types_type_object );
+
+	/* Setup the values type object
+	 */
+	pyregf_values_type_object.tp_new = PyType_GenericNew;
+
+	if( PyType_Ready(
+	     &pyregf_values_type_object ) < 0 )
+	{
+		goto on_error;
+	}
+	Py_IncRef(
+	 (PyObject *) &pyregf_values_type_object );
+
+	PyModule_AddObject(
+	 module,
+	 "values",
+	 (PyObject *) &pyregf_values_type_object );
 
 	PyGILState_Release(
 	 gil_state );

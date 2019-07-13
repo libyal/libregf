@@ -405,6 +405,7 @@ int regf_test_hive_bin_header_read_data(
 	 &error );
 
 #if defined( HAVE_REGF_TEST_MEMORY )
+#if defined( OPTIMIZATION_DISABLED )
 
 	/* Test regf_test_hive_bin_header_read_data with memcpy failing
 	 */
@@ -434,6 +435,7 @@ int regf_test_hive_bin_header_read_data(
 		libcerror_error_free(
 		 &error );
 	}
+#endif /* defined( OPTIMIZATION_DISABLED ) */
 #endif /* defined( HAVE_REGF_TEST_MEMORY ) */
 
 	/* Test with invalid signature

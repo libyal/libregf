@@ -304,6 +304,7 @@ int libregf_file_get_type(
      libregf_error_t **error );
 
 /* Retrieves the root key
+ * Creates a new key
  * Returns 1 if successful, 0 if no such key or -1 on error
  */
 LIBREGF_EXTERN \
@@ -314,6 +315,7 @@ int libregf_file_get_root_key(
 
 /* Retrieves the key for the specific UTF-8 encoded path
  * The path separator is the \ character
+ * Creates a new key
  * Returns 1 if successful, 0 if no such key or -1 on error
  */
 LIBREGF_EXTERN \
@@ -326,6 +328,7 @@ int libregf_file_get_key_by_utf8_path(
 
 /* Retrieves the key for the specific UTF-16 encoded path
  * The path separator is the \ character
+ * Creates a new key
  * Returns 1 if successful, 0 if no such key or -1 on error
  */
 LIBREGF_EXTERN \
@@ -391,7 +394,7 @@ int libregf_key_get_name(
 LIBREGF_EXTERN \
 int libregf_key_get_utf8_name_size(
      libregf_key_t *key,
-     size_t *utf8_name_size,
+     size_t *utf8_string_size,
      libregf_error_t **error );
 
 /* Retrieves the UTF-8 string value of the key name
@@ -402,8 +405,8 @@ int libregf_key_get_utf8_name_size(
 LIBREGF_EXTERN \
 int libregf_key_get_utf8_name(
      libregf_key_t *key,
-     uint8_t *utf8_name,
-     size_t utf8_name_size,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
      libregf_error_t **error );
 
 /* Retrieves the UTF-16 string size of the key name
@@ -413,7 +416,7 @@ int libregf_key_get_utf8_name(
 LIBREGF_EXTERN \
 int libregf_key_get_utf16_name_size(
      libregf_key_t *key,
-     size_t *utf16_name_size,
+     size_t *utf16_string_size,
      libregf_error_t **error );
 
 /* Retrieves the UTF-16 string value of the key name
@@ -424,8 +427,8 @@ int libregf_key_get_utf16_name_size(
 LIBREGF_EXTERN \
 int libregf_key_get_utf16_name(
      libregf_key_t *key,
-     uint16_t *utf16_name,
-     size_t utf16_name_size,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
      libregf_error_t **error );
 
 /* Retrieves the class name size
@@ -454,7 +457,7 @@ int libregf_key_get_class_name(
 LIBREGF_EXTERN \
 int libregf_key_get_utf8_class_name_size(
      libregf_key_t *key,
-     size_t *utf8_class_name_size,
+     size_t *utf8_string_size,
      libregf_error_t **error );
 
 /* Retrieves the UTF-8 string value of the class name
@@ -465,8 +468,8 @@ int libregf_key_get_utf8_class_name_size(
 LIBREGF_EXTERN \
 int libregf_key_get_utf8_class_name(
      libregf_key_t *key,
-     uint8_t *utf8_class_name,
-     size_t utf8_class_name_size,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
      libregf_error_t **error );
 
 /* Retrieves the UTF-16 string size of the class name
@@ -476,7 +479,7 @@ int libregf_key_get_utf8_class_name(
 LIBREGF_EXTERN \
 int libregf_key_get_utf16_class_name_size(
      libregf_key_t *key,
-     size_t *utf16_class_name_size,
+     size_t *utf16_string_size,
      libregf_error_t **error );
 
 /* Retrieves the UTF-16 string value of the class name
@@ -487,18 +490,17 @@ int libregf_key_get_utf16_class_name_size(
 LIBREGF_EXTERN \
 int libregf_key_get_utf16_class_name(
      libregf_key_t *key,
-     uint16_t *utf16_class_name,
-     size_t utf16_class_name_size,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
      libregf_error_t **error );
 
-/* Retrieves the last written date and time
- * The returned time is a 64-bit version of a filetime value
+/* Retrieves the 64-bit FILETIME value of the last written date and time
  * Returns 1 if successful or -1 on error
  */
 LIBREGF_EXTERN \
 int libregf_key_get_last_written_time(
      libregf_key_t *key,
-     uint64_t *last_written_time,
+     uint64_t *filetime,
      libregf_error_t **error );
 
 /* Retrieves the security descriptor size
@@ -521,7 +523,6 @@ int libregf_key_get_security_descriptor(
      libregf_error_t **error );
 
 /* Retrieves the number of values
- * All sets in a key contain the same number of values
  * Returns 1 if successful or -1 on error
  */
 LIBREGF_EXTERN \
@@ -531,6 +532,7 @@ int libregf_key_get_number_of_values(
      libregf_error_t **error );
 
 /* Retrieves the value
+ * Creates a new value
  * Returns 1 if successful or -1 on error
  */
 LIBREGF_EXTERN \
@@ -541,8 +543,8 @@ int libregf_key_get_value(
      libregf_error_t **error );
 
 /* Retrieves the value for the specific UTF-8 encoded name
- * To retrieve the default value specify value name as NULL
- * and its length as 0
+ * To retrieve the default value specify value name as NULL and its length as 0
+ * Creates a new value
  * Returns 1 if successful, 0 if no such value or -1 on error
  */
 LIBREGF_EXTERN \
@@ -554,8 +556,8 @@ int libregf_key_get_value_by_utf8_name(
      libregf_error_t **error );
 
 /* Retrieves the value for the specific UTF-16 encoded name
- * To retrieve the default value specify value name as NULL
- * and its length as 0
+ * To retrieve the default value specify value name as NULL and its length as 0
+ * Creates a new value
  * Returns 1 if successful, 0 if no such value or -1 on error
  */
 LIBREGF_EXTERN \
@@ -576,6 +578,7 @@ int libregf_key_get_number_of_sub_keys(
      libregf_error_t **error );
 
 /* Retrieves the sub key for the specific index
+ * Creates a new key
  * Returns 1 if successful or -1 on error
  */
 LIBREGF_EXTERN \
@@ -586,6 +589,7 @@ int libregf_key_get_sub_key(
      libregf_error_t **error );
 
 /* Retrieves the sub key for the specific UTF-8 encoded name
+ * Creates a new key
  * Returns 1 if successful, 0 if no such sub key or -1 on error
  */
 LIBREGF_EXTERN \
@@ -598,6 +602,7 @@ int libregf_key_get_sub_key_by_utf8_name(
 
 /* Retrieves the sub key for the specific UTF-8 encoded path
  * The path separator is the \ character
+ * Creates a new key
  * Returns 1 if successful, 0 if no such sub key or -1 on error
  */
 LIBREGF_EXTERN \
@@ -609,6 +614,7 @@ int libregf_key_get_sub_key_by_utf8_path(
      libregf_error_t **error );
 
 /* Retrieves the sub key for the specific UTF-16 encoded name
+ * Creates a new key
  * Returns 1 if successful, 0 if no such sub key or -1 on error
  */
 LIBREGF_EXTERN \
@@ -621,6 +627,7 @@ int libregf_key_get_sub_key_by_utf16_name(
 
 /* Retrieves the sub key for the specific UTF-16 encoded path
  * The path separator is the \ character
+ * Creates a new key
  * Returns 1 if successful, 0 if no such sub key or -1 on error
  */
 LIBREGF_EXTERN \
@@ -686,7 +693,7 @@ int libregf_value_get_name(
 LIBREGF_EXTERN \
 int libregf_value_get_utf8_name_size(
      libregf_value_t *value,
-     size_t *utf8_name_size,
+     size_t *utf8_string_size,
      libregf_error_t **error );
 
 /* Retrieves the UTF-8 string value of the value name
@@ -697,8 +704,8 @@ int libregf_value_get_utf8_name_size(
 LIBREGF_EXTERN \
 int libregf_value_get_utf8_name(
      libregf_value_t *value,
-     uint8_t *utf8_name,
-     size_t utf8_name_size,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
      libregf_error_t **error );
 
 /* Retrieves the UTF-16 string size of the value name
@@ -708,7 +715,7 @@ int libregf_value_get_utf8_name(
 LIBREGF_EXTERN \
 int libregf_value_get_utf16_name_size(
      libregf_value_t *value,
-     size_t *utf16_name_size,
+     size_t *utf16_string_size,
      libregf_error_t **error );
 
 /* Retrieves the UTF-16 string value of the value name
@@ -719,8 +726,8 @@ int libregf_value_get_utf16_name_size(
 LIBREGF_EXTERN \
 int libregf_value_get_utf16_name(
      libregf_value_t *value,
-     uint16_t *utf16_name,
-     size_t utf16_name_size,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
      libregf_error_t **error );
 
 /* Retrieves the value type
@@ -830,6 +837,83 @@ int libregf_value_get_value_binary_data(
      libregf_value_t *value,
      uint8_t *binary_data,
      size_t size,
+     libregf_error_t **error );
+
+/* Retrieves the multi string value
+ * Creates a new multi string
+ * Returns 1 if successful or -1 on error
+ */
+LIBREGF_EXTERN \
+int libregf_value_get_value_multi_string(
+     libregf_value_t *value,
+     libregf_multi_string_t **multi_string,
+     libregf_error_t **error );
+
+/* -------------------------------------------------------------------------
+ * Multi string functions
+ * ------------------------------------------------------------------------- */
+
+/* Frees a multi string
+ * Returns 1 if successful or -1 on error
+ */
+LIBREGF_EXTERN \
+int libregf_multi_string_free(
+     libregf_multi_string_t **multi_string,
+     libregf_error_t **error );
+
+/* Retrieves the number of strings
+ * Returns 1 if successful or -1 on error
+ */
+LIBREGF_EXTERN \
+int libregf_multi_string_get_number_of_strings(
+     libregf_multi_string_t *multi_string,
+     int *number_of_strings,
+     libregf_error_t **error );
+
+/* Retrieves the UTF-8 string size of a specific string
+ * The returned size includes the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+LIBREGF_EXTERN \
+int libregf_multi_string_get_utf8_string_size(
+     libregf_multi_string_t *multi_string,
+     int string_index,
+     size_t *utf8_string_size,
+     libregf_error_t **error );
+
+/* Retrieves the UTF-8 encoded string of a specific string
+ * The size should include the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+LIBREGF_EXTERN \
+int libregf_multi_string_get_utf8_string(
+     libregf_multi_string_t *multi_string,
+     int string_index,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
+     libregf_error_t **error );
+
+/* Retrieves the UTF-16 string size of a specific string
+ * The returned size includes the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+LIBREGF_EXTERN \
+int libregf_multi_string_get_utf16_string_size(
+     libregf_multi_string_t *multi_string,
+     int string_index,
+     size_t *utf16_string_size,
+     libregf_error_t **error );
+
+/* Retrieves the UTF-16 encoded string of a specific string
+ * The size should include the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+LIBREGF_EXTERN \
+int libregf_multi_string_get_utf16_string(
+     libregf_multi_string_t *multi_string,
+     int string_index,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
      libregf_error_t **error );
 
 #if defined( __cplusplus )

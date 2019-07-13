@@ -25,6 +25,7 @@
 #include <common.h>
 #include <types.h>
 
+#include "libregf_hive_bin_cell.h"
 #include "libregf_io_handle.h"
 #include "libregf_libbfio.h"
 #include "libregf_libcerror.h"
@@ -76,6 +77,13 @@ int libregf_hive_bins_list_read(
      libbfio_handle_t *file_io_handle,
      off64_t file_offset,
      uint32_t hive_bins_size,
+     libcerror_error_t **error );
+
+int libregf_hive_bins_list_get_cell_at_offset(
+     libregf_hive_bins_list_t *hive_bins_list,
+     libbfio_handle_t *file_io_handle,
+     uint32_t hive_bin_cell_offset,
+     libregf_hive_bin_cell_t **hive_bin_cell,
      libcerror_error_t **error );
 
 int libregf_hive_bins_list_read_element_data(

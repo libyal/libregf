@@ -25,6 +25,7 @@
 
 #include "libregf_definitions.h"
 #include "libregf_hive_bin.h"
+#include "libregf_hive_bin_header.h"
 #include "libregf_hive_bins_list.h"
 #include "libregf_io_handle.h"
 #include "libregf_libbfio.h"
@@ -287,11 +288,11 @@ int libregf_hive_bins_list_read(
      uint32_t hive_bins_size,
      libcerror_error_t **error )
 {
-	libregf_hive_bin_t *hive_bin = NULL;
-	static char *function        = "libregf_hive_bins_list_read";
-	off64_t alignment_size       = 0;
-	int hive_bin_index           = 0;
-	int result                   = 0;
+	libregf_hive_bin_header_t *hive_bin_header = NULL;
+	static char *function                      = "libregf_hive_bins_list_read";
+	off64_t alignment_size                     = 0;
+	int hive_bin_index                         = 0;
+	int result                                 = 0;
 
 	if( hive_bins_list == NULL )
 	{
@@ -315,51 +316,25 @@ int libregf_hive_bins_list_read(
 
 		return( -1 );
 	}
-	if( libregf_hive_bin_initialize(
-	     &hive_bin,
+	if( libregf_hive_bin_header_initialize(
+	     &hive_bin_header,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create hive bin.",
+		 "%s: unable to create hive bin header.",
 		 function );
 
 		goto on_error;
 	}
 	while( hive_bins_size > 0 )
 	{
-		if( libbfio_handle_seek_offset(
-		     file_io_handle,
-		     file_offset,
-		     SEEK_SET,
-		     error ) == -1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_IO,
-			 LIBCERROR_IO_ERROR_SEEK_FAILED,
-			 "%s: unable to seek file header offset: %" PRIi64 ".",
-			 function,
-			 file_offset );
-
-			goto on_error;
-		}
-#if defined( HAVE_DEBUG_OUTPUT )
-		if( libcnotify_verbose != 0 )
-		{
-			libcnotify_printf(
-			 "%s: reading hive bin: %d at offset: %" PRIi64 " (0x%08" PRIx64 ")\n",
-			 function,
-			 hive_bin_index,
-			 file_offset,
-			 file_offset );
-		}
-#endif
-		result = libregf_hive_bin_read_header(
-		          hive_bin,
+		result = libregf_hive_bin_header_read_file_io_handle(
+		          hive_bin_header,
 		          file_io_handle,
+		          file_offset,
 		          error );
 
 		if( result == -1 )
@@ -368,8 +343,9 @@ int libregf_hive_bins_list_read(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_IO,
 			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read hive bin header at offset: %" PRIi64 " (0x%08" PRIx64 ").",
+			 "%s: unable to read hive bin: %d header at offset: %" PRIi64 " (0x%08" PRIx64 ").",
 			 function,
+			 hive_bin_index,
 			 file_offset,
 			 file_offset );
 
@@ -381,8 +357,9 @@ int libregf_hive_bins_list_read(
 			if( libcnotify_verbose != 0 )
 			{
 				libcnotify_printf(
-				 "%s: missing hive bin at offset: %" PRIi64 " (0x%08" PRIx64 ").\n",
+				 "%s: missing hive bin: %d header at offset: %" PRIi64 " (0x%08" PRIx64 ").\n",
 				 function,
+				 hive_bin_index,
 				 file_offset,
 				 file_offset );
 			}
@@ -395,7 +372,7 @@ int libregf_hive_bins_list_read(
 
 			continue;
 		}
-		if( hive_bin->offset != ( file_offset - ( 4096 + alignment_size ) ) )
+		if( hive_bin_header->offset != ( file_offset - ( 4096 + alignment_size ) ) )
 		{
 			if( ( hive_bins_list->flags & LIBREGF_HIVE_BINS_FLAG_IS_CORRUPTED ) == 0 )
 			{
@@ -405,7 +382,7 @@ int libregf_hive_bins_list_read(
 				 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
 				 "%s: mismatch in hive bin offset (stored: %" PRIu32 " != calculated: %" PRIi64 ").",
 				 function,
-				 hive_bin->offset,
+				 hive_bin_header->offset,
 				 file_offset - ( 4096 + alignment_size ) );
 
 				goto on_error;
@@ -416,19 +393,19 @@ int libregf_hive_bins_list_read(
 				libcnotify_printf(
 				 "%s: mismatch in hive bin offset (stored: %" PRIu32 " != calculated: %" PRIi64 ") difference: %" PRIi64 ".\n",
 				 function,
-				 hive_bin->offset,
+				 hive_bin_header->offset,
 				 file_offset - ( 4096 + alignment_size ),
-				 file_offset - ( 4096 + hive_bin->offset ) );
+				 file_offset - ( 4096 + hive_bin_header->offset ) );
 			}
 #endif
-			alignment_size = file_offset - ( 4096 + hive_bin->offset );
+			alignment_size = file_offset - ( 4096 + hive_bin_header->offset );
 		}
 		if( libfdata_list_append_element(
 		     hive_bins_list->data_list,
 		     &hive_bin_index,
 		     0,
 		     file_offset,
-		     (size64_t) hive_bin->size,
+		     (size64_t) hive_bin_header->size,
 		     0,
 		     error ) != 1 )
 		{
@@ -442,26 +419,24 @@ int libregf_hive_bins_list_read(
 
 			goto on_error;
 		}
-		file_offset    += hive_bin->size;
-		hive_bins_size -= hive_bin->size;
+		file_offset    += hive_bin_header->size;
+		hive_bins_size -= hive_bin_header->size;
 
 		hive_bin_index++;
 	}
-	if( libregf_hive_bin_free(
-	     &hive_bin,
+	if( libregf_hive_bin_header_free(
+	     &hive_bin_header,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to free hive bin.",
+		 "%s: unable to free hive bin header.",
 		 function );
 
 		return( -1 );
 	}
-	hive_bin = NULL;
-
 	if( result == 0 )
 	{
 		if( hive_bin_index == 0 )
@@ -487,10 +462,10 @@ int libregf_hive_bins_list_read(
 	return( 1 );
 
 on_error:
-	if( hive_bin != NULL )
+	if( hive_bin_header != NULL )
 	{
-		libregf_hive_bin_free(
-		 &hive_bin,
+		libregf_hive_bin_header_free(
+		 &hive_bin_header,
 		 NULL );
 	}
 	return( -1 );
@@ -511,60 +486,33 @@ int libregf_hive_bins_list_read_element_data(
      uint8_t read_flags LIBREGF_ATTRIBUTE_UNUSED,
      libcerror_error_t **error )
 {
-	libregf_hive_bin_t *hive_bin = NULL;
-	static char *function        = "libregf_hive_bins_list_read_element_data";
-	int result                   = 0;
+	libregf_hive_bin_t *hive_bin               = NULL;
+	libregf_hive_bin_header_t *hive_bin_header = NULL;
+	static char *function                      = "libregf_hive_bins_list_read_element_data";
 
 	LIBREGF_UNREFERENCED_PARAMETER( data_handle )
 	LIBREGF_UNREFERENCED_PARAMETER( data_range_file_index )
 	LIBREGF_UNREFERENCED_PARAMETER( data_range_flags )
 	LIBREGF_UNREFERENCED_PARAMETER( read_flags )
 
-	if( libregf_hive_bin_initialize(
-	     &hive_bin,
+	if( libregf_hive_bin_header_initialize(
+	     &hive_bin_header,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create hive bin.",
+		 "%s: unable to create hive bin header.",
 		 function );
 
 		goto on_error;
 	}
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
-	{
-		libcnotify_printf(
-		 "%s: reading hive bin at offset: %" PRIi64 " (0x%08" PRIx64 ")\n",
-		 function,
-		 data_range_offset,
-		 data_range_offset );
-	}
-#endif
-	if( libbfio_handle_seek_offset(
+	if( libregf_hive_bin_header_read_file_io_handle(
+	     hive_bin_header,
 	     file_io_handle,
 	     data_range_offset,
-	     SEEK_SET,
-	     error ) == -1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_SEEK_FAILED,
-		 "%s: unable to seek file header offset: %" PRIi64 ".",
-		 function,
-		 data_range_offset );
-
-		goto on_error;
-	}
-	result = libregf_hive_bin_read_header(
-	          hive_bin,
-	          file_io_handle,
-	          error );
-
-	if( result != 1 )
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -577,7 +525,7 @@ int libregf_hive_bins_list_read_element_data(
 
 		goto on_error;
 	}
-	if( (size64_t) hive_bin->size != data_range_size )
+	if( (size64_t) hive_bin_header->size != data_range_size )
 	{
 		libcerror_error_set(
 		 error,
@@ -585,8 +533,23 @@ int libregf_hive_bins_list_read_element_data(
 		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
 		 "%s: mismatch in hive bin size (stored: %" PRIu32 " != calculated: %" PRIu64 ").",
 		 function,
-		 hive_bin->size,
+		 hive_bin_header->size,
 		 data_range_size );
+
+		goto on_error;
+	}
+	if( libregf_hive_bin_initialize(
+	     &hive_bin,
+	     hive_bin_header->offset,
+	     hive_bin_header->size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create hive bin.",
+		 function );
 
 		goto on_error;
 	}
@@ -622,6 +585,19 @@ int libregf_hive_bins_list_read_element_data(
 
 		goto on_error;
 	}
+	if( libregf_hive_bin_header_free(
+	     &hive_bin_header,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free hive bin header.",
+		 function );
+
+		return( -1 );
+	}
 	return( 1 );
 
 on_error:
@@ -629,6 +605,12 @@ on_error:
 	{
 		libregf_hive_bin_free(
 		 &hive_bin,
+		 NULL );
+	}
+	if( hive_bin_header != NULL )
+	{
+		libregf_hive_bin_header_free(
+		 &hive_bin_header,
 		 NULL );
 	}
 	return( -1 );

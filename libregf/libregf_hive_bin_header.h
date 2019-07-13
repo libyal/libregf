@@ -1,5 +1,5 @@
 /*
- * Hive Bin functions
+ * Hive bin header functions
  *
  * Copyright (C) 2009-2019, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -19,24 +19,22 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBREGF_HIVE_BIN_H )
-#define _LIBREGF_HIVE_BIN_H
+#if !defined( _LIBREGF_HIVE_BIN_HEADER_H )
+#define _LIBREGF_HIVE_BIN_HEADER_H
 
 #include <common.h>
 #include <types.h>
 
-#include "libregf_hive_bin_cell.h"
 #include "libregf_libbfio.h"
-#include "libregf_libcdata.h"
 #include "libregf_libcerror.h"
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
-typedef struct libregf_hive_bin libregf_hive_bin_t;
+typedef struct libregf_hive_bin_header libregf_hive_bin_header_t;
 
-struct libregf_hive_bin
+struct libregf_hive_bin_header
 {
 	/* The offset of the hive bin
 	 */
@@ -45,55 +43,31 @@ struct libregf_hive_bin
 	/* The size of the hive bin
 	 */
 	uint32_t size;
-
-	/* The hive bin (cells) data
-	 */
-	uint8_t *data;
-
-	/* The hive bin (cells) data size
-	 */
-	size_t data_size;
-
-	/* The hive bin cells array
-	 */
-	libcdata_array_t *cells_array;
 };
 
-int libregf_hive_bin_initialize(
-     libregf_hive_bin_t **hive_bin,
-     uint32_t offset,
-     uint32_t size,
+int libregf_hive_bin_header_initialize(
+     libregf_hive_bin_header_t **hive_bin_header,
      libcerror_error_t **error );
 
-int libregf_hive_bin_free(
-     libregf_hive_bin_t **hive_bin,
+int libregf_hive_bin_header_free(
+     libregf_hive_bin_header_t **hive_bin_header,
      libcerror_error_t **error );
 
-int libregf_hive_bin_read_cells(
-     libregf_hive_bin_t *hive_bin,
+int libregf_hive_bin_header_read_data(
+     libregf_hive_bin_header_t *hive_bin_header,
+     const uint8_t *data,
+     size_t data_size,
+     libcerror_error_t **error );
+
+int libregf_hive_bin_header_read_file_io_handle(
+     libregf_hive_bin_header_t *hive_bin_header,
      libbfio_handle_t *file_io_handle,
-     libcerror_error_t **error );
-
-int libregf_hive_bin_get_number_of_cells(
-     libregf_hive_bin_t *hive_bin,
-     uint16_t *number_of_cells,
-     libcerror_error_t **error );
-
-int libregf_hive_bin_get_cell(
-     libregf_hive_bin_t *hive_bin,
-     uint16_t cell_index,
-     libregf_hive_bin_cell_t **hive_bin_cell,
-     libcerror_error_t **error );
-
-int libregf_hive_bin_get_cell_at_offset(
-     libregf_hive_bin_t *hive_bin,
-     uint32_t cell_offset,
-     libregf_hive_bin_cell_t **hive_bin_cell,
+     off64_t file_offset,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )
 }
 #endif
 
-#endif /* !defined( _LIBREGF_HIVE_BIN_H ) */
+#endif /* !defined( _LIBREGF_HIVE_BIN_HEADER_H ) */
 

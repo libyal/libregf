@@ -134,6 +134,7 @@ stamp-h[1-9]
 /tests/regf_test_file_header
 /tests/regf_test_hive_bin
 /tests/regf_test_hive_bin_cell
+/tests/regf_test_hive_bin_header
 /tests/regf_test_hive_bins_list
 /tests/regf_test_io_handle
 /tests/regf_test_key

@@ -22,6 +22,7 @@ MSVSCPP_FILES = \
 	regf_test_file_header/regf_test_file_header.vcproj \
 	regf_test_hive_bin/regf_test_hive_bin.vcproj \
 	regf_test_hive_bin_cell/regf_test_hive_bin_cell.vcproj \
+	regf_test_hive_bin_header/regf_test_hive_bin_header.vcproj \
 	regf_test_hive_bins_list/regf_test_hive_bins_list.vcproj \
 	regf_test_io_handle/regf_test_io_handle.vcproj \
 	regf_test_key/regf_test_key.vcproj \

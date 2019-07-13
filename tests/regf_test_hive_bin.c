@@ -57,6 +57,8 @@ int regf_test_hive_bin_initialize(
 	 */
 	result = libregf_hive_bin_initialize(
 	          &hive_bin,
+	          4096,
+	          4096,
 	          &error );
 
 	REGF_TEST_ASSERT_EQUAL_INT(
@@ -93,6 +95,8 @@ int regf_test_hive_bin_initialize(
 	 */
 	result = libregf_hive_bin_initialize(
 	          NULL,
+	          4096,
+	          4096,
 	          &error );
 
 	REGF_TEST_ASSERT_EQUAL_INT(
@@ -111,6 +115,8 @@ int regf_test_hive_bin_initialize(
 
 	result = libregf_hive_bin_initialize(
 	          &hive_bin,
+	          4096,
+	          4096,
 	          &error );
 
 	REGF_TEST_ASSERT_EQUAL_INT(
@@ -139,6 +145,8 @@ int regf_test_hive_bin_initialize(
 
 		result = libregf_hive_bin_initialize(
 		          &hive_bin,
+		          4096,
+		          4096,
 		          &error );
 
 		if( regf_test_malloc_attempts_before_fail != -1 )
@@ -181,6 +189,8 @@ int regf_test_hive_bin_initialize(
 
 		result = libregf_hive_bin_initialize(
 		          &hive_bin,
+		          4096,
+		          4096,
 		          &error );
 
 		if( regf_test_memset_attempts_before_fail != -1 )
@@ -286,6 +296,8 @@ int regf_test_hive_bin_get_number_of_cells(
 	 */
 	result = libregf_hive_bin_initialize(
 	          &hive_bin,
+	          4096,
+	          4096,
 	          &error );
 
 	REGF_TEST_ASSERT_EQUAL_INT(
@@ -421,8 +433,6 @@ int main(
 	 regf_test_hive_bin_free );
 
 #ifdef TODO
-
-	/* TODO: add tests for libregf_hive_bin_read_header */
 
 	/* TODO: add tests for libregf_hive_bin_read_cells */
 

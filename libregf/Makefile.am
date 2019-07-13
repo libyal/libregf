@@ -33,6 +33,7 @@ libregf_la_SOURCES = \
 	libregf_file_header.c libregf_file_header.h \
 	libregf_hive_bin.c libregf_hive_bin.h \
 	libregf_hive_bin_cell.c libregf_hive_bin_cell.h \
+	libregf_hive_bin_header.c libregf_hive_bin_header.h \
 	libregf_hive_bins_list.c libregf_hive_bins_list.h \
 	libregf_io_handle.c libregf_io_handle.h \
 	libregf_key.c libregf_key.h \

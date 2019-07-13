@@ -206,6 +206,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libregf\libregf_hive_bin_header.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libregf\libregf_hive_bins_list.c"
 				>
 			</File>
@@ -297,6 +301,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libregf\libregf_hive_bin_cell.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libregf\libregf_hive_bin_header.h"
 				>
 			</File>
 			<File

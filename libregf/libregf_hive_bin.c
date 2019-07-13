@@ -28,6 +28,7 @@
 #include "libregf_definitions.h"
 #include "libregf_hive_bin.h"
 #include "libregf_hive_bin_cell.h"
+#include "libregf_hive_bin_header.h"
 #include "libregf_libbfio.h"
 #include "libregf_libcdata.h"
 #include "libregf_libcerror.h"
@@ -36,14 +37,14 @@
 
 #include "regf_hive_bin.h"
 
-const char *regf_hive_bin_signature = "hbin";
-
 /* Creates a hive bin
  * Make sure the value hive_bin is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
 int libregf_hive_bin_initialize(
      libregf_hive_bin_t **hive_bin,
+     uint32_t offset,
+     uint32_t size,
      libcerror_error_t **error )
 {
 	static char *function = "libregf_hive_bin_initialize";
@@ -98,6 +99,9 @@ int libregf_hive_bin_initialize(
 
 		goto on_error;
 	}
+	( *hive_bin )->offset = offset;
+	( *hive_bin )->size   = size;
+
 	return( 1 );
 
 on_error:
@@ -162,150 +166,6 @@ int libregf_hive_bin_free(
 		*hive_bin = NULL;
 	}
 	return( result );
-}
-
-/* Reads a hive bin header
- * Returns 1 if successful, 0 if no hive bin signature was found or -1 on error
- */
-int libregf_hive_bin_read_header(
-     libregf_hive_bin_t *hive_bin,
-     libbfio_handle_t *file_io_handle,
-     libcerror_error_t **error )
-{
-	regf_hive_bin_header_t hive_bin_header;
-
-	static char *function = "libregf_hive_bin_read_header";
-	ssize_t read_count    = 0;
-
-#if defined( HAVE_DEBUG_OUTPUT )
-	uint32_t value_32bit  = 0;
-#endif
-
-	if( hive_bin == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid hive bin.",
-		 function );
-
-		return( -1 );
-	}
-	read_count = libbfio_handle_read_buffer(
-	              file_io_handle,
-	              (uint8_t *) &hive_bin_header,
-	              sizeof( regf_hive_bin_header_t ),
-	              error );
-
-	if( read_count != (ssize_t) sizeof( regf_hive_bin_header_t ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read hive bin header data.",
-		 function );
-
-		return( -1 );
-	}
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
-	{
-		libcnotify_printf(
-		 "%s: hive bin header:\n",
-		 function );
-		libcnotify_print_data(
-		 (uint8_t *) &hive_bin_header,
-		 sizeof( regf_hive_bin_header_t ),
-		 LIBCNOTIFY_PRINT_DATA_FLAG_GROUP_DATA );
-	}
-#endif
-	if( memory_compare(
-	     hive_bin_header.signature,
-	     regf_hive_bin_signature,
-	     4 ) != 0 )
-	{
-		return( 0 );
-	}
-	byte_stream_copy_to_uint32_little_endian(
-	 hive_bin_header.hive_bin_offset,
-	 hive_bin->offset );
-
-	byte_stream_copy_to_uint32_little_endian(
-	 hive_bin_header.size,
-	 hive_bin->size );
-
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
-	{
-		libcnotify_printf(
-		 "%s: signature\t\t\t\t\t: %c%c%c%c\n",
-		 function,
-		 hive_bin_header.signature[ 0 ],
-		 hive_bin_header.signature[ 1 ],
-		 hive_bin_header.signature[ 2 ],
-		 hive_bin_header.signature[ 3 ] );
-
-		libcnotify_printf(
-		 "%s: hive bin offset\t\t\t\t: %" PRIu32 " (0x%08" PRIx32 ")\n",
-		 function,
-		 hive_bin->offset,
-		 hive_bin->offset );
-		libcnotify_printf(
-		 "%s: size\t\t\t\t\t: %" PRIu32 " bytes\n",
-		 function,
-		 hive_bin->size );
-
-		byte_stream_copy_to_uint32_little_endian(
-		 hive_bin_header.unknown1,
-		 value_32bit );
-		libcnotify_printf(
-		 "%s: unknown1\t\t\t\t\t: 0x%08" PRIx32 " (%" PRIu32 ")\n",
-		 function,
-		 value_32bit,
-		 value_32bit );
-		byte_stream_copy_to_uint32_little_endian(
-		 hive_bin_header.unknown2,
-		 value_32bit );
-		libcnotify_printf(
-		 "%s: unknown2\t\t\t\t\t: 0x%08" PRIx32 " (%" PRIu32 ")\n",
-		 function,
-		 value_32bit,
-		 value_32bit );
-
-		if( libregf_debug_print_filetime_value(
-		     function,
-		     "unknown time\t\t\t\t",
-		     hive_bin_header.unknown_time,
-		     8,
-		     LIBFDATETIME_ENDIAN_LITTLE,
-		     LIBFDATETIME_STRING_FORMAT_TYPE_CTIME | LIBFDATETIME_STRING_FORMAT_FLAG_DATE_TIME_NANO_SECONDS,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
-			 "%s: unable to print filetime value.",
-			 function );
-
-			return( -1 );
-		}
-		byte_stream_copy_to_uint32_little_endian(
-		 hive_bin_header.unknown_spare,
-		 value_32bit );
-		libcnotify_printf(
-		 "%s: unknown spare\t\t\t\t: 0x%08" PRIx32 " (%" PRIu32 ")\n",
-		 function,
-		 value_32bit,
-		 value_32bit );
-
-		libcnotify_printf(
-		 "\n" );
-	}
-#endif
-	return( 1 );
 }
 
 /* Reads a hive bin and determines its cells

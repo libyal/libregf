@@ -49,6 +49,7 @@ check_PROGRAMS = \
 	regf_test_file_header \
 	regf_test_hive_bin \
 	regf_test_hive_bin_cell \
+	regf_test_hive_bin_header \
 	regf_test_hive_bins_list \
 	regf_test_io_handle \
 	regf_test_key \
@@ -162,6 +163,28 @@ regf_test_hive_bin_cell_SOURCES = \
 	regf_test_unused.h
 
 regf_test_hive_bin_cell_LDADD = \
+	../libregf/libregf.la \
+	@LIBCERROR_LIBADD@
+
+regf_test_hive_bin_header_SOURCES = \
+	regf_test_functions.c regf_test_functions.h \
+	regf_test_hive_bin_header.c \
+	regf_test_libbfio.h \
+	regf_test_libcerror.h \
+	regf_test_libregf.h \
+	regf_test_macros.h \
+	regf_test_memory.c regf_test_memory.h \
+	regf_test_unused.h
+
+regf_test_hive_bin_header_LDADD = \
+	@LIBBFIO_LIBADD@ \
+	@LIBCPATH_LIBADD@ \
+	@LIBCFILE_LIBADD@ \
+	@LIBUNA_LIBADD@ \
+	@LIBCSPLIT_LIBADD@ \
+	@LIBCNOTIFY_LIBADD@ \
+	@LIBCLOCALE_LIBADD@ \
+	@LIBCDATA_LIBADD@ \
 	../libregf/libregf.la \
 	@LIBCERROR_LIBADD@
 

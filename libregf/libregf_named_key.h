@@ -19,8 +19,8 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBREGF_NAMED_KEY_ENTRY_H )
-#define _LIBREGF_NAMED_KEY_ENTRY_H
+#if !defined( _LIBREGF_NAMED_KEY_H )
+#define _LIBREGF_NAMED_KEY_H
 
 #include <common.h>
 #include <types.h>
@@ -48,14 +48,6 @@ struct libregf_named_key
 	 */
 	uint16_t name_size;
 
-	/* The class name
-	 */
-	uint8_t *class_name;
-
-	/* The class name size
-	 */
-	uint16_t class_name_size;
-
 	/* The last written time
 	 */
 	uint64_t last_written_time;
@@ -63,6 +55,34 @@ struct libregf_named_key
 	/* The flags
 	 */
 	uint16_t flags;
+
+	/* The number of sub keys
+	 */
+	uint32_t number_of_sub_keys;
+
+	/* The sub keys list offset
+	 */
+	uint32_t sub_keys_list_offset;
+
+	/* The number of values
+	 */
+	uint32_t number_of_values;
+
+	/* The values list offset
+	 */
+	uint32_t values_list_offset;
+
+	/* The security key offset
+	 */
+	uint32_t security_key_offset;
+
+	/* The class name offset
+	 */
+	uint32_t class_name_offset;
+
+	/* The class name size
+	 */
+	uint16_t class_name_size;
 };
 
 int libregf_named_key_initialize(
@@ -73,7 +93,7 @@ int libregf_named_key_free(
      libregf_named_key_t **named_key,
      libcerror_error_t **error );
 
-int libregf_named_key_read(
+int libregf_named_key_read_data(
      libregf_named_key_t *named_key,
      const uint8_t *data,
      size_t data_size,
@@ -85,5 +105,5 @@ int libregf_named_key_read(
 }
 #endif
 
-#endif /* !defined( _LIBREGF_NAMED_KEY_ENTRY_H ) */
+#endif /* !defined( _LIBREGF_NAMED_KEY_H ) */
 

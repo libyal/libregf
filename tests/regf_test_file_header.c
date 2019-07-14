@@ -345,9 +345,9 @@ on_error:
 int regf_test_file_header_read_data(
      void )
 {
-	libcerror_error_t *error          = NULL;
+	libcerror_error_t *error           = NULL;
 	libregf_file_header_t *file_header = NULL;
-	int result                        = 0;
+	int result                         = 0;
 
 	/* Initialize test
 	 */
@@ -463,40 +463,6 @@ int regf_test_file_header_read_data(
 
 	libcerror_error_free(
 	 &error );
-
-#if defined( HAVE_REGF_TEST_MEMORY )
-#if defined( OPTIMIZATION_DISABLED )
-
-	/* Test regf_test_file_header_read_data with memcpy failing
-	 */
-	regf_test_memcpy_attempts_before_fail = 0;
-
-	result = libregf_file_header_read_data(
-	          file_header,
-	          regf_test_file_header_data1,
-	          512,
-	          &error );
-
-	if( regf_test_memcpy_attempts_before_fail != -1 )
-	{
-		regf_test_memcpy_attempts_before_fail = -1;
-	}
-	else
-	{
-		REGF_TEST_ASSERT_EQUAL_INT(
-		 "result",
-		 result,
-		 -1 );
-
-		REGF_TEST_ASSERT_IS_NOT_NULL(
-		 "error",
-		 error );
-
-		libcerror_error_free(
-		 &error );
-	}
-#endif /* defined( OPTIMIZATION_DISABLED ) */
-#endif /* defined( HAVE_REGF_TEST_MEMORY ) */
 
 	/* Test error case where signature is invalid
 	 */

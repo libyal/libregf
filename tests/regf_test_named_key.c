@@ -35,6 +35,28 @@
 
 #include "../libregf/libregf_named_key.h"
 
+uint8_t regf_test_named_key_data1[ 140 ] = {
+	0x6e, 0x6b, 0x2c, 0x00, 0x0d, 0x3f, 0x8a, 0x46, 0x68, 0x22, 0xd2, 0x01, 0x02, 0x00, 0x00, 0x00,
+	0x68, 0x09, 0x00, 0x00, 0x0a, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xd8, 0x14, 0x00, 0x00,
+	0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff, 0xa8, 0x2c, 0x00, 0x00,
+	0xff, 0xff, 0xff, 0xff, 0x28, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x38, 0x00, 0x33, 0x00, 0x39, 0x00, 0x00, 0x00, 0x43, 0x73, 0x69, 0x54,
+	0x6f, 0x6f, 0x6c, 0x2d, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x48, 0x69, 0x76, 0x65, 0x2d, 0x7b,
+	0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x2d, 0x30, 0x30, 0x30, 0x30, 0x2d, 0x30, 0x30,
+	0x30, 0x30, 0x2d, 0x30, 0x30, 0x30, 0x30, 0x2d, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
+	0x30, 0x30, 0x30, 0x30, 0x7d, 0x00, 0x39, 0x00, 0x31, 0x00, 0x45, 0x00 };
+
+uint8_t regf_test_named_key_error_data1[ 140 ] = {
+	0xff, 0xff, 0x2c, 0x00, 0x0d, 0x3f, 0x8a, 0x46, 0x68, 0x22, 0xd2, 0x01, 0x02, 0x00, 0x00, 0x00,
+	0x68, 0x09, 0x00, 0x00, 0x0a, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xd8, 0x14, 0x00, 0x00,
+	0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff, 0xa8, 0x2c, 0x00, 0x00,
+	0xff, 0xff, 0xff, 0xff, 0x28, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x38, 0x00, 0x33, 0x00, 0x39, 0x00, 0x00, 0x00, 0x43, 0x73, 0x69, 0x54,
+	0x6f, 0x6f, 0x6c, 0x2d, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x48, 0x69, 0x76, 0x65, 0x2d, 0x7b,
+	0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x2d, 0x30, 0x30, 0x30, 0x30, 0x2d, 0x30, 0x30,
+	0x30, 0x30, 0x2d, 0x30, 0x30, 0x30, 0x30, 0x2d, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30,
+	0x30, 0x30, 0x30, 0x30, 0x7d, 0x00, 0x39, 0x00, 0x31, 0x00, 0x45, 0x00 };
+
 #if defined( __GNUC__ ) && !defined( LIBREGF_DLL_IMPORT )
 
 /* Tests the libregf_named_key_initialize function
@@ -270,6 +292,199 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the libregf_named_key_read_data function
+ * Returns 1 if successful or 0 if not
+ */
+int regf_test_named_key_read_data(
+     void )
+{
+	libcerror_error_t *error           = NULL;
+	libregf_named_key_t *named_key = NULL;
+	int result                         = 0;
+
+	/* Initialize test
+	 */
+	result = libregf_named_key_initialize(
+	          &named_key,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "named_key",
+	 named_key );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	result = libregf_named_key_read_data(
+	          named_key,
+	          regf_test_named_key_data1,
+	          140,
+	          0,
+	          LIBREGF_CODEPAGE_WINDOWS_1252,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	REGF_TEST_ASSERT_EQUAL_UINT32(
+	 "named_key->name_size",
+	 named_key->name_size,
+	 57 );
+
+	/* Test error cases
+	 */
+	result = libregf_named_key_read_data(
+	          NULL,
+	          regf_test_named_key_data1,
+	          140,
+	          0,
+	          LIBREGF_CODEPAGE_WINDOWS_1252,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libregf_named_key_read_data(
+	          named_key,
+	          NULL,
+	          140,
+	          0,
+	          LIBREGF_CODEPAGE_WINDOWS_1252,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libregf_named_key_read_data(
+	          named_key,
+	          regf_test_named_key_data1,
+	          0,
+	          0,
+	          LIBREGF_CODEPAGE_WINDOWS_1252,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libregf_named_key_read_data(
+	          named_key,
+	          regf_test_named_key_data1,
+	          (size_t) SSIZE_MAX + 1,
+	          0,
+	          LIBREGF_CODEPAGE_WINDOWS_1252,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Test error case where signature is invalid
+	 */
+	result = libregf_named_key_read_data(
+	          named_key,
+	          regf_test_named_key_error_data1,
+	          140,
+	          0,
+	          LIBREGF_CODEPAGE_WINDOWS_1252,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libregf_named_key_free(
+	          &named_key,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "named_key",
+	 named_key );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( named_key != NULL )
+	{
+		libregf_named_key_free(
+		 &named_key,
+		 NULL );
+	}
+	return( 0 );
+}
+
 #endif /* defined( __GNUC__ ) && !defined( LIBREGF_DLL_IMPORT ) */
 
 /* The main program
@@ -297,7 +512,9 @@ int main(
 	 "libregf_named_key_free",
 	 regf_test_named_key_free );
 
-	/* TODO: add tests for libregf_named_key_read */
+	REGF_TEST_RUN(
+	 "libregf_named_key_read_data",
+	 regf_test_named_key_read_data );
 
 #endif /* defined( __GNUC__ ) && !defined( LIBREGF_DLL_IMPORT ) */
 

@@ -153,7 +153,7 @@ int libregf_named_key_free(
 /* Reads a named key
  * Returns 1 if successful or -1 on error
  */
-int libregf_named_key_read(
+int libregf_named_key_read_data(
      libregf_named_key_t *named_key,
      const uint8_t *data,
      size_t data_size,
@@ -161,25 +161,13 @@ int libregf_named_key_read(
      int ascii_codepage LIBREGF_ATTRIBUTE_UNUSED,
      libcerror_error_t **error )
 {
-	static char *function                        = "libregf_named_key_read";
+	static char *function                        = "libregf_named_key_read_data";
 	libuna_unicode_character_t unicode_character = 0;
 	size_t data_offset                           = 0;
 	size_t name_index                            = 0;
-	uint32_t class_name_offset                   = 0;
-	uint32_t number_of_sub_keys                  = 0;
-	uint32_t number_of_values_list_elements      = 0;
-	uint32_t security_key_offset                 = 0;
-	uint32_t sub_keys_list_offset                = 0;
-	uint32_t values_list_offset                  = 0;
-	uint16_t class_name_size                     = 0;
 	int result                                   = 0;
 
 #if defined( HAVE_DEBUG_OUTPUT )
-	system_character_t filetime_string[ 32 ];
-
-	system_character_t *value_string             = NULL;
-	libfdatetime_filetime_t *filetime            = NULL;
-	size_t value_string_size                     = 0;
 	uint32_t value_32bit                         = 0;
 #endif
 
@@ -266,27 +254,27 @@ int libregf_named_key_read(
 
 	byte_stream_copy_to_uint32_little_endian(
 	 ( (regf_named_key_t *) data )->number_of_sub_keys,
-	 number_of_sub_keys );
+	 named_key->number_of_sub_keys );
 
 	byte_stream_copy_to_uint32_little_endian(
 	 ( (regf_named_key_t *) data )->sub_keys_list_offset,
-	 sub_keys_list_offset );
+	 named_key->sub_keys_list_offset );
 
 	byte_stream_copy_to_uint32_little_endian(
 	 ( (regf_named_key_t *) data )->number_of_values,
-	 number_of_values_list_elements );
+	 named_key->number_of_values );
 
 	byte_stream_copy_to_uint32_little_endian(
 	 ( (regf_named_key_t *) data )->values_list_offset,
-	 values_list_offset );
+	 named_key->values_list_offset );
 
 	byte_stream_copy_to_uint32_little_endian(
 	 ( (regf_named_key_t *) data )->security_key_offset,
-	 security_key_offset );
+	 named_key->security_key_offset );
 
 	byte_stream_copy_to_uint32_little_endian(
 	 ( (regf_named_key_t *) data )->class_name_offset,
-	 class_name_offset );
+	 named_key->class_name_offset );
 
 	byte_stream_copy_to_uint16_little_endian(
 	 ( (regf_named_key_t *) data )->key_name_size,
@@ -294,13 +282,13 @@ int libregf_named_key_read(
 
 	byte_stream_copy_to_uint16_little_endian(
 	 ( (regf_named_key_t *) data )->class_name_size,
-	 class_name_size );
+	 named_key->class_name_size );
 
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
 	{
 		libcnotify_printf(
-		 "%s: signature\t\t\t\t: %c%c\n",
+		 "%s: signature\t\t\t\t\t: %c%c\n",
 		 function,
 		 ( (regf_named_key_t *) data )->signature[ 0 ],
 		 ( (regf_named_key_t *) data )->signature[ 1 ] );
@@ -312,73 +300,20 @@ int libregf_named_key_read(
 		libregf_debug_print_named_key_flags(
 		 named_key->flags );
 
-		if( libfdatetime_filetime_initialize(
-		     &filetime,
+		if( libregf_debug_print_filetime_value(
+		     function,
+		     "last written time\t\t\t\t",
+		     ( (regf_named_key_t *) data )->last_written_time,
+		     8,
+		     LIBFDATETIME_ENDIAN_LITTLE,
+		     LIBFDATETIME_STRING_FORMAT_TYPE_CTIME | LIBFDATETIME_STRING_FORMAT_FLAG_DATE_TIME_NANO_SECONDS,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create filetime.",
-			 function );
-
-			goto on_error;
-		}
-		if( libfdatetime_filetime_copy_from_64bit(
-		     filetime,
-		     named_key->last_written_time,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to copy filetime from 64-bit value.",
-			 function );
-
-			goto on_error;
-		}
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-		result = libfdatetime_filetime_copy_to_utf16_string(
-		          filetime,
-		          (uint16_t *) filetime_string,
-		          32,
-		          LIBFDATETIME_STRING_FORMAT_TYPE_CTIME | LIBFDATETIME_STRING_FORMAT_FLAG_DATE_TIME_NANO_SECONDS,
-		          error );
-#else
-		result = libfdatetime_filetime_copy_to_utf8_string(
-		          filetime,
-		          (uint8_t *) filetime_string,
-		          32,
-		          LIBFDATETIME_STRING_FORMAT_TYPE_CTIME | LIBFDATETIME_STRING_FORMAT_FLAG_DATE_TIME_NANO_SECONDS,
-		          error );
-#endif
-		if( result != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to copy filetime to string.",
-			 function );
-
-			goto on_error;
-		}
-		libcnotify_printf(
-		 "%s: last written time\t\t\t: %" PRIs_SYSTEM " UTC\n",
-		 function,
-		 filetime_string );
-
-		if( libfdatetime_filetime_free(
-		     &filetime,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free filetime.",
+			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to print FILETIME value.",
 			 function );
 
 			goto on_error;
@@ -387,7 +322,7 @@ int libregf_named_key_read(
 		 ( (regf_named_key_t *) data )->unknown1,
 		 value_32bit );
 		libcnotify_printf(
-		 "%s: unknown1\t\t\t\t: 0x%08" PRIx32 " (%" PRIu32 ")\n",
+		 "%s: unknown1\t\t\t\t\t: 0x%08" PRIx32 " (%" PRIu32 ")\n",
 		 function,
 		 value_32bit,
 		 value_32bit );
@@ -396,14 +331,14 @@ int libregf_named_key_read(
 		 ( (regf_named_key_t *) data )->parent_key_offset,
 		 value_32bit );
 		libcnotify_printf(
-		 "%s: parent key offset\t\t\t: 0x%08" PRIx32 "\n",
+		 "%s: parent key offset\t\t\t\t: 0x%08" PRIx32 "\n",
 		 function,
 		 value_32bit );
 
 		libcnotify_printf(
-		 "%s: number of sub keys\t\t\t: %" PRIu32 "\n",
+		 "%s: number of sub keys\t\t\t\t: %" PRIu32 "\n",
 		 function,
-		 number_of_sub_keys );
+		 named_key->number_of_sub_keys );
 
 		byte_stream_copy_to_uint32_little_endian(
 		 ( (regf_named_key_t *) data )->number_of_volatile_sub_keys,
@@ -416,7 +351,7 @@ int libregf_named_key_read(
 		libcnotify_printf(
 		 "%s: sub keys list offset\t\t\t: 0x%08" PRIx32 "\n",
 		 function,
-		 sub_keys_list_offset );
+		 named_key->sub_keys_list_offset );
 
 		byte_stream_copy_to_uint32_little_endian(
 		 ( (regf_named_key_t *) data )->volatile_sub_keys_list_offset,
@@ -427,30 +362,30 @@ int libregf_named_key_read(
 		 value_32bit );
 
 		libcnotify_printf(
-		 "%s: number of values\t\t\t: %" PRIu32 "\n",
+		 "%s: number of values\t\t\t\t: %" PRIu32 "\n",
 		 function,
-		 number_of_values_list_elements );
+		 named_key->number_of_values );
 
 		libcnotify_printf(
-		 "%s: values list offset\t\t\t: 0x%08" PRIx32 "\n",
+		 "%s: values list offset\t\t\t\t: 0x%08" PRIx32 "\n",
 		 function,
-		 values_list_offset );
+		 named_key->values_list_offset );
 
 		libcnotify_printf(
 		 "%s: security key offset\t\t\t: 0x%08" PRIx32 "\n",
 		 function,
-		 security_key_offset );
+		 named_key->security_key_offset );
 
 		libcnotify_printf(
-		 "%s: class name offset\t\t\t: 0x%08" PRIx32 "\n",
+		 "%s: class name offset\t\t\t\t: 0x%08" PRIx32 "\n",
 		 function,
-		 class_name_offset );
+		 named_key->class_name_offset );
 
 		byte_stream_copy_to_uint32_little_endian(
 		 ( (regf_named_key_t *) data )->largest_sub_key_name_size,
 		 value_32bit );
 		libcnotify_printf(
-		 "%s: largest sub key name size\t\t: 0x%08" PRIx32 " (%" PRIu32 ")\n",
+		 "%s: largest sub key name size\t\t\t: 0x%08" PRIx32 " (%" PRIu32 ")\n",
 		 function,
 		 value_32bit,
 		 value_32bit );
@@ -459,7 +394,7 @@ int libregf_named_key_read(
 		 ( (regf_named_key_t *) data )->largest_sub_key_class_name_size,
 		 value_32bit );
 		libcnotify_printf(
-		 "%s: largest sub key class name size\t: 0x%08" PRIx32 " (%" PRIu32 ")\n",
+		 "%s: largest sub key class name size\t\t: 0x%08" PRIx32 " (%" PRIu32 ")\n",
 		 function,
 		 value_32bit,
 		 value_32bit );
@@ -468,7 +403,7 @@ int libregf_named_key_read(
 		 ( (regf_named_key_t *) data )->largest_value_name_size,
 		 value_32bit );
 		libcnotify_printf(
-		 "%s: largest value name size\t\t: 0x%08" PRIx32 " (%" PRIu32 ")\n",
+		 "%s: largest value name size\t\t\t: 0x%08" PRIx32 " (%" PRIu32 ")\n",
 		 function,
 		 value_32bit,
 		 value_32bit );
@@ -477,7 +412,7 @@ int libregf_named_key_read(
 		 ( (regf_named_key_t *) data )->largest_value_data_size,
 		 value_32bit );
 		libcnotify_printf(
-		 "%s: largest value data size\t\t: 0x%08" PRIx32 " (%" PRIu32 ")\n",
+		 "%s: largest value data size\t\t\t: 0x%08" PRIx32 " (%" PRIu32 ")\n",
 		 function,
 		 value_32bit,
 		 value_32bit );
@@ -486,7 +421,7 @@ int libregf_named_key_read(
 		 ( (regf_named_key_t *) data )->unknown6,
 		 value_32bit );
 		libcnotify_printf(
-		 "%s: unknown6\t\t\t\t: 0x%08" PRIx32 " (%" PRIu32 ")\n",
+		 "%s: unknown6\t\t\t\t\t: 0x%08" PRIx32 " (%" PRIu32 ")\n",
 		 function,
 		 value_32bit,
 		 value_32bit );
@@ -497,20 +432,21 @@ int libregf_named_key_read(
 		 named_key->name_size );
 
 		libcnotify_printf(
-		 "%s: class name size\t\t\t: %" PRIu16 "\n",
+		 "%s: class name size\t\t\t\t: %" PRIu16 "\n",
 		 function,
-		 class_name_size );
+		 named_key->class_name_size );
 	}
 #endif
 	data_offset = sizeof( regf_named_key_t );
 
-	if( named_key->name_size == 0 )
+	if( ( named_key->name_size == 0 )
+	 || ( named_key->name_size > ( data_size - data_offset ) ) )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-		 "%s: invalid key name size.",
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid key name size value out of bounds.",
 		 function );
 
 		goto on_error;
@@ -586,39 +522,43 @@ int libregf_named_key_read(
 	{
 		if( ( named_key->flags & LIBREGF_NAMED_KEY_FLAG_NAME_IS_ASCII ) != 0 )
 		{
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-			result = libuna_utf16_string_size_from_byte_stream(
-				  named_key->name,
-				  (size_t) named_key->name_size,
-				  ascii_codepage,
-				  &value_string_size,
-				  error );
-#else
-			result = libuna_utf8_string_size_from_byte_stream(
-				  named_key->name,
-				  (size_t) named_key->name_size,
-				  ascii_codepage,
-				  &value_string_size,
-				  error );
-#endif
+			if( libregf_debug_print_string_value(
+			     function,
+			     "key name\t\t\t\t\t",
+			     named_key->name,
+			     (size_t) named_key->name_size,
+			     ascii_codepage,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+				 "%s: unable to print string value.",
+				 function );
+
+				goto on_error;
+			}
 		}
 		else
 		{
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-			result = libuna_utf16_string_size_from_utf16_stream(
-				  named_key->name,
-				  (size_t) named_key->name_size,
-				  LIBUNA_ENDIAN_LITTLE,
-				  &value_string_size,
-				  error );
-#else
-			result = libuna_utf8_string_size_from_utf16_stream(
-				  named_key->name,
-				  (size_t) named_key->name_size,
-				  LIBUNA_ENDIAN_LITTLE,
-				  &value_string_size,
-				  error );
-#endif
+			if( libregf_debug_print_utf16_string_value(
+			     function,
+			     "key name\t\t\t\t\t",
+			     named_key->name,
+			     (size_t) named_key->name_size,
+			     LIBUNA_ENDIAN_LITTLE,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+				 "%s: unable to print UTF-16 string value.",
+				 function );
+
+				goto on_error;
+			}
 		}
 		if( result != 1 )
 		{
@@ -631,87 +571,13 @@ int libregf_named_key_read(
 
 			goto on_error;
 		}
-		value_string = system_string_allocate(
-		                value_string_size );
-
-		if( value_string == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_MEMORY,
-			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create key name string.",
-			 function );
-
-			goto on_error;
-		}
-		if( ( named_key->flags & LIBREGF_NAMED_KEY_FLAG_NAME_IS_ASCII ) != 0 )
-		{
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-			result = libuna_utf16_string_copy_from_byte_stream(
-				  (libuna_utf16_character_t *) value_string,
-				  value_string_size,
-				  named_key->name,
-				  (size_t) named_key->name_size,
-				  ascii_codepage,
-				  error );
-#else
-			result = libuna_utf8_string_copy_from_byte_stream(
-				  (libuna_utf8_character_t *) value_string,
-				  value_string_size,
-				  named_key->name,
-				  (size_t) named_key->name_size,
-				  ascii_codepage,
-				  error );
-#endif
-		}
-		else
-		{
-#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-			result = libuna_utf16_string_copy_from_utf16_stream(
-				  (libuna_utf16_character_t *) value_string,
-				  value_string_size,
-				  named_key->name,
-				  (size_t) named_key->name_size,
-				  LIBUNA_ENDIAN_LITTLE,
-				  error );
-#else
-			result = libuna_utf8_string_copy_from_utf16_stream(
-				  (libuna_utf8_character_t *) value_string,
-				  value_string_size,
-				  named_key->name,
-				  (size_t) named_key->name_size,
-				  LIBUNA_ENDIAN_LITTLE,
-				  error );
-#endif
-		}
-		if( result != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve key name string.",
-			 function );
-
-			goto on_error;
-		}
-		libcnotify_printf(
-		 "%s: key name\t\t\t\t: %" PRIs_SYSTEM "\n",
-		 function,
-		 value_string );
-
 		libcnotify_printf(
 		 "%s: key name hash\t\t\t\t: 0x%08" PRIx32 "\n",
 		 function,
 		 named_key->name_hash );
-
-		memory_free(
-		 value_string );
-
-		value_string = NULL;
 	}
-#endif
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
+
 	data_offset += named_key->name_size;
 
 #if defined( HAVE_DEBUG_OUTPUT )
@@ -742,23 +608,11 @@ int libregf_named_key_read(
 			 "\n" );
 		}
 	}
-#endif
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
+
 	return( 1 );
 
 on_error:
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( filetime != NULL )
-	{
-		libfdatetime_filetime_free(
-		 &filetime,
-		 NULL );
-	}
-	if( value_string != NULL )
-	{
-		memory_free(
-		 value_string );
-	}
-#endif
 	if( named_key->name != NULL )
 	{
 		memory_free(

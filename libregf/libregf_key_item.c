@@ -40,6 +40,7 @@
 #include "libregf_libfdatetime.h"
 #include "libregf_libfwnt.h"
 #include "libregf_libuna.h"
+#include "libregf_named_key.h"
 #include "libregf_unused.h"
 #include "libregf_value_item.h"
 
@@ -243,30 +244,14 @@ int libregf_key_item_read_named_key(
      libbfio_handle_t *file_io_handle,
      libregf_hive_bins_list_t *hive_bins_list,
      off64_t named_key_offset,
-     uint32_t named_key_hash LIBREGF_ATTRIBUTE_UNUSED,
+     uint32_t named_key_hash,
      libcerror_error_t **error )
 {
-	libregf_hive_bin_cell_t *hive_bin_cell       = NULL;
-	const uint8_t *hive_bin_cell_data            = NULL;
-	static char *function                        = "libregf_key_item_read_named_key";
-	libuna_unicode_character_t unicode_character = 0;
-	size_t hive_bin_cell_size                    = 0;
-	size_t name_index                            = 0;
-	uint32_t class_name_offset                   = 0;
-	uint32_t number_of_sub_keys                  = 0;
-	uint32_t number_of_values_list_elements      = 0;
-	uint32_t security_key_offset                 = 0;
-	uint32_t sub_keys_list_offset                = 0;
-	uint32_t values_list_offset                  = 0;
-	uint16_t class_name_size                     = 0;
-	int hive_bin_index                           = 0;
-	int result                                   = 0;
-
-#if defined( HAVE_DEBUG_OUTPUT )
-	uint32_t value_32bit                         = 0;
-#endif
-
-	LIBREGF_UNREFERENCED_PARAMETER( named_key_hash )
+	libregf_hive_bin_cell_t *hive_bin_cell  = NULL;
+	libregf_named_key_t *named_key          = NULL;
+	static char *function                   = "libregf_key_item_read_named_key";
+	int hive_bin_index                      = 0;
+	int result                              = 0;
 
 	if( hive_bins_list == NULL )
 	{
@@ -306,7 +291,7 @@ int libregf_key_item_read_named_key(
 	if( libcnotify_verbose != 0 )
 	{
 		libcnotify_printf(
-		 "%s: reading named key at offset: %" PRIi32 " (0x%08" PRIx32 ")\n",
+		 "%s: reading named key at offset: %" PRIi64 " (0x%08" PRIx64 ").",
 		 function,
 		 named_key_offset,
 		 named_key_offset );
@@ -330,411 +315,54 @@ int libregf_key_item_read_named_key(
 
 		goto on_error;
 	}
-	hive_bin_cell_data = hive_bin_cell->data;
-	hive_bin_cell_size = hive_bin_cell->size;
-
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
-	{
-		libcnotify_printf(
-		 "%s: hive bin cell data:\n",
-		 function );
-		libcnotify_print_data(
-		 hive_bin_cell_data,
-		 hive_bin_cell_size,
-		 0 );
-	}
-#endif
-	if( hive_bin_cell_size < sizeof( regf_named_key_t ) )
+	if( libregf_named_key_initialize(
+	     &named_key,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid hive bin cell size too small.",
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create named key.",
 		 function );
 
 		goto on_error;
 	}
-	/* Check if the cell signature matches that of a named key: "nk"
-	 */
-	if( ( hive_bin_cell_data[ 0 ] != (uint8_t) 'n' )
-	 || ( hive_bin_cell_data[ 1 ] != (uint8_t) 'k' ) )
+	if( libregf_named_key_read_data(
+	     named_key,
+	     hive_bin_cell->data,
+	     hive_bin_cell->size,
+	     named_key_hash,
+	     hive_bins_list->io_handle->ascii_codepage,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported named key signature.",
-		 function );
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read named key at offset: %" PRIi64 " (0x%08" PRIx64 ").",
+		 function,
+		 named_key_offset,
+		 named_key_offset );
 
 		goto on_error;
 	}
-	byte_stream_copy_to_uint16_little_endian(
-	 ( (regf_named_key_t *) hive_bin_cell_data )->flags,
-	 key_item->flags );
+	key_item->flags             = named_key->flags;
+	key_item->last_written_time = named_key->last_written_time;
+	key_item->name              = named_key->name;
+	key_item->name_size         = named_key->name_size;
 
-	byte_stream_copy_to_uint64_little_endian(
-	 ( (regf_named_key_t *) hive_bin_cell_data )->last_written_time,
-	 key_item->last_written_time );
+	named_key->name      = NULL;
+	named_key->name_size = 0;
 
-	byte_stream_copy_to_uint32_little_endian(
-	 ( (regf_named_key_t *) hive_bin_cell_data )->number_of_sub_keys,
-	 number_of_sub_keys );
-
-	byte_stream_copy_to_uint32_little_endian(
-	 ( (regf_named_key_t *) hive_bin_cell_data )->sub_keys_list_offset,
-	 sub_keys_list_offset );
-
-	byte_stream_copy_to_uint32_little_endian(
-	 ( (regf_named_key_t *) hive_bin_cell_data )->number_of_values,
-	 number_of_values_list_elements );
-
-	byte_stream_copy_to_uint32_little_endian(
-	 ( (regf_named_key_t *) hive_bin_cell_data )->values_list_offset,
-	 values_list_offset );
-
-	byte_stream_copy_to_uint32_little_endian(
-	 ( (regf_named_key_t *) hive_bin_cell_data )->security_key_offset,
-	 security_key_offset );
-
-	byte_stream_copy_to_uint32_little_endian(
-	 ( (regf_named_key_t *) hive_bin_cell_data )->class_name_offset,
-	 class_name_offset );
-
-	byte_stream_copy_to_uint16_little_endian(
-	 ( (regf_named_key_t *) hive_bin_cell_data )->key_name_size,
-	 key_item->name_size );
-
-	byte_stream_copy_to_uint16_little_endian(
-	 ( (regf_named_key_t *) hive_bin_cell_data )->class_name_size,
-	 class_name_size );
-
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
-	{
-		libcnotify_printf(
-		 "%s: signature\t\t\t\t: %c%c\n",
-		 function,
-		 ( (regf_named_key_t *) hive_bin_cell_data )->signature[ 0 ],
-		 ( (regf_named_key_t *) hive_bin_cell_data )->signature[ 1 ] );
-
-		libcnotify_printf(
-		 "%s: flags\t\t\t\t\t: 0x%04" PRIx16 "\n",
-		 function,
-		 key_item->flags );
-		libregf_debug_print_named_key_flags(
-		 key_item->flags );
-
-		if( libregf_debug_print_filetime_value(
-		     function,
-		     "last written time\t\t\t",
-		     ( (regf_named_key_t *) hive_bin_cell_data )->last_written_time,
-		     8,
-		     LIBFDATETIME_ENDIAN_LITTLE,
-		     LIBFDATETIME_STRING_FORMAT_TYPE_CTIME | LIBFDATETIME_STRING_FORMAT_FLAG_DATE_TIME_NANO_SECONDS,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
-			 "%s: unable to print filetime value.",
-			 function );
-
-			goto on_error;
-		}
-		byte_stream_copy_to_uint32_little_endian(
-		 ( (regf_named_key_t *) hive_bin_cell_data )->unknown1,
-		 value_32bit );
-		libcnotify_printf(
-		 "%s: unknown1\t\t\t\t: 0x%08" PRIx32 " (%" PRIu32 ")\n",
-		 function,
-		 value_32bit,
-		 value_32bit );
-
-		byte_stream_copy_to_uint32_little_endian(
-		 ( (regf_named_key_t *) hive_bin_cell_data )->parent_key_offset,
-		 value_32bit );
-		libcnotify_printf(
-		 "%s: parent key offset\t\t\t: 0x%08" PRIx32 "\n",
-		 function,
-		 value_32bit );
-
-		libcnotify_printf(
-		 "%s: number of sub keys\t\t\t: %" PRIu32 "\n",
-		 function,
-		 number_of_sub_keys );
-
-		byte_stream_copy_to_uint32_little_endian(
-		 ( (regf_named_key_t *) hive_bin_cell_data )->number_of_volatile_sub_keys,
-		 value_32bit );
-		libcnotify_printf(
-		 "%s: number of volatile sub keys\t\t: %" PRIu32 "\n",
-		 function,
-		 value_32bit );
-
-		libcnotify_printf(
-		 "%s: sub keys list offset\t\t\t: 0x%08" PRIx32 "\n",
-		 function,
-		 sub_keys_list_offset );
-
-		byte_stream_copy_to_uint32_little_endian(
-		 ( (regf_named_key_t *) hive_bin_cell_data )->volatile_sub_keys_list_offset,
-		 value_32bit );
-		libcnotify_printf(
-		 "%s: volatile sub keys list offset\t\t: 0x%08" PRIx32 "\n",
-		 function,
-		 value_32bit );
-
-		libcnotify_printf(
-		 "%s: number of values\t\t\t: %" PRIu32 "\n",
-		 function,
-		 number_of_values_list_elements );
-
-		libcnotify_printf(
-		 "%s: values list offset\t\t\t: 0x%08" PRIx32 "\n",
-		 function,
-		 values_list_offset );
-
-		libcnotify_printf(
-		 "%s: security key offset\t\t\t: 0x%08" PRIx32 "\n",
-		 function,
-		 security_key_offset );
-
-		libcnotify_printf(
-		 "%s: class name offset\t\t\t: 0x%08" PRIx32 "\n",
-		 function,
-		 class_name_offset );
-
-		byte_stream_copy_to_uint32_little_endian(
-		 ( (regf_named_key_t *) hive_bin_cell_data )->largest_sub_key_name_size,
-		 value_32bit );
-		libcnotify_printf(
-		 "%s: largest sub key name size\t\t: 0x%08" PRIx32 " (%" PRIu32 ")\n",
-		 function,
-		 value_32bit,
-		 value_32bit );
-
-		byte_stream_copy_to_uint32_little_endian(
-		 ( (regf_named_key_t *) hive_bin_cell_data )->largest_sub_key_class_name_size,
-		 value_32bit );
-		libcnotify_printf(
-		 "%s: largest sub key class name size\t: 0x%08" PRIx32 " (%" PRIu32 ")\n",
-		 function,
-		 value_32bit,
-		 value_32bit );
-
-		byte_stream_copy_to_uint32_little_endian(
-		 ( (regf_named_key_t *) hive_bin_cell_data )->largest_value_name_size,
-		 value_32bit );
-		libcnotify_printf(
-		 "%s: largest value name size\t\t: 0x%08" PRIx32 " (%" PRIu32 ")\n",
-		 function,
-		 value_32bit,
-		 value_32bit );
-
-		byte_stream_copy_to_uint32_little_endian(
-		 ( (regf_named_key_t *) hive_bin_cell_data )->largest_value_data_size,
-		 value_32bit );
-		libcnotify_printf(
-		 "%s: largest value data size\t\t: 0x%08" PRIx32 " (%" PRIu32 ")\n",
-		 function,
-		 value_32bit,
-		 value_32bit );
-
-		byte_stream_copy_to_uint32_little_endian(
-		 ( (regf_named_key_t *) hive_bin_cell_data )->unknown6,
-		 value_32bit );
-		libcnotify_printf(
-		 "%s: unknown6\t\t\t\t: 0x%08" PRIx32 " (%" PRIu32 ")\n",
-		 function,
-		 value_32bit,
-		 value_32bit );
-
-		libcnotify_printf(
-		 "%s: key name size\t\t\t\t: %" PRIu16 "\n",
-		 function,
-		 key_item->name_size );
-
-		libcnotify_printf(
-		 "%s: class name size\t\t\t: %" PRIu16 "\n",
-		 function,
-		 class_name_size );
-	}
-#endif
-	hive_bin_cell_data += sizeof( regf_named_key_t );
-
-#if defined( HAVE_DEBUG_OUTPUT )
-	hive_bin_cell_size -= sizeof( regf_named_key_t );
-#endif
-
-	if( key_item->name_size == 0 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-		 "%s: invalid key name size.",
-		 function );
-
-		goto on_error;
-	}
-	key_item->name = (uint8_t *) memory_allocate(
-	                              sizeof( uint8_t ) * (size_t) key_item->name_size );
-
-	if( key_item->name == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_MEMORY,
-		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create key name.",
-		 function );
-
-		goto on_error;
-	}
-	if( memory_copy(
-	     key_item->name,
-	     hive_bin_cell_data,
-	     (size_t) key_item->name_size ) == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_MEMORY,
-		 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-		 "%s: unable to copy key name.",
-		 function );
-
-		goto on_error;
-	}
-	key_item->name_hash = 0;
-
-	while( name_index < (size_t) key_item->name_size )
-	{
-		if( ( key_item->flags & LIBREGF_NAMED_KEY_FLAG_NAME_IS_ASCII ) != 0 )
-		{
-			result = libuna_unicode_character_copy_from_byte_stream(
-				  &unicode_character,
-				  key_item->name,
-				  (size_t) key_item->name_size,
-				  &name_index,
-				  hive_bins_list->io_handle->ascii_codepage,
-				  error );
-		}
-		else
-		{
-			result = libuna_unicode_character_copy_from_utf16_stream(
-				  &unicode_character,
-				  key_item->name,
-				  (size_t) key_item->name_size,
-				  &name_index,
-				  LIBUNA_ENDIAN_LITTLE,
-				  error );
-		}
-		if( result != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
-			 "%s: unable to copy key name to Unicode character.",
-			 function );
-
-			goto on_error;
-		}
-		key_item->name_hash *= 37;
-		key_item->name_hash += (uint32_t) towupper( (wint_t) unicode_character );
-	}
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
-	{
-		if( ( key_item->flags & LIBREGF_NAMED_KEY_FLAG_NAME_IS_ASCII ) != 0 )
-		{
-			if( libregf_debug_print_string_value(
-			     function,
-			     "key name\t\t\t\t",
-			     key_item->name,
-			     (size_t) key_item->name_size,
-			     hive_bins_list->io_handle->ascii_codepage,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
-				 "%s: unable to print string value.",
-				 function );
-
-				goto on_error;
-			}
-		}
-		else
-		{
-			if( libregf_debug_print_utf16_string_value(
-			     function,
-			     "key name\t\t\t\t",
-			     key_item->name,
-			     (size_t) key_item->name_size,
-			     LIBUNA_ENDIAN_LITTLE,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
-				 "%s: unable to print UTF-16 string value.",
-				 function );
-
-				goto on_error;
-			}
-		}
-		libcnotify_printf(
-		 "%s: key name hash\t\t\t\t: 0x%08" PRIx32 "\n",
-		 function,
-		 key_item->name_hash );
-	}
-	hive_bin_cell_data += key_item->name_size;
-	hive_bin_cell_size -= key_item->name_size;
-#endif
-
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
-	{
-		if( ( named_key_hash != 0 )
-		 && ( named_key_hash != key_item->name_hash ) )
-		{
-			libcnotify_printf(
-			 "%s: mismatch in name hash ( 0x%08" PRIx32 " != 0x%08" PRIx32 " ).\n",
-			 function,
-			 named_key_hash,
-			 key_item->name_hash );
-		}
-		if( hive_bin_cell_size > 0 )
-		{
-			libcnotify_printf(
-			 "%s: padding:\n",
-			 function );
-			libcnotify_print_data(
-			 hive_bin_cell_data,
-			 hive_bin_cell_size,
-			 0 );
-		}
-		else
-		{
-			libcnotify_printf(
-			 "\n" );
-		}
-	}
-#endif
-	if( class_name_offset != 0xffffffffUL )
+	if( named_key->class_name_offset != 0xffffffffUL )
 	{
 		if( libregf_key_item_read_class_name(
 		     key_item,
 		     file_io_handle,
 		     hive_bins_list,
-		     class_name_offset,
-		     class_name_size,
+		     named_key->class_name_offset,
+		     named_key->class_name_size,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -743,19 +371,19 @@ int libregf_key_item_read_named_key(
 			 LIBCERROR_IO_ERROR_READ_FAILED,
 			 "%s: unable to read class name at offset: %" PRIu32 " (0x%08" PRIx32 ").",
 			 function,
-			 class_name_offset,
-			 class_name_offset );
+			 named_key->class_name_offset,
+			 named_key->class_name_offset );
 
 			goto on_error;
 		}
 	}
-	if( security_key_offset != 0xffffffffUL )
+	if( named_key->security_key_offset != 0xffffffffUL )
 	{
 		if( libregf_key_item_read_security_key(
 		     key_item,
 		     file_io_handle,
 		     hive_bins_list,
-		     security_key_offset,
+		     named_key->security_key_offset,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -764,13 +392,13 @@ int libregf_key_item_read_named_key(
 			 LIBCERROR_IO_ERROR_READ_FAILED,
 			 "%s: unable to read security key aat offset: %" PRIu32 " (0x%08" PRIx32 ").",
 			 function,
-			 security_key_offset,
-			 security_key_offset );
+			 named_key->security_key_offset,
+			 named_key->security_key_offset );
 
 			goto on_error;
 		}
 	}
-	if( number_of_sub_keys > 0 )
+	if( named_key->number_of_sub_keys > 0 )
 	{
 		result = libfdata_tree_node_sub_nodes_data_range_is_set(
 		          key_tree_node,
@@ -791,7 +419,7 @@ int libregf_key_item_read_named_key(
 		{
 			result = libregf_hive_bins_list_get_index_at_offset(
 			          hive_bins_list,
-			          (off64_t) sub_keys_list_offset,
+			          (off64_t) named_key->sub_keys_list_offset,
 			          &hive_bin_index,
 			          error );
 
@@ -813,7 +441,7 @@ int libregf_key_item_read_named_key(
 			else if( libfdata_tree_node_set_sub_nodes_data_range(
 			          key_tree_node,
 			          0,
-			          (off64_t) sub_keys_list_offset,
+			          (off64_t) named_key->sub_keys_list_offset,
 			          0,
 			          0,
 			          error ) != 1 )
@@ -865,7 +493,7 @@ int libregf_key_item_read_named_key(
 	}
 	result = libregf_hive_bins_list_get_index_at_offset(
 	          hive_bins_list,
-	          (off64_t) values_list_offset,
+	          (off64_t) named_key->values_list_offset,
 	          &hive_bin_index,
 	          error );
 
@@ -890,8 +518,8 @@ int libregf_key_item_read_named_key(
 		     key_item,
 		     file_io_handle,
 		     hive_bins_list,
-		     values_list_offset,
-		     number_of_values_list_elements,
+		     named_key->values_list_offset,
+		     named_key->number_of_values,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -900,14 +528,27 @@ int libregf_key_item_read_named_key(
 			 LIBCERROR_IO_ERROR_READ_FAILED,
 			 "%s: unable to read values list at offset: %" PRIu32 " (0x%08" PRIx32 ").",
 			 function,
-			 values_list_offset,
-			 values_list_offset );
+			 named_key->values_list_offset,
+			 named_key->values_list_offset );
 
 			goto on_error;
 		}
 	}
 	/* The values and sub keys are read on demand
 	 */
+	if( libregf_named_key_free(
+	     &named_key,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free named key.",
+		 function );
+
+		goto on_error;
+	}
 	return( 1 );
 
 on_error:
@@ -932,6 +573,12 @@ on_error:
 	}
 	key_item->name_size = 0;
 
+	if( named_key != NULL )
+	{
+		libregf_named_key_free(
+		 &named_key,
+		 NULL );
+	}
 	return( -1 );
 }
 

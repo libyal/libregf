@@ -110,3 +110,90 @@ members:
   data_type: filetime
 - name: unknown_spare
   data_type: uint32
+---
+name: named_key
+aliases: [CM_KEY_NODE]
+type: structure
+description: Named key
+members:
+- name: signature
+  type: stream
+  element_data_type: byte
+  elements_data_size: 2
+  value: "nk"
+- name: flags
+  data_type: uint16
+- name: last_written_time
+  description: Last written date and time
+  data_type: filetime
+- name: unknown1
+  data_type: uint32
+- name: parent_key_offset
+  data_type: uint32
+- name: number_of_sub_keys
+  data_type: uint32
+- name: number_of_volatile_sub_keys
+  data_type: uint32
+- name: sub_keys_list_offset
+  data_type: uint32
+- name: volatile_sub_keys_list_offset
+  data_type: uint32
+- name: number_of_values
+  data_type: uint32
+- name: values_list_offset
+  data_type: uint32
+- name: security_key_offset
+  data_type: uint32
+- name: class_name_offset
+  data_type: uint32
+- name: largest_sub_key_name_size
+  data_type: uint32
+- name: largest_sub_key_class_name_size
+  data_type: uint32
+- name: largest_value_name_size
+  data_type: uint32
+- name: largest_value_data_size
+  data_type: uint32
+- name: unknown2
+  data_type: uint32
+- name: name_size
+  data_type: uint16
+- name: class_name_size
+  data_type: uint16
+- name: name
+  type: stream
+  element_data_type: byte
+  elements_data_size: named_key.name_size
+- name: padding
+  type: padding
+  alignment_size: 8
+---
+name: value_key
+aliases: [CM_KEY_VALUE]
+type: structure
+description: Value key
+members:
+- name: signature
+  type: stream
+  element_data_type: byte
+  elements_data_size: 2
+  value: "vk"
+- name: name_size
+  data_type: uint16
+- name: data_size
+  data_type: uint32
+- name: data_offset
+  data_type: uint32
+- name: data_type
+  data_type: uint32
+- name: flags
+  data_type: uint16
+- name: unknown1
+  data_type: uint16
+- name: name
+  type: stream
+  element_data_type: byte
+  elements_data_size: value_key.name_size
+- name: padding
+  type: padding
+  alignment_size: 8

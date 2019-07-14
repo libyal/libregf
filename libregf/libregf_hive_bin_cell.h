@@ -41,7 +41,7 @@ struct libregf_hive_bin_cell
 
 	/* The reference to the hive bin cell data
 	 */
-	uint8_t *data;
+	const uint8_t *data;
 
 	/* The hive bin cell size
 	 */

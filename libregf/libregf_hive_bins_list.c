@@ -622,7 +622,7 @@ int libregf_hive_bins_list_read_element_data(
 
 		goto on_error;
 	}
-	if( libregf_hive_bin_read_cells(
+	if( libregf_hive_bin_read_cells_file_io_handle(
 	     hive_bin,
 	     file_io_handle,
 	     error ) != 1 )

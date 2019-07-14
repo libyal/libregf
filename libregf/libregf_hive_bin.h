@@ -69,7 +69,13 @@ int libregf_hive_bin_free(
      libregf_hive_bin_t **hive_bin,
      libcerror_error_t **error );
 
-int libregf_hive_bin_read_cells(
+int libregf_hive_bin_read_cells_data(
+     libregf_hive_bin_t *hive_bin,
+     const uint8_t *data,
+     size_t data_size,
+     libcerror_error_t **error );
+
+int libregf_hive_bin_read_cells_file_io_handle(
      libregf_hive_bin_t *hive_bin,
      libbfio_handle_t *file_io_handle,
      libcerror_error_t **error );

@@ -97,6 +97,25 @@ int libregf_hive_bin_initialize(
 		 "%s: unable to clear hive bin.",
 		 function );
 
+		memory_free(
+		 *hive_bin );
+
+		*hive_bin = NULL;
+
+		return( -1 );
+	}
+	if( libcdata_array_initialize(
+	     &( ( *hive_bin )->cells_array ),
+	     0,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create cells array.",
+		 function );
+
 		goto on_error;
 	}
 	( *hive_bin )->offset = offset;
@@ -171,19 +190,20 @@ int libregf_hive_bin_free(
 /* Reads a hive bin and determines its cells
  * Returns 1 if successful or -1 on error
  */
-int libregf_hive_bin_read_cells(
+int libregf_hive_bin_read_cells_data(
      libregf_hive_bin_t *hive_bin,
-     libbfio_handle_t *file_io_handle,
+     const uint8_t *data,
+     size_t data_size,
      libcerror_error_t **error )
 {
 	libregf_hive_bin_cell_t *hive_bin_cell = NULL;
-	uint8_t *hive_bin_cells_data           = NULL;
-	static char *function                  = "libregf_hive_bin_read_cells";
-	ssize_t read_count                     = 0;
-	size_t hive_bin_cells_data_size        = 0;
-	uint32_t hive_bin_cell_size            = 0;
-	uint32_t hive_bin_cells_offset         = 0;
-	int hive_bin_cell_index                = 0;
+	static char *function                  = "libregf_hive_bin_read_cells_data";
+	size_t data_offset                     = 0;
+	uint32_t cell_size                     = 0;
+	uint32_t file_offset                   = 0;
+	uint8_t flags                          = 0;
+	int cell_index                         = 0;
+	int entry_index                        = 0;
 
 	if( hive_bin == NULL )
 	{
@@ -192,6 +212,230 @@ int libregf_hive_bin_read_cells(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid hive bin.",
+		 function );
+
+		return( -1 );
+	}
+	if( data == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid data.",
+		 function );
+
+		return( -1 );
+	}
+	if( data_size < 4 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
+		 "%s: invalid data size value too small.",
+		 function );
+
+		return( -1 );
+	}
+	if( data_size > (size_t) SSIZE_MAX )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid data size value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libcnotify_verbose != 0 )
+	{
+		libcnotify_printf(
+		 "%s: hive bin cells:\n",
+		 function );
+		libcnotify_print_data(
+		 data,
+		 data_size,
+		 LIBCNOTIFY_PRINT_DATA_FLAG_GROUP_DATA );
+	}
+#endif
+/* TODO empty cells array */
+	file_offset = hive_bin->offset + sizeof( regf_hive_bin_header_t );
+
+	while( data_offset < data_size )
+	{
+#if defined( HAVE_DEBUG_OUTPUT )
+		if( libcnotify_verbose != 0 )
+		{
+			libcnotify_printf(
+			 "%s: hive bin cell: %03d offset\t\t\t: 0x%08" PRIx32 "\n",
+			 function,
+			 cell_index,
+			 file_offset );
+		}
+#endif
+		if( data_offset > ( data_size - 4 ) )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: invalid cell size value exceeds hive bin size.",
+			 function );
+
+			goto on_error;
+		}
+		byte_stream_copy_to_uint32_little_endian(
+		 &( data[ data_offset ] ),
+		 cell_size );
+
+		data_offset += 4;
+
+#if defined( HAVE_DEBUG_OUTPUT )
+		if( libcnotify_verbose != 0 )
+		{
+			libcnotify_printf(
+			 "%s: hive bin cell: %03d size\t\t\t: 0x%08" PRIx32 " (%" PRIi32 ")\n",
+			 function,
+			 cell_index,
+			 cell_size,
+			 (int32_t) cell_size );
+		}
+#endif
+		flags = 0;
+
+		if( (int32_t) cell_size < 0 )
+		{
+			cell_size = (uint32_t) ( -1 * (int32_t) cell_size );
+		}
+		else
+		{
+			flags |= LIBREGF_HIVE_BIN_CELL_FLAG_UNALLOCATED;
+		}
+		if( ( cell_size % 8 ) != 0 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+			 "%s: invalid cell size value should be multitude of 8.",
+			 function );
+
+			goto on_error;
+		}
+		/* Remove the size of the cell size value
+		 */
+		cell_size -= 4;
+
+		if( cell_size > ( data_size - data_offset ) )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: invalid cell size value exceeds hive bin size.",
+			 function );
+
+			goto on_error;
+		}
+#if defined( HAVE_DEBUG_OUTPUT )
+		if( libcnotify_verbose != 0 )
+		{
+			libcnotify_printf(
+			 "%s: hive bin cell: %03d data:\n",
+			 function,
+			 cell_index );
+			libcnotify_print_data(
+			 &( data[ data_offset ] ),
+			 cell_size,
+			 LIBCNOTIFY_PRINT_DATA_FLAG_GROUP_DATA );
+		}
+#endif
+		if( libregf_hive_bin_cell_initialize(
+		     &hive_bin_cell,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create hive bin cell.",
+			 function );
+
+			goto on_error;
+		}
+		hive_bin_cell->offset = (uint32_t) file_offset;
+		hive_bin_cell->data   = &( data[ data_offset ] );
+		hive_bin_cell->size   = cell_size;
+		hive_bin_cell->flags |= flags;
+
+		data_offset += cell_size;
+		file_offset += 4 + cell_size;
+
+		if( libcdata_array_append_entry(
+		     hive_bin->cells_array,
+		     &entry_index,
+		     (intptr_t *) hive_bin_cell,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+			 "%s: unable to append hive bin cell: %d.",
+			 function,
+			 cell_index );
+
+			goto on_error;
+		}
+		hive_bin_cell = NULL;
+
+		cell_index++;
+	}
+	return( 1 );
+
+on_error:
+	if( hive_bin_cell != NULL )
+	{
+		libregf_hive_bin_cell_free(
+		 &hive_bin_cell,
+		 NULL );
+	}
+/* TODO empty cells array */
+	return( -1 );
+}
+
+/* Reads a hive bin and determines its cells
+ * Returns 1 if successful or -1 on error
+ */
+int libregf_hive_bin_read_cells_file_io_handle(
+     libregf_hive_bin_t *hive_bin,
+     libbfio_handle_t *file_io_handle,
+     libcerror_error_t **error )
+{
+	static char *function = "libregf_hive_bin_read_cells_file_io_handle";
+	ssize_t read_count    = 0;
+
+	if( hive_bin == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid hive bin.",
+		 function );
+
+		return( -1 );
+	}
+	if( hive_bin->cells_array == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid hive bin - missing cells array.",
 		 function );
 
 		return( -1 );
@@ -218,17 +462,6 @@ int libregf_hive_bin_read_cells(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
 		 "%s: invalid hive bin - size value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
-	if( hive_bin->cells_array != NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid hive bin - cells array already set.",
 		 function );
 
 		return( -1 );
@@ -266,166 +499,24 @@ int libregf_hive_bin_read_cells(
 
 		goto on_error;
 	}
-	if( libcdata_array_initialize(
-	     &( hive_bin->cells_array ),
-	     0,
+	if( libregf_hive_bin_read_cells_data(
+	     hive_bin,
+	     hive_bin->data,
+	     hive_bin->data_size,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create hive bin cells array.",
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read hive bin cells.",
 		 function );
 
 		goto on_error;
 	}
-	hive_bin_cells_data      = hive_bin->data;
-	hive_bin_cells_data_size = hive_bin->data_size;
-	hive_bin_cells_offset    = hive_bin->offset + sizeof( regf_hive_bin_header_t );
-
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
-	{
-		libcnotify_printf(
-		 "%s: hive bin cells:\n",
-		 function );
-		libcnotify_print_data(
-		 hive_bin_cells_data,
-		 hive_bin_cells_data_size,
-		 LIBCNOTIFY_PRINT_DATA_FLAG_GROUP_DATA );
-	}
-#endif
-	while( hive_bin_cells_data_size > 0 )
-	{
-		if( libregf_hive_bin_cell_initialize(
-		     &hive_bin_cell,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create hive bin cell.",
-			 function );
-
-			goto on_error;
-		}
-#if defined( HAVE_DEBUG_OUTPUT )
-		if( libcnotify_verbose != 0 )
-		{
-			libcnotify_printf(
-			 "%s: hive bin cell: %03d offset\t\t\t: 0x%08" PRIx32 "\n",
-			 function,
-			 hive_bin_cell_index,
-			 hive_bin_cells_offset );
-		}
-#endif
-		hive_bin_cell->offset = (uint32_t) hive_bin_cells_offset;
-
-/* TODO check bounds ?*/
-		byte_stream_copy_to_uint32_little_endian(
-		 hive_bin_cells_data,
-		 hive_bin_cell_size );
-
-		hive_bin_cells_data      += 4;
-		hive_bin_cells_offset    += 4;
-		hive_bin_cells_data_size -= 4;
-
-#if defined( HAVE_DEBUG_OUTPUT )
-		if( libcnotify_verbose != 0 )
-		{
-			libcnotify_printf(
-			 "%s: hive bin cell: %03d size\t\t\t: 0x%08" PRIx32 " (%" PRIi32 ")\n",
-			 function,
-			 hive_bin_cell_index,
-			 hive_bin_cell_size,
-			 (int32_t) hive_bin_cell_size );
-		}
-#endif
-		if( (int32_t) hive_bin_cell_size < 0 )
-		{
-			hive_bin_cell_size = (uint32_t) ( -1 * (int32_t) hive_bin_cell_size );
-		}
-		else
-		{
-			hive_bin_cell->flags |= LIBREGF_HIVE_BIN_CELL_FLAG_UNALLOCATED;
-		}
-		if( ( hive_bin_cell_size % 8 ) != 0 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-			 "%s: invalid cell size value should be multitude of 8.",
-			 function );
-
-			goto on_error;
-		}
-		/* Remove the size of the cell size value
-		 */
-		hive_bin_cell_size -= 4;
-
-		if( hive_bin_cell_size > hive_bin_cells_data_size )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-			 "%s: invalid cell size value exceeds hive bin size.",
-			 function );
-
-			goto on_error;
-		}
-#if defined( HAVE_DEBUG_OUTPUT )
-		if( libcnotify_verbose != 0 )
-		{
-			libcnotify_printf(
-			 "%s: hive bin cell: %03d data:\n",
-			 function,
-			 hive_bin_cell_index );
-			libcnotify_print_data(
-			 hive_bin_cells_data,
-			 hive_bin_cell_size,
-			 LIBCNOTIFY_PRINT_DATA_FLAG_GROUP_DATA );
-		}
-#endif
-		hive_bin_cell->data = hive_bin_cells_data;
-		hive_bin_cell->size = hive_bin_cell_size;
-
-		if( libcdata_array_append_entry(
-		     hive_bin->cells_array,
-		     &hive_bin_cell_index,
-		     (intptr_t *) hive_bin_cell,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-			 "%s: unable to append hive bin cell: %d.",
-			 function,
-			 hive_bin_cell_index );
-
-			goto on_error;
-		}
-		hive_bin_cell = NULL;
-
-		hive_bin_cells_data      += hive_bin_cell_size;
-		hive_bin_cells_offset    += hive_bin_cell_size;
-		hive_bin_cells_data_size -= hive_bin_cell_size;
-
-		hive_bin_cell_index++;
-	}
 	return( 1 );
 
 on_error:
-	if( hive_bin_cell != NULL )
-	{
-		libregf_hive_bin_cell_free(
-		 &hive_bin_cell,
-		 NULL );
-	}
 	if( hive_bin->data != NULL )
 	{
 		memory_free(

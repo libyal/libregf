@@ -247,7 +247,7 @@ int libregf_key_item_read_named_key(
      libcerror_error_t **error )
 {
 	libregf_hive_bin_cell_t *hive_bin_cell       = NULL;
-	uint8_t *hive_bin_cell_data                  = NULL;
+	const uint8_t *hive_bin_cell_data            = NULL;
 	static char *function                        = "libregf_key_item_read_named_key";
 	libuna_unicode_character_t unicode_character = 0;
 	size_t hive_bin_cell_size                    = 0;
@@ -947,7 +947,7 @@ int libregf_key_item_read_class_name(
      libcerror_error_t **error )
 {
 	libregf_hive_bin_cell_t *hive_bin_cell = NULL;
-	uint8_t *hive_bin_cell_data            = NULL;
+	const uint8_t *hive_bin_cell_data      = NULL;
 	static char *function                  = "libregf_key_item_read_class_name";
 	size_t hive_bin_cell_size              = 0;
 
@@ -1157,7 +1157,7 @@ int libregf_key_item_read_security_key(
      libcerror_error_t **error )
 {
 	libregf_hive_bin_cell_t *hive_bin_cell             = NULL;
-	uint8_t *hive_bin_cell_data                        = NULL;
+	const uint8_t *hive_bin_cell_data                  = NULL;
 	static char *function                              = "libregf_key_item_read_security_key";
 	size_t hive_bin_cell_size                          = 0;
 
@@ -1461,7 +1461,7 @@ int libregf_key_item_read_values_list(
      libcerror_error_t **error )
 {
 	libregf_hive_bin_cell_t *hive_bin_cell = NULL;
-	uint8_t *hive_bin_cell_data            = NULL;
+	const uint8_t *hive_bin_cell_data      = NULL;
 	static char *function                  = "libregf_key_item_read_values_list";
 	size_t hive_bin_cell_size              = 0;
 	uint32_t values_list_element_iterator  = 0;
@@ -1745,8 +1745,8 @@ int libregf_key_item_read_sub_keys_list(
      libcerror_error_t **error )
 {
 	libregf_hive_bin_cell_t *hive_bin_cell    = NULL;
-	uint8_t *hive_bin_cell_data               = NULL;
-	uint8_t *sub_keys_list_data               = NULL;
+	const uint8_t *hive_bin_cell_data         = NULL;
+	const uint8_t *sub_keys_list_data         = NULL;
 	static char *function                     = "libregf_key_item_read_sub_keys_list";
 	size_t hive_bin_cell_size                 = 0;
 	uint32_t element_hash                     = 0;

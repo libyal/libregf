@@ -105,6 +105,8 @@ int libregf_checksum_calculate_little_endian_xor32(
 		{
 			byte_size = sizeof( libregf_aligned_t ) - alignment_size;
 
+			/* Align the buffer iterator in 4-byte steps
+			 */
 			while( byte_size != 0 )
 			{
 				value_32bit = 0;
@@ -150,7 +152,7 @@ int libregf_checksum_calculate_little_endian_xor32(
 		{
 			byte_order = _BYTE_STREAM_ENDIAN_LITTLE;
 		}
-		/* Determine the aligned XOR value
+		/* Calculate the XOR value using the aligned buffer iterator
 		 */
 		while( size > sizeof( libregf_aligned_t ) )
 		{
@@ -164,17 +166,6 @@ int libregf_checksum_calculate_little_endian_xor32(
 		 */
 		if( alignment_size > 0 )
 		{
-			if( alignment_size >= sizeof( libregf_aligned_t ) )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-				 "%s: invalid alignment size value out of bounds.",
-				 function );
-
-				return( -1 );
-			}
 			byte_count      = ( alignment_size % 4 ) * 8;
 			alignment_count = ( sizeof( libregf_aligned_t ) - alignment_size ) * 8;
 

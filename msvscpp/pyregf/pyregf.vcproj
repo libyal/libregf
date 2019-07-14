@@ -210,6 +210,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\pyregf\pyregf_multi_string.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\pyregf\pyregf_value.c"
 				>
 			</File>
@@ -281,6 +285,10 @@
 			</File>
 			<File
 				RelativePath="..\..\pyregf\pyregf_libregf.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\pyregf\pyregf_multi_string.h"
 				>
 			</File>
 			<File

@@ -144,7 +144,9 @@ regf_test_file_header_LDADD = \
 	@LIBCERROR_LIBADD@
 
 regf_test_hive_bin_SOURCES = \
+	regf_test_functions.c regf_test_functions.h \
 	regf_test_hive_bin.c \
+	regf_test_libbfio.h \
 	regf_test_libcerror.h \
 	regf_test_libregf.h \
 	regf_test_macros.h \
@@ -152,6 +154,14 @@ regf_test_hive_bin_SOURCES = \
 	regf_test_unused.h
 
 regf_test_hive_bin_LDADD = \
+	@LIBBFIO_LIBADD@ \
+	@LIBCPATH_LIBADD@ \
+	@LIBCFILE_LIBADD@ \
+	@LIBUNA_LIBADD@ \
+	@LIBCSPLIT_LIBADD@ \
+	@LIBCNOTIFY_LIBADD@ \
+	@LIBCLOCALE_LIBADD@ \
+	@LIBCDATA_LIBADD@ \
 	../libregf/libregf.la \
 	@LIBCERROR_LIBADD@
 

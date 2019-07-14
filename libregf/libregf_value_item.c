@@ -427,7 +427,7 @@ int libregf_value_item_read_value_key(
 {
 	libregf_hive_bin_cell_t *hive_bin_cell       = NULL;
 	uint8_t *data_offset_data                    = NULL;
-	uint8_t *hive_bin_cell_data                  = NULL;
+	const uint8_t *hive_bin_cell_data            = NULL;
 	static char *function                        = "libregf_value_item_read_value_key";
 	libuna_unicode_character_t unicode_character = 0;
 	size_t hive_bin_cell_size                    = 0;
@@ -924,7 +924,7 @@ int libregf_value_item_read_value_data(
      libcerror_error_t **error )
 {
 	libregf_hive_bin_cell_t *hive_bin_cell = NULL;
-	uint8_t *hive_bin_cell_data            = NULL;
+	const uint8_t *hive_bin_cell_data      = NULL;
 	static char *function                  = "libregf_value_item_read_value_data";
 	size_t hive_bin_cell_size              = 0;
 	size_t utf16_string_size               = 0;
@@ -1252,7 +1252,7 @@ int libregf_value_item_read_data_block_list(
      libcerror_error_t **error )
 {
 	libregf_hive_bin_cell_t *hive_bin_cell = NULL;
-	uint8_t *hive_bin_cell_data            = NULL;
+	const uint8_t *hive_bin_cell_data      = NULL;
 	static char *function                  = "libregf_value_item_read_data_block_list";
 	size_t hive_bin_cell_size              = 0;
 	uint32_t calculated_value_data_size    = 0;

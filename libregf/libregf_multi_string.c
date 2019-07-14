@@ -260,11 +260,14 @@ int libregf_internal_multi_string_read_data(
 			}
 			data_offset += 2;
 		}
+		if( string_size == 2 )
+		{
+			break;
+		}
 		number_of_strings++;
 	}
-	if( ( string_size != 2 )
-	 || ( data[ data_size - 2 ] != 0 )
-	 || ( data[ data_size - 1 ] != 0 ) )
+	if( ( data[ data_offset - 2 ] != 0 )
+	 || ( data[ data_offset - 1 ] != 0 ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -275,8 +278,6 @@ int libregf_internal_multi_string_read_data(
 
 		goto on_error;
 	}
-	number_of_strings--;
-
 	internal_multi_string->data = (uint8_t *) memory_allocate(
 	                                           sizeof( uint8_t ) * data_size );
 

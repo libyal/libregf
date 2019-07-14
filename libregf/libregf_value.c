@@ -2176,7 +2176,7 @@ int libregf_value_get_value_multi_string(
 		 "%s: unable to retrieve value item.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	if( value_item == NULL )
 	{
@@ -2187,7 +2187,7 @@ int libregf_value_get_value_multi_string(
 		 "%s: missing value item.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	if( value_item->type != LIBREGF_VALUE_TYPE_MULTI_VALUE_STRING )
 	{
@@ -2199,7 +2199,7 @@ int libregf_value_get_value_multi_string(
 		 function,
 		 value_item->type );
 
-		return( -1 );
+		goto on_error;
 	}
 	if( libregf_value_item_get_data(
 	     value_item,
@@ -2215,7 +2215,7 @@ int libregf_value_get_value_multi_string(
 		 "%s: unable to retrieve value data.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	if( libregf_multi_string_initialize(
 	     multi_string,
@@ -2228,7 +2228,7 @@ int libregf_value_get_value_multi_string(
 		 "%s: unable to create multi string.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	if( libregf_internal_multi_string_read_data(
 	     (libregf_internal_multi_string_t *) *multi_string,
@@ -2243,7 +2243,7 @@ int libregf_value_get_value_multi_string(
 		 "%s: unable to read multi string from value data.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	return( 1 );
 

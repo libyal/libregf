@@ -567,7 +567,8 @@ REG_DWORD_LITTLE_ENDIAN | Integer 32-bit signed little-endian (double word)
 | 0x00000006 | REG_LINK | String that contains a symbolic link +
 UTF-16 little-endian string with end-of-string character
 | 0x00000007 | REG_MULTI_SZ | Array of strings +
-Array of UTF-16 little-endian strings with end-of-string character, where the array is terminated by an empyt string
+Array of UTF-16 little-endian strings with end-of-string character, where the array is terminated by an empty string +
+Note that the termination empty string is not always present
 | 0x00000008 | REG_RESOURCE_LIST | [yellow-background]*Unknown (List of hardware resources of used by a physical device driver)*
 | 0x00000009 | REG_FULL_RESOURCE_DESCRIPTOR | [yellow-background]*Unknown (List of hardware resources of controlled by a physical device driver)*
 | 0x0000000a | REG_RESOURCE_REQUIREMENTS_LIST | [yellow-background]*Unknown (List of hardware resources of available to a physical device driver)*
@@ -917,7 +918,7 @@ data size                     : 0x00000008 (8)
 data offset                   : 0x01cf5450
 data type                     : 4 (REG_DWORD_LITTLE_ENDIAN) Integer 32-bit signed little-endian
 flags                         : 0x0001
-        Value name is an ASCII string
+        Value name is an ASCII string (VALUE_COMP_NAME)
 
 unknown1                      : 0x006f (111)
 value name                    : lParam
@@ -953,7 +954,7 @@ data size                     : 0x80000003 (3)
 data offset                   : 0x00000031
 data type                     : 1 (REG_SZ) String
 flags                         : 0x0001
-        Value name is an ASCII string
+        Value name is an ASCII string (VALUE_COMP_NAME)
 
 unknown1                      : 0x0000 (0)
 value name                    : bEnableFlag
@@ -983,7 +984,7 @@ data size                     : 0x0000020b (523)
 data offset                   : 0x00357bb8
 data type                     : 1 (REG_SZ) String
 flags                         : 0x0001
-        Value name is an ASCII string
+        Value name is an ASCII string (VALUE_COMP_NAME)
 
 unknown1                      : 0x0000 (0)
 value name                    : WPPFileName
@@ -1000,6 +1001,27 @@ value data:
 
 The Windows Registry-editor indicates this as a valid value and presents the
 string "MediaStack".
+
+=== Multi string value without terminating empty string
+
+....
+signature                            : vk
+value name size                      : 9
+data size                            : 0x0000000c (12)
+data offset                          : 0x0001fe40
+data type                            : 0x00000007 (REG_MULTI_SZ) Array of strings
+flags                                : 0x0001
+        Value name is an ASCII string (VALUE_COMP_NAME)
+
+unknown1                             : 0xffff (65535)
+value name                           : Languages
+value name hash                      : 0x413cd487
+padding:
+00000000: 65 79 00 04 00 00 00                               ey.....
+
+data:
+00000000: 65 00 6e 00 2d 00 55 00  53 00 00 00               e.n.-.U. S...
+....
 
 === Value key data size - data block segments size mismatch
 
@@ -1020,7 +1042,7 @@ data size                            : 0x00000008 (8)
 data offset                          : 0x000c1b80
 data type                            : 0x00000004 (REG_DWORD_LITTLE_ENDIAN) Integer 32-bit signed little-endian
 flags                                : 0x0001
-        Value name is an ASCII string
+        Value name is an ASCII string (VALUE_COMP_NAME)
 
 unknown1                             : 0x000b (11)
 value name                           : lParam

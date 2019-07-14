@@ -83,6 +83,9 @@ uint8_t regf_test_multi_string_data1[ 712 ] = {
 	0x66, 0x00, 0x69, 0x00, 0x67, 0x00, 0x75, 0x00, 0x72, 0x00, 0x61, 0x00, 0x74, 0x00, 0x69, 0x00,
 	0x6f, 0x00, 0x6e, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
+uint8_t regf_test_multi_string_data2[ 12 ] = {
+	0x65, 0x00, 0x6e, 0x00, 0x2d, 0x00, 0x55, 0x00, 0x53, 0x00, 0x00, 0x00 };
+
 #if defined( __GNUC__ ) && !defined( LIBREGF_DLL_IMPORT )
 
 /* Tests the libregf_multi_string_initialize function
@@ -377,6 +380,66 @@ int regf_test_internal_multi_string_read_data(
 	 "multi_string->number_of_strings",
 	 ( (libregf_internal_multi_string_t *) multi_string )->number_of_strings,
 	 29 );
+
+	/* Clean up
+	 */
+	result = libregf_multi_string_free(
+	          &multi_string,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "multi_string",
+	 multi_string );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Initialize test
+	 */
+	result = libregf_multi_string_initialize(
+	          &multi_string,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "multi_string",
+	 multi_string );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	result = libregf_internal_multi_string_read_data(
+	          (libregf_internal_multi_string_t *) multi_string,
+	          regf_test_multi_string_data2,
+	          12,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "multi_string->number_of_strings",
+	 ( (libregf_internal_multi_string_t *) multi_string )->number_of_strings,
+	 1 );
 
 	/* Clean up
 	 */

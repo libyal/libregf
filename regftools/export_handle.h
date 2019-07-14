@@ -88,13 +88,10 @@ int export_handle_close_input(
      export_handle_t *export_handle,
      libcerror_error_t **error );
 
-/* Key specific export functions
- */
-
-/* File export functions
- */
-int export_handle_export_keyes(
+int export_handle_export_key(
      export_handle_t *export_handle,
+     const system_character_t *key_path,
+     size_t key_path_length,
      libregf_key_t *key,
      log_handle_t *log_handle,
      libcerror_error_t **error );

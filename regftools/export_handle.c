@@ -562,10 +562,13 @@ int export_handle_close_input(
  */
 int export_handle_export_key(
      export_handle_t *export_handle,
+     const system_character_t *key_path,
+     size_t key_path_length,
      libregf_key_t *key,
      log_handle_t *log_handle,
      libcerror_error_t **error )
 {
+	system_character_t *sub_key_path = NULL;
 	system_character_t *value_string = NULL;
 	libregf_key_t *sub_key           = NULL;
 	libregf_value_t *value           = NULL;
@@ -573,6 +576,7 @@ int export_handle_export_key(
 	static char *function            = "export_handle_export_key";
 	size_t data_size                 = 0;
 	size_t expected_data_size        = 0;
+	size_t sub_key_path_length       = 0;
 	size_t value_string_size         = 0;
 	ssize_t print_count              = 0;
 	uint64_t value_64bit             = 0;
@@ -591,6 +595,28 @@ int export_handle_export_key(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid export handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( key_path == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid key path.",
+		 function );
+
+		return( -1 );
+	}
+	if( key_path_length > (size_t) ( SSIZE_MAX - 1 ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid key path length value exceeds maximum.",
 		 function );
 
 		return( -1 );
@@ -617,44 +643,99 @@ int export_handle_export_key(
 
 		goto on_error;
 	}
+	if( value_string_size > (size_t) ( SSIZE_MAX / sizeof( system_character_t ) ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid name size value exceeds maximum.",
+		 function );
+
+		goto on_error;
+	}
+	sub_key_path_length = key_path_length;
+
 	if( value_string_size > 0 )
 	{
-		if( ( value_string_size > (size_t) SSIZE_MAX )
-		 || ( ( sizeof( system_character_t ) * value_string_size ) > (size_t) SSIZE_MAX ) )
+		if( key_path_length > 0 )
 		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
-			 "%s: invalid name size value exceeds maximum.",
-			 function );
-
-			goto on_error;
+			sub_key_path_length += 1;
 		}
-		value_string = system_string_allocate(
-		                value_string_size );
+		sub_key_path_length += value_string_size - 1;
+	}
+	if( sub_key_path_length > (size_t) ( SSIZE_MAX / sizeof( system_character_t ) ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid sub key path length value exceeds maximum.",
+		 function );
 
-		if( value_string == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_MEMORY,
-			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create name string.",
-			 function );
+		goto on_error;
+	}
+	sub_key_path = system_string_allocate(
+	                sub_key_path_length + 1 );
 
-			goto on_error;
-		}
+	if( sub_key_path == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create sub key path.",
+		 function );
+
+		goto on_error;
+	}
+	if( sub_key_path == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create sub key path.",
+		 function );
+
+		goto on_error;
+	}
+	if( system_string_copy(
+	     sub_key_path,
+	     key_path,
+	     key_path_length ) == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBREGF_MEMORY_ERROR_COPY_FAILED,
+		 "%s: unable to copy key path to sub key path.",
+		 function );
+
+		goto on_error;
+	}
+	if( key_path_length > 0 )
+	{
+		sub_key_path[ key_path_length ] = '\\';
+
+		key_path_length += 1;
+	}
+	if( value_string_size == 0 )
+	{
+		sub_key_path[ key_path_length ] = 0;
+	}
+	else
+	{
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 		result = libregf_key_get_utf16_name(
 		          key,
-		          (uint16_t *) value_string,
+		          (uint16_t *) &( sub_key_path[ key_path_length ] ),
 		          value_string_size,
 		          error );
 #else
 		result = libregf_key_get_utf8_name(
 		          key,
-		          (uint8_t *) value_string,
+		          (uint8_t *) &( sub_key_path[ key_path_length ] ),
 		          value_string_size,
 		          error );
 #endif
@@ -669,19 +750,17 @@ int export_handle_export_key(
 
 			goto on_error;
 		}
-/* TODO print full key path */
-		fprintf(
-		 export_handle->notify_stream,
-		 "Key: %" PRIs_SYSTEM "\n",
-		 value_string );
-
-		memory_free(
-		 value_string );
-
-		value_string = NULL;
 	}
-#ifdef TODO
-/* TODO fix this */
+	fprintf(
+	 export_handle->notify_stream,
+	 "Key path: %" PRIs_SYSTEM "\n",
+	 sub_key_path );
+
+	fprintf(
+	 export_handle->notify_stream,
+	 "Key: %" PRIs_SYSTEM "\n",
+	 &( sub_key_path[ key_path_length ] ) );
+
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libregf_key_get_utf16_class_name_size(
 	          key,
@@ -707,8 +786,7 @@ int export_handle_export_key(
 	if( ( result != 0 )
 	 && ( value_string_size > 0 ) )
 	{
-		if( ( value_string_size > (size_t) SSIZE_MAX )
-		 || ( ( sizeof( system_character_t ) * value_string_size ) > (size_t) SSIZE_MAX ) )
+		if( value_string_size > (size_t) ( SSIZE_MAX / sizeof( system_character_t ) ) )
 		{
 			libcerror_error_set(
 			 error,
@@ -767,7 +845,6 @@ int export_handle_export_key(
 
 		value_string = NULL;
 	}
-#endif
 	if( libregf_key_get_number_of_values(
 	     key,
 	     &number_of_values,
@@ -826,8 +903,7 @@ int export_handle_export_key(
 		}
 		if( value_string_size > 0 )
 		{
-			if( ( value_string_size > (size_t) SSIZE_MAX )
-			 || ( ( sizeof( system_character_t ) * value_string_size ) > (size_t) SSIZE_MAX ) )
+			if( value_string_size > (size_t) ( SSIZE_MAX / sizeof( system_character_t ) ) )
 			{
 				libcerror_error_set(
 				 error,
@@ -1036,8 +1112,7 @@ int export_handle_export_key(
 				}
 				if( value_string_size > 0 )
 				{
-					if( ( value_string_size > (size_t) SSIZE_MAX )
-					 || ( ( sizeof( system_character_t ) * value_string_size ) > (size_t) SSIZE_MAX ) )
+					if( value_string_size > (size_t) ( SSIZE_MAX / sizeof( system_character_t ) ) )
 					{
 						libcerror_error_set(
 						 error,
@@ -1324,6 +1399,8 @@ int export_handle_export_key(
 		}
 		if( export_handle_export_key(
 		     export_handle,
+		     sub_key_path,
+		     sub_key_path_length,
 		     sub_key,
 		     log_handle,
 		     error ) != 1 )
@@ -1353,6 +1430,9 @@ int export_handle_export_key(
 			goto on_error;
 		}
 	}
+	memory_free(
+	 sub_key_path );
+
 	return( 1 );
 
 on_error:
@@ -1377,6 +1457,11 @@ on_error:
 	{
 		memory_free(
 		 value_string );
+	}
+	if( sub_key_path != NULL )
+	{
+		memory_free(
+		 sub_key_path );
 	}
 	return( -1 );
 }
@@ -1424,6 +1509,8 @@ int export_handle_export_file(
 	{
 		if( export_handle_export_key(
 		     export_handle,
+		     _SYSTEM_STRING( "" ),
+		     0,
 		     root_key,
 		     log_handle,
 		     error ) != 1 )

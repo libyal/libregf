@@ -37,10 +37,9 @@
 #include "libregf_libcnotify.h"
 #include "libregf_libfcache.h"
 #include "libregf_libfdata.h"
-#include "libregf_libfdatetime.h"
-#include "libregf_libfwnt.h"
 #include "libregf_libuna.h"
 #include "libregf_named_key.h"
+#include "libregf_security_key.h"
 #include "libregf_unused.h"
 #include "libregf_value_item.h"
 
@@ -197,44 +196,6 @@ int libregf_key_item_free(
 	return( result );
 }
 
-/* Retrieves the number of key item
- * Returns 1 if successful or -1 on error
- */
-int libregf_key_item_get_number_of_values(
-     libregf_key_item_t *key_item,
-     int *number_of_values,
-     libcerror_error_t **error )
-{
-	static char *function = "libregf_key_item_get_number_of_values";
-
-	if( key_item == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid key item.",
-		 function );
-
-		return( -1 );
-	}
-	if( libfdata_list_get_number_of_elements(
-	     key_item->values_list,
-	     number_of_values,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve number of elements from values data list.",
-		 function );
-
-		return( -1 );
-	}
-	return( 1 );
-}
-
 /* Reads a named key
  * Returns the number of bytes read if successful or -1 on error
  */
@@ -247,11 +208,11 @@ int libregf_key_item_read_named_key(
      uint32_t named_key_hash,
      libcerror_error_t **error )
 {
-	libregf_hive_bin_cell_t *hive_bin_cell  = NULL;
-	libregf_named_key_t *named_key          = NULL;
-	static char *function                   = "libregf_key_item_read_named_key";
-	int hive_bin_index                      = 0;
-	int result                              = 0;
+	libregf_hive_bin_cell_t *hive_bin_cell = NULL;
+	libregf_named_key_t *named_key         = NULL;
+	static char *function                  = "libregf_key_item_read_named_key";
+	int hive_bin_index                     = 0;
+	int result                             = 0;
 
 	if( hive_bins_list == NULL )
 	{
@@ -271,6 +232,17 @@ int libregf_key_item_read_named_key(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid hive bins list - missing IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( key_item->name != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid key item - name value already set.",
 		 function );
 
 		return( -1 );
@@ -390,7 +362,7 @@ int libregf_key_item_read_named_key(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_IO,
 			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read security key aat offset: %" PRIu32 " (0x%08" PRIx32 ").",
+			 "%s: unable to read security key at offset: %" PRIu32 " (0x%08" PRIx32 ").",
 			 function,
 			 named_key->security_key_offset,
 			 named_key->security_key_offset );
@@ -803,16 +775,9 @@ int libregf_key_item_read_security_key(
      uint32_t security_key_offset,
      libcerror_error_t **error )
 {
-	libregf_hive_bin_cell_t *hive_bin_cell             = NULL;
-	const uint8_t *hive_bin_cell_data                  = NULL;
-	static char *function                              = "libregf_key_item_read_security_key";
-	size_t hive_bin_cell_size                          = 0;
-
-#if defined( HAVE_DEBUG_OUTPUT )
-	libfwnt_security_descriptor_t *security_descriptor = NULL;
-	uint32_t value_32bit                               = 0;
-	uint16_t value_16bit                               = 0;
-#endif
+	libregf_hive_bin_cell_t *hive_bin_cell = NULL;
+	libregf_security_key_t *security_key   = NULL;
+	static char *function                  = "libregf_key_item_read_security_key";
 
 	if( key_item == NULL )
 	{
@@ -821,6 +786,17 @@ int libregf_key_item_read_security_key(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid key item.",
+		 function );
+
+		return( -1 );
+	}
+	if( key_item->security_descriptor != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid key item - security descriptor value already set.",
 		 function );
 
 		return( -1 );
@@ -848,17 +824,6 @@ int libregf_key_item_read_security_key(
 
 		return( -1 );
 	}
-	if( key_item->security_descriptor != NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid key item - security descriptor value already set.",
-		 function );
-
-		return( -1 );
-	}
 	if( libregf_hive_bins_list_get_cell_at_offset(
 	     hive_bins_list,
 	     file_io_handle,
@@ -877,222 +842,64 @@ int libregf_key_item_read_security_key(
 
 		goto on_error;
 	}
-	hive_bin_cell_data = hive_bin_cell->data;
-	hive_bin_cell_size = hive_bin_cell->size;
-
-	if( hive_bin_cell_size < sizeof( regf_security_key_t ) )
+	if( libregf_security_key_initialize(
+	     &security_key,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid hive bin cell size too small.",
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create security key.",
 		 function );
 
 		goto on_error;
 	}
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
-	{
-		libcnotify_printf(
-		 "%s: header data:\n",
-		 function );
-		libcnotify_print_data(
-		 hive_bin_cell_data,
-		 sizeof( regf_security_key_t ),
-		 0 );
-	}
-#endif
-	/* Check if the cell signature matches that of a security key: "sk"
-	 */
-	if( ( hive_bin_cell_data[ 0 ] != (uint8_t) 's' )
-	 || ( hive_bin_cell_data[ 1 ] != (uint8_t) 'k' ) )
+	if( libregf_security_key_read_data(
+	     security_key,
+	     hive_bin_cell->data,
+	     hive_bin_cell->size,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported security key signature.",
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read security key at offset: %" PRIu32 " (0x%08" PRIx32 ").",
+		 function,
+		 security_key_offset,
+		 security_key_offset );
+
+		goto on_error;
+	}
+	key_item->security_descriptor      = security_key->security_descriptor;
+	key_item->security_descriptor_size = security_key->security_descriptor_size;
+
+	security_key->security_descriptor      = NULL;
+	security_key->security_descriptor_size = 0;
+
+	if( libregf_security_key_free(
+	     &security_key,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free security key.",
 		 function );
 
 		goto on_error;
 	}
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
-	{
-		libcnotify_printf(
-		 "%s: signature\t\t\t\t: %c%c\n",
-		 function,
-		 ( (regf_security_key_t *) hive_bin_cell_data )->signature[ 0 ],
-		 ( (regf_security_key_t *) hive_bin_cell_data )->signature[ 1 ] );
-
-		byte_stream_copy_to_uint16_little_endian(
-		 ( (regf_security_key_t *) hive_bin_cell_data )->unknown1,
-		 value_16bit );
-		libcnotify_printf(
-		 "%s: unknown1\t\t\t\t: 0x%04" PRIx16 " (%" PRIu16 ")\n",
-		 function,
-		 value_16bit,
-		 value_16bit );
-
-		byte_stream_copy_to_uint32_little_endian(
-		 ( (regf_security_key_t *) hive_bin_cell_data )->previous_security_key_offset,
-		 value_32bit );
-		libcnotify_printf(
-		 "%s: previous security key offset\t: 0x%08" PRIx32 "\n",
-		 function,
-		 value_32bit );
-		byte_stream_copy_to_uint32_little_endian(
-		 ( (regf_security_key_t *) hive_bin_cell_data )->next_security_key_offset,
-		 value_32bit );
-		libcnotify_printf(
-		 "%s: next security key offset\t\t: 0x%08" PRIx32 "\n",
-		 function,
-		 value_32bit );
-
-		byte_stream_copy_to_uint32_little_endian(
-		 ( (regf_security_key_t *) hive_bin_cell_data )->reference_count,
-		 value_32bit );
-		libcnotify_printf(
-		 "%s: reference count\t\t\t: %" PRIu32 "\n",
-		 function,
-		 value_32bit );
-
-		libcnotify_printf(
-		 "\n" );
-	}
-#endif
-	hive_bin_cell_data += sizeof( regf_security_key_t );
-	hive_bin_cell_size -= sizeof( regf_security_key_t );
-
-	if( hive_bin_cell_size < 4 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid hive bin cell size too small to contain security descriptor.",
-		 function );
-
-		goto on_error;
-	}
-/* TODO print unknown 4 bytes */
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
-	{
-		libcnotify_printf(
-		 "%s: security descriptor data:\n",
-		 function );
-		libcnotify_print_data(
-		 &( hive_bin_cell_data[ 4 ] ),
-		 hive_bin_cell_size - 4,
-		 0 );
-	}
-#endif
-	key_item->security_descriptor_size = hive_bin_cell_size - 4;
-
-	if( key_item->security_descriptor_size > 0 )
-	{
-		key_item->security_descriptor = (uint8_t *) memory_allocate(
-		                                             sizeof( uint8_t ) * key_item->security_descriptor_size );
-
-		if( key_item->security_descriptor == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_MEMORY,
-			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create key security descriptor.",
-			 function );
-
-			goto on_error;
-		}
-		if( memory_copy(
-		     key_item->security_descriptor,
-		     &( hive_bin_cell_data[ 4 ] ),
-		     key_item->security_descriptor_size ) == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_MEMORY,
-			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-			 "%s: unable to copy hive bin cell data to security descriptor.",
-			 function );
-
-			goto on_error;
-		}
-#if defined( HAVE_DEBUG_OUTPUT )
-		if( libcnotify_verbose != 0 )
-		{
-			if( libfwnt_security_descriptor_initialize(
-			     &security_descriptor,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-				 "%s: unable to create security descriptor.",
-				 function );
-
-				goto on_error;
-			}
-			if( libfwnt_security_descriptor_copy_from_byte_stream(
-			     security_descriptor,
-			     key_item->security_descriptor,
-			     key_item->security_descriptor_size,
-			     LIBFWNT_ENDIAN_LITTLE,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
-				 "%s: unable to copy security descriptor from byte stream.",
-				 function );
-
-				goto on_error;
-			}
-			if( libfwnt_security_descriptor_free(
-			     &security_descriptor,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-				 "%s: unable to free security descriptor.",
-				 function );
-
-				goto on_error;
-			}
-			libcnotify_printf(
-			 "\n" );
-		}
-#endif
-	}
-/* TODO padding/trailing data ? */
-
 	return( 1 );
 
 on_error:
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( security_descriptor != NULL )
+	if( security_key != NULL )
 	{
-		libfwnt_security_descriptor_free(
-		 &security_descriptor,
+		libregf_security_key_free(
+		 &security_key,
 		 NULL );
 	}
-#endif
-	if( key_item->security_descriptor != NULL )
-	{
-		memory_free(
-		 key_item->security_descriptor );
-
-		key_item->security_descriptor = NULL;
-	}
-	key_item->security_descriptor_size = 0;
-
 	return( -1 );
 }
 
@@ -1781,6 +1588,44 @@ int libregf_key_item_read_sub_nodes(
 	else if( result == 0 )
 	{
 /* TODO signal corruption */
+	}
+	return( 1 );
+}
+
+/* Retrieves the number of key item
+ * Returns 1 if successful or -1 on error
+ */
+int libregf_key_item_get_number_of_values(
+     libregf_key_item_t *key_item,
+     int *number_of_values,
+     libcerror_error_t **error )
+{
+	static char *function = "libregf_key_item_get_number_of_values";
+
+	if( key_item == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid key item.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfdata_list_get_number_of_elements(
+	     key_item->values_list,
+	     number_of_values,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve number of elements from values data list.",
+		 function );
+
+		return( -1 );
 	}
 	return( 1 );
 }

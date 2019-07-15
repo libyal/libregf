@@ -30,6 +30,7 @@ MSVSCPP_FILES = \
 	regf_test_multi_string/regf_test_multi_string.vcproj \
 	regf_test_named_key/regf_test_named_key.vcproj \
 	regf_test_notify/regf_test_notify.vcproj \
+	regf_test_security_key/regf_test_security_key.vcproj \
 	regf_test_support/regf_test_support.vcproj \
 	regf_test_value/regf_test_value.vcproj \
 	regf_test_value_item/regf_test_value_item.vcproj \

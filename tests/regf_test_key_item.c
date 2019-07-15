@@ -270,16 +270,14 @@ on_error:
 	return( 0 );
 }
 
-/* Tests the libregf_key_item_get_number_of_values function
+/* Tests the libregf_key_item_read_named_key function
  * Returns 1 if successful or 0 if not
  */
-int regf_test_key_item_get_number_of_values(
+int regf_test_key_item_read_named_key(
      void )
 {
 	libcerror_error_t *error     = NULL;
 	libregf_key_item_t *key_item = NULL;
-	int number_of_values         = 0;
-	int number_of_values_is_set  = 0;
 	int result                   = 0;
 
 	/* Initialize test
@@ -303,27 +301,19 @@ int regf_test_key_item_get_number_of_values(
 
 	/* Test regular cases
 	 */
-	result = libregf_key_item_get_number_of_values(
-	          key_item,
-	          &number_of_values,
-	          &error );
-
-	REGF_TEST_ASSERT_NOT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	REGF_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	number_of_values_is_set = result;
+/* TODO implement */
 
 	/* Test error cases
 	 */
-	result = libregf_key_item_get_number_of_values(
+/* TODO implement */
+
+	result = libregf_key_item_read_named_key(
 	          NULL,
-	          &number_of_values,
+	          NULL,
+	          NULL,
+	          NULL,
+	          0,
+	          0,
 	          &error );
 
 	REGF_TEST_ASSERT_EQUAL_INT(
@@ -338,25 +328,27 @@ int regf_test_key_item_get_number_of_values(
 	libcerror_error_free(
 	 &error );
 
-	if( number_of_values_is_set != 0 )
-	{
-		result = libregf_key_item_get_number_of_values(
-		          key_item,
-		          NULL,
-		          &error );
+	result = libregf_key_item_read_named_key(
+	          key_item,
+	          NULL,
+	          NULL,
+	          NULL,
+	          0,
+	          0,
+	          &error );
 
-		REGF_TEST_ASSERT_EQUAL_INT(
-		 "result",
-		 result,
-		 -1 );
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
 
-		REGF_TEST_ASSERT_IS_NOT_NULL(
-		 "error",
-		 error );
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
-		libcerror_error_free(
-		 &error );
-	}
+	libcerror_error_free(
+	 &error );
+
 	/* Clean up
 	 */
 	result = libregf_key_item_free(
@@ -393,6 +385,259 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the libregf_key_item_get_number_of_values function
+ * Returns 1 if successful or 0 if not
+ */
+int regf_test_key_item_get_number_of_values(
+     libregf_key_item_t *key_item )
+{
+	libcerror_error_t *error = NULL;
+	int number_of_values     = 0;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+#ifdef TODO
+	result = libregf_key_item_get_number_of_values(
+	          key_item,
+	          &number_of_values,
+	          &error );
+
+	REGF_TEST_ASSERT_NOT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+#endif
+
+	/* Test error cases
+	 */
+	result = libregf_key_item_get_number_of_values(
+	          NULL,
+	          &number_of_values,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libregf_key_item_get_number_of_values(
+	          key_item,
+	          NULL,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libregf_key_item_compare_name_with_utf8_string function
+ * Returns 1 if successful or 0 if not
+ */
+int regf_test_key_item_compare_name_with_utf8_string(
+     libregf_key_item_t *key_item )
+{
+	uint8_t utf8_string[ 5 ] = {
+		't', 'e', 's', 't', 0 };
+
+	libcerror_error_t *error = NULL;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+/* TODO implement */
+
+	/* Test error cases
+	 */
+	result = libregf_key_item_compare_name_with_utf8_string(
+	          NULL,
+	          0,
+	          utf8_string,
+	          4,
+	          LIBREGF_CODEPAGE_WINDOWS_1252,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libregf_key_item_compare_name_with_utf8_string(
+	          key_item,
+	          0,
+	          NULL,
+	          4,
+	          LIBREGF_CODEPAGE_WINDOWS_1252,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libregf_key_item_compare_name_with_utf8_string(
+	          key_item,
+	          0,
+	          utf8_string,
+	          (size_t) SSIZE_MAX + 1,
+	          LIBREGF_CODEPAGE_WINDOWS_1252,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libregf_key_item_compare_name_with_utf16_string function
+ * Returns 1 if successful or 0 if not
+ */
+int regf_test_key_item_compare_name_with_utf16_string(
+     libregf_key_item_t *key_item )
+{
+	uint16_t utf16_string[ 5 ] = {
+		't', 'e', 's', 't', 0 };
+
+	libcerror_error_t *error = NULL;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+/* TODO implement */
+
+	/* Test error cases
+	 */
+	result = libregf_key_item_compare_name_with_utf16_string(
+	          NULL,
+	          0,
+	          utf16_string,
+	          4,
+	          LIBREGF_CODEPAGE_WINDOWS_1252,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libregf_key_item_compare_name_with_utf16_string(
+	          key_item,
+	          0,
+	          NULL,
+	          4,
+	          LIBREGF_CODEPAGE_WINDOWS_1252,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libregf_key_item_compare_name_with_utf16_string(
+	          key_item,
+	          0,
+	          utf16_string,
+	          (size_t) SSIZE_MAX + 1,
+	          LIBREGF_CODEPAGE_WINDOWS_1252,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
 #endif /* defined( __GNUC__ ) && !defined( LIBREGF_DLL_IMPORT ) */
 
 /* The main program
@@ -407,6 +652,14 @@ int main(
      char * const argv[] REGF_TEST_ATTRIBUTE_UNUSED )
 #endif
 {
+#if defined( __GNUC__ ) && !defined( LIBREGF_DLL_IMPORT )
+
+	libcerror_error_t *error     = NULL;
+	libregf_key_item_t *key_item = NULL;
+	int result                   = 0;
+
+#endif /* defined( __GNUC__ ) && !defined( LIBREGF_DLL_IMPORT ) */
+
 	REGF_TEST_UNREFERENCED_PARAMETER( argc )
 	REGF_TEST_UNREFERENCED_PARAMETER( argv )
 
@@ -420,9 +673,9 @@ int main(
 	 "libregf_key_item_free",
 	 regf_test_key_item_free );
 
-	/* TODO: add tests for libregf_key_item_get_number_of_values */
-
-	/* TODO: add tests for libregf_key_item_read_named_key */
+	REGF_TEST_RUN(
+	 "libregf_key_item_read_named_key",
+	 regf_test_key_item_read_named_key );
 
 	/* TODO: add tests for libregf_key_item_read_class_name */
 
@@ -436,15 +689,81 @@ int main(
 
 	/* TODO: add tests for libregf_key_item_read_sub_nodes */
 
-	/* TODO: add tests for libregf_key_item_compare_name_with_utf8_string */
+	/* Initialize test
+	 */
+	result = libregf_key_item_initialize(
+	          &key_item,
+	          &error );
 
-	/* TODO: add tests for libregf_key_item_compare_name_with_utf16_string */
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "key_item",
+	 key_item );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Run tests
+	 */
+	REGF_TEST_RUN_WITH_ARGS(
+	 "libregf_key_item_get_number_of_values",
+	 regf_test_key_item_get_number_of_values,
+	 key_item );
+
+	REGF_TEST_RUN_WITH_ARGS(
+	 "libregf_key_item_compare_name_with_utf8_string",
+	 regf_test_key_item_compare_name_with_utf8_string,
+	 key_item );
+
+	REGF_TEST_RUN_WITH_ARGS(
+	 "libregf_key_item_compare_name_with_utf16_string",
+	 regf_test_key_item_compare_name_with_utf16_string,
+	 key_item );
+
+	/* Clean up
+	 */
+	result = libregf_key_item_free(
+	          &key_item,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "key_item",
+	 key_item );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 #endif /* defined( __GNUC__ ) && !defined( LIBREGF_DLL_IMPORT ) */
 
 	return( EXIT_SUCCESS );
 
 on_error:
+#if defined( __GNUC__ ) && !defined( LIBREGF_DLL_IMPORT )
+
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( key_item != NULL )
+	{
+		libregf_key_item_free(
+		 &key_item,
+		 NULL );
+	}
+#endif /* defined( __GNUC__ ) && !defined( LIBREGF_DLL_IMPORT ) */
+
 	return( EXIT_FAILURE );
 }
 

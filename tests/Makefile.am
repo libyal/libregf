@@ -57,6 +57,7 @@ check_PROGRAMS = \
 	regf_test_multi_string \
 	regf_test_named_key \
 	regf_test_notify \
+	regf_test_security_key \
 	regf_test_support \
 	regf_test_value \
 	regf_test_value_item
@@ -279,6 +280,18 @@ regf_test_notify_SOURCES = \
 	regf_test_unused.h
 
 regf_test_notify_LDADD = \
+	../libregf/libregf.la \
+	@LIBCERROR_LIBADD@
+
+regf_test_security_key_SOURCES = \
+	regf_test_libcerror.h \
+	regf_test_libregf.h \
+	regf_test_macros.h \
+	regf_test_memory.c regf_test_memory.h \
+	regf_test_security_key.c \
+	regf_test_unused.h
+
+regf_test_security_key_LDADD = \
 	../libregf/libregf.la \
 	@LIBCERROR_LIBADD@
 

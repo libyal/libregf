@@ -96,11 +96,6 @@ int libregf_key_item_free(
      libregf_key_item_t **key_item,
      libcerror_error_t **error );
 
-int libregf_key_item_get_number_of_values(
-     libregf_key_item_t *key_item,
-     int *number_of_values,
-     libcerror_error_t **error );
-
 int libregf_key_item_read_named_key(
      libregf_key_item_t *key_item,
      libfdata_tree_node_t *key_tree_node,
@@ -162,6 +157,11 @@ int libregf_key_item_read_sub_nodes(
      size64_t sub_nodes_data_size,
      uint32_t sub_nodes_data_flags,
      uint8_t read_flags,
+     libcerror_error_t **error );
+
+int libregf_key_item_get_number_of_values(
+     libregf_key_item_t *key_item,
+     int *number_of_values,
      libcerror_error_t **error );
 
 int libregf_key_item_compare_name_with_utf8_string(

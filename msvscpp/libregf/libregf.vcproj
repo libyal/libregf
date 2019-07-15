@@ -242,6 +242,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libregf\libregf_security_key.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libregf\libregf_support.c"
 				>
 			</File>
@@ -385,6 +389,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libregf\libregf_notify.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libregf\libregf_security_key.h"
 				>
 			</File>
 			<File

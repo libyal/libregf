@@ -443,7 +443,10 @@ The offset value is in bytes and relative from the start of the hive bin data
 | 8 | 4 | | Next security key offset +
 The offset value is in bytes and relative from the start of the hive bin data
 | 12 | 4 | | Reference count
-| 16 | ... | | NT security descriptor
+| 16 | 4 | | NT security descriptor size
+| 20 | ... | | NT security descriptor
+| ... | ... | | Padding +
+Sometimes contains remnant data
 |===
 
 === [[sub_key_list]]Sub key list

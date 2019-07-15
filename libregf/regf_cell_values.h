@@ -183,6 +183,11 @@ struct regf_security_key
 	 * Consists of 4 bytes
 	 */
 	uint8_t reference_count[ 4 ];
+
+	/* The security descriptor size
+	 * Consists of 4 bytes
+	 */
+	uint8_t security_descriptor_size[ 4 ];
 };
 
 typedef struct regf_value_key regf_value_key_t;

@@ -53,6 +53,7 @@ libregf_la_SOURCES = \
 	libregf_multi_string.c libregf_multi_string.h \
 	libregf_named_key.c libregf_named_key.h \
 	libregf_notify.c libregf_notify.h \
+	libregf_security_key.c libregf_security_key.h \
 	libregf_support.c libregf_support.h \
 	libregf_types.h \
 	libregf_unused.h \

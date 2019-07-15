@@ -25,7 +25,6 @@
 #include <common.h>
 #include <types.h>
 
-#include "libregf_libcdata.h"
 #include "libregf_libcerror.h"
 
 #if defined( __cplusplus )

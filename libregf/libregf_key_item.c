@@ -214,6 +214,28 @@ int libregf_key_item_read_named_key(
 	int hive_bin_index                     = 0;
 	int result                             = 0;
 
+	if( key_item == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid key item.",
+		 function );
+
+		return( -1 );
+	}
+	if( key_item->name != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid key item - name value already set.",
+		 function );
+
+		return( -1 );
+	}
 	if( hive_bins_list == NULL )
 	{
 		libcerror_error_set(
@@ -232,17 +254,6 @@ int libregf_key_item_read_named_key(
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
 		 "%s: invalid hive bins list - missing IO handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( key_item->name != NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid key item - name value already set.",
 		 function );
 
 		return( -1 );

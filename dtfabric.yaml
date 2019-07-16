@@ -197,3 +197,30 @@ members:
 - name: padding
   type: padding
   alignment_size: 8
+---
+name: security_key
+type: structure
+description: Security key
+members:
+- name: signature
+  type: stream
+  element_data_type: byte
+  elements_data_size: 2
+  value: "sk"
+- name: unknown1
+  data_type: uint16
+- name: previous_security_key_offset
+  data_type: uint32
+- name: next_security_key_offset
+  data_type: uint32
+- name: reference_count
+  data_type: uint32
+- name: security_descriptor_size
+  data_type: uint32
+- name: security_descriptor
+  type: stream
+  element_data_type: byte
+  elements_data_size: security_key.security_descriptor_size
+- name: padding
+  type: padding
+  alignment_size: 8

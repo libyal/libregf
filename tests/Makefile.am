@@ -237,6 +237,7 @@ regf_test_key_LDADD = \
 	@LIBCERROR_LIBADD@
 
 regf_test_key_item_SOURCES = \
+	regf_test_functions.c regf_test_functions.h \
 	regf_test_key_item.c \
 	regf_test_libcerror.h \
 	regf_test_libregf.h \
@@ -245,8 +246,18 @@ regf_test_key_item_SOURCES = \
 	regf_test_unused.h
 
 regf_test_key_item_LDADD = \
+	@LIBBFIO_LIBADD@ \
+	@LIBCPATH_LIBADD@ \
+	@LIBCFILE_LIBADD@ \
+	@LIBUNA_LIBADD@ \
+	@LIBCSPLIT_LIBADD@ \
+	@LIBCNOTIFY_LIBADD@ \
+	@LIBCLOCALE_LIBADD@ \
+	@LIBCDATA_LIBADD@ \
 	../libregf/libregf.la \
-	@LIBCERROR_LIBADD@
+	@LIBCTHREADS_LIBADD@ \
+	@LIBCERROR_LIBADD@ \
+	@PTHREAD_LIBADD@
 
 regf_test_multi_string_SOURCES = \
 	regf_test_libcerror.h \

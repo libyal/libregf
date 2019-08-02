@@ -1261,6 +1261,8 @@ int main(
 
 	/* TODO: add tests for libregf_key_item_read_sub_nodes */
 
+#if !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 )
+
 	/* Initialize test
 	 */
 	result = libregf_key_item_initialize(
@@ -1316,6 +1318,7 @@ int main(
 	 "error",
 	 error );
 
+#endif /* !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 ) */
 #endif /* defined( __GNUC__ ) && !defined( LIBREGF_DLL_IMPORT ) */
 
 	return( EXIT_SUCCESS );

@@ -20,6 +20,7 @@
  */
 
 #include <common.h>
+#include <byte_stream.h>
 #include <file_stream.h>
 #include <types.h>
 
@@ -38,10 +39,6 @@
 
 uint8_t regf_test_hive_bin_header_data1[ 32 ] = {
 	0x68, 0x62, 0x69, 0x6e, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-        0x00, 0x00, 0x00, 0x00, 0x12, 0xf3, 0xf1, 0xb0, 0x1c, 0xcf, 0xcf, 0x01, 0x00, 0x00, 0x00, 0x00 };
-
-uint8_t regf_test_hive_bin_header_error_data1[ 32 ] = {
-	0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x00, 0x12, 0xf3, 0xf1, 0xb0, 0x1c, 0xcf, 0xcf, 0x01, 0x00, 0x00, 0x00, 0x00 };
 
 #if defined( __GNUC__ ) && !defined( LIBREGF_DLL_IMPORT )
@@ -440,11 +437,19 @@ int regf_test_hive_bin_header_read_data(
 
 	/* Test with invalid signature
 	 */
+	byte_stream_copy_from_uint32_little_endian(
+	 &( regf_test_hive_bin_header_data1[ 0 ] ),
+	 0xffffffffUL );
+
 	result = libregf_hive_bin_header_read_data(
 	          hive_bin_header,
-	          regf_test_hive_bin_header_error_data1,
+	          regf_test_hive_bin_header_data1,
 	          32,
 	          &error );
+
+	byte_stream_copy_from_uint32_little_endian(
+	 &( regf_test_hive_bin_header_data1[ 0 ] ),
+	 0x6e696268UL );
 
 	REGF_TEST_ASSERT_EQUAL_INT(
 	 "result",
@@ -668,7 +673,7 @@ int regf_test_hive_bin_header_read_file_io_handle(
 	 */
 	result = regf_test_open_file_io_handle(
 	          &file_io_handle,
-	          regf_test_hive_bin_header_error_data1,
+	          regf_test_hive_bin_header_data1,
 	          32,
 	          &error );
 
@@ -685,11 +690,19 @@ int regf_test_hive_bin_header_read_file_io_handle(
 	 "error",
 	 error );
 
+	byte_stream_copy_from_uint32_little_endian(
+	 &( regf_test_hive_bin_header_data1[ 0 ] ),
+	 0xffffffffUL );
+
 	result = libregf_hive_bin_header_read_file_io_handle(
 	          hive_bin_header,
 	          file_io_handle,
 	          0,
 	          &error );
+
+	byte_stream_copy_from_uint32_little_endian(
+	 &( regf_test_hive_bin_header_data1[ 0 ] ),
+	 0x6e696268UL );
 
 	REGF_TEST_ASSERT_EQUAL_INT(
 	 "result",

@@ -334,8 +334,6 @@ int libregf_internal_multi_string_read_data(
 
 		goto on_error;
 	}
-	internal_multi_string->number_of_strings = number_of_strings;
-
 	data_offset = 0;
 	data_size  -= 2;
 
@@ -361,7 +359,14 @@ int libregf_internal_multi_string_read_data(
 		internal_multi_string->string_sizes[ string_index ] = string_size;
 
 		string_index++;
+
+		if( string_index >= number_of_strings )
+		{
+			break;
+		}
 	}
+	internal_multi_string->number_of_strings = number_of_strings;
+
 	return( 1 );
 
 on_error:

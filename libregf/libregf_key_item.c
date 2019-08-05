@@ -421,22 +421,25 @@ int libregf_key_item_read_named_key(
 			{
 				key_item->flags |= LIBREGF_KEY_ITEM_FLAG_IS_CORRUPTED;
 			}
-			else if( libfdata_tree_node_set_sub_nodes_data_range(
-			          key_tree_node,
-			          0,
-			          (off64_t) named_key->sub_keys_list_offset,
-			          0,
-			          0,
-			          error ) != 1 )
+			else
 			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-				 "%s: unable to set sub keys list as sub nodes range.",
-				 function );
+				if( libfdata_tree_node_set_sub_nodes_data_range(
+				     key_tree_node,
+				     0,
+				     (off64_t) named_key->sub_keys_list_offset,
+				     0,
+				     0,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+					 "%s: unable to set sub keys list as sub nodes range.",
+					 function );
 
-				goto on_error;
+					goto on_error;
+				}
 			}
 		}
 	}
@@ -1657,6 +1660,7 @@ int libregf_key_item_compare_name_with_utf8_string(
 	libuna_unicode_character_t string_character = 0;
 	size_t name_index                           = 0;
 	size_t utf8_string_index                    = 0;
+	int character_compare_result                = 0;
 	int result                                  = 0;
 
 	if( key_item == NULL )
@@ -1762,12 +1766,15 @@ int libregf_key_item_compare_name_with_utf8_string(
 
 				return( -1 );
 			}
-			if( towupper( (wint_t) name_character ) != towupper( (wint_t) string_character ) )
+			character_compare_result = towupper( (wint_t) name_character ) == towupper( (wint_t) string_character );
+
+			if( character_compare_result == 0 )
 			{
 				break;
 			}
 		}
-		if( ( name_index == (size_t) key_item->name_size )
+		if( ( character_compare_result != 0 )
+		 && ( name_index == (size_t) key_item->name_size )
 		 && ( utf8_string_index == utf8_string_length ) )
 		{
 			return( 1 );
@@ -1792,6 +1799,7 @@ int libregf_key_item_compare_name_with_utf16_string(
 	libuna_unicode_character_t string_character = 0;
 	size_t name_index                           = 0;
 	size_t utf16_string_index                   = 0;
+	int character_compare_result                = 0;
 	int result                                  = 0;
 
 	if( key_item == NULL )
@@ -1897,12 +1905,15 @@ int libregf_key_item_compare_name_with_utf16_string(
 
 				return( -1 );
 			}
-			if( towupper( (wint_t) name_character ) != towupper( (wint_t) string_character ) )
+			character_compare_result = towupper( (wint_t) name_character ) == towupper( (wint_t) string_character );
+
+			if( character_compare_result == 0 )
 			{
 				break;
 			}
 		}
-		if( ( name_index == (size_t) key_item->name_size )
+		if( ( character_compare_result != 0 )
+		 && ( name_index == (size_t) key_item->name_size )
 		 && ( utf16_string_index == utf16_string_length ) )
 		{
 			return( 1 );

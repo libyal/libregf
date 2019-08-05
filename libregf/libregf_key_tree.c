@@ -44,10 +44,11 @@ int libregf_key_tree_get_sub_key_values_by_utf8_name(
      libregf_key_item_t **sub_key_item,
      libcerror_error_t **error )
 {
-	static char *function  = "libregf_key_tree_get_sub_key_values_by_utf8_name";
-	int number_of_sub_keys = 0;
-	int result             = 0;
-	int sub_key_index      = 0;
+	libfdata_tree_node_t *safe_key_tree_sub_node = NULL;
+	static char *function                        = "libregf_key_tree_get_sub_key_values_by_utf8_name";
+	int number_of_sub_keys                       = 0;
+	int result                                   = 0;
+	int sub_key_index                            = 0;
 
 	if( key_tree_sub_node == NULL )
 	{
@@ -71,6 +72,8 @@ int libregf_key_tree_get_sub_key_values_by_utf8_name(
 
 		return( -1 );
 	}
+	*key_tree_sub_node = NULL;
+
 	if( libfdata_tree_node_get_number_of_sub_nodes(
 	     key_tree_node,
 	     (intptr_t *) file_io_handle,
@@ -97,7 +100,7 @@ int libregf_key_tree_get_sub_key_values_by_utf8_name(
 		     (intptr_t *) file_io_handle,
 		     (libfdata_cache_t *) key_cache,
 		     sub_key_index,
-		     key_tree_sub_node,
+		     &safe_key_tree_sub_node,
 		     0,
 		     error ) != 1 )
 		{
@@ -112,7 +115,7 @@ int libregf_key_tree_get_sub_key_values_by_utf8_name(
 			return( -1 );
 		}
 		if( libfdata_tree_node_get_node_value(
-		     *key_tree_sub_node,
+		     safe_key_tree_sub_node,
 		     (intptr_t *) file_io_handle,
 		     (libfdata_cache_t *) key_cache,
 		     (intptr_t **) sub_key_item,
@@ -156,6 +159,8 @@ int libregf_key_tree_get_sub_key_values_by_utf8_name(
 	{
 		return( 0 );
 	}
+	*key_tree_sub_node = safe_key_tree_sub_node;
+
 	return( 1 );
 }
 
@@ -174,10 +179,11 @@ int libregf_key_tree_get_sub_key_values_by_utf16_name(
      libregf_key_item_t **sub_key_item,
      libcerror_error_t **error )
 {
-	static char *function  = "libregf_key_tree_get_sub_key_values_by_utf16_name";
-	int number_of_sub_keys = 0;
-	int result             = 0;
-	int sub_key_index      = 0;
+	libfdata_tree_node_t *safe_key_tree_sub_node = NULL;
+	static char *function                        = "libregf_key_tree_get_sub_key_values_by_utf16_name";
+	int number_of_sub_keys                       = 0;
+	int result                                   = 0;
+	int sub_key_index                            = 0;
 
 	if( key_tree_sub_node == NULL )
 	{
@@ -201,6 +207,8 @@ int libregf_key_tree_get_sub_key_values_by_utf16_name(
 
 		return( -1 );
 	}
+	*key_tree_sub_node = NULL;
+
 	if( libfdata_tree_node_get_number_of_sub_nodes(
 	     key_tree_node,
 	     (intptr_t *) file_io_handle,
@@ -227,7 +235,7 @@ int libregf_key_tree_get_sub_key_values_by_utf16_name(
 		     (intptr_t *) file_io_handle,
 		     (libfdata_cache_t *) key_cache,
 		     sub_key_index,
-		     key_tree_sub_node,
+		     &safe_key_tree_sub_node,
 		     0,
 		     error ) != 1 )
 		{
@@ -242,7 +250,7 @@ int libregf_key_tree_get_sub_key_values_by_utf16_name(
 			return( -1 );
 		}
 		if( libfdata_tree_node_get_node_value(
-		     *key_tree_sub_node,
+		     safe_key_tree_sub_node,
 		     (intptr_t *) file_io_handle,
 		     (libfdata_cache_t *) key_cache,
 		     (intptr_t **) sub_key_item,
@@ -286,6 +294,8 @@ int libregf_key_tree_get_sub_key_values_by_utf16_name(
 	{
 		return( 0 );
 	}
+	*key_tree_sub_node = safe_key_tree_sub_node;
+
 	return( 1 );
 }
 

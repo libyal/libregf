@@ -338,6 +338,66 @@ int regf_test_named_key_read_data(
 	/* Test error cases
 	 */
 	result = libregf_named_key_read_data(
+	          named_key,
+	          regf_test_named_key_data1,
+	          140,
+	          0,
+	          LIBREGF_CODEPAGE_WINDOWS_1252,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libregf_named_key_free(
+	          &named_key,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "named_key",
+	 named_key );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Initialize test
+	 */
+	result = libregf_named_key_initialize(
+	          &named_key,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "named_key",
+	 named_key );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libregf_named_key_read_data(
 	          NULL,
 	          regf_test_named_key_data1,
 	          140,
@@ -417,6 +477,73 @@ int regf_test_named_key_read_data(
 	libcerror_error_free(
 	 &error );
 
+#if defined( HAVE_REGF_TEST_MEMORY )
+
+	/* Test libregf_named_key_read_data with malloc failing
+	 */
+	regf_test_malloc_attempts_before_fail = 0;
+
+	result = libregf_named_key_read_data(
+	          named_key,
+	          regf_test_named_key_data1,
+	          140,
+	          0,
+	          LIBREGF_CODEPAGE_WINDOWS_1252,
+	          &error );
+
+	if( regf_test_malloc_attempts_before_fail != -1 )
+	{
+		regf_test_malloc_attempts_before_fail = -1;
+	}
+	else
+	{
+		REGF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		REGF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#if defined( OPTIMIZATION_DISABLED )
+
+	/* Test libregf_named_key_read_data with memcpy failing
+	 */
+	regf_test_memcpy_attempts_before_fail = 0;
+
+	result = libregf_named_key_read_data(
+	          named_key,
+	          regf_test_named_key_data1,
+	          140,
+	          0,
+	          LIBREGF_CODEPAGE_WINDOWS_1252,
+	          &error );
+
+	if( regf_test_memcpy_attempts_before_fail != -1 )
+	{
+		regf_test_memcpy_attempts_before_fail = -1;
+	}
+	else
+	{
+		REGF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		REGF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( OPTIMIZATION_DISABLED ) */
+#endif /* defined( HAVE_REGF_TEST_MEMORY ) */
+
 	/* Test error case where signature is invalid
 	 */
 	byte_stream_copy_from_uint16_little_endian(
@@ -434,6 +561,36 @@ int regf_test_named_key_read_data(
 	byte_stream_copy_from_uint16_little_endian(
 	 &( regf_test_named_key_data1[ 0 ] ),
 	 0x6b6e );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Test error case where name size is invalid
+	 */
+	byte_stream_copy_from_uint16_little_endian(
+	 &( regf_test_named_key_data1[ 72 ] ),
+	 0x0000 );
+
+	result = libregf_named_key_read_data(
+	          named_key,
+	          regf_test_named_key_data1,
+	          140,
+	          0,
+	          LIBREGF_CODEPAGE_WINDOWS_1252,
+	          &error );
+
+	byte_stream_copy_from_uint16_little_endian(
+	 &( regf_test_named_key_data1[ 72 ] ),
+	 0x0039 );
 
 	REGF_TEST_ASSERT_EQUAL_INT(
 	 "result",

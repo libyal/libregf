@@ -341,8 +341,8 @@ Contains a FILETIME
 | 12 | 4 | | [yellow-background]*Unknown (Empty value)* +
 | 16 | 4 | | Parent key offset +
 The offset value is in bytes and relative from the start of the hive bin data
-| 20 | 4 | | number of sub keys
-| 24 | 4 | | number of volatile sub keys
+| 20 | 4 | | Number of sub keys
+| 24 | 4 | | Number of volatile sub keys
 | 28 | 4 | | Sub keys list offset +
 The offset value is in bytes and relative from the start of the hive bin data +
 Refers to a sub keys list or contains -1 (0xffffffff) if empty. +
@@ -351,7 +351,7 @@ See section: <<sub_key_list,Sub key list>>
 The offset value is in bytes and relative from the start of the hive bin data +
 Refers to a sub keys list or contains -1 (0xffffffff) if empty. +
 See section: <<sub_key_list,Sub key list>>
-| 36 | 4 | | number of values
+| 36 | 4 | | Number of values
 | 40 | 4 | | Values list offset +
 The offset value is in bytes and relative from the start of the hive bin data +
 Refers to a values list or -1 (0xffffffff) if empty. +

@@ -213,6 +213,7 @@ int libregf_key_is_corrupted(
 	libregf_internal_key_t *internal_key = NULL;
 	libregf_key_item_t *key_item         = NULL;
 	static char *function                = "libregf_key_is_corrupted";
+	int result                           = 1;
 
 	if( key == NULL )
 	{
@@ -227,6 +228,21 @@ int libregf_key_is_corrupted(
 	}
 	internal_key = (libregf_internal_key_t *) key;
 
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_key->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( libfdata_tree_node_get_node_value(
 	     internal_key->key_tree_node,
 	     (intptr_t *) internal_key->file_io_handle,
@@ -242,9 +258,9 @@ int libregf_key_is_corrupted(
 		 "%s: unable to retrieve key item.",
 		 function );
 
-		return( -1 );
+		result = -1;
 	}
-	if( key_item == NULL )
+	else if( key_item == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -253,13 +269,28 @@ int libregf_key_is_corrupted(
 		 "%s: missing key item.",
 		 function );
 
+		result = -1;
+	}
+	else if( ( key_item->item_flags & LIBREGF_KEY_ITEM_FLAG_IS_CORRUPTED ) == 0 )
+	{
+		result = 0;
+	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_key->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
 		return( -1 );
 	}
-	if( ( key_item->item_flags & LIBREGF_KEY_ITEM_FLAG_IS_CORRUPTED ) != 0 )
-	{
-		return( 1 );
-	}
-	return( 0 );
+#endif
+	return( result );
 }
 
 /* Retrieves the offset of the key
@@ -275,6 +306,7 @@ int libregf_key_get_offset(
 	size64_t size                        = 0;
 	uint32_t flags                       = 0;
 	int file_index                       = 0;
+	int result                           = 1;
 
 	if( key == NULL )
 	{
@@ -311,6 +343,21 @@ int libregf_key_get_offset(
 
 		return( -1 );
 	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_key->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( libfdata_tree_node_get_data_range(
 	     internal_key->key_tree_node,
 	     &file_index,
@@ -326,14 +373,31 @@ int libregf_key_get_offset(
 		 "%s: unable to retrieve key data range.",
 		 function );
 
+		result = -1;
+	}
+	else
+	{
+		/* The offset is relative from the start of the hive bins list
+		 * and points to the start of the corresponding hive bin cell
+		 */
+		*offset += internal_key->io_handle->hive_bins_list_offset + 4;
+	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_key->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
 		return( -1 );
 	}
-	/* The offset is relative from the start of the hive bins list
-	 * and points to the start of the corresponding hive bin cell
-	 */
-	*offset += internal_key->io_handle->hive_bins_list_offset + 4;
-
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the key name size
@@ -347,6 +411,7 @@ int libregf_key_get_name_size(
 	libregf_internal_key_t *internal_key = NULL;
 	libregf_key_item_t *key_item         = NULL;
 	static char *function                = "libregf_key_get_name_size";
+	int result                           = 1;
 
 	if( key == NULL )
 	{
@@ -372,6 +437,21 @@ int libregf_key_get_name_size(
 
 		return( -1 );
 	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_key->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( libfdata_tree_node_get_node_value(
 	     internal_key->key_tree_node,
 	     (intptr_t *) internal_key->file_io_handle,
@@ -387,9 +467,9 @@ int libregf_key_get_name_size(
 		 "%s: unable to retrieve key item.",
 		 function );
 
-		return( -1 );
+		result = -1;
 	}
-	if( key_item == NULL )
+	else if( key_item == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -398,11 +478,28 @@ int libregf_key_get_name_size(
 		 "%s: missing key item.",
 		 function );
 
+		result = -1;
+	}
+	else
+	{
+		*name_size = key_item->name_size;
+	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_key->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
 		return( -1 );
 	}
-	*name_size = key_item->name_size;
-
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the key name data and size
@@ -417,6 +514,7 @@ int libregf_key_get_name(
 	libregf_internal_key_t *internal_key = NULL;
 	libregf_key_item_t *key_item         = NULL;
 	static char *function                = "libregf_key_get_name";
+	int result                           = 1;
 
 	if( key == NULL )
 	{
@@ -453,6 +551,21 @@ int libregf_key_get_name(
 
 		return( -1 );
 	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_key->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( libfdata_tree_node_get_node_value(
 	     internal_key->key_tree_node,
 	     (intptr_t *) internal_key->file_io_handle,
@@ -468,9 +581,9 @@ int libregf_key_get_name(
 		 "%s: unable to retrieve key item.",
 		 function );
 
-		return( -1 );
+		result = -1;
 	}
-	if( key_item == NULL )
+	else if( key_item == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -479,9 +592,9 @@ int libregf_key_get_name(
 		 "%s: missing key item.",
 		 function );
 
-		return( -1 );
+		result = -1;
 	}
-	if( name_size < key_item->name_size )
+	else if( name_size < key_item->name_size )
 	{
 		libcerror_error_set(
 		 error,
@@ -490,12 +603,12 @@ int libregf_key_get_name(
 		 "%s: invalid name size value out of bounds.",
 		 function );
 
-		return( -1 );
+		result = -1;
 	}
-	if( memory_copy(
-	     name,
-	     key_item->name,
-	     key_item->name_size ) == NULL )
+	else if( memory_copy(
+	          name,
+	          key_item->name,
+	          key_item->name_size ) == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -504,9 +617,24 @@ int libregf_key_get_name(
 		 "%s: unable to copy name.",
 		 function );
 
+		result = -1;
+	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_key->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
 		return( -1 );
 	}
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the UTF-8 string size of the key name
@@ -521,7 +649,7 @@ int libregf_key_get_utf8_name_size(
 	libregf_internal_key_t *internal_key = NULL;
 	libregf_key_item_t *key_item         = NULL;
 	static char *function                = "libregf_key_get_utf8_name_size";
-	int result                           = 0;
+	int result                           = 1;
 
 	if( key == NULL )
 	{
@@ -547,6 +675,21 @@ int libregf_key_get_utf8_name_size(
 
 		return( -1 );
 	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_key->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( libfdata_tree_node_get_node_value(
 	     internal_key->key_tree_node,
 	     (intptr_t *) internal_key->file_io_handle,
@@ -562,9 +705,9 @@ int libregf_key_get_utf8_name_size(
 		 "%s: unable to retrieve key item.",
 		 function );
 
-		return( -1 );
+		result = -1;
 	}
-	if( key_item == NULL )
+	else if( key_item == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -573,9 +716,9 @@ int libregf_key_get_utf8_name_size(
 		 "%s: missing key item.",
 		 function );
 
-		return( -1 );
+		result = -1;
 	}
-	if( key_item->name == NULL )
+	else if( key_item->name == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -584,38 +727,56 @@ int libregf_key_get_utf8_name_size(
 		 "%s: invalid key item - missing name.",
 		 function );
 
-		return( -1 );
-	}
-	if( ( key_item->flags & LIBREGF_NAMED_KEY_FLAG_NAME_IS_ASCII ) != 0 )
-	{
-		result = libuna_utf8_string_size_from_byte_stream(
-			  key_item->name,
-			  (size_t) key_item->name_size,
-			  internal_key->io_handle->ascii_codepage,
-			  utf8_string_size,
-			  error );
+		result = -1;
 	}
 	else
 	{
-		result = libuna_utf8_string_size_from_utf16_stream(
-			  key_item->name,
-			  (size_t) key_item->name_size,
-			  LIBUNA_ENDIAN_LITTLE,
-			  utf8_string_size,
-			  error );
+		if( ( key_item->flags & LIBREGF_NAMED_KEY_FLAG_NAME_IS_ASCII ) != 0 )
+		{
+			result = libuna_utf8_string_size_from_byte_stream(
+				  key_item->name,
+				  (size_t) key_item->name_size,
+				  internal_key->io_handle->ascii_codepage,
+				  utf8_string_size,
+				  error );
+		}
+		else
+		{
+			result = libuna_utf8_string_size_from_utf16_stream(
+				  key_item->name,
+				  (size_t) key_item->name_size,
+				  LIBUNA_ENDIAN_LITTLE,
+				  utf8_string_size,
+				  error );
+		}
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve UTF-8 string size.",
+			 function );
+
+			result = -1;
+		}
 	}
-	if( result != 1 )
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_key->read_write_lock,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve UTF-8 string size.",
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
 		 function );
 
 		return( -1 );
 	}
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the UTF-8 string value of the key name
@@ -632,7 +793,7 @@ int libregf_key_get_utf8_name(
 	libregf_internal_key_t *internal_key = NULL;
 	libregf_key_item_t *key_item         = NULL;
 	static char *function                = "libregf_key_get_utf8_name";
-	int result                           = 0;
+	int result                           = 1;
 
 	if( key == NULL )
 	{
@@ -658,6 +819,21 @@ int libregf_key_get_utf8_name(
 
 		return( -1 );
 	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_key->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( libfdata_tree_node_get_node_value(
 	     internal_key->key_tree_node,
 	     (intptr_t *) internal_key->file_io_handle,
@@ -673,9 +849,9 @@ int libregf_key_get_utf8_name(
 		 "%s: unable to retrieve key item.",
 		 function );
 
-		return( -1 );
+		result = -1;
 	}
-	if( key_item == NULL )
+	else if( key_item == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -684,9 +860,9 @@ int libregf_key_get_utf8_name(
 		 "%s: missing key item.",
 		 function );
 
-		return( -1 );
+		result = -1;
 	}
-	if( key_item->name == NULL )
+	else if( key_item->name == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -695,40 +871,58 @@ int libregf_key_get_utf8_name(
 		 "%s: invalid key item - missing name.",
 		 function );
 
-		return( -1 );
-	}
-	if( ( key_item->flags & LIBREGF_NAMED_KEY_FLAG_NAME_IS_ASCII ) != 0 )
-	{
-		result = libuna_utf8_string_copy_from_byte_stream(
-			  utf8_string,
-			  utf8_string_size,
-			  key_item->name,
-			  (size_t) key_item->name_size,
-			  internal_key->io_handle->ascii_codepage,
-			  error );
+		result = -1;
 	}
 	else
 	{
-		result = libuna_utf8_string_copy_from_utf16_stream(
-			  utf8_string,
-			  utf8_string_size,
-			  key_item->name,
-			  (size_t) key_item->name_size,
-			  LIBUNA_ENDIAN_LITTLE,
-			  error );
+		if( ( key_item->flags & LIBREGF_NAMED_KEY_FLAG_NAME_IS_ASCII ) != 0 )
+		{
+			result = libuna_utf8_string_copy_from_byte_stream(
+				  utf8_string,
+				  utf8_string_size,
+				  key_item->name,
+				  (size_t) key_item->name_size,
+				  internal_key->io_handle->ascii_codepage,
+				  error );
+		}
+		else
+		{
+			result = libuna_utf8_string_copy_from_utf16_stream(
+				  utf8_string,
+				  utf8_string_size,
+				  key_item->name,
+				  (size_t) key_item->name_size,
+				  LIBUNA_ENDIAN_LITTLE,
+				  error );
+		}
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve UTF-8 string.",
+			 function );
+
+			result = -1;
+		}
 	}
-	if( result != 1 )
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_key->read_write_lock,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve UTF-8 string.",
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
 		 function );
 
 		return( -1 );
 	}
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the UTF-16 string size of the key name
@@ -743,7 +937,7 @@ int libregf_key_get_utf16_name_size(
 	libregf_internal_key_t *internal_key = NULL;
 	libregf_key_item_t *key_item         = NULL;
 	static char *function                = "libregf_key_get_utf16_name_size";
-	int result                           = 0;
+	int result                           = 1;
 
 	if( key == NULL )
 	{
@@ -769,6 +963,21 @@ int libregf_key_get_utf16_name_size(
 
 		return( -1 );
 	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_key->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( libfdata_tree_node_get_node_value(
 	     internal_key->key_tree_node,
 	     (intptr_t *) internal_key->file_io_handle,
@@ -784,9 +993,9 @@ int libregf_key_get_utf16_name_size(
 		 "%s: unable to retrieve key item.",
 		 function );
 
-		return( -1 );
+		result = -1;
 	}
-	if( key_item == NULL )
+	else if( key_item == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -795,9 +1004,9 @@ int libregf_key_get_utf16_name_size(
 		 "%s: missing key item.",
 		 function );
 
-		return( -1 );
+		result = -1;
 	}
-	if( key_item->name == NULL )
+	else if( key_item->name == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -806,38 +1015,56 @@ int libregf_key_get_utf16_name_size(
 		 "%s: invalid key item - missing name.",
 		 function );
 
-		return( -1 );
-	}
-	if( ( key_item->flags & LIBREGF_NAMED_KEY_FLAG_NAME_IS_ASCII ) != 0 )
-	{
-		result = libuna_utf16_string_size_from_byte_stream(
-			  key_item->name,
-			  (size_t) key_item->name_size,
-			  internal_key->io_handle->ascii_codepage,
-			  utf16_string_size,
-			  error );
+		result = -1;
 	}
 	else
 	{
-		result = libuna_utf16_string_size_from_utf16_stream(
-			  key_item->name,
-			  (size_t) key_item->name_size,
-			  LIBUNA_ENDIAN_LITTLE,
-			  utf16_string_size,
-			  error );
+		if( ( key_item->flags & LIBREGF_NAMED_KEY_FLAG_NAME_IS_ASCII ) != 0 )
+		{
+			result = libuna_utf16_string_size_from_byte_stream(
+				  key_item->name,
+				  (size_t) key_item->name_size,
+				  internal_key->io_handle->ascii_codepage,
+				  utf16_string_size,
+				  error );
+		}
+		else
+		{
+			result = libuna_utf16_string_size_from_utf16_stream(
+				  key_item->name,
+				  (size_t) key_item->name_size,
+				  LIBUNA_ENDIAN_LITTLE,
+				  utf16_string_size,
+				  error );
+		}
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve UTF-16 string size.",
+			 function );
+
+			result = -1;
+		}
 	}
-	if( result != 1 )
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_key->read_write_lock,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve UTF-16 string size.",
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
 		 function );
 
 		return( -1 );
 	}
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the UTF-16 string value of the key name
@@ -854,7 +1081,7 @@ int libregf_key_get_utf16_name(
 	libregf_internal_key_t *internal_key = NULL;
 	libregf_key_item_t *key_item         = NULL;
 	static char *function                = "libregf_value_get_utf16_name";
-	int result                           = 0;
+	int result                           = 1;
 
 	if( key == NULL )
 	{
@@ -880,6 +1107,21 @@ int libregf_key_get_utf16_name(
 
 		return( -1 );
 	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_key->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( libfdata_tree_node_get_node_value(
 	     internal_key->key_tree_node,
 	     (intptr_t *) internal_key->file_io_handle,
@@ -895,9 +1137,9 @@ int libregf_key_get_utf16_name(
 		 "%s: unable to retrieve key item.",
 		 function );
 
-		return( -1 );
+		result = -1;
 	}
-	if( key_item == NULL )
+	else if( key_item == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -906,9 +1148,9 @@ int libregf_key_get_utf16_name(
 		 "%s: missing key item.",
 		 function );
 
-		return( -1 );
+		result = -1;
 	}
-	if( key_item->name == NULL )
+	else if( key_item->name == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -917,40 +1159,58 @@ int libregf_key_get_utf16_name(
 		 "%s: invalid key item - missing name.",
 		 function );
 
-		return( -1 );
-	}
-	if( ( key_item->flags & LIBREGF_NAMED_KEY_FLAG_NAME_IS_ASCII ) != 0 )
-	{
-		result = libuna_utf16_string_copy_from_byte_stream(
-			  utf16_string,
-			  utf16_string_size,
-			  key_item->name,
-			  (size_t) key_item->name_size,
-			  internal_key->io_handle->ascii_codepage,
-			  error );
+		result = -1;
 	}
 	else
 	{
-		result = libuna_utf16_string_copy_from_utf16_stream(
-			  utf16_string,
-			  utf16_string_size,
-			  key_item->name,
-			  (size_t) key_item->name_size,
-			  LIBUNA_ENDIAN_LITTLE,
-			  error );
+		if( ( key_item->flags & LIBREGF_NAMED_KEY_FLAG_NAME_IS_ASCII ) != 0 )
+		{
+			result = libuna_utf16_string_copy_from_byte_stream(
+				  utf16_string,
+				  utf16_string_size,
+				  key_item->name,
+				  (size_t) key_item->name_size,
+				  internal_key->io_handle->ascii_codepage,
+				  error );
+		}
+		else
+		{
+			result = libuna_utf16_string_copy_from_utf16_stream(
+				  utf16_string,
+				  utf16_string_size,
+				  key_item->name,
+				  (size_t) key_item->name_size,
+				  LIBUNA_ENDIAN_LITTLE,
+				  error );
+		}
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve UTF-16 string.",
+			 function );
+
+			result = -1;
+		}
 	}
-	if( result != 1 )
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_key->read_write_lock,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve UTF-16 string.",
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
 		 function );
 
 		return( -1 );
 	}
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the class name size
@@ -964,6 +1224,7 @@ int libregf_key_get_class_name_size(
 	libregf_internal_key_t *internal_key = NULL;
 	libregf_key_item_t *key_item         = NULL;
 	static char *function                = "libregf_key_get_class_name_size";
+	int result                           = 0;
 
 	if( key == NULL )
 	{
@@ -989,6 +1250,21 @@ int libregf_key_get_class_name_size(
 
 		return( -1 );
 	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_key->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( libfdata_tree_node_get_node_value(
 	     internal_key->key_tree_node,
 	     (intptr_t *) internal_key->file_io_handle,
@@ -1004,9 +1280,9 @@ int libregf_key_get_class_name_size(
 		 "%s: unable to retrieve key item.",
 		 function );
 
-		return( -1 );
+		result = -1;
 	}
-	if( key_item == NULL )
+	else if( key_item == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -1015,15 +1291,30 @@ int libregf_key_get_class_name_size(
 		 "%s: missing key item.",
 		 function );
 
+		result = -1;
+	}
+	else if( key_item->class_name != NULL )
+	{
+		*class_name_size = key_item->class_name_size;
+
+		result = 1;
+	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_key->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
 		return( -1 );
 	}
-	if( key_item->class_name == NULL )
-	{
-		return( 0 );
-	}
-	*class_name_size = key_item->class_name_size;
-
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the class name
@@ -1038,6 +1329,7 @@ int libregf_key_get_class_name(
 	libregf_internal_key_t *internal_key = NULL;
 	libregf_key_item_t *key_item         = NULL;
 	static char *function                = "libregf_key_get_class_name";
+	int result                           = 0;
 
 	if( key == NULL )
 	{
@@ -1074,6 +1366,21 @@ int libregf_key_get_class_name(
 
 		return( -1 );
 	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_key->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( libfdata_tree_node_get_node_value(
 	     internal_key->key_tree_node,
 	     (intptr_t *) internal_key->file_io_handle,
@@ -1089,9 +1396,9 @@ int libregf_key_get_class_name(
 		 "%s: unable to retrieve key item.",
 		 function );
 
-		return( -1 );
+		result = -1;
 	}
-	if( key_item == NULL )
+	else if( key_item == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -1100,38 +1407,56 @@ int libregf_key_get_class_name(
 		 "%s: missing key item.",
 		 function );
 
-		return( -1 );
+		result = -1;
 	}
-	if( key_item->class_name == NULL )
+	else if( key_item->class_name != NULL )
 	{
-		return( 0 );
+		if( class_name_size < key_item->class_name_size )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: invalid class name size value out of bounds.",
+			 function );
+
+			result = -1;
+		}
+		else if( memory_copy(
+		          class_name,
+		          key_item->class_name,
+		          key_item->class_name_size ) == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+			 "%s: unable to copy class name.",
+			 function );
+
+			result = -1;
+		}
+		else
+		{
+			result = 1;
+		}
 	}
-	if( class_name_size < key_item->class_name_size )
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_key->read_write_lock,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid class name size value out of bounds.",
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
 		 function );
 
 		return( -1 );
 	}
-	if( memory_copy(
-	     class_name,
-	     key_item->class_name,
-	     key_item->class_name_size ) == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_MEMORY,
-		 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-		 "%s: unable to copy class name.",
-		 function );
-
-		return( -1 );
-	}
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the UTF-8 string size of the class name
@@ -1161,6 +1486,21 @@ int libregf_key_get_utf8_class_name_size(
 	}
 	internal_key = (libregf_internal_key_t *) key;
 
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_key->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( libfdata_tree_node_get_node_value(
 	     internal_key->key_tree_node,
 	     (intptr_t *) internal_key->file_io_handle,
@@ -1176,9 +1516,9 @@ int libregf_key_get_utf8_class_name_size(
 		 "%s: unable to retrieve key item.",
 		 function );
 
-		return( -1 );
+		result = -1;
 	}
-	if( key_item == NULL )
+	else if( key_item == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -1187,18 +1527,16 @@ int libregf_key_get_utf8_class_name_size(
 		 "%s: missing key item.",
 		 function );
 
-		return( -1 );
+		result = -1;
 	}
-	if( key_item->class_name != NULL )
+	else if( key_item->class_name != NULL )
 	{
-		result = libuna_utf8_string_size_from_utf16_stream(
-			  key_item->class_name,
-			  (size_t) key_item->class_name_size,
-			  LIBUNA_ENDIAN_LITTLE,
-			  utf8_string_size,
-			  error );
-
-		if( result != 1 )
+		if( libuna_utf8_string_size_from_utf16_stream(
+		     key_item->class_name,
+		     (size_t) key_item->class_name_size,
+		     LIBUNA_ENDIAN_LITTLE,
+		     utf8_string_size,
+		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -1207,9 +1545,28 @@ int libregf_key_get_utf8_class_name_size(
 			 "%s: unable to retrieve UTF-8 string size.",
 			 function );
 
-			return( -1 );
+			result = -1;
+		}
+		else
+		{
+			result = 1;
 		}
 	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_key->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	return( result );
 }
 
@@ -1242,6 +1599,21 @@ int libregf_key_get_utf8_class_name(
 	}
 	internal_key = (libregf_internal_key_t *) key;
 
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_key->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( libfdata_tree_node_get_node_value(
 	     internal_key->key_tree_node,
 	     (intptr_t *) internal_key->file_io_handle,
@@ -1257,9 +1629,9 @@ int libregf_key_get_utf8_class_name(
 		 "%s: unable to retrieve key item.",
 		 function );
 
-		return( -1 );
+		result = -1;
 	}
-	if( key_item == NULL )
+	else if( key_item == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -1268,19 +1640,17 @@ int libregf_key_get_utf8_class_name(
 		 "%s: missing key item.",
 		 function );
 
-		return( -1 );
+		result = -1;
 	}
-	if( key_item->class_name != NULL )
+	else if( key_item->class_name != NULL )
 	{
-		result = libuna_utf8_string_copy_from_utf16_stream(
-			  utf8_string,
-			  utf8_string_size,
-			  key_item->class_name,
-			  (size_t) key_item->class_name_size,
-			  LIBUNA_ENDIAN_LITTLE,
-			  error );
-
-		if( result != 1 )
+		if( libuna_utf8_string_copy_from_utf16_stream(
+		     utf8_string,
+		     utf8_string_size,
+		     key_item->class_name,
+		     (size_t) key_item->class_name_size,
+		     LIBUNA_ENDIAN_LITTLE,
+		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -1289,9 +1659,28 @@ int libregf_key_get_utf8_class_name(
 			 "%s: unable to retrieve UTF-8 string.",
 			 function );
 
-			return( -1 );
+			result = -1;
+		}
+		else
+		{
+			result = 1;
 		}
 	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_key->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	return( result );
 }
 
@@ -1322,6 +1711,21 @@ int libregf_key_get_utf16_class_name_size(
 	}
 	internal_key = (libregf_internal_key_t *) key;
 
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_key->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( libfdata_tree_node_get_node_value(
 	     internal_key->key_tree_node,
 	     (intptr_t *) internal_key->file_io_handle,
@@ -1337,9 +1741,9 @@ int libregf_key_get_utf16_class_name_size(
 		 "%s: unable to retrieve key item.",
 		 function );
 
-		return( -1 );
+		result = -1;
 	}
-	if( key_item == NULL )
+	else if( key_item == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -1348,18 +1752,16 @@ int libregf_key_get_utf16_class_name_size(
 		 "%s: missing key item.",
 		 function );
 
-		return( -1 );
+		result = -1;
 	}
-	if( key_item->class_name != NULL )
+	else if( key_item->class_name != NULL )
 	{
-		result = libuna_utf16_string_size_from_utf16_stream(
-			  key_item->class_name,
-			  (size_t) key_item->class_name_size,
-			  LIBUNA_ENDIAN_LITTLE,
-			  utf16_string_size,
-			  error );
-
-		if( result != 1 )
+		if( libuna_utf16_string_size_from_utf16_stream(
+		     key_item->class_name,
+		     (size_t) key_item->class_name_size,
+		     LIBUNA_ENDIAN_LITTLE,
+		     utf16_string_size,
+		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -1368,9 +1770,28 @@ int libregf_key_get_utf16_class_name_size(
 			 "%s: unable to retrieve UTF-16 string size.",
 			 function );
 
-			return( -1 );
+			result = -1;
+		}
+		else
+		{
+			result = 1;
 		}
 	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_key->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	return( result );
 }
 
@@ -1403,6 +1824,21 @@ int libregf_key_get_utf16_class_name(
 	}
 	internal_key = (libregf_internal_key_t *) key;
 
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_key->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( libfdata_tree_node_get_node_value(
 	     internal_key->key_tree_node,
 	     (intptr_t *) internal_key->file_io_handle,
@@ -1418,9 +1854,9 @@ int libregf_key_get_utf16_class_name(
 		 "%s: unable to retrieve key item.",
 		 function );
 
-		return( -1 );
+		result = -1;
 	}
-	if( key_item == NULL )
+	else if( key_item == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -1429,19 +1865,17 @@ int libregf_key_get_utf16_class_name(
 		 "%s: missing key item.",
 		 function );
 
-		return( -1 );
+		result = -1;
 	}
-	if( key_item->class_name != NULL )
+	else if( key_item->class_name != NULL )
 	{
-		result = libuna_utf16_string_copy_from_utf16_stream(
-			  utf16_string,
-			  utf16_string_size,
-			  key_item->class_name,
-			  (size_t) key_item->class_name_size,
-			  LIBUNA_ENDIAN_LITTLE,
-			  error );
-
-		if( result != 1 )
+		if( libuna_utf16_string_copy_from_utf16_stream(
+		     utf16_string,
+		     utf16_string_size,
+		     key_item->class_name,
+		     (size_t) key_item->class_name_size,
+		     LIBUNA_ENDIAN_LITTLE,
+		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -1450,9 +1884,28 @@ int libregf_key_get_utf16_class_name(
 			 "%s: unable to retrieve UTF-16 string.",
 			 function );
 
-			return( -1 );
+			result = -1;
+		}
+		else
+		{
+			result = 1;
 		}
 	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_key->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	return( result );
 }
 
@@ -1480,6 +1933,8 @@ int libregf_key_get_last_written_time(
 		return( -1 );
 	}
 	internal_key = (libregf_internal_key_t *) key;
+
+/* TODO add thread lock support */
 
 	if( libfdata_tree_node_get_node_value(
 	     internal_key->key_tree_node,
@@ -1561,6 +2016,8 @@ int libregf_key_get_security_descriptor_size(
 
 		return( -1 );
 	}
+/* TODO add thread lock support */
+
 	if( libfdata_tree_node_get_node_value(
 	     internal_key->key_tree_node,
 	     (intptr_t *) internal_key->file_io_handle,
@@ -1647,6 +2104,8 @@ int libregf_key_get_security_descriptor(
 
 		return( -1 );
 	}
+/* TODO add thread lock support */
+
 	if( libfdata_tree_node_get_node_value(
 	     internal_key->key_tree_node,
 	     (intptr_t *) internal_key->file_io_handle,
@@ -1733,6 +2192,8 @@ int libregf_key_get_number_of_values(
 	}
 	internal_key = (libregf_internal_key_t *) key;
 
+/* TODO add thread lock support */
+
 	if( libfdata_tree_node_get_node_value(
 	     internal_key->key_tree_node,
 	     (intptr_t *) internal_key->file_io_handle,
@@ -1817,6 +2278,8 @@ int libregf_key_get_value(
 
 		return( -1 );
 	}
+/* TODO add thread lock support */
+
 	if( libfdata_tree_node_get_node_value(
 	     internal_key->key_tree_node,
 	     (intptr_t *) internal_key->file_io_handle,
@@ -1974,6 +2437,8 @@ int libregf_key_get_value_by_utf8_name(
 
 		return( -1 );
 	}
+/* TODO add thread lock support */
+
 	if( libfdata_tree_node_get_node_value(
 	     internal_key->key_tree_node,
 	     (intptr_t *) internal_key->file_io_handle,
@@ -2247,6 +2712,8 @@ int libregf_key_get_value_by_utf16_name(
 
 		return( -1 );
 	}
+/* TODO add thread lock support */
+
 	if( libfdata_tree_node_get_node_value(
 	     internal_key->key_tree_node,
 	     (intptr_t *) internal_key->file_io_handle,
@@ -2451,6 +2918,8 @@ int libregf_key_get_number_of_sub_keys(
 	}
 	internal_key = (libregf_internal_key_t *) key;
 
+/* TODO add thread lock support */
+
 	if( libfdata_tree_node_get_number_of_sub_nodes(
 	     internal_key->key_tree_node,
 	     (intptr_t *) internal_key->file_io_handle,
@@ -2520,6 +2989,8 @@ int libregf_key_get_sub_key(
 
 		return( -1 );
 	}
+/* TODO add thread lock support */
+
 	if( libfdata_tree_node_get_sub_node_by_index(
 	     internal_key->key_tree_node,
 	     (intptr_t *) internal_key->file_io_handle,
@@ -2658,6 +3129,8 @@ int libregf_key_get_sub_key_by_utf8_name(
 
 		return( -1 );
 	}
+/* TODO add thread lock support */
+
 	while( utf8_string_index < utf8_string_length )
 	{
 		if( libuna_unicode_character_copy_from_utf8(
@@ -2818,6 +3291,8 @@ int libregf_key_get_sub_key_by_utf8_path(
 
 		return( -1 );
 	}
+/* TODO add thread lock support */
+
 	if( utf8_string_length > 0 )
 	{
 		/* Ignore a leading separator
@@ -3045,6 +3520,8 @@ int libregf_key_get_sub_key_by_utf16_name(
 
 		return( -1 );
 	}
+/* TODO add thread lock support */
+
 	while( utf16_string_index < utf16_string_length )
 	{
 		if( libuna_unicode_character_copy_from_utf16(
@@ -3205,6 +3682,8 @@ int libregf_key_get_sub_key_by_utf16_path(
 
 		return( -1 );
 	}
+/* TODO add thread lock support */
+
 	if( utf16_string_length > 0 )
 	{
 		/* Ignore a leading separator

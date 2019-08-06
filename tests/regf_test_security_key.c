@@ -339,6 +339,64 @@ int regf_test_security_key_read_data(
 	/* Test error cases
 	 */
 	result = libregf_security_key_read_data(
+	          security_key,
+	          regf_test_security_key_data1,
+	          180,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libregf_security_key_free(
+	          &security_key,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "security_key",
+	 security_key );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Initialize test
+	 */
+	result = libregf_security_key_initialize(
+	          &security_key,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "security_key",
+	 security_key );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libregf_security_key_read_data(
 	          NULL,
 	          regf_test_security_key_data1,
 	          180,
@@ -409,6 +467,69 @@ int regf_test_security_key_read_data(
 
 	libcerror_error_free(
 	 &error );
+
+#if defined( HAVE_REGF_TEST_MEMORY )
+
+	/* Test libregf_security_key_read_data with malloc failing
+	 */
+	regf_test_malloc_attempts_before_fail = 0;
+
+	result = libregf_security_key_read_data(
+	          security_key,
+	          regf_test_security_key_data1,
+	          180,
+	          &error );
+
+	if( regf_test_malloc_attempts_before_fail != -1 )
+	{
+		regf_test_malloc_attempts_before_fail = -1;
+	}
+	else
+	{
+		REGF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		REGF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#if defined( OPTIMIZATION_DISABLED )
+
+	/* Test libregf_security_key_read_data with memcpy failing
+	 */
+	regf_test_memcpy_attempts_before_fail = 0;
+
+	result = libregf_security_key_read_data(
+	          security_key,
+	          regf_test_security_key_data1,
+	          180,
+	          &error );
+
+	if( regf_test_memcpy_attempts_before_fail != -1 )
+	{
+		regf_test_memcpy_attempts_before_fail = -1;
+	}
+	else
+	{
+		REGF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		REGF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( OPTIMIZATION_DISABLED ) */
+#endif /* defined( HAVE_REGF_TEST_MEMORY ) */
 
 	/* Test error case where signature is invalid
 	 */

@@ -258,6 +258,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libregf\libregf_value_key.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libregf\libregf_value_type.c"
 				>
 			</File>
@@ -413,6 +417,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libregf\libregf_value_item.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libregf\libregf_value_key.h"
 				>
 			</File>
 			<File

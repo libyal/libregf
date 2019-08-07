@@ -34,6 +34,7 @@ MSVSCPP_FILES = \
 	regf_test_support/regf_test_support.vcproj \
 	regf_test_value/regf_test_value.vcproj \
 	regf_test_value_item/regf_test_value_item.vcproj \
+	regf_test_value_key/regf_test_value_key.vcproj \
 	regfexport/regfexport.vcproj \
 	regfinfo/regfinfo.vcproj \
 	regfmount/regfmount.vcproj \

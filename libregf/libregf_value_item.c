@@ -40,6 +40,7 @@
 #include "libregf_libuna.h"
 #include "libregf_unused.h"
 #include "libregf_value_item.h"
+#include "libregf_value_key.h"
 
 #include "regf_cell_values.h"
 
@@ -426,6 +427,7 @@ int libregf_value_item_read_value_key(
      libcerror_error_t **error )
 {
 	libregf_hive_bin_cell_t *hive_bin_cell       = NULL;
+	libregf_value_key_t *value_key               = NULL;
 	uint8_t *data_offset_data                    = NULL;
 	const uint8_t *hive_bin_cell_data            = NULL;
 	static char *function                        = "libregf_value_item_read_value_key";

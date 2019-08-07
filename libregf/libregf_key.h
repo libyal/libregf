@@ -1,5 +1,5 @@
 /*
- * Item functions
+ * Key functions
  *
  * Copyright (C) 2009-2019, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -19,8 +19,8 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBREGF_INTERNAL_KEY_H )
-#define _LIBREGF_INTERNAL_KEY_H
+#if !defined( _LIBREGF_KEY_H )
+#define _LIBREGF_KEY_H
 
 #include <common.h>
 #include <types.h>
@@ -199,11 +199,25 @@ int libregf_key_get_value(
      libregf_value_t **value,
      libcerror_error_t **error );
 
+int libregf_internal_key_get_value_by_utf8_name(
+     libregf_internal_key_t *internal_key,
+     const uint8_t *utf8_string,
+     size_t utf8_string_length,
+     libregf_value_t **value,
+     libcerror_error_t **error );
+
 LIBREGF_EXTERN \
 int libregf_key_get_value_by_utf8_name(
      libregf_key_t *key,
      const uint8_t *utf8_string,
      size_t utf8_string_length,
+     libregf_value_t **value,
+     libcerror_error_t **error );
+
+int libregf_internal_key_get_value_by_utf16_name(
+     libregf_internal_key_t *internal_key,
+     const uint16_t *utf16_string,
+     size_t utf16_string_length,
      libregf_value_t **value,
      libcerror_error_t **error );
 
@@ -228,9 +242,23 @@ int libregf_key_get_sub_key(
      libregf_key_t **sub_key,
      libcerror_error_t **error );
 
+int libregf_internal_key_get_sub_key_by_utf8_name(
+     libregf_internal_key_t *internal_key,
+     const uint8_t *utf8_string,
+     size_t utf8_string_length,
+     libregf_key_t **sub_key,
+     libcerror_error_t **error );
+
 LIBREGF_EXTERN \
 int libregf_key_get_sub_key_by_utf8_name(
      libregf_key_t *key,
+     const uint8_t *utf8_string,
+     size_t utf8_string_length,
+     libregf_key_t **sub_key,
+     libcerror_error_t **error );
+
+int libregf_internal_key_get_sub_key_by_utf8_path(
+     libregf_internal_key_t *internal_key,
      const uint8_t *utf8_string,
      size_t utf8_string_length,
      libregf_key_t **sub_key,
@@ -244,9 +272,23 @@ int libregf_key_get_sub_key_by_utf8_path(
      libregf_key_t **sub_key,
      libcerror_error_t **error );
 
+int libregf_internal_key_get_sub_key_by_utf16_name(
+     libregf_internal_key_t *internal_key,
+     const uint16_t *utf16_string,
+     size_t utf16_string_length,
+     libregf_key_t **sub_key,
+     libcerror_error_t **error );
+
 LIBREGF_EXTERN \
 int libregf_key_get_sub_key_by_utf16_name(
      libregf_key_t *key,
+     const uint16_t *utf16_string,
+     size_t utf16_string_length,
+     libregf_key_t **sub_key,
+     libcerror_error_t **error );
+
+int libregf_internal_key_get_sub_key_by_utf16_path(
+     libregf_internal_key_t *internal_key,
      const uint16_t *utf16_string,
      size_t utf16_string_length,
      libregf_key_t **sub_key,
@@ -264,5 +306,5 @@ int libregf_key_get_sub_key_by_utf16_path(
 }
 #endif
 
-#endif /* !defined( _LIBREGF_INTERNAL_KEY_H ) */
+#endif /* !defined( _LIBREGF_KEY_H ) */
 

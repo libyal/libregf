@@ -1920,6 +1920,7 @@ int libregf_key_get_last_written_time(
 	libregf_internal_key_t *internal_key = NULL;
 	libregf_key_item_t *key_item         = NULL;
 	static char *function                = "libregf_key_get_last_written_time";
+	int result                           = 1;
 
 	if( key == NULL )
 	{
@@ -1934,8 +1935,32 @@ int libregf_key_get_last_written_time(
 	}
 	internal_key = (libregf_internal_key_t *) key;
 
-/* TODO add thread lock support */
+	if( filetime == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid filetime.",
+		 function );
 
+		return( -1 );
+	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_key->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( libfdata_tree_node_get_node_value(
 	     internal_key->key_tree_node,
 	     (intptr_t *) internal_key->file_io_handle,
@@ -1951,9 +1976,9 @@ int libregf_key_get_last_written_time(
 		 "%s: unable to retrieve key item.",
 		 function );
 
-		return( -1 );
+		result = -1;
 	}
-	if( key_item == NULL )
+	else if( key_item == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -1962,22 +1987,28 @@ int libregf_key_get_last_written_time(
 		 "%s: missing key item.",
 		 function );
 
-		return( -1 );
+		result = -1;
 	}
-	if( filetime == NULL )
+	else
+	{
+		*filetime = key_item->last_written_time;
+	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_key->read_write_lock,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid filetime.",
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
 		 function );
 
 		return( -1 );
 	}
-	*filetime = key_item->last_written_time;
-
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the security descriptor size
@@ -1991,6 +2022,7 @@ int libregf_key_get_security_descriptor_size(
 	libregf_internal_key_t *internal_key = NULL;
 	libregf_key_item_t *key_item         = NULL;
 	static char *function                = "libregf_key_get_security_descriptor_size";
+	int result                           = 0;
 
 	if( key == NULL )
 	{
@@ -2016,8 +2048,21 @@ int libregf_key_get_security_descriptor_size(
 
 		return( -1 );
 	}
-/* TODO add thread lock support */
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_key->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
 
+		return( -1 );
+	}
+#endif
 	if( libfdata_tree_node_get_node_value(
 	     internal_key->key_tree_node,
 	     (intptr_t *) internal_key->file_io_handle,
@@ -2033,9 +2078,9 @@ int libregf_key_get_security_descriptor_size(
 		 "%s: unable to retrieve key item.",
 		 function );
 
-		return( -1 );
+		result = -1;
 	}
-	if( key_item == NULL )
+	else if( key_item == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -2044,16 +2089,31 @@ int libregf_key_get_security_descriptor_size(
 		 "%s: missing key item.",
 		 function );
 
+		result = -1;
+	}
+	else if( ( key_item->security_descriptor != NULL )
+	      && ( key_item->security_descriptor_size != 0 ) )
+	{
+		*security_descriptor_size = key_item->security_descriptor_size;
+
+		result = 1;
+	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_key->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
 		return( -1 );
 	}
-	if( ( key_item->security_descriptor == NULL )
-	 || ( key_item->security_descriptor_size == 0 ) )
-	{
-		return( 0 );
-	}
-	*security_descriptor_size = key_item->security_descriptor_size;
-
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the security descriptor
@@ -2068,6 +2128,7 @@ int libregf_key_get_security_descriptor(
 	libregf_internal_key_t *internal_key = NULL;
 	libregf_key_item_t *key_item         = NULL;
 	static char *function                = "libregf_key_get_security_descriptor";
+	int result                           = 0;
 
 	if( key == NULL )
 	{
@@ -2104,8 +2165,21 @@ int libregf_key_get_security_descriptor(
 
 		return( -1 );
 	}
-/* TODO add thread lock support */
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_key->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
 
+		return( -1 );
+	}
+#endif
 	if( libfdata_tree_node_get_node_value(
 	     internal_key->key_tree_node,
 	     (intptr_t *) internal_key->file_io_handle,
@@ -2121,9 +2195,9 @@ int libregf_key_get_security_descriptor(
 		 "%s: unable to retrieve key item.",
 		 function );
 
-		return( -1 );
+		result = -1;
 	}
-	if( key_item == NULL )
+	else if( key_item == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -2132,39 +2206,57 @@ int libregf_key_get_security_descriptor(
 		 "%s: missing key item.",
 		 function );
 
-		return( -1 );
+		result = -1;
 	}
-	if( ( key_item->security_descriptor == NULL )
-	 || ( key_item->security_descriptor_size == 0 ) )
+	if( ( key_item->security_descriptor != NULL )
+	 && ( key_item->security_descriptor_size != 0 ) )
 	{
-		return( 0 );
+		if( security_descriptor_size < key_item->security_descriptor_size )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: invalid security descriptor size value out of bounds.",
+			 function );
+
+			result = -1;
+		}
+		else if( memory_copy(
+		          security_descriptor,
+		          key_item->security_descriptor,
+		          key_item->security_descriptor_size ) == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+			 "%s: unable to copy security descriptor.",
+			 function );
+
+			result = -1;
+		}
+		else
+		{
+			result = 1;
+		}
 	}
-	if( security_descriptor_size < key_item->security_descriptor_size )
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_key->read_write_lock,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid security descriptor size value out of bounds.",
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
 		 function );
 
 		return( -1 );
 	}
-	if( memory_copy(
-	     security_descriptor,
-	     key_item->security_descriptor,
-	     key_item->security_descriptor_size ) == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_MEMORY,
-		 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-		 "%s: unable to copy security descriptor.",
-		 function );
-
-		return( -1 );
-	}
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the number of values of the referenced key
@@ -2178,6 +2270,7 @@ int libregf_key_get_number_of_values(
 	libregf_internal_key_t *internal_key = NULL;
 	libregf_key_item_t *key_item         = NULL;
 	static char *function                = "libregf_key_get_number_of_values";
+	int result                           = 1;
 
 	if( key == NULL )
 	{
@@ -2192,8 +2285,21 @@ int libregf_key_get_number_of_values(
 	}
 	internal_key = (libregf_internal_key_t *) key;
 
-/* TODO add thread lock support */
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_key->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
 
+		return( -1 );
+	}
+#endif
 	if( libfdata_tree_node_get_node_value(
 	     internal_key->key_tree_node,
 	     (intptr_t *) internal_key->file_io_handle,
@@ -2209,12 +2315,12 @@ int libregf_key_get_number_of_values(
 		 "%s: unable to retrieve key item.",
 		 function );
 
-		return( -1 );
+		result = -1;
 	}
-	if( libregf_key_item_get_number_of_values(
-	     key_item,
-	     number_of_values,
-	     error ) != 1 )
+	else if( libregf_key_item_get_number_of_values(
+	          key_item,
+	          number_of_values,
+	          error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -2223,9 +2329,24 @@ int libregf_key_get_number_of_values(
 		 "%s: unable to retrieve number of values.",
 		 function );
 
+		result = -1;
+	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_key->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
 		return( -1 );
 	}
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the value
@@ -2242,6 +2363,7 @@ int libregf_key_get_value(
 	libregf_internal_key_t *internal_key         = NULL;
 	libregf_key_item_t *key_item                 = NULL;
 	static char *function                        = "libregf_key_get_value";
+	int result                                   = 1;
 
 	if( key == NULL )
 	{
@@ -2278,8 +2400,21 @@ int libregf_key_get_value(
 
 		return( -1 );
 	}
-/* TODO add thread lock support */
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_key->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
 
+		return( -1 );
+	}
+#endif
 	if( libfdata_tree_node_get_node_value(
 	     internal_key->key_tree_node,
 	     (intptr_t *) internal_key->file_io_handle,
@@ -2295,9 +2430,9 @@ int libregf_key_get_value(
 		 "%s: unable to retrieve key item.",
 		 function );
 
-		return( -1 );
+		result = -1;
 	}
-	if( key_item == NULL )
+	else if( key_item == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -2306,13 +2441,13 @@ int libregf_key_get_value(
 		 "%s: missing key item.",
 		 function );
 
-		return( -1 );
+		result = -1;
 	}
-	if( libfdata_list_get_list_element_by_index(
-	     key_item->values_list,
-	     value_index,
-	     &values_list_element,
-	     error ) != 1 )
+	else if( libfdata_list_get_list_element_by_index(
+	          key_item->values_list,
+	          value_index,
+	          &values_list_element,
+	          error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -2322,15 +2457,15 @@ int libregf_key_get_value(
 		 function,
 		 value_index );
 
-		return( -1 );
+		result = -1;
 	}
-	if( libregf_value_initialize(
-	     value,
-	     internal_key->io_handle,
-	     internal_key->file_io_handle,
-	     values_list_element,
-	     key_item->values_cache,
-	     error ) != 1 )
+	else if( libregf_value_initialize(
+	          value,
+	          internal_key->io_handle,
+	          internal_key->file_io_handle,
+	          values_list_element,
+	          key_item->values_cache,
+	          error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -2339,9 +2474,24 @@ int libregf_key_get_value(
 		 "%s: unable to initialize value.",
 		 function );
 
+		result = -1;
+	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_key->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
 		return( -1 );
 	}
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the value for the specific UTF-8 encoded name
@@ -2349,18 +2499,17 @@ int libregf_key_get_value(
  * Creates a new value
  * Returns 1 if successful, 0 if no such value or -1 on error
  */
-int libregf_key_get_value_by_utf8_name(
-     libregf_key_t *key,
+int libregf_internal_key_get_value_by_utf8_name(
+     libregf_internal_key_t *internal_key,
      const uint8_t *utf8_string,
      size_t utf8_string_length,
      libregf_value_t **value,
      libcerror_error_t **error )
 {
 	libfdata_list_element_t *values_list_element = NULL;
-	libregf_internal_key_t *internal_key         = NULL;
 	libregf_key_item_t *key_item                 = NULL;
 	libregf_value_item_t *value_item             = NULL;
-	static char *function                        = "libregf_key_get_value_by_utf8_name";
+	static char *function                        = "libregf_internal_key_get_value_by_utf8_name";
 	libuna_unicode_character_t unicode_character = 0;
 	size_t utf8_string_index                     = 0;
 	uint32_t name_hash                           = 0;
@@ -2368,7 +2517,7 @@ int libregf_key_get_value_by_utf8_name(
 	int result                                   = 0;
 	int value_index                              = 0;
 
-	if( key == NULL )
+	if( internal_key == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -2379,8 +2528,6 @@ int libregf_key_get_value_by_utf8_name(
 
 		return( -1 );
 	}
-	internal_key = (libregf_internal_key_t *) key;
-
 	if( internal_key->io_handle == NULL )
 	{
 		libcerror_error_set(
@@ -2437,8 +2584,6 @@ int libregf_key_get_value_by_utf8_name(
 
 		return( -1 );
 	}
-/* TODO add thread lock support */
-
 	if( libfdata_tree_node_get_node_value(
 	     internal_key->key_tree_node,
 	     (intptr_t *) internal_key->file_io_handle,
@@ -2619,29 +2764,21 @@ int libregf_key_get_value_by_utf8_name(
 	return( 1 );
 }
 
-/* Retrieves the value for the specific UTF-16 encoded name
- * To retrieve the default value specify string as NULL and its length as 0
+/* Retrieves the value for the specific UTF-8 encoded name
+ * To retrieve the default value specify value name as NULL and its length as 0
  * Creates a new value
  * Returns 1 if successful, 0 if no such value or -1 on error
  */
-int libregf_key_get_value_by_utf16_name(
+int libregf_key_get_value_by_utf8_name(
      libregf_key_t *key,
-     const uint16_t *utf16_string,
-     size_t utf16_string_length,
+     const uint8_t *utf8_string,
+     size_t utf8_string_length,
      libregf_value_t **value,
      libcerror_error_t **error )
 {
-	libfdata_list_element_t *values_list_element = NULL;
-	libregf_internal_key_t *internal_key         = NULL;
-	libregf_key_item_t *key_item                 = NULL;
-	libregf_value_item_t *value_item             = NULL;
-	static char *function                        = "libregf_key_get_value_by_utf16_name";
-	libuna_unicode_character_t unicode_character = 0;
-	size_t utf16_string_index                    = 0;
-	uint32_t name_hash                           = 0;
-	int number_of_values                         = 0;
-	int result                                   = 0;
-	int value_index                              = 0;
+	libregf_internal_key_t *internal_key = NULL;
+	static char *function                = "libregf_key_get_value_by_utf8_name";
+	int result                           = 0;
 
 	if( key == NULL )
 	{
@@ -2656,6 +2793,91 @@ int libregf_key_get_value_by_utf16_name(
 	}
 	internal_key = (libregf_internal_key_t *) key;
 
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_key->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	result = libregf_internal_key_get_value_by_utf8_name(
+	          internal_key,
+	          utf8_string,
+	          utf8_string_length,
+	          value,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve key by UTF-8 name.",
+		 function );
+
+		result = -1;
+	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_key->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
+}
+
+/* Retrieves the value for the specific UTF-16 encoded name
+ * To retrieve the default value specify string as NULL and its length as 0
+ * Creates a new value
+ * Returns 1 if successful, 0 if no such value or -1 on error
+ */
+int libregf_internal_key_get_value_by_utf16_name(
+     libregf_internal_key_t *internal_key,
+     const uint16_t *utf16_string,
+     size_t utf16_string_length,
+     libregf_value_t **value,
+     libcerror_error_t **error )
+{
+	libfdata_list_element_t *values_list_element = NULL;
+	libregf_key_item_t *key_item                 = NULL;
+	libregf_value_item_t *value_item             = NULL;
+	static char *function                        = "libregf_internal_key_get_value_by_utf16_name";
+	libuna_unicode_character_t unicode_character = 0;
+	size_t utf16_string_index                    = 0;
+	uint32_t name_hash                           = 0;
+	int number_of_values                         = 0;
+	int result                                   = 0;
+	int value_index                              = 0;
+
+	if( internal_key == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid key.",
+		 function );
+
+		return( -1 );
+	}
 	if( internal_key->io_handle == NULL )
 	{
 		libcerror_error_set(
@@ -2712,8 +2934,6 @@ int libregf_key_get_value_by_utf16_name(
 
 		return( -1 );
 	}
-/* TODO add thread lock support */
-
 	if( libfdata_tree_node_get_node_value(
 	     internal_key->key_tree_node,
 	     (intptr_t *) internal_key->file_io_handle,
@@ -2894,16 +3114,21 @@ int libregf_key_get_value_by_utf16_name(
 	return( 1 );
 }
 
-/* Retrieves the number of sub keys
- * Returns 1 if successful or -1 on error
+/* Retrieves the value for the specific UTF-16 encoded name
+ * To retrieve the default value specify value name as NULL and its length as 0
+ * Creates a new value
+ * Returns 1 if successful, 0 if no such value or -1 on error
  */
-int libregf_key_get_number_of_sub_keys(
+int libregf_key_get_value_by_utf16_name(
      libregf_key_t *key,
-     int *number_of_sub_keys,
+     const uint16_t *utf16_string,
+     size_t utf16_string_length,
+     libregf_value_t **value,
      libcerror_error_t **error )
 {
 	libregf_internal_key_t *internal_key = NULL;
-	static char *function                = "libregf_key_get_number_of_sub_keys";
+	static char *function                = "libregf_key_get_value_by_utf16_name";
+	int result                           = 0;
 
 	if( key == NULL )
 	{
@@ -2918,8 +3143,97 @@ int libregf_key_get_number_of_sub_keys(
 	}
 	internal_key = (libregf_internal_key_t *) key;
 
-/* TODO add thread lock support */
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_key->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
 
+		return( -1 );
+	}
+#endif
+	result = libregf_internal_key_get_value_by_utf16_name(
+	          internal_key,
+	          utf16_string,
+	          utf16_string_length,
+	          value,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve key by UTF-16 name.",
+		 function );
+
+		result = -1;
+	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_key->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
+}
+
+/* Retrieves the number of sub keys
+ * Returns 1 if successful or -1 on error
+ */
+int libregf_key_get_number_of_sub_keys(
+     libregf_key_t *key,
+     int *number_of_sub_keys,
+     libcerror_error_t **error )
+{
+	libregf_internal_key_t *internal_key = NULL;
+	static char *function                = "libregf_key_get_number_of_sub_keys";
+	int result                           = 1;
+
+	if( key == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid key.",
+		 function );
+
+		return( -1 );
+	}
+	internal_key = (libregf_internal_key_t *) key;
+
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_key->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( libfdata_tree_node_get_number_of_sub_nodes(
 	     internal_key->key_tree_node,
 	     (intptr_t *) internal_key->file_io_handle,
@@ -2935,9 +3249,24 @@ int libregf_key_get_number_of_sub_keys(
 		 "%s: unable to retrieve number of sub keys.",
 		 function );
 
+		result = -1;
+	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_key->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
 		return( -1 );
 	}
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the sub key for the specific index
@@ -2953,6 +3282,7 @@ int libregf_key_get_sub_key(
 	libfdata_tree_node_t *key_tree_sub_node = NULL;
 	libregf_internal_key_t *internal_key    = NULL;
 	static char *function                   = "libregf_key_get_sub_key";
+	int result                              = 1;
 
 	if( key == NULL )
 	{
@@ -2989,8 +3319,21 @@ int libregf_key_get_sub_key(
 
 		return( -1 );
 	}
-/* TODO add thread lock support */
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_key->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
 
+		return( -1 );
+	}
+#endif
 	if( libfdata_tree_node_get_sub_node_by_index(
 	     internal_key->key_tree_node,
 	     (intptr_t *) internal_key->file_io_handle,
@@ -3008,9 +3351,9 @@ int libregf_key_get_sub_key(
 		 function,
 		 sub_key_index );
 
-		return( -1 );
+		result = -1;
 	}
-	if( key_tree_sub_node == NULL )
+	else if( key_tree_sub_node == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -3019,15 +3362,15 @@ int libregf_key_get_sub_key(
 		 "%s: invalid key tree sub node.",
 		 function );
 
-		return( -1 );
+		result = -1;
 	}
-	if( libregf_key_initialize(
-	     sub_key,
-	     internal_key->io_handle,
-	     internal_key->file_io_handle,
-	     key_tree_sub_node,
-	     internal_key->key_cache,
-	     error ) != 1 )
+	else if( libregf_key_initialize(
+	          sub_key,
+	          internal_key->io_handle,
+	          internal_key->file_io_handle,
+	          key_tree_sub_node,
+	          internal_key->key_cache,
+	          error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -3036,32 +3379,46 @@ int libregf_key_get_sub_key(
 		 "%s: unable to initialize sub key.",
 		 function );
 
+		result = -1;
+	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_key->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
 		return( -1 );
 	}
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the sub key for the specific UTF-8 encoded name
  * Creates a new key
  * Returns 1 if successful, 0 if no such sub key or -1 on error
  */
-int libregf_key_get_sub_key_by_utf8_name(
-     libregf_key_t *key,
+int libregf_internal_key_get_sub_key_by_utf8_name(
+     libregf_internal_key_t *internal_key,
      const uint8_t *utf8_string,
      size_t utf8_string_length,
      libregf_key_t **sub_key,
      libcerror_error_t **error )
 {
 	libfdata_tree_node_t *key_tree_sub_node      = NULL;
-	libregf_internal_key_t *internal_key         = NULL;
 	libregf_key_item_t *sub_key_item             = NULL;
-	static char *function                        = "libregf_key_get_sub_key_by_utf8_name";
+	static char *function                        = "libregf_internal_key_get_sub_key_by_utf8_name";
 	libuna_unicode_character_t unicode_character = 0;
 	size_t utf8_string_index                     = 0;
 	uint32_t name_hash                           = 0;
 	int result                                   = 0;
 
-	if( key == NULL )
+	if( internal_key == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -3072,8 +3429,6 @@ int libregf_key_get_sub_key_by_utf8_name(
 
 		return( -1 );
 	}
-	internal_key = (libregf_internal_key_t *) key;
-
 	if( internal_key->io_handle == NULL )
 	{
 		libcerror_error_set(
@@ -3129,8 +3484,6 @@ int libregf_key_get_sub_key_by_utf8_name(
 
 		return( -1 );
 	}
-/* TODO add thread lock support */
-
 	while( utf8_string_index < utf8_string_length )
 	{
 		if( libuna_unicode_character_copy_from_utf8(
@@ -3198,30 +3551,20 @@ int libregf_key_get_sub_key_by_utf8_name(
 	return( result );
 }
 
-/* Retrieves the sub key for the specific UTF-8 encoded path
- * The path separator is the \ character
+/* Retrieves the sub key for the specific UTF-8 encoded name
  * Creates a new key
- * Returns 1 if successful, 0 if no such key or -1 on error
+ * Returns 1 if successful, 0 if no such sub key or -1 on error
  */
-int libregf_key_get_sub_key_by_utf8_path(
+int libregf_key_get_sub_key_by_utf8_name(
      libregf_key_t *key,
      const uint8_t *utf8_string,
      size_t utf8_string_length,
      libregf_key_t **sub_key,
      libcerror_error_t **error )
 {
-	libfdata_tree_node_t *key_tree_node          = NULL;
-	libfdata_tree_node_t *key_tree_sub_node      = NULL;
-	libregf_internal_key_t *internal_key         = NULL;
-	libregf_key_item_t *key_item                 = NULL;
-	libregf_key_item_t *sub_key_item             = NULL;
-	uint8_t *utf8_string_segment                 = NULL;
-	static char *function                        = "libregf_key_get_sub_key_by_utf8_path";
-	libuna_unicode_character_t unicode_character = 0;
-	size_t utf8_string_index                     = 0;
-	size_t utf8_string_segment_length            = 0;
-	uint32_t name_hash                           = 0;
-	int result                                   = 0;
+	libregf_internal_key_t *internal_key = NULL;
+	static char *function                = "libregf_key_get_sub_key_by_utf8_name";
+	int result                           = 0;
 
 	if( key == NULL )
 	{
@@ -3234,8 +3577,92 @@ int libregf_key_get_sub_key_by_utf8_path(
 
 		return( -1 );
 	}
-	internal_key = (libregf_internal_key_t *) key;
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_key->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
 
+		return( -1 );
+	}
+#endif
+	result = libregf_internal_key_get_sub_key_by_utf8_name(
+	          internal_key,
+	          utf8_string,
+	          utf8_string_length,
+	          sub_key,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve key by UTF-8 name.",
+		 function );
+
+		result = -1;
+	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_key->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
+}
+
+/* Retrieves the sub key for the specific UTF-8 encoded path
+ * The path separator is the \ character
+ * Creates a new key
+ * Returns 1 if successful, 0 if no such key or -1 on error
+ */
+int libregf_internal_key_get_sub_key_by_utf8_path(
+     libregf_internal_key_t *internal_key,
+     const uint8_t *utf8_string,
+     size_t utf8_string_length,
+     libregf_key_t **sub_key,
+     libcerror_error_t **error )
+{
+	libfdata_tree_node_t *key_tree_node          = NULL;
+	libfdata_tree_node_t *key_tree_sub_node      = NULL;
+	libregf_key_item_t *key_item                 = NULL;
+	libregf_key_item_t *sub_key_item             = NULL;
+	uint8_t *utf8_string_segment                 = NULL;
+	static char *function                        = "libregf_internal_key_get_sub_key_by_utf8_path";
+	libuna_unicode_character_t unicode_character = 0;
+	size_t utf8_string_index                     = 0;
+	size_t utf8_string_segment_length            = 0;
+	uint32_t name_hash                           = 0;
+	int result                                   = 0;
+
+	if( internal_key == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid key.",
+		 function );
+
+		return( -1 );
+	}
 	if( internal_key->io_handle == NULL )
 	{
 		libcerror_error_set(
@@ -3291,8 +3718,6 @@ int libregf_key_get_sub_key_by_utf8_path(
 
 		return( -1 );
 	}
-/* TODO add thread lock support */
-
 	if( utf8_string_length > 0 )
 	{
 		/* Ignore a leading separator
@@ -3432,25 +3857,21 @@ int libregf_key_get_sub_key_by_utf8_path(
 	return( result );
 }
 
-/* Retrieves the sub key for the specific UTF-16 encoded name
+/* Retrieves the sub key for the specific UTF-8 encoded path
+ * The path separator is the \ character
  * Creates a new key
- * Returns 1 if successful, 0 if no such sub key or -1 on error
+ * Returns 1 if successful, 0 if no such key or -1 on error
  */
-int libregf_key_get_sub_key_by_utf16_name(
+int libregf_key_get_sub_key_by_utf8_path(
      libregf_key_t *key,
-     const uint16_t *utf16_string,
-     size_t utf16_string_length,
+     const uint8_t *utf8_string,
+     size_t utf8_string_length,
      libregf_key_t **sub_key,
      libcerror_error_t **error )
 {
-	libfdata_tree_node_t *key_tree_sub_node      = NULL;
-	libregf_internal_key_t *internal_key         = NULL;
-	libregf_key_item_t *sub_key_item             = NULL;
-	static char *function                        = "libregf_key_get_value_by_utf16_name";
-	libuna_unicode_character_t unicode_character = 0;
-	size_t utf16_string_index                    = 0;
-	uint32_t name_hash                           = 0;
-	int result                                   = 0;
+	libregf_internal_key_t *internal_key = NULL;
+	static char *function                = "libregf_key_get_sub_key_by_utf8_path";
+	int result                           = 0;
 
 	if( key == NULL )
 	{
@@ -3465,6 +3886,87 @@ int libregf_key_get_sub_key_by_utf16_name(
 	}
 	internal_key = (libregf_internal_key_t *) key;
 
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_key->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	result = libregf_internal_key_get_sub_key_by_utf8_path(
+	          internal_key,
+	          utf8_string,
+	          utf8_string_length,
+	          sub_key,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve key by UTF-8 path.",
+		 function );
+
+		result = -1;
+	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_key->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
+}
+
+/* Retrieves the sub key for the specific UTF-16 encoded name
+ * Creates a new key
+ * Returns 1 if successful, 0 if no such sub key or -1 on error
+ */
+int libregf_internal_key_get_sub_key_by_utf16_name(
+     libregf_internal_key_t *internal_key,
+     const uint16_t *utf16_string,
+     size_t utf16_string_length,
+     libregf_key_t **sub_key,
+     libcerror_error_t **error )
+{
+	libfdata_tree_node_t *key_tree_sub_node      = NULL;
+	libregf_key_item_t *sub_key_item             = NULL;
+	static char *function                        = "libregf_internal_key_get_value_by_utf16_name";
+	libuna_unicode_character_t unicode_character = 0;
+	size_t utf16_string_index                    = 0;
+	uint32_t name_hash                           = 0;
+	int result                                   = 0;
+
+	if( internal_key == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid key.",
+		 function );
+
+		return( -1 );
+	}
 	if( internal_key->io_handle == NULL )
 	{
 		libcerror_error_set(
@@ -3520,8 +4022,6 @@ int libregf_key_get_sub_key_by_utf16_name(
 
 		return( -1 );
 	}
-/* TODO add thread lock support */
-
 	while( utf16_string_index < utf16_string_length )
 	{
 		if( libuna_unicode_character_copy_from_utf16(
@@ -3589,30 +4089,20 @@ int libregf_key_get_sub_key_by_utf16_name(
 	return( result );
 }
 
-/* Retrieves the sub key for the specific UTF-16 encoded path
- * The path separator is the \ character
+/* Retrieves the sub key for the specific UTF-16 encoded name
  * Creates a new key
- * Returns 1 if successful, 0 if no such key or -1 on error
+ * Returns 1 if successful, 0 if no such sub key or -1 on error
  */
-int libregf_key_get_sub_key_by_utf16_path(
+int libregf_key_get_sub_key_by_utf16_name(
      libregf_key_t *key,
      const uint16_t *utf16_string,
      size_t utf16_string_length,
      libregf_key_t **sub_key,
      libcerror_error_t **error )
 {
-	libfdata_tree_node_t *key_tree_node          = NULL;
-	libfdata_tree_node_t *key_tree_sub_node      = NULL;
-	libregf_internal_key_t *internal_key         = NULL;
-	libregf_key_item_t *key_item                 = NULL;
-	libregf_key_item_t *sub_key_item             = NULL;
-	uint16_t *utf16_string_segment               = NULL;
-	static char *function                        = "libregf_key_get_sub_key_by_utf16_path";
-	libuna_unicode_character_t unicode_character = 0;
-	size_t utf16_string_index                    = 0;
-	size_t utf16_string_segment_length           = 0;
-	uint32_t name_hash                           = 0;
-	int result                                   = 0;
+	libregf_internal_key_t *internal_key = NULL;
+	static char *function                = "libregf_key_get_sub_key_by_utf16_name";
+	int result                           = 0;
 
 	if( key == NULL )
 	{
@@ -3627,6 +4117,92 @@ int libregf_key_get_sub_key_by_utf16_path(
 	}
 	internal_key = (libregf_internal_key_t *) key;
 
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_key->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	result = libregf_internal_key_get_sub_key_by_utf16_name(
+	          internal_key,
+	          utf16_string,
+	          utf16_string_length,
+	          sub_key,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve key by UTF-16 name.",
+		 function );
+
+		result = -1;
+	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_key->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
+}
+
+/* Retrieves the sub key for the specific UTF-16 encoded path
+ * The path separator is the \ character
+ * Creates a new key
+ * Returns 1 if successful, 0 if no such key or -1 on error
+ */
+int libregf_internal_key_get_sub_key_by_utf16_path(
+     libregf_internal_key_t *internal_key,
+     const uint16_t *utf16_string,
+     size_t utf16_string_length,
+     libregf_key_t **sub_key,
+     libcerror_error_t **error )
+{
+	libfdata_tree_node_t *key_tree_node          = NULL;
+	libfdata_tree_node_t *key_tree_sub_node      = NULL;
+	libregf_key_item_t *key_item                 = NULL;
+	libregf_key_item_t *sub_key_item             = NULL;
+	uint16_t *utf16_string_segment               = NULL;
+	static char *function                        = "libregf_internal_key_get_sub_key_by_utf16_path";
+	libuna_unicode_character_t unicode_character = 0;
+	size_t utf16_string_index                    = 0;
+	size_t utf16_string_segment_length           = 0;
+	uint32_t name_hash                           = 0;
+	int result                                   = 0;
+
+	if( internal_key == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid key.",
+		 function );
+
+		return( -1 );
+	}
 	if( internal_key->io_handle == NULL )
 	{
 		libcerror_error_set(
@@ -3682,8 +4258,6 @@ int libregf_key_get_sub_key_by_utf16_path(
 
 		return( -1 );
 	}
-/* TODO add thread lock support */
-
 	if( utf16_string_length > 0 )
 	{
 		/* Ignore a leading separator
@@ -3820,6 +4394,86 @@ int libregf_key_get_sub_key_by_utf16_path(
 			return( -1 );
 		}
 	}
+	return( result );
+}
+
+/* Retrieves the sub key for the specific UTF-16 encoded path
+ * The path separator is the \ character
+ * Creates a new key
+ * Returns 1 if successful, 0 if no such key or -1 on error
+ */
+int libregf_key_get_sub_key_by_utf16_path(
+     libregf_key_t *key,
+     const uint16_t *utf16_string,
+     size_t utf16_string_length,
+     libregf_key_t **sub_key,
+     libcerror_error_t **error )
+{
+	libregf_internal_key_t *internal_key = NULL;
+	static char *function                = "libregf_key_get_sub_key_by_utf16_path";
+	int result                           = 0;
+
+	if( key == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid key.",
+		 function );
+
+		return( -1 );
+	}
+	internal_key = (libregf_internal_key_t *) key;
+
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_key->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	result = libregf_internal_key_get_sub_key_by_utf16_path(
+	          internal_key,
+	          utf16_string,
+	          utf16_string_length,
+	          sub_key,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve key by UTF-16 path.",
+		 function );
+
+		result = -1;
+	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_key->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	return( result );
 }
 

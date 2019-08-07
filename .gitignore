@@ -146,6 +146,7 @@ stamp-h[1-9]
 /tests/regf_test_support
 /tests/regf_test_value
 /tests/regf_test_value_item
+/tests/regf_test_value_key
 /tests/tmp*
 
 # Local library dependencies specific files

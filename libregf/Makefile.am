@@ -59,6 +59,7 @@ libregf_la_SOURCES = \
 	libregf_unused.h \
 	libregf_value.c libregf_value.h \
 	libregf_value_item.c libregf_value_item.h \
+	libregf_value_key.c libregf_value_key.h \
 	libregf_value_type.c libregf_value_type.h \
 	regf_cell_values.h \
 	regf_file_header.h \

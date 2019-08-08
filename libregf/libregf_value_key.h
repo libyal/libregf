@@ -47,9 +47,9 @@ struct libregf_value_key
 	 */
 	uint16_t name_size;
 
-	/* The value type
+	/* The value data type
 	 */
-	uint32_t type;
+	uint32_t data_type;
 
 	/* The flags
 	 */
@@ -59,9 +59,17 @@ struct libregf_value_key
 	 */
 	uint32_t data_offset;
 
+	/* The value data
+	 */
+	uint8_t *data;
+
 	/* The value data offset
 	 */
 	uint32_t data_size;
+
+	/* Value to indicate the value data is stored in the key
+	 */
+	uint8_t data_in_key;
 };
 
 int libregf_value_key_initialize(

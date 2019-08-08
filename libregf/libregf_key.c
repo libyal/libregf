@@ -2208,8 +2208,8 @@ int libregf_key_get_security_descriptor(
 
 		result = -1;
 	}
-	if( ( key_item->security_descriptor != NULL )
-	 && ( key_item->security_descriptor_size != 0 ) )
+	else if( ( key_item->security_descriptor != NULL )
+	      && ( key_item->security_descriptor_size != 0 ) )
 	{
 		if( security_descriptor_size < key_item->security_descriptor_size )
 		{
@@ -3577,6 +3577,8 @@ int libregf_key_get_sub_key_by_utf8_name(
 
 		return( -1 );
 	}
+	internal_key = (libregf_internal_key_t *) key;
+
 #if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_write(
 	     internal_key->read_write_lock,

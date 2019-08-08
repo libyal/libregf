@@ -36,10 +36,18 @@
 
 #include "../libregf/libregf_value_key.h"
 
+/* Value key with name and data stored outside key
+ */
 uint8_t regf_test_value_key_data1[ 36 ] = {
 	0x76, 0x6b, 0x0c, 0x00, 0x22, 0x00, 0x00, 0x00, 0x30, 0xdc, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00,
 	0x01, 0x00, 0x00, 0x00, 0x44, 0x69, 0x73, 0x70, 0x46, 0x69, 0x6c, 0x65, 0x4e, 0x61, 0x6d, 0x65,
 	0x00, 0x00, 0x00, 0x00 };
+
+/* Value key with name and data stored inside key
+ */
+uint8_t regf_test_value_key_data2[ 28 ] = {
+	0x76, 0x6b, 0x02, 0x00, 0x04, 0x00, 0x00, 0x80, 0x30, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00,
+	0x01, 0x00, 0x00, 0x00, 0x4f, 0x6e, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 #if defined( __GNUC__ ) && !defined( LIBREGF_DLL_IMPORT )
 
@@ -282,9 +290,10 @@ on_error:
 int regf_test_value_key_read_data(
      void )
 {
-	libcerror_error_t *error           = NULL;
+	libcerror_error_t *error       = NULL;
 	libregf_value_key_t *value_key = NULL;
-	int result                         = 0;
+	uint8_t *name_backup           = NULL;
+	int result                     = 0;
 
 	/* Initialize test
 	 */
@@ -329,15 +338,103 @@ int regf_test_value_key_read_data(
 	 value_key->name_size,
 	 12 );
 
+	/* Clean up
+	 */
+	result = libregf_value_key_free(
+	          &value_key,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "value_key",
+	 value_key );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Initialize test
+	 */
+	result = libregf_value_key_initialize(
+	          &value_key,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "value_key",
+	 value_key );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	result = libregf_value_key_read_data(
+	          value_key,
+	          regf_test_value_key_data2,
+	          28,
+	          0,
+	          LIBREGF_CODEPAGE_WINDOWS_1252,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	REGF_TEST_ASSERT_EQUAL_UINT32(
+	 "value_key->name_size",
+	 value_key->name_size,
+	 2 );
+
 	/* Test error cases
 	 */
 	result = libregf_value_key_read_data(
 	          value_key,
-	          regf_test_value_key_data1,
-	          36,
+	          regf_test_value_key_data2,
+	          28,
 	          0,
 	          LIBREGF_CODEPAGE_WINDOWS_1252,
 	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	name_backup = value_key->name;
+
+	value_key->name = NULL;
+
+	result = libregf_value_key_read_data(
+	          value_key,
+	          regf_test_value_key_data2,
+	          28,
+	          0,
+	          LIBREGF_CODEPAGE_WINDOWS_1252,
+	          &error );
+
+	value_key->name = name_backup;
 
 	REGF_TEST_ASSERT_EQUAL_INT(
 	 "result",

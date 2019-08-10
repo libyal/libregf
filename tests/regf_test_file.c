@@ -1234,22 +1234,19 @@ on_error:
 	return( 0 );
 }
 
-/* Tests the libregf_file_get_ascii_codepage function
+/* Tests the libregf_file_is_corrupted function
  * Returns 1 if successful or 0 if not
  */
-int regf_test_file_get_ascii_codepage(
+int regf_test_file_is_corrupted(
      libregf_file_t *file )
 {
-	libcerror_error_t *error  = NULL;
-	int ascii_codepage        = 0;
-	int ascii_codepage_is_set = 0;
-	int result                = 0;
+	libcerror_error_t *error = NULL;
+	int result               = 0;
 
 	/* Test regular cases
 	 */
-	result = libregf_file_get_ascii_codepage(
+	result = libregf_file_is_corrupted(
 	          file,
-	          &ascii_codepage,
 	          &error );
 
 	REGF_TEST_ASSERT_NOT_EQUAL_INT(
@@ -1261,7 +1258,60 @@ int regf_test_file_get_ascii_codepage(
 	 "error",
 	 error );
 
-	ascii_codepage_is_set = result;
+	/* Test error cases
+	 */
+	result = libregf_file_is_corrupted(
+	          NULL,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libregf_file_get_ascii_codepage function
+ * Returns 1 if successful or 0 if not
+ */
+int regf_test_file_get_ascii_codepage(
+     libregf_file_t *file )
+{
+	libcerror_error_t *error  = NULL;
+	int ascii_codepage        = 0;
+	int result                = 0;
+
+	/* Test regular cases
+	 */
+	result = libregf_file_get_ascii_codepage(
+	          file,
+	          &ascii_codepage,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	/* Test error cases
 	 */
@@ -1282,25 +1332,23 @@ int regf_test_file_get_ascii_codepage(
 	libcerror_error_free(
 	 &error );
 
-	if( ascii_codepage_is_set != 0 )
-	{
-		result = libregf_file_get_ascii_codepage(
-		          file,
-		          NULL,
-		          &error );
+	result = libregf_file_get_ascii_codepage(
+	          file,
+	          NULL,
+	          &error );
 
-		REGF_TEST_ASSERT_EQUAL_INT(
-		 "result",
-		 result,
-		 -1 );
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
 
-		REGF_TEST_ASSERT_IS_NOT_NULL(
-		 "error",
-		 error );
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
-		libcerror_error_free(
-		 &error );
-	}
+	libcerror_error_free(
+	 &error );
+
 	return( 1 );
 
 on_error:
@@ -1450,6 +1498,101 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the libregf_file_get_format_version function
+ * Returns 1 if successful or 0 if not
+ */
+int regf_test_file_get_format_version(
+     libregf_file_t *file )
+{
+	libcerror_error_t *error = NULL;
+	uint32_t major_version   = 0;
+	uint32_t minor_version   = 0;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libregf_file_get_format_version(
+	          file,
+	          &major_version,
+	          &minor_version,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libregf_file_get_format_version(
+	          NULL,
+	          &major_version,
+	          &minor_version,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libregf_file_get_format_version(
+	          file,
+	          NULL,
+	          &minor_version,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libregf_file_get_format_version(
+	          file,
+	          &major_version,
+	          NULL,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
 /* Tests the libregf_file_get_type function
  * Returns 1 if successful or 0 if not
  */
@@ -1459,7 +1602,6 @@ int regf_test_file_get_type(
 	libcerror_error_t *error = NULL;
 	uint32_t type            = 0;
 	int result               = 0;
-	int type_is_set          = 0;
 
 	/* Test regular cases
 	 */
@@ -1468,16 +1610,14 @@ int regf_test_file_get_type(
 	          &type,
 	          &error );
 
-	REGF_TEST_ASSERT_NOT_EQUAL_INT(
+	REGF_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
-	 -1 );
+	 1 );
 
 	REGF_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
-
-	type_is_set = result;
 
 	/* Test error cases
 	 */
@@ -1498,25 +1638,23 @@ int regf_test_file_get_type(
 	libcerror_error_free(
 	 &error );
 
-	if( type_is_set != 0 )
-	{
-		result = libregf_file_get_type(
-		          file,
-		          NULL,
-		          &error );
+	result = libregf_file_get_type(
+	          file,
+	          NULL,
+	          &error );
 
-		REGF_TEST_ASSERT_EQUAL_INT(
-		 "result",
-		 result,
-		 -1 );
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
 
-		REGF_TEST_ASSERT_IS_NOT_NULL(
-		 "error",
-		 error );
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
-		libcerror_error_free(
-		 &error );
-	}
+	libcerror_error_free(
+	 &error );
+
 	return( 1 );
 
 on_error:
@@ -1537,7 +1675,6 @@ int regf_test_file_get_root_key(
 	libcerror_error_t *error = NULL;
 	libregf_key_t *root_key  = 0;
 	int result               = 0;
-	int root_key_is_set      = 0;
 
 	/* Test regular cases
 	 */
@@ -1555,9 +1692,7 @@ int regf_test_file_get_root_key(
 	 "error",
 	 error );
 
-	root_key_is_set = result;
-
-	if( root_key_is_set != 0 )
+	if( result != 0 )
 	{
 		REGF_TEST_ASSERT_IS_NOT_NULL(
 		 "root_key",
@@ -1599,29 +1734,27 @@ int regf_test_file_get_root_key(
 	libcerror_error_free(
 	 &error );
 
-	if( root_key_is_set != 0 )
-	{
-		result = libregf_file_get_root_key(
-		          file,
-		          NULL,
-		          &error );
+	result = libregf_file_get_root_key(
+	          file,
+	          NULL,
+	          &error );
 
-		REGF_TEST_ASSERT_EQUAL_INT(
-		 "result",
-		 result,
-		 -1 );
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
 
-		REGF_TEST_ASSERT_IS_NULL(
-		 "root_key",
-		 root_key );
+	REGF_TEST_ASSERT_IS_NULL(
+	 "root_key",
+	 root_key );
 
-		REGF_TEST_ASSERT_IS_NOT_NULL(
-		 "error",
-		 error );
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
 
-		libcerror_error_free(
-		 &error );
-	}
+	libcerror_error_free(
+	 &error );
+
 	return( 1 );
 
 on_error:
@@ -1809,7 +1942,10 @@ int main(
 
 #endif /* defined( __GNUC__ ) && !defined( LIBREGF_DLL_IMPORT ) */
 
-		/* TODO: add tests for libregf_file_is_corrupted */
+		REGF_TEST_RUN_WITH_ARGS(
+		 "libregf_file_is_corrupted",
+		 regf_test_file_is_corrupted,
+		 file );
 
 		REGF_TEST_RUN_WITH_ARGS(
 		 "libregf_file_get_ascii_codepage",
@@ -1821,7 +1957,10 @@ int main(
 		 regf_test_file_set_ascii_codepage,
 		 file );
 
-		/* TODO: add tests for libregf_file_get_format_version */
+		REGF_TEST_RUN_WITH_ARGS(
+		 "libregf_file_get_format_version",
+		 regf_test_file_get_format_version,
+		 file );
 
 		REGF_TEST_RUN_WITH_ARGS(
 		 "libregf_file_get_type",
@@ -1833,7 +1972,11 @@ int main(
 		 regf_test_file_get_root_key,
 		 file );
 
+		/* TODO: add tests for libregf_internal_file_get_key_by_utf8_path */
+
 		/* TODO: add tests for libregf_file_get_key_by_utf8_path */
+
+		/* TODO: add tests for libregf_internal_file_get_key_by_utf16_path */
 
 		/* TODO: add tests for libregf_file_get_key_by_utf16_path */
 

@@ -30,6 +30,7 @@
 #include "libregf_libcerror.h"
 #include "libregf_libfcache.h"
 #include "libregf_libfdata.h"
+#include "libregf_value_key.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -39,25 +40,9 @@ typedef struct libregf_value_item libregf_value_item_t;
 
 struct libregf_value_item
 {
-	/* The flags
+	/* The value key
 	 */
-	uint16_t flags;
-
-	/* The name hash
-	 */
-	uint32_t name_hash;
-
-	/* The name
-	 */
-	uint8_t *name;
-
-	/* The name size
-	 */
-	uint16_t name_size;
-
-	/* The value type
-	 */
-	uint32_t type;
+	libregf_value_key_t *value_key;
 
 	/* The value data type
 	 */
@@ -136,6 +121,47 @@ int libregf_value_item_read_element_data(
      uint8_t read_flags,
      libcerror_error_t **error );
 
+int libregf_value_item_is_corrupted(
+     libregf_value_item_t *value_item,
+     libcerror_error_t **error );
+
+int libregf_value_item_get_name_size(
+     libregf_value_item_t *value_item,
+     size_t *name_size,
+     libcerror_error_t **error );
+
+int libregf_value_item_get_name(
+     libregf_value_item_t *value_item,
+     uint8_t *name,
+     size_t name_size,
+     libcerror_error_t **error );
+
+int libregf_value_item_get_utf8_name_size(
+     libregf_value_item_t *value_item,
+     size_t *utf8_string_size,
+     int ascii_codepage,
+     libcerror_error_t **error );
+
+int libregf_value_item_get_utf8_name(
+     libregf_value_item_t *value_item,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
+     int ascii_codepage,
+     libcerror_error_t **error );
+
+int libregf_value_item_get_utf16_name_size(
+     libregf_value_item_t *value_item,
+     size_t *utf16_string_size,
+     int ascii_codepage,
+     libcerror_error_t **error );
+
+int libregf_value_item_get_utf16_name(
+     libregf_value_item_t *value_item,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
+     int ascii_codepage,
+     libcerror_error_t **error );
+
 int libregf_value_item_compare_name_with_utf8_string(
      libregf_value_item_t *value_item,
      uint32_t name_hash,
@@ -150,6 +176,67 @@ int libregf_value_item_compare_name_with_utf16_string(
      const uint16_t *utf16_string,
      size_t utf16_string_length,
      int ascii_codepage,
+     libcerror_error_t **error );
+
+int libregf_value_item_get_value_type(
+     libregf_value_item_t *value_item,
+     uint32_t *value_type,
+     libcerror_error_t **error );
+
+int libregf_value_item_get_value_32bit(
+     libregf_value_item_t *value_item,
+     libbfio_handle_t *file_io_handle,
+     uint32_t *value_32bit,
+     libcerror_error_t **error );
+
+int libregf_value_item_get_value_64bit(
+     libregf_value_item_t *value_item,
+     libbfio_handle_t *file_io_handle,
+     uint64_t *value_64bit,
+     libcerror_error_t **error );
+
+int libregf_value_item_get_value_utf8_string_size(
+     libregf_value_item_t *value_item,
+     libbfio_handle_t *file_io_handle,
+     size_t *utf8_string_size,
+     libcerror_error_t **error );
+
+int libregf_value_item_get_value_utf8_string(
+     libregf_value_item_t *value_item,
+     libbfio_handle_t *file_io_handle,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
+     libcerror_error_t **error );
+
+int libregf_value_item_get_value_utf16_string_size(
+     libregf_value_item_t *value_item,
+     libbfio_handle_t *file_io_handle,
+     size_t *utf16_string_size,
+     libcerror_error_t **error );
+
+int libregf_value_item_get_value_utf16_string(
+     libregf_value_item_t *value_item,
+     libbfio_handle_t *file_io_handle,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
+     libcerror_error_t **error );
+
+int libregf_value_item_get_value_binary_data_size(
+     libregf_value_item_t *value_item,
+     size_t *binary_data_size,
+     libcerror_error_t **error );
+
+int libregf_value_item_get_value_binary_data(
+     libregf_value_item_t *value_item,
+     libbfio_handle_t *file_io_handle,
+     uint8_t *binary_data,
+     size_t binary_data_size,
+     libcerror_error_t **error );
+
+int libregf_value_item_get_value_multi_string(
+     libregf_value_item_t *value_item,
+     libbfio_handle_t *file_io_handle,
+     libregf_multi_string_t **multi_string,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

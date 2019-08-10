@@ -1202,6 +1202,8 @@ int main(
 	 "libregf_internal_multi_string_read_data",
 	 regf_test_internal_multi_string_read_data );
 
+#if !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 )
+
 	/* Initialize test
 	 */
 	result = libregf_multi_string_initialize(
@@ -1281,6 +1283,8 @@ int main(
 	REGF_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
+
+#endif /* !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 ) */
 
 #endif /* defined( __GNUC__ ) && !defined( LIBREGF_DLL_IMPORT ) */
 

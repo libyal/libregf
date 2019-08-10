@@ -276,8 +276,8 @@ int libregf_value_key_read_data(
 	 value_data_offset );
 
 	byte_stream_copy_to_uint32_little_endian(
-	 ( (regf_value_key_t *) data )->data_type,
-	 value_key->data_type );
+	 ( (regf_value_key_t *) data )->value_type,
+	 value_key->value_type );
 
 	byte_stream_copy_to_uint16_little_endian(
 	 ( (regf_value_key_t *) data )->flags,
@@ -321,13 +321,13 @@ int libregf_value_key_read_data(
 			 0 );
 		}
 		libcnotify_printf(
-		 "%s: data type\t\t\t\t\t: 0x%08" PRIx32 " (%s) %s\n",
+		 "%s: value type\t\t\t\t\t: 0x%08" PRIx32 " (%s) %s\n",
 		 function,
-		 value_key->data_type,
+		 value_key->value_type,
 		 libregf_data_type_get_identifier(
-		  value_key->data_type ),
+		  value_key->value_type ),
 		 libregf_data_type_get_description(
-		  value_key->data_type ) );
+		  value_key->value_type ) );
 
 		libcnotify_printf(
 		 "%s: flags\t\t\t\t\t: 0x%04" PRIx16 "\n",
@@ -375,8 +375,8 @@ int libregf_value_key_read_data(
 		}
 		if( value_key->data_size > 0 )
 		{
-			if( ( value_key->data_type == LIBREGF_VALUE_TYPE_STRING )
-			 || ( value_key->data_type == LIBREGF_VALUE_TYPE_EXPANDABLE_STRING ) )
+			if( ( value_key->value_type == LIBREGF_VALUE_TYPE_STRING )
+			 || ( value_key->value_type == LIBREGF_VALUE_TYPE_EXPANDABLE_STRING ) )
 			{
 				if( ( value_key->data_size == 1 )
 				 || ( value_key->data_size == 3 ) )
@@ -633,5 +633,687 @@ on_error:
 	value_key->name_size = 0;
 
 	return( -1 );
+}
+
+/* Retrieves the value name size
+ * Returns 1 if successful or -1 on error
+ */
+int libregf_value_key_get_name_size(
+     libregf_value_key_t *value_key,
+     size_t *name_size,
+     libcerror_error_t **error )
+{
+	static char *function = "libregf_value_key_get_name_size";
+
+	if( value_key == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid value key.",
+		 function );
+
+		return( -1 );
+	}
+	if( name_size == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid name size.",
+		 function );
+
+		return( -1 );
+	}
+	*name_size = value_key->name_size;
+
+	return( 1 );
+}
+
+/* Retrieves the value name
+ * Returns 1 if successful or -1 on error
+ */
+int libregf_value_key_get_name(
+     libregf_value_key_t *value_key,
+     uint8_t *name,
+     size_t name_size,
+     libcerror_error_t **error )
+{
+	static char *function = "libregf_value_key_get_name";
+
+	if( value_key == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid value key.",
+		 function );
+
+		return( -1 );
+	}
+	if( name == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid name.",
+		 function );
+
+		return( -1 );
+	}
+	if( name_size > (size_t) SSIZE_MAX )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid name size value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
+	if( name_size < value_key->name_size )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid name size value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+	if( memory_copy(
+	     name,
+	     value_key->name,
+	     value_key->name_size ) == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+		 "%s: unable to copy name.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the UTF-8 string size of the value name
+ * The returned size includes the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+int libregf_value_key_get_utf8_name_size(
+     libregf_value_key_t *value_key,
+     size_t *utf8_name_size,
+     int ascii_codepage,
+     libcerror_error_t **error )
+{
+	static char *function = "libregf_value_key_get_utf8_name_size";
+	int result            = 0;
+
+	if( value_key == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid value key.",
+		 function );
+
+		return( -1 );
+	}
+	if( value_key->name == NULL )
+	{
+		if( utf8_name_size == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+			 "%s: invalid UTF-8 name size.",
+			 function );
+
+			return( -1 );
+		}
+		*utf8_name_size = 0;
+	}
+	else
+	{
+		if( ( value_key->flags & LIBREGF_VALUE_KEY_FLAG_NAME_IS_ASCII ) != 0 )
+		{
+			result = libuna_utf8_string_size_from_byte_stream(
+				  value_key->name,
+				  (size_t) value_key->name_size,
+				  ascii_codepage,
+				  utf8_name_size,
+				  error );
+		}
+		else
+		{
+			result = libuna_utf8_string_size_from_utf16_stream(
+				  value_key->name,
+				  (size_t) value_key->name_size,
+				  LIBUNA_ENDIAN_LITTLE,
+				  utf8_name_size,
+				  error );
+		}
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve UTF-8 string size.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	return( 1 );
+}
+
+/* Retrieves the UTF-8 string value of the value name
+ * The function uses a codepage if necessary, it uses the codepage set for the library
+ * The size should include the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+int libregf_value_key_get_utf8_name(
+     libregf_value_key_t *value_key,
+     uint8_t *utf8_name,
+     size_t utf8_name_size,
+     int ascii_codepage,
+     libcerror_error_t **error )
+{
+	static char *function = "libregf_value_key_get_utf8_name";
+	int result            = 0;
+
+	if( value_key == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid value key.",
+		 function );
+
+		return( -1 );
+	}
+	if( value_key->name == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid value key - missing name.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( value_key->flags & LIBREGF_VALUE_KEY_FLAG_NAME_IS_ASCII ) != 0 )
+	{
+		result = libuna_utf8_string_copy_from_byte_stream(
+			  utf8_name,
+			  utf8_name_size,
+			  value_key->name,
+			  (size_t) value_key->name_size,
+			  ascii_codepage,
+			  error );
+	}
+	else
+	{
+		result = libuna_utf8_string_copy_from_utf16_stream(
+			  utf8_name,
+			  utf8_name_size,
+			  value_key->name,
+			  (size_t) value_key->name_size,
+			  LIBUNA_ENDIAN_LITTLE,
+			  error );
+	}
+	if( result != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve UTF-8 string.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the UTF-16 string size of the value name
+ * The returned size includes the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+int libregf_value_key_get_utf16_name_size(
+     libregf_value_key_t *value_key,
+     size_t *utf16_name_size,
+     int ascii_codepage,
+     libcerror_error_t **error )
+{
+	static char *function = "libregf_value_key_get_utf16_name_size";
+	int result            = 0;
+
+	if( value_key == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid value key.",
+		 function );
+
+		return( -1 );
+	}
+	if( value_key->name == NULL )
+	{
+		if( utf16_name_size == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+			 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+			 "%s: invalid UTF-16 name size.",
+			 function );
+
+			return( -1 );
+		}
+		*utf16_name_size = 0;
+	}
+	else
+	{
+		if( ( value_key->flags & LIBREGF_VALUE_KEY_FLAG_NAME_IS_ASCII ) != 0 )
+		{
+			result = libuna_utf16_string_size_from_byte_stream(
+				  value_key->name,
+				  (size_t) value_key->name_size,
+				  ascii_codepage,
+				  utf16_name_size,
+				  error );
+		}
+		else
+		{
+			result = libuna_utf16_string_size_from_utf16_stream(
+				  value_key->name,
+				  (size_t) value_key->name_size,
+				  LIBUNA_ENDIAN_LITTLE,
+				  utf16_name_size,
+				  error );
+		}
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve UTF-16 string size.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	return( 1 );
+}
+
+/* Retrieves the UTF-16 string value of the value name
+ * The function uses a codepage if necessary, it uses the codepage set for the library
+ * The size should include the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+int libregf_value_key_get_utf16_name(
+     libregf_value_key_t *value_key,
+     uint16_t *utf16_name,
+     size_t utf16_name_size,
+     int ascii_codepage,
+     libcerror_error_t **error )
+{
+	static char *function = "libregf_value_key_get_utf16_name";
+	int result            = 0;
+
+	if( value_key == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid value key.",
+		 function );
+
+		return( -1 );
+	}
+	if( value_key->name == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid value key - missing name.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( value_key->flags & LIBREGF_VALUE_KEY_FLAG_NAME_IS_ASCII ) != 0 )
+	{
+		result = libuna_utf16_string_copy_from_byte_stream(
+			  utf16_name,
+			  utf16_name_size,
+			  value_key->name,
+			  (size_t) value_key->name_size,
+			  ascii_codepage,
+			  error );
+	}
+	else
+	{
+		result = libuna_utf16_string_copy_from_utf16_stream(
+			  utf16_name,
+			  utf16_name_size,
+			  value_key->name,
+			  (size_t) value_key->name_size,
+			  LIBUNA_ENDIAN_LITTLE,
+			  error );
+	}
+	if( result != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve UTF-16 string.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the value type
+ * Returns 1 if successful or -1 on error
+ */
+int libregf_value_key_get_value_type(
+     libregf_value_key_t *value_key,
+     uint32_t *value_type,
+     libcerror_error_t **error )
+{
+	static char *function = "libregf_value_key_get_value_type";
+
+	if( value_key == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid value key.",
+		 function );
+
+		return( -1 );
+	}
+	if( value_type == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid data type.",
+		 function );
+
+		return( -1 );
+	}
+	*value_type = value_key->value_type;
+
+	return( 1 );
+}
+
+/* Compares the value name with UTF-8 string
+ * Returns 1 if the names match, 0 if not or -1 on error
+ */
+int libregf_value_key_compare_name_with_utf8_string(
+     libregf_value_key_t *value_key,
+     uint32_t name_hash,
+     const uint8_t *utf8_string,
+     size_t utf8_string_length,
+     int ascii_codepage,
+     libcerror_error_t **error )
+{
+	static char *function                       = "libregf_value_key_compare_name_with_utf8_string";
+	libuna_unicode_character_t name_character   = 0;
+	libuna_unicode_character_t string_character = 0;
+	size_t name_index                           = 0;
+	size_t utf8_string_index                    = 0;
+	int result                                  = 0;
+
+	if( value_key == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid value key.",
+		 function );
+
+		return( -1 );
+	}
+	if( utf8_string_length > (size_t) SSIZE_MAX )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid UTF-8 string length value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
+	/* Check if we are looking for the nameless default value
+	 */
+	if( value_key->name == NULL )
+	{
+		if( ( utf8_string == NULL )
+		 && ( utf8_string_length == 0 ) )
+		{
+			return( 1 );
+		}
+	}
+	else if( ( name_hash == 0 )
+	      || ( value_key->name_hash == 0 )
+	      || ( value_key->name_hash == name_hash ) )
+	{
+		/* Do a full compare if there no name hash was provided or the name hash matches
+		 */
+		while( name_index < (size_t) value_key->name_size )
+		{
+			if( utf8_string_index >= utf8_string_length )
+			{
+				break;
+			}
+			if( ( value_key->flags & LIBREGF_VALUE_KEY_FLAG_NAME_IS_ASCII ) != 0 )
+			{
+				result = libuna_unicode_character_copy_from_byte_stream(
+					  &name_character,
+					  value_key->name,
+					  (size_t) value_key->name_size,
+					  &name_index,
+					  ascii_codepage,
+					  error );
+			}
+			else
+			{
+				result = libuna_unicode_character_copy_from_utf16_stream(
+					  &name_character,
+					  value_key->name,
+					  (size_t) value_key->name_size,
+					  &name_index,
+					  LIBUNA_ENDIAN_LITTLE,
+					  error );
+			}
+			if( result != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+				 "%s: unable to copy value name to Unicode character.",
+				 function );
+
+				return( -1 );
+			}
+			if( libuna_unicode_character_copy_from_utf8(
+			     &string_character,
+			     utf8_string,
+			     utf8_string_length,
+			     &utf8_string_index,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+				 "%s: unable to copy UTF-8 string to Unicode character.",
+				 function );
+
+				return( -1 );
+			}
+			if( towupper( (wint_t) name_character ) != towupper( (wint_t) string_character ) )
+			{
+				break;
+			}
+		}
+		if( ( name_index == (size_t) value_key->name_size )
+		 && ( utf8_string_index == utf8_string_length ) )
+		{
+			return( 1 );
+		}
+	}
+	return( 0 );
+}
+
+/* Compares the value name with UTF-16 string
+ * Returns 1 if the names match, 0 if not or -1 on error
+ */
+int libregf_value_key_compare_name_with_utf16_string(
+     libregf_value_key_t *value_key,
+     uint32_t name_hash,
+     const uint16_t *utf16_string,
+     size_t utf16_string_length,
+     int ascii_codepage,
+     libcerror_error_t **error )
+{
+	static char *function                       = "libregf_value_key_compare_name_with_utf16_string";
+	libuna_unicode_character_t name_character   = 0;
+	libuna_unicode_character_t string_character = 0;
+	size_t name_index                           = 0;
+	size_t utf16_string_index                   = 0;
+	int result                                  = 0;
+
+	if( value_key == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid value key.",
+		 function );
+
+		return( -1 );
+	}
+	if( utf16_string_length > (size_t) SSIZE_MAX )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid UTF-16 string length value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
+	/* Check if we are looking for the nameless default value
+	 */
+	if( value_key->name == NULL )
+	{
+		if( ( utf16_string == NULL )
+		 && ( utf16_string_length == 0 ) )
+		{
+			return( 1 );
+		}
+	}
+	else if( ( name_hash == 0 )
+	      || ( value_key->name_hash == 0 )
+	      || ( value_key->name_hash == name_hash ) )
+	{
+		/* Do a full compare if there no name hash was provided or the name hash matches
+		 */
+		while( name_index < (size_t) value_key->name_size )
+		{
+			if( utf16_string_index >= utf16_string_length )
+			{
+				break;
+			}
+			if( ( value_key->flags & LIBREGF_VALUE_KEY_FLAG_NAME_IS_ASCII ) != 0 )
+			{
+				result = libuna_unicode_character_copy_from_byte_stream(
+				          &name_character,
+				          value_key->name,
+				          (size_t) value_key->name_size,
+				          &name_index,
+				          ascii_codepage,
+				          error );
+			}
+			else
+			{
+				result = libuna_unicode_character_copy_from_utf16_stream(
+				          &name_character,
+				          value_key->name,
+				          (size_t) value_key->name_size,
+				          &name_index,
+				          LIBUNA_ENDIAN_LITTLE,
+				          error );
+			}
+			if( result != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+				 "%s: unable to copy value name to Unicode character.",
+				 function );
+
+				return( -1 );
+			}
+			if( libuna_unicode_character_copy_from_utf16(
+			     &string_character,
+			     utf16_string,
+			     utf16_string_length,
+			     &utf16_string_index,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+				 "%s: unable to copy UTF-16 string to Unicode character.",
+				 function );
+
+				return( -1 );
+			}
+			if( towupper( (wint_t) name_character ) != towupper( (wint_t) string_character ) )
+			{
+				break;
+			}
+		}
+		if( ( name_index == (size_t) value_key->name_size )
+		 && ( utf16_string_index == utf16_string_length ) )
+		{
+			return( 1 );
+		}
+	}
+	return( 0 );
 }
 

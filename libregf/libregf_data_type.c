@@ -81,5 +81,5 @@ const char *libregf_data_type_get_description(
 	 ( libregf_data_types[ iterator ] ).description );
 }
 
-#endif
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
 

@@ -24,6 +24,7 @@ libregf_la_SOURCES = \
 	libregf.c \
 	libregf_checksum.c libregf_checksum.h \
 	libregf_codepage.h \
+	libregf_data_block_key.c libregf_data_block_key.h \
 	libregf_data_type.c libregf_data_type.h \
 	libregf_debug.c libregf_debug.h \
 	libregf_definitions.h \
@@ -60,7 +61,6 @@ libregf_la_SOURCES = \
 	libregf_value.c libregf_value.h \
 	libregf_value_item.c libregf_value_item.h \
 	libregf_value_key.c libregf_value_key.h \
-	libregf_value_type.c libregf_value_type.h \
 	regf_cell_values.h \
 	regf_file_header.h \
 	regf_hive_bin.h

@@ -215,10 +215,10 @@ struct regf_value_key
 	 */
 	uint8_t data_offset[ 4 ];
 
-	/* The data type
+	/* The value type
 	 * Consists of 4 bytes
 	 */
-	uint8_t data_type[ 4 ];
+	uint8_t value_type[ 4 ];
 
 	/* The flags
 	 * Consists of 2 bytes

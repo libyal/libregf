@@ -1,5 +1,4 @@
 TODO
-* clean up: move value key out of value item
 * fix:
   - multiple successive open of transaction regf file
 * clean up

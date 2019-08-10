@@ -43,6 +43,7 @@ EXTRA_DIST = \
 
 check_PROGRAMS = \
 	regf_test_checksum \
+	regf_test_data_block_key \
 	regf_test_data_type \
 	regf_test_error \
 	regf_test_file \
@@ -71,6 +72,18 @@ regf_test_checksum_SOURCES = \
 	regf_test_unused.h
 
 regf_test_checksum_LDADD = \
+	../libregf/libregf.la \
+	@LIBCERROR_LIBADD@
+
+regf_test_data_block_key_SOURCES = \
+	regf_test_data_block_key.c \
+	regf_test_libcerror.h \
+	regf_test_libregf.h \
+	regf_test_macros.h \
+	regf_test_memory.c regf_test_memory.h \
+	regf_test_unused.h
+
+regf_test_data_block_key_LDADD = \
 	../libregf/libregf.la \
 	@LIBCERROR_LIBADD@
 

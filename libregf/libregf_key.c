@@ -39,7 +39,6 @@
 #include "libregf_libuna.h"
 #include "libregf_value.h"
 #include "libregf_value_item.h"
-#include "libregf_value_type.h"
 
 /* Creates a key
  * Make sure the value key is referencing, is set to NULL
@@ -2689,53 +2688,26 @@ int libregf_internal_key_get_value_by_utf8_name(
 
 			return( -1 );
 		}
-		if( value_item == NULL )
+		result = libregf_value_item_compare_name_with_utf8_string(
+			  value_item,
+			  name_hash,
+			  utf8_string,
+			  utf8_string_length,
+			  internal_key->io_handle->ascii_codepage,
+			  error );
+
+		if( result == -1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: missing value item: %d values.",
-			 function,
-			 value_index );
+			 LIBCERROR_RUNTIME_ERROR_GENERIC,
+			 "%s: unable to compare value name with UTF-8 string.",
+			 function );
 
 			return( -1 );
 		}
-		if( value_item->name == NULL )
-		{
-			if( ( utf8_string == NULL )
-			 && ( utf8_string_length == 0 ) )
-			{
-				result = 1;
-			}
-		}
-		else if( utf8_string == NULL )
-		{
-			continue;
-		}
-		else
-		{
-			result = libregf_value_item_compare_name_with_utf8_string(
-				  value_item,
-				  name_hash,
-				  utf8_string,
-				  utf8_string_length,
-				  internal_key->io_handle->ascii_codepage,
-				  error );
-
-			if( result == -1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_GENERIC,
-				 "%s: unable to compare value name with UTF-8 string.",
-				 function );
-
-				return( -1 );
-			}
-		}
-		if( result != 0 )
+		else if( result != 0 )
 		{
 			break;
 		}
@@ -3039,53 +3011,26 @@ int libregf_internal_key_get_value_by_utf16_name(
 
 			return( -1 );
 		}
-		if( value_item == NULL )
+		result = libregf_value_item_compare_name_with_utf16_string(
+			  value_item,
+			  name_hash,
+			  utf16_string,
+			  utf16_string_length,
+			  internal_key->io_handle->ascii_codepage,
+			  error );
+
+		if( result == -1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-			 "%s: missing value item: %d values.",
-			 function,
-			 value_index );
+			 LIBCERROR_RUNTIME_ERROR_GENERIC,
+			 "%s: unable to compare value name with UTF-16 string.",
+			 function );
 
 			return( -1 );
 		}
-		if( value_item->name == NULL )
-		{
-			if( ( utf16_string == NULL )
-			 && ( utf16_string_length == 0 ) )
-			{
-				result = 1;
-			}
-		}
-		else if( utf16_string == NULL )
-		{
-			continue;
-		}
-		else
-		{
-			result = libregf_value_item_compare_name_with_utf16_string(
-				  value_item,
-				  name_hash,
-				  utf16_string,
-				  utf16_string_length,
-				  internal_key->io_handle->ascii_codepage,
-				  error );
-
-			if( result == -1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_GENERIC,
-				 "%s: unable to compare value name with UTF-16 string.",
-				 function );
-
-				return( -1 );
-			}
-		}
-		if( result != 0 )
+		else if( result != 0 )
 		{
 			break;
 		}

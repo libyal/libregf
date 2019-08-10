@@ -33,7 +33,6 @@
 #include "libregf_multi_string.h"
 #include "libregf_value.h"
 #include "libregf_value_item.h"
-#include "libregf_value_type.h"
 
 /* Creates a value
  * Make sure the value value is referencing, is set to NULL
@@ -207,6 +206,7 @@ int libregf_value_is_corrupted(
 	libregf_internal_value_t *internal_value = NULL;
 	libregf_value_item_t *value_item         = NULL;
 	static char *function                    = "libregf_value_is_corrupted";
+	int result                               = 1;
 
 	if( value == NULL )
 	{
@@ -221,6 +221,21 @@ int libregf_value_is_corrupted(
 	}
 	internal_value = (libregf_internal_value_t *) value;
 
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_value->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( libfdata_list_element_get_element_value(
 	     internal_value->values_list_element,
 	     (intptr_t *) internal_value->file_io_handle,
@@ -236,24 +251,42 @@ int libregf_value_is_corrupted(
 		 "%s: unable to retrieve value item.",
 		 function );
 
-		return( -1 );
+		result = -1;
 	}
-	if( value_item == NULL )
+	else
+	{
+		result = libregf_value_item_is_corrupted(
+		          value_item,
+		          error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to determine if value is corrupted.",
+			 function );
+
+			result = -1;
+		}
+	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_value->read_write_lock,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing value item.",
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
 		 function );
 
 		return( -1 );
 	}
-	if( ( value_item->item_flags & LIBREGF_VALUE_ITEM_FLAG_IS_CORRUPTED ) != 0 )
-	{
-		return( 1 );
-	}
-	return( 0 );
+#endif
+	return( result );
 }
 
 /* Retrieves the offset of the value
@@ -269,253 +302,7 @@ int libregf_value_get_offset(
 	size64_t size                            = 0;
 	uint32_t flags                           = 0;
 	int file_index                           = 0;
-
-	if( value == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid value.",
-		 function );
-
-		return( -1 );
-	}
-	internal_value = (libregf_internal_value_t *) value;
-
-	if( internal_value->io_handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid key - missing IO handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( offset == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid offset.",
-		 function );
-
-		return( -1 );
-	}
-	if( libfdata_list_element_get_data_range(
-	     internal_value->values_list_element,
-	     &file_index,
-	     offset,
-	     &size,
-	     &flags,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve value data range.",
-		 function );
-
-		return( -1 );
-	}
-	/* The offset is relative from the start of the hive bins list
-	 * and points to the start of the corresponding hive bin cell
-	 */
-	*offset += internal_value->io_handle->hive_bins_list_offset + 4;
-
-	return( 1 );
-}
-
-/* Retrieves the value name size
- * Returns 1 if successful or -1 on error
- */
-int libregf_value_get_name_size(
-     libregf_value_t *value,
-     size_t *name_size,
-     libcerror_error_t **error )
-{
-	libregf_internal_value_t *internal_value = NULL;
-	libregf_value_item_t *value_item         = NULL;
-	static char *function                    = "libregf_value_get_name_size";
-
-	if( value == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid value.",
-		 function );
-
-		return( -1 );
-	}
-	internal_value = (libregf_internal_value_t *) value;
-
-	if( name_size == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid name size.",
-		 function );
-
-		return( -1 );
-	}
-	if( libfdata_list_element_get_element_value(
-	     internal_value->values_list_element,
-	     (intptr_t *) internal_value->file_io_handle,
-	     (libfdata_cache_t *) internal_value->values_cache,
-	     (intptr_t **) &value_item,
-	     0,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve value item.",
-		 function );
-
-		return( -1 );
-	}
-	if( value_item == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing value item.",
-		 function );
-
-		return( -1 );
-	}
-	*name_size = value_item->name_size;
-
-	return( 1 );
-}
-
-/* Retrieves the value name
- * Returns 1 if successful or -1 on error
- */
-int libregf_value_get_name(
-     libregf_value_t *value,
-     uint8_t *name,
-     size_t name_size,
-     libcerror_error_t **error )
-{
-	libregf_internal_value_t *internal_value = NULL;
-	libregf_value_item_t *value_item         = NULL;
-	static char *function                    = "libregf_value_get_name";
-
-	if( value == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid value.",
-		 function );
-
-		return( -1 );
-	}
-	internal_value = (libregf_internal_value_t *) value;
-
-	if( name == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid name.",
-		 function );
-
-		return( -1 );
-	}
-	if( name_size > (size_t) SSIZE_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid name size value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
-	if( libfdata_list_element_get_element_value(
-	     internal_value->values_list_element,
-	     (intptr_t *) internal_value->file_io_handle,
-	     (libfdata_cache_t *) internal_value->values_cache,
-	     (intptr_t **) &value_item,
-	     0,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve value item.",
-		 function );
-
-		return( -1 );
-	}
-	if( value_item == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing value item.",
-		 function );
-
-		return( -1 );
-	}
-	if( name_size < value_item->name_size )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid name size value out of bounds.",
-		 function );
-
-		return( -1 );
-	}
-	if( memory_copy(
-	     name,
-	     value_item->name,
-	     value_item->name_size ) == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_MEMORY,
-		 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-		 "%s: unable to copy name.",
-		 function );
-
-		return( -1 );
-	}
-	return( 1 );
-}
-
-/* Retrieves the UTF-8 string size of the value name
- * The returned size includes the end of string character
- * Returns 1 if successful or -1 on error
- */
-int libregf_value_get_utf8_name_size(
-     libregf_value_t *value,
-     size_t *utf8_name_size,
-     libcerror_error_t **error )
-{
-	libregf_internal_value_t *internal_value = NULL;
-	libregf_value_item_t *value_item         = NULL;
-	static char *function                    = "libregf_value_get_utf8_name_size";
-	int result                               = 0;
+	int result                               = 1;
 
 	if( value == NULL )
 	{
@@ -541,6 +328,115 @@ int libregf_value_get_utf8_name_size(
 
 		return( -1 );
 	}
+	if( offset == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid offset.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_value->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	if( libfdata_list_element_get_data_range(
+	     internal_value->values_list_element,
+	     &file_index,
+	     offset,
+	     &size,
+	     &flags,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve value data range.",
+		 function );
+
+		result = -1;
+	}
+	else
+	{
+		/* The offset is relative from the start of the hive bins list
+		 * and points to the start of the corresponding hive bin cell
+		 */
+		*offset += internal_value->io_handle->hive_bins_list_offset + 4;
+	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_value->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
+}
+
+/* Retrieves the value name size
+ * Returns 1 if successful or -1 on error
+ */
+int libregf_value_get_name_size(
+     libregf_value_t *value,
+     size_t *name_size,
+     libcerror_error_t **error )
+{
+	libregf_internal_value_t *internal_value = NULL;
+	libregf_value_item_t *value_item         = NULL;
+	static char *function                    = "libregf_value_get_name_size";
+	int result                               = 1;
+
+	if( value == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid value.",
+		 function );
+
+		return( -1 );
+	}
+	internal_value = (libregf_internal_value_t *) value;
+
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_value->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( libfdata_list_element_get_element_value(
 	     internal_value->values_list_element,
 	     (intptr_t *) internal_value->file_io_handle,
@@ -556,67 +452,233 @@ int libregf_value_get_utf8_name_size(
 		 "%s: unable to retrieve value item.",
 		 function );
 
+		result = -1;
+	}
+	else if( libregf_value_item_get_name_size(
+	          value_item,
+	          name_size,
+	          error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve name size.",
+		 function );
+
+		result = -1;
+	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_value->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
 		return( -1 );
 	}
-	if( value_item == NULL )
+#endif
+	return( result );
+}
+
+/* Retrieves the value name
+ * Returns 1 if successful or -1 on error
+ */
+int libregf_value_get_name(
+     libregf_value_t *value,
+     uint8_t *name,
+     size_t name_size,
+     libcerror_error_t **error )
+{
+	libregf_internal_value_t *internal_value = NULL;
+	libregf_value_item_t *value_item         = NULL;
+	static char *function                    = "libregf_value_get_name";
+	int result                               = 1;
+
+	if( value == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid value.",
+		 function );
+
+		return( -1 );
+	}
+	internal_value = (libregf_internal_value_t *) value;
+
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_value->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	if( libfdata_list_element_get_element_value(
+	     internal_value->values_list_element,
+	     (intptr_t *) internal_value->file_io_handle,
+	     (libfdata_cache_t *) internal_value->values_cache,
+	     (intptr_t **) &value_item,
+	     0,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve value item.",
+		 function );
+
+		result = -1;
+	}
+	else if( libregf_value_item_get_name(
+	          value_item,
+	          name,
+	          name_size,
+	          error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve name.",
+		 function );
+
+		result = -1;
+	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_value->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
+}
+
+/* Retrieves the UTF-8 string size of the value name
+ * The returned size includes the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+int libregf_value_get_utf8_name_size(
+     libregf_value_t *value,
+     size_t *utf8_name_size,
+     libcerror_error_t **error )
+{
+	libregf_internal_value_t *internal_value = NULL;
+	libregf_value_item_t *value_item         = NULL;
+	static char *function                    = "libregf_value_get_utf8_name_size";
+	int result                               = 1;
+
+	if( value == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid value.",
+		 function );
+
+		return( -1 );
+	}
+	internal_value = (libregf_internal_value_t *) value;
+
+	if( internal_value->io_handle == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing value item.",
+		 "%s: invalid value - missing IO handle.",
 		 function );
 
 		return( -1 );
 	}
-	if( value_item->name == NULL )
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_value->read_write_lock,
+	     error ) != 1 )
 	{
-		if( utf8_name_size == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-			 "%s: invalid UTF-8 name size.",
-			 function );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
 
-			return( -1 );
-		}
-		*utf8_name_size = 0;
+		return( -1 );
 	}
-	else
+#endif
+	if( libfdata_list_element_get_element_value(
+	     internal_value->values_list_element,
+	     (intptr_t *) internal_value->file_io_handle,
+	     (libfdata_cache_t *) internal_value->values_cache,
+	     (intptr_t **) &value_item,
+	     0,
+	     error ) != 1 )
 	{
-		if( ( value_item->flags & LIBREGF_VALUE_KEY_FLAG_NAME_IS_ASCII ) != 0 )
-		{
-			result = libuna_utf8_string_size_from_byte_stream(
-				  value_item->name,
-				  (size_t) value_item->name_size,
-				  internal_value->io_handle->ascii_codepage,
-				  utf8_name_size,
-				  error );
-		}
-		else
-		{
-			result = libuna_utf8_string_size_from_utf16_stream(
-				  value_item->name,
-				  (size_t) value_item->name_size,
-				  LIBUNA_ENDIAN_LITTLE,
-				  utf8_name_size,
-				  error );
-		}
-		if( result != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve UTF-8 string size.",
-			 function );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve value item.",
+		 function );
 
-			return( -1 );
-		}
+		result = -1;
 	}
-	return( 1 );
+	else if( libregf_value_item_get_utf8_name_size(
+	          value_item,
+	          utf8_name_size,
+	          internal_value->io_handle->ascii_codepage,
+	          error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve UTF-8 name size.",
+		 function );
+
+		result = -1;
+	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_value->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
 }
 
 /* Retrieves the UTF-8 string value of the value name
@@ -633,7 +695,7 @@ int libregf_value_get_utf8_name(
 	libregf_internal_value_t *internal_value = NULL;
 	libregf_value_item_t *value_item         = NULL;
 	static char *function                    = "libregf_value_get_utf8_name";
-	int result                               = 0;
+	int result                               = 1;
 
 	if( value == NULL )
 	{
@@ -659,6 +721,21 @@ int libregf_value_get_utf8_name(
 
 		return( -1 );
 	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_value->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( libfdata_list_element_get_element_value(
 	     internal_value->values_list_element,
 	     (intptr_t *) internal_value->file_io_handle,
@@ -674,62 +751,40 @@ int libregf_value_get_utf8_name(
 		 "%s: unable to retrieve value item.",
 		 function );
 
-		return( -1 );
+		result = -1;
 	}
-	if( value_item == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing value item.",
-		 function );
-
-		return( -1 );
-	}
-	if( value_item->name == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid value item - missing name.",
-		 function );
-
-		return( -1 );
-	}
-	if( ( value_item->flags & LIBREGF_VALUE_KEY_FLAG_NAME_IS_ASCII ) != 0 )
-	{
-		result = libuna_utf8_string_copy_from_byte_stream(
-			  utf8_name,
-			  utf8_name_size,
-			  value_item->name,
-			  (size_t) value_item->name_size,
-			  internal_value->io_handle->ascii_codepage,
-			  error );
-	}
-	else
-	{
-		result = libuna_utf8_string_copy_from_utf16_stream(
-			  utf8_name,
-			  utf8_name_size,
-			  value_item->name,
-			  (size_t) value_item->name_size,
-			  LIBUNA_ENDIAN_LITTLE,
-			  error );
-	}
-	if( result != 1 )
+	else if( libregf_value_item_get_utf8_name(
+	          value_item,
+	          utf8_name,
+	          utf8_name_size,
+	          internal_value->io_handle->ascii_codepage,
+	          error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve UTF-8 string.",
+		 "%s: unable to retrieve UTF-8 name size.",
+		 function );
+
+		result = -1;
+	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_value->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
 		 function );
 
 		return( -1 );
 	}
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the UTF-16 string size of the value name
@@ -744,7 +799,7 @@ int libregf_value_get_utf16_name_size(
 	libregf_internal_value_t *internal_value = NULL;
 	libregf_value_item_t *value_item         = NULL;
 	static char *function                    = "libregf_value_get_utf16_name_size";
-	int result                               = 0;
+	int result                               = 1;
 
 	if( value == NULL )
 	{
@@ -770,6 +825,21 @@ int libregf_value_get_utf16_name_size(
 
 		return( -1 );
 	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_value->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( libfdata_list_element_get_element_value(
 	     internal_value->values_list_element,
 	     (intptr_t *) internal_value->file_io_handle,
@@ -785,67 +855,39 @@ int libregf_value_get_utf16_name_size(
 		 "%s: unable to retrieve value item.",
 		 function );
 
-		return( -1 );
+		result = -1;
 	}
-	if( value_item == NULL )
+	else if( libregf_value_item_get_utf16_name_size(
+	          value_item,
+	          utf16_name_size,
+	          internal_value->io_handle->ascii_codepage,
+	          error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing value item.",
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve UTF-16 name size.",
+		 function );
+
+		result = -1;
+	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_value->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
 		 function );
 
 		return( -1 );
 	}
-	if( value_item->name == NULL )
-	{
-		if( utf16_name_size == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-			 "%s: invalid UTF-16 name size.",
-			 function );
-
-			return( -1 );
-		}
-		*utf16_name_size = 0;
-	}
-	else
-	{
-		if( ( value_item->flags & LIBREGF_VALUE_KEY_FLAG_NAME_IS_ASCII ) != 0 )
-		{
-			result = libuna_utf16_string_size_from_byte_stream(
-				  value_item->name,
-				  (size_t) value_item->name_size,
-				  internal_value->io_handle->ascii_codepage,
-				  utf16_name_size,
-				  error );
-		}
-		else
-		{
-			result = libuna_utf16_string_size_from_utf16_stream(
-				  value_item->name,
-				  (size_t) value_item->name_size,
-				  LIBUNA_ENDIAN_LITTLE,
-				  utf16_name_size,
-				  error );
-		}
-		if( result != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve UTF-16 string size.",
-			 function );
-
-			return( -1 );
-		}
-	}
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the UTF-16 string value of the value name
@@ -862,7 +904,7 @@ int libregf_value_get_utf16_name(
 	libregf_internal_value_t *internal_value = NULL;
 	libregf_value_item_t *value_item         = NULL;
 	static char *function                    = "libregf_value_get_utf16_name";
-	int result                               = 0;
+	int result                               = 1;
 
 	if( value == NULL )
 	{
@@ -888,6 +930,21 @@ int libregf_value_get_utf16_name(
 
 		return( -1 );
 	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_value->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( libfdata_list_element_get_element_value(
 	     internal_value->values_list_element,
 	     (intptr_t *) internal_value->file_io_handle,
@@ -903,62 +960,40 @@ int libregf_value_get_utf16_name(
 		 "%s: unable to retrieve value item.",
 		 function );
 
-		return( -1 );
+		result = -1;
 	}
-	if( value_item == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing value item.",
-		 function );
-
-		return( -1 );
-	}
-	if( value_item->name == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid value item - missing name.",
-		 function );
-
-		return( -1 );
-	}
-	if( ( value_item->flags & LIBREGF_VALUE_KEY_FLAG_NAME_IS_ASCII ) != 0 )
-	{
-		result = libuna_utf16_string_copy_from_byte_stream(
-			  utf16_name,
-			  utf16_name_size,
-			  value_item->name,
-			  (size_t) value_item->name_size,
-			  internal_value->io_handle->ascii_codepage,
-			  error );
-	}
-	else
-	{
-		result = libuna_utf16_string_copy_from_utf16_stream(
-			  utf16_name,
-			  utf16_name_size,
-			  value_item->name,
-			  (size_t) value_item->name_size,
-			  LIBUNA_ENDIAN_LITTLE,
-			  error );
-	}
-	if( result != 1 )
+	else if( libregf_value_item_get_utf16_name(
+	          value_item,
+	          utf16_name,
+	          utf16_name_size,
+	          internal_value->io_handle->ascii_codepage,
+	          error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve UTF-16 string.",
+		 "%s: unable to retrieve UTF-16 name size.",
+		 function );
+
+		result = -1;
+	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_value->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
 		 function );
 
 		return( -1 );
 	}
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the value type
@@ -972,6 +1007,7 @@ int libregf_value_get_value_type(
 	libregf_internal_value_t *internal_value = NULL;
 	libregf_value_item_t *value_item         = NULL;
 	static char *function                    = "libregf_value_get_value_type";
+	int result                               = 1;
 
 	if( value == NULL )
 	{
@@ -986,17 +1022,21 @@ int libregf_value_get_value_type(
 	}
 	internal_value = (libregf_internal_value_t *) value;
 
-	if( value_type == NULL )
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_value->read_write_lock,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid value type.",
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
 		 function );
 
 		return( -1 );
 	}
+#endif
 	if( libfdata_list_element_get_element_value(
 	     internal_value->values_list_element,
 	     (intptr_t *) internal_value->file_io_handle,
@@ -1012,22 +1052,38 @@ int libregf_value_get_value_type(
 		 "%s: unable to retrieve value item.",
 		 function );
 
-		return( -1 );
+		result = -1;
 	}
-	if( value_item == NULL )
+	else if( libregf_value_item_get_value_type(
+	          value_item,
+	          value_type,
+	          error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing value item.",
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve value type.",
+		 function );
+
+		result = -1;
+	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_value->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
 		 function );
 
 		return( -1 );
 	}
-	*value_type = value_item->type;
-
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the value data size
@@ -1041,6 +1097,7 @@ int libregf_value_get_value_data_size(
 	libregf_internal_value_t *internal_value = NULL;
 	libregf_value_item_t *value_item         = NULL;
 	static char *function                    = "libregf_value_get_value_data_size";
+	int result                               = 1;
 
 	if( value == NULL )
 	{
@@ -1055,6 +1112,21 @@ int libregf_value_get_value_data_size(
 	}
 	internal_value = (libregf_internal_value_t *) value;
 
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_value->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( libfdata_list_element_get_element_value(
 	     internal_value->values_list_element,
 	     (intptr_t *) internal_value->file_io_handle,
@@ -1070,52 +1142,38 @@ int libregf_value_get_value_data_size(
 		 "%s: unable to retrieve value item.",
 		 function );
 
-		return( -1 );
+		result = -1;
 	}
-	if( value_item == NULL )
+	else if( libregf_value_item_get_data_size(
+	          value_item,
+	          value_data_size,
+	          error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing value item.",
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve value data size.",
+		 function );
+
+		result = -1;
+	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_value->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
 		 function );
 
 		return( -1 );
 	}
-	if( value_item->data_type == 0 )
-	{
-		if( value_data_size == NULL )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-			 "%s: invalid value data size.",
-			 function );
-
-			return( -1 );
-		}
-		*value_data_size = 0;
-	}
-	else
-	{
-		if( libregf_value_item_get_data_size(
-		     value_item,
-		     value_data_size,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve value data size.",
-			 function );
-
-			return( -1 );
-		}
-	}
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the value data
@@ -1168,6 +1226,7 @@ int libregf_value_get_value_data(
 
 		return( -1 );
 	}
+/* TODO add thread lock support */
 	if( libfdata_list_element_get_element_value(
 	     internal_value->values_list_element,
 	     (intptr_t *) internal_value->file_io_handle,
@@ -1239,10 +1298,8 @@ int libregf_value_get_value_32bit(
 {
 	libregf_internal_value_t *internal_value = NULL;
 	libregf_value_item_t *value_item         = NULL;
-	uint8_t *value_data                      = NULL;
 	static char *function                    = "libregf_value_get_value_32bit";
-	size_t value_data_size                   = 0;
-	uint8_t byte_order                       = 0;
+	int result                               = 1;
 
 	if( value == NULL )
 	{
@@ -1257,6 +1314,21 @@ int libregf_value_get_value_32bit(
 	}
 	internal_value = (libregf_internal_value_t *) value;
 
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_value->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( libfdata_list_element_get_element_value(
 	     internal_value->values_list_element,
 	     (intptr_t *) internal_value->file_io_handle,
@@ -1272,81 +1344,39 @@ int libregf_value_get_value_32bit(
 		 "%s: unable to retrieve value item.",
 		 function );
 
-		return( -1 );
+		result = -1;
 	}
-	if( value_item == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing value item.",
-		 function );
-
-		return( -1 );
-	}
-	if( ( value_item->type != LIBREGF_VALUE_TYPE_INTEGER_32BIT_BIG_ENDIAN )
-	 && ( value_item->type != LIBREGF_VALUE_TYPE_INTEGER_32BIT_LITTLE_ENDIAN ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported 32-bit integer value type: 0x%04" PRIx32 ".",
-		 function,
-		 value_item->type );
-
-		return( -1 );
-	}
-	if( value_item->type == LIBREGF_VALUE_TYPE_INTEGER_32BIT_BIG_ENDIAN )
-	{
-		byte_order = LIBREGF_ENDIAN_BIG;
-	}
-	else
-	{
-		byte_order = LIBREGF_ENDIAN_LITTLE;
-	}
-	if( libregf_value_item_get_data(
-	     value_item,
-	     internal_value->file_io_handle,
-	     &value_data,
-	     &value_data_size,
-	     error ) != 1 )
+	else if( libregf_value_item_get_value_32bit(
+	          value_item,
+	          internal_value->file_io_handle,
+	          value_32bit,
+	          error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve value data.",
+		 "%s: unable to retrieve 32-bit value.",
 		 function );
 
-		return( -1 );
+		result = -1;
 	}
-	if( value_data_size != 4 )
-	{
-		if( value_data_size > 4 )
-		{
-			value_data_size = 4;
-		}
-		value_item->item_flags |= LIBREGF_VALUE_ITEM_FLAG_IS_CORRUPTED;
-	}
-	if( libregf_value_type_copy_to_32bit(
-	     value_data,
-	     value_data_size,
-	     byte_order,
-	     value_32bit,
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_value->read_write_lock,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBCERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to set 32-bit value.",
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
 		 function );
 
 		return( -1 );
 	}
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the 64-bit value
@@ -1359,9 +1389,8 @@ int libregf_value_get_value_64bit(
 {
 	libregf_internal_value_t *internal_value = NULL;
 	libregf_value_item_t *value_item         = NULL;
-	uint8_t *value_data                      = NULL;
 	static char *function                    = "libregf_value_get_value_64bit";
-	size_t value_data_size                   = 0;
+	int result                               = 1;
 
 	if( value == NULL )
 	{
@@ -1376,6 +1405,21 @@ int libregf_value_get_value_64bit(
 	}
 	internal_value = (libregf_internal_value_t *) value;
 
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_value->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( libfdata_list_element_get_element_value(
 	     internal_value->values_list_element,
 	     (intptr_t *) internal_value->file_io_handle,
@@ -1391,72 +1435,39 @@ int libregf_value_get_value_64bit(
 		 "%s: unable to retrieve value item.",
 		 function );
 
-		return( -1 );
+		result = -1;
 	}
-	if( value_item == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing value item.",
-		 function );
-
-		return( -1 );
-	}
-	if( value_item->type != LIBREGF_VALUE_TYPE_INTEGER_64BIT_LITTLE_ENDIAN )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported 64-bit integer value type: 0x%04" PRIx32 ".",
-		 function,
-		 value_item->type );
-
-		return( -1 );
-	}
-	if( libregf_value_item_get_data(
-	     value_item,
-	     internal_value->file_io_handle,
-	     &value_data,
-	     &value_data_size,
-	     error ) != 1 )
+	else if( libregf_value_item_get_value_64bit(
+	          value_item,
+	          internal_value->file_io_handle,
+	          value_64bit,
+	          error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve value data.",
+		 "%s: unable to retrieve 64-bit value.",
 		 function );
 
-		return( -1 );
+		result = -1;
 	}
-	if( value_data_size != 8 )
-	{
-		if( value_data_size > 8 )
-		{
-			value_data_size = 8;
-		}
-		value_item->item_flags |= LIBREGF_VALUE_ITEM_FLAG_IS_CORRUPTED;
-	}
-	if( libregf_value_type_copy_to_64bit(
-	     value_data,
-	     value_data_size,
-	     LIBREGF_ENDIAN_LITTLE,
-	     value_64bit,
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_value->read_write_lock,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBCERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to set 64-bit value.",
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
 		 function );
 
 		return( -1 );
 	}
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the UTF-8 string size
@@ -1470,9 +1481,8 @@ int libregf_value_get_value_utf8_string_size(
 {
 	libregf_internal_value_t *internal_value = NULL;
 	libregf_value_item_t *value_item         = NULL;
-	uint8_t *value_data                      = NULL;
 	static char *function                    = "libregf_value_get_value_utf8_string_size";
-	size_t value_data_size                   = 0;
+	int result                               = 1;
 
 	if( value == NULL )
 	{
@@ -1487,17 +1497,21 @@ int libregf_value_get_value_utf8_string_size(
 	}
 	internal_value = (libregf_internal_value_t *) value;
 
-	if( internal_value->io_handle == NULL )
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_value->read_write_lock,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid value - missing IO handle.",
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
 		 function );
 
 		return( -1 );
 	}
+#endif
 	if( libfdata_list_element_get_element_value(
 	     internal_value->values_list_element,
 	     (intptr_t *) internal_value->file_io_handle,
@@ -1513,65 +1527,39 @@ int libregf_value_get_value_utf8_string_size(
 		 "%s: unable to retrieve value item.",
 		 function );
 
-		return( -1 );
+		result = -1;
 	}
-	if( value_item == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing value item.",
-		 function );
-
-		return( -1 );
-	}
-	if( ( value_item->type != LIBREGF_VALUE_TYPE_STRING )
-	 && ( value_item->type != LIBREGF_VALUE_TYPE_EXPANDABLE_STRING )
-	 && ( value_item->type != LIBREGF_VALUE_TYPE_SYMBOLIC_LINK ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported string value type: 0x%04" PRIx32 ".",
-		 function,
-		 value_item->type );
-
-		return( -1 );
-	}
-	if( libregf_value_item_get_data(
-	     value_item,
-	     internal_value->file_io_handle,
-	     &value_data,
-	     &value_data_size,
-	     error ) != 1 )
+	else if( libregf_value_item_get_value_utf8_string_size(
+	          value_item,
+	          internal_value->file_io_handle,
+	          utf8_string_size,
+	          error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve value data.",
+		 "%s: unable to retrieve UTF-8 string size.",
 		 function );
 
-		return( -1 );
+		result = -1;
 	}
-	if( libregf_value_type_get_utf8_string_size(
-	     value_data,
-	     value_data_size,
-	     utf8_string_size,
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_value->read_write_lock,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBCERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to set UTF-8 string size value.",
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
 		 function );
 
 		return( -1 );
 	}
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the UTF-8 string value
@@ -1587,9 +1575,8 @@ int libregf_value_get_value_utf8_string(
 {
 	libregf_internal_value_t *internal_value = NULL;
 	libregf_value_item_t *value_item         = NULL;
-	uint8_t *value_data                      = NULL;
 	static char *function                    = "libregf_value_get_value_utf8_string";
-	size_t value_data_size                   = 0;
+	int result                               = 1;
 
 	if( value == NULL )
 	{
@@ -1604,17 +1591,21 @@ int libregf_value_get_value_utf8_string(
 	}
 	internal_value = (libregf_internal_value_t *) value;
 
-	if( internal_value->io_handle == NULL )
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_value->read_write_lock,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid value - missing IO handle.",
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
 		 function );
 
 		return( -1 );
 	}
+#endif
 	if( libfdata_list_element_get_element_value(
 	     internal_value->values_list_element,
 	     (intptr_t *) internal_value->file_io_handle,
@@ -1630,66 +1621,40 @@ int libregf_value_get_value_utf8_string(
 		 "%s: unable to retrieve value item.",
 		 function );
 
-		return( -1 );
+		result = -1;
 	}
-	if( value_item == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing value item.",
-		 function );
-
-		return( -1 );
-	}
-	if( ( value_item->type != LIBREGF_VALUE_TYPE_STRING )
-	 && ( value_item->type != LIBREGF_VALUE_TYPE_EXPANDABLE_STRING )
-	 && ( value_item->type != LIBREGF_VALUE_TYPE_SYMBOLIC_LINK ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported string value type: 0x%04" PRIx32 ".",
-		 function,
-		 value_item->type );
-
-		return( -1 );
-	}
-	if( libregf_value_item_get_data(
-	     value_item,
-	     internal_value->file_io_handle,
-	     &value_data,
-	     &value_data_size,
-	     error ) != 1 )
+	else if( libregf_value_item_get_value_utf8_string(
+	          value_item,
+	          internal_value->file_io_handle,
+	          utf8_string,
+	          utf8_string_size,
+	          error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve value data.",
+		 "%s: unable to retrieve UTF-8 string.",
 		 function );
 
-		return( -1 );
+		result = -1;
 	}
-	if( libregf_value_type_copy_to_utf8_string(
-	     value_data,
-	     value_data_size,
-	     utf8_string,
-	     utf8_string_size,
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_value->read_write_lock,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBCERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to set UTF-8 string value.",
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
 		 function );
 
 		return( -1 );
 	}
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the UTF-16 string size at a specific value from the referenced value
@@ -1703,9 +1668,8 @@ int libregf_value_get_value_utf16_string_size(
 {
 	libregf_internal_value_t *internal_value = NULL;
 	libregf_value_item_t *value_item         = NULL;
-	uint8_t *value_data                      = NULL;
 	static char *function                    = "libregf_value_get_value_utf16_string_size";
-	size_t value_data_size                   = 0;
+	int result                               = 1;
 
 	if( value == NULL )
 	{
@@ -1720,17 +1684,21 @@ int libregf_value_get_value_utf16_string_size(
 	}
 	internal_value = (libregf_internal_value_t *) value;
 
-	if( internal_value->io_handle == NULL )
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_value->read_write_lock,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid value - missing IO handle.",
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
 		 function );
 
 		return( -1 );
 	}
+#endif
 	if( libfdata_list_element_get_element_value(
 	     internal_value->values_list_element,
 	     (intptr_t *) internal_value->file_io_handle,
@@ -1746,65 +1714,39 @@ int libregf_value_get_value_utf16_string_size(
 		 "%s: unable to retrieve value item.",
 		 function );
 
-		return( -1 );
+		result = -1;
 	}
-	if( value_item == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing value item.",
-		 function );
-
-		return( -1 );
-	}
-	if( ( value_item->type != LIBREGF_VALUE_TYPE_STRING )
-	 && ( value_item->type != LIBREGF_VALUE_TYPE_EXPANDABLE_STRING )
-	 && ( value_item->type != LIBREGF_VALUE_TYPE_SYMBOLIC_LINK ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported string value type: 0x%04" PRIx32 ".",
-		 function,
-		 value_item->type );
-
-		return( -1 );
-	}
-	if( libregf_value_item_get_data(
-	     value_item,
-	     internal_value->file_io_handle,
-	     &value_data,
-	     &value_data_size,
-	     error ) != 1 )
+	else if( libregf_value_item_get_value_utf16_string_size(
+	          value_item,
+	          internal_value->file_io_handle,
+	          utf16_string_size,
+	          error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve value data.",
+		 "%s: unable to retrieve UTF-16 string size.",
 		 function );
 
-		return( -1 );
+		result = -1;
 	}
-	if( libregf_value_type_get_utf16_string_size(
-	     value_data,
-	     value_data_size,
-	     utf16_string_size,
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_value->read_write_lock,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBCERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to set UTF-16 string size value.",
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
 		 function );
 
 		return( -1 );
 	}
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the UTF-16 string value
@@ -1820,9 +1762,8 @@ int libregf_value_get_value_utf16_string(
 {
 	libregf_internal_value_t *internal_value = NULL;
 	libregf_value_item_t *value_item         = NULL;
-	uint8_t *value_data                      = NULL;
 	static char *function                    = "libregf_value_get_value_utf16_string";
-	size_t value_data_size                   = 0;
+	int result                               = 1;
 
 	if( value == NULL )
 	{
@@ -1837,17 +1778,21 @@ int libregf_value_get_value_utf16_string(
 	}
 	internal_value = (libregf_internal_value_t *) value;
 
-	if( internal_value->io_handle == NULL )
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_value->read_write_lock,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid value - missing IO handle.",
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
 		 function );
 
 		return( -1 );
 	}
+#endif
 	if( libfdata_list_element_get_element_value(
 	     internal_value->values_list_element,
 	     (intptr_t *) internal_value->file_io_handle,
@@ -1863,66 +1808,40 @@ int libregf_value_get_value_utf16_string(
 		 "%s: unable to retrieve value item.",
 		 function );
 
-		return( -1 );
+		result = -1;
 	}
-	if( value_item == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing value item.",
-		 function );
-
-		return( -1 );
-	}
-	if( ( value_item->type != LIBREGF_VALUE_TYPE_STRING )
-	 && ( value_item->type != LIBREGF_VALUE_TYPE_EXPANDABLE_STRING )
-	 && ( value_item->type != LIBREGF_VALUE_TYPE_SYMBOLIC_LINK ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported string value type: 0x%04" PRIx32 ".",
-		 function,
-		 value_item->type );
-
-		return( -1 );
-	}
-	if( libregf_value_item_get_data(
-	     value_item,
-	     internal_value->file_io_handle,
-	     &value_data,
-	     &value_data_size,
-	     error ) != 1 )
+	else if( libregf_value_item_get_value_utf16_string(
+	          value_item,
+	          internal_value->file_io_handle,
+	          utf16_string,
+	          utf16_string_size,
+	          error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve value data.",
+		 "%s: unable to retrieve UTF-16 string.",
 		 function );
 
-		return( -1 );
+		result = -1;
 	}
-	if( libregf_value_type_copy_to_utf16_string(
-	     value_data,
-	     value_data_size,
-	     utf16_string,
-	     utf16_string_size,
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_value->read_write_lock,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBCERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to set UTF-16 string value.",
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
 		 function );
 
 		return( -1 );
 	}
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the binary data size
@@ -1936,6 +1855,7 @@ int libregf_value_get_value_binary_data_size(
 	libregf_internal_value_t *internal_value = NULL;
 	libregf_value_item_t *value_item         = NULL;
 	static char *function                    = "libregf_value_get_value_binary_data_size";
+	int result                               = 1;
 
 	if( value == NULL )
 	{
@@ -1950,6 +1870,21 @@ int libregf_value_get_value_binary_data_size(
 	}
 	internal_value = (libregf_internal_value_t *) value;
 
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_value->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( libfdata_list_element_get_element_value(
 	     internal_value->values_list_element,
 	     (intptr_t *) internal_value->file_io_handle,
@@ -1965,46 +1900,38 @@ int libregf_value_get_value_binary_data_size(
 		 "%s: unable to retrieve value item.",
 		 function );
 
-		return( -1 );
+		result = -1;
 	}
-	if( value_item == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing value item.",
-		 function );
-
-		return( -1 );
-	}
-	if( value_item->type != LIBREGF_VALUE_TYPE_BINARY_DATA )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported binary data value type: 0x%04" PRIx32 ".",
-		 function,
-		 value_item->type );
-
-		return( -1 );
-	}
-	if( libregf_value_item_get_data_size(
-	     value_item,
-	     size,
-	     error ) != 1 )
+	else if( libregf_value_item_get_value_binary_data_size(
+	          value_item,
+	          size,
+	          error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve value data size.",
+		 "%s: unable to retrieve binary data size.",
+		 function );
+
+		result = -1;
+	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_value->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
 		 function );
 
 		return( -1 );
 	}
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the binary data value
@@ -2018,9 +1945,8 @@ int libregf_value_get_value_binary_data(
 {
 	libregf_internal_value_t *internal_value = NULL;
 	libregf_value_item_t *value_item         = NULL;
-	uint8_t *value_data                      = NULL;
 	static char *function                    = "libregf_value_get_value_binary_data";
-	size_t value_data_size                   = 0;
+	int result                               = 1;
 
 	if( value == NULL )
 	{
@@ -2035,6 +1961,21 @@ int libregf_value_get_value_binary_data(
 	}
 	internal_value = (libregf_internal_value_t *) value;
 
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_value->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( libfdata_list_element_get_element_value(
 	     internal_value->values_list_element,
 	     (intptr_t *) internal_value->file_io_handle,
@@ -2050,65 +1991,40 @@ int libregf_value_get_value_binary_data(
 		 "%s: unable to retrieve value item.",
 		 function );
 
-		return( -1 );
+		result = -1;
 	}
-	if( value_item == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing value item.",
-		 function );
-
-		return( -1 );
-	}
-	if( value_item->type != LIBREGF_VALUE_TYPE_BINARY_DATA )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported binary data value type: 0x%04" PRIx32 ".",
-		 function,
-		 value_item->type );
-
-		return( -1 );
-	}
-/* TODO optimize to read directly from block or stream */
-	if( libregf_value_item_get_data(
-	     value_item,
-	     internal_value->file_io_handle,
-	     &value_data,
-	     &value_data_size,
-	     error ) != 1 )
+	else if( libregf_value_item_get_value_binary_data(
+	          value_item,
+	          internal_value->file_io_handle,
+	          binary_data,
+	          size,
+	          error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve value data.",
+		 "%s: unable to retrieve binary data.",
 		 function );
 
-		return( -1 );
+		result = -1;
 	}
-	if( libregf_value_type_copy_to_binary_data(
-	     value_data,
-	     value_data_size,
-	     binary_data,
-	     size,
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_value->read_write_lock,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_CONVERSION,
-		 LIBCERROR_CONVERSION_ERROR_GENERIC,
-		 "%s: unable to set binary data.",
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
 		 function );
 
 		return( -1 );
 	}
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the multi string value
@@ -2122,9 +2038,8 @@ int libregf_value_get_value_multi_string(
 {
 	libregf_internal_value_t *internal_value = NULL;
 	libregf_value_item_t *value_item         = NULL;
-	uint8_t *value_data                      = NULL;
 	static char *function                    = "libregf_value_get_value_multi_string";
-	size_t value_data_size                   = 0;
+	int result                               = 1;
 
 	if( value == NULL )
 	{
@@ -2139,17 +2054,6 @@ int libregf_value_get_value_multi_string(
 	}
 	internal_value = (libregf_internal_value_t *) value;
 
-	if( internal_value->io_handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid value - missing IO handle.",
-		 function );
-
-		return( -1 );
-	}
 	if( multi_string == NULL )
 	{
 		libcerror_error_set(
@@ -2161,6 +2065,32 @@ int libregf_value_get_value_multi_string(
 
 		return( -1 );
 	}
+	if( *multi_string != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid multi string value already set.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_value->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
 	if( libfdata_list_element_get_element_value(
 	     internal_value->values_list_element,
 	     (intptr_t *) internal_value->file_io_handle,
@@ -2176,84 +2106,42 @@ int libregf_value_get_value_multi_string(
 		 "%s: unable to retrieve value item.",
 		 function );
 
-		goto on_error;
+		result = -1;
 	}
-	if( value_item == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing value item.",
-		 function );
-
-		goto on_error;
-	}
-	if( value_item->type != LIBREGF_VALUE_TYPE_MULTI_VALUE_STRING )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported string value type: 0x%04" PRIx32 ".",
-		 function,
-		 value_item->type );
-
-		goto on_error;
-	}
-	if( libregf_value_item_get_data(
-	     value_item,
-	     internal_value->file_io_handle,
-	     &value_data,
-	     &value_data_size,
-	     error ) != 1 )
+	else if( libregf_value_item_get_value_multi_string(
+	          value_item,
+	          internal_value->file_io_handle,
+	          multi_string,
+	          error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve value data.",
+		 "%s: unable to retrieve multi string.",
 		 function );
 
-		goto on_error;
+		result = -1;
 	}
-	if( libregf_multi_string_initialize(
-	     multi_string,
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_value->read_write_lock,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create multi string.",
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
 		 function );
 
-		goto on_error;
-	}
-	if( libregf_internal_multi_string_read_data(
-	     (libregf_internal_multi_string_t *) *multi_string,
-	     value_data,
-	     value_data_size,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read multi string from value data.",
-		 function );
-
-		goto on_error;
-	}
-	return( 1 );
-
-on_error:
-	if( *multi_string != NULL )
-	{
 		libregf_multi_string_free(
 		 multi_string,
 		 NULL );
+
+		return( -1 );
 	}
-	return( -1 );
+#endif
+	return( result );
 }
 

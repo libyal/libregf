@@ -46,6 +46,7 @@ int libregf_checksum_calculate_little_endian_xor32(
 	uint8_t *buffer_iterator                   = NULL;
 	static char *function                      = "libregf_checksum_calculate_little_endian_xor32";
 	libregf_aligned_t value_aligned            = 0;
+	uint32_t big_endian_value_32bit            = 0;
 	uint32_t safe_checksum_value               = 0;
 	uint32_t value_32bit                       = 0;
 	uint8_t alignment_count                    = 0;
@@ -199,16 +200,14 @@ int libregf_checksum_calculate_little_endian_xor32(
 
 			if( byte_order == _BYTE_STREAM_ENDIAN_BIG )
 			{
-				value_32bit = (uint32_t) ( value_aligned >> byte_count );
+				big_endian_value_32bit = (uint32_t) ( ( value_aligned >> byte_count ) & 0xffffffffUL );
 
 				/* Change big-endian into little-endian
 				 */
-				value_32bit = ( ( value_32bit & 0x00ff ) << 24 )
-				            | ( ( value_32bit & 0xff00 ) << 8 )
-				            | ( ( value_32bit >> 8 ) & 0xff00 )
-				            | ( ( value_32bit >> 24 ) & 0x00ff );
-
-				value_aligned <<= byte_count;
+				value_32bit = ( ( big_endian_value_32bit & 0x000000ffUL ) << 24 )
+				            | ( ( big_endian_value_32bit & 0x0000ff00UL ) << 8 )
+				            | ( ( big_endian_value_32bit >> 8 ) & 0x0000ff00UL )
+				            | ( ( big_endian_value_32bit >> 24 ) & 0x000000ffUL );
 			}
 			else if( byte_order == _BYTE_STREAM_ENDIAN_LITTLE )
 			{

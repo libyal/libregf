@@ -79,14 +79,14 @@ uint8_t regf_test_file_header_data1[ 512 ] = {
 int regf_test_file_header_initialize(
      void )
 {
-	libcerror_error_t *error          = NULL;
+	libcerror_error_t *error           = NULL;
 	libregf_file_header_t *file_header = NULL;
-	int result                        = 0;
+	int result                         = 0;
 
 #if defined( HAVE_REGF_TEST_MEMORY )
-	int number_of_malloc_fail_tests   = 1;
-	int number_of_memset_fail_tests   = 1;
-	int test_number                   = 0;
+	int number_of_malloc_fail_tests    = 1;
+	int number_of_memset_fail_tests    = 1;
+	int test_number                    = 0;
 #endif
 
 	/* Test regular cases

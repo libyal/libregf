@@ -125,6 +125,8 @@ int regf_test_named_key_initialize(
 	          &named_key,
 	          &error );
 
+	named_key = NULL;
+
 	REGF_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
@@ -136,8 +138,6 @@ int regf_test_named_key_initialize(
 
 	libcerror_error_free(
 	 &error );
-
-	named_key = NULL;
 
 #if defined( HAVE_REGF_TEST_MEMORY )
 

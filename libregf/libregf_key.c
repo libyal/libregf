@@ -77,6 +77,17 @@ int libregf_key_initialize(
 
 		return( -1 );
 	}
+	if( io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid IO handle.",
+		 function );
+
+		return( -1 );
+	}
 	if( key_tree_node == NULL )
 	{
 		libcerror_error_set(
@@ -2352,17 +2363,170 @@ int libregf_key_get_number_of_values(
  * Creates a new value
  * Returns 1 if successful or -1 on error
  */
+int libregf_internal_key_get_value(
+     libregf_internal_key_t *internal_key,
+     int value_index,
+     libregf_value_t **value,
+     libcerror_error_t **error )
+{
+	libfdata_list_element_t *values_list_element = NULL;
+	libregf_key_item_t *key_item                 = NULL;
+	libregf_value_item_t *value_item             = NULL;
+	static char *function                        = "libregf_internal_key_get_value";
+	size64_t size                                = 0;
+	off64_t offset                               = 0;
+	uint32_t flags                               = 0;
+	int file_index                               = 0;
+
+	if( internal_key == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid key.",
+		 function );
+
+		return( -1 );
+	}
+	if( value == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid value.",
+		 function );
+
+		return( -1 );
+	}
+	if( *value != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: value already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfdata_tree_node_get_node_value(
+	     internal_key->key_tree_node,
+	     (intptr_t *) internal_key->file_io_handle,
+	     (libfdata_cache_t *) internal_key->key_cache,
+	     (intptr_t **) &key_item,
+	     0,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve key item.",
+		 function );
+
+		return( -1 );
+	}
+	if( key_item == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: missing key item.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfdata_list_get_list_element_by_index(
+	     key_item->values_list,
+	     value_index,
+	     &values_list_element,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve value: %d.",
+		 function,
+		 value_index );
+
+		return( -1 );
+	}
+	if( libfdata_list_element_get_data_range(
+	     values_list_element,
+	     &file_index,
+	     &offset,
+	     &size,
+	     &flags,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve value data range.",
+		 function );
+
+		return( -1 );
+	}
+	/* The offset is relative from the start of the hive bins list
+	 * and points to the start of the corresponding hive bin cell
+	 */
+	offset += internal_key->io_handle->hive_bins_list_offset + 4;
+
+	if( libfdata_list_element_get_element_value(
+	     values_list_element,
+	     (intptr_t *) internal_key->file_io_handle,
+	     (libfdata_cache_t *) key_item->values_cache,
+	     (intptr_t **) &value_item,
+	     0,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve value item.",
+		 function );
+
+		return( -1 );
+	}
+	if( libregf_value_initialize(
+	     value,
+	     internal_key->io_handle,
+	     internal_key->file_io_handle,
+	     offset,
+	     value_item,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to initialize value.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the value
+ * Creates a new value
+ * Returns 1 if successful or -1 on error
+ */
 int libregf_key_get_value(
      libregf_key_t *key,
      int value_index,
      libregf_value_t **value,
      libcerror_error_t **error )
 {
-	libfdata_list_element_t *values_list_element = NULL;
-	libregf_internal_key_t *internal_key         = NULL;
-	libregf_key_item_t *key_item                 = NULL;
-	static char *function                        = "libregf_key_get_value";
-	int result                                   = 1;
+	libregf_internal_key_t *internal_key = NULL;
+	static char *function                = "libregf_key_get_value";
+	int result                           = 1;
 
 	if( key == NULL )
 	{
@@ -2414,39 +2578,11 @@ int libregf_key_get_value(
 		return( -1 );
 	}
 #endif
-	if( libfdata_tree_node_get_node_value(
-	     internal_key->key_tree_node,
-	     (intptr_t *) internal_key->file_io_handle,
-	     (libfdata_cache_t *) internal_key->key_cache,
-	     (intptr_t **) &key_item,
-	     0,
+	if( libregf_internal_key_get_value(
+	     internal_key,
+	     value_index,
+	     value,
 	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve key item.",
-		 function );
-
-		result = -1;
-	}
-	else if( key_item == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing key item.",
-		 function );
-
-		result = -1;
-	}
-	else if( libfdata_list_get_list_element_by_index(
-	          key_item->values_list,
-	          value_index,
-	          &values_list_element,
-	          error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -2455,23 +2591,6 @@ int libregf_key_get_value(
 		 "%s: unable to retrieve value: %d.",
 		 function,
 		 value_index );
-
-		result = -1;
-	}
-	else if( libregf_value_initialize(
-	          value,
-	          internal_key->io_handle,
-	          internal_key->file_io_handle,
-	          values_list_element,
-	          key_item->values_cache,
-	          error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to initialize value.",
-		 function );
 
 		result = -1;
 	}
@@ -2510,8 +2629,12 @@ int libregf_internal_key_get_value_by_utf8_name(
 	libregf_value_item_t *value_item             = NULL;
 	static char *function                        = "libregf_internal_key_get_value_by_utf8_name";
 	libuna_unicode_character_t unicode_character = 0;
+	size64_t size                                = 0;
 	size_t utf8_string_index                     = 0;
+	off64_t offset                               = 0;
+	uint32_t flags                               = 0;
 	uint32_t name_hash                           = 0;
+	int file_index                               = 0;
 	int number_of_values                         = 0;
 	int result                                   = 0;
 	int value_index                              = 0;
@@ -2716,12 +2839,34 @@ int libregf_internal_key_get_value_by_utf8_name(
 	{
 		return( 0 );
 	}
+	if( libfdata_list_element_get_data_range(
+	     values_list_element,
+	     &file_index,
+	     &offset,
+	     &size,
+	     &flags,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve value data range.",
+		 function );
+
+		return( -1 );
+	}
+	/* The offset is relative from the start of the hive bins list
+	 * and points to the start of the corresponding hive bin cell
+	 */
+	offset += internal_key->io_handle->hive_bins_list_offset + 4;
+
 	if( libregf_value_initialize(
 	     value,
 	     internal_key->io_handle,
 	     internal_key->file_io_handle,
-	     values_list_element,
-	     key_item->values_cache,
+	     offset,
+	     value_item,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -2833,8 +2978,12 @@ int libregf_internal_key_get_value_by_utf16_name(
 	libregf_value_item_t *value_item             = NULL;
 	static char *function                        = "libregf_internal_key_get_value_by_utf16_name";
 	libuna_unicode_character_t unicode_character = 0;
+	size64_t size                                = 0;
 	size_t utf16_string_index                    = 0;
+	off64_t offset                               = 0;
+	uint32_t flags                               = 0;
 	uint32_t name_hash                           = 0;
+	int file_index                               = 0;
 	int number_of_values                         = 0;
 	int result                                   = 0;
 	int value_index                              = 0;
@@ -3039,12 +3188,34 @@ int libregf_internal_key_get_value_by_utf16_name(
 	{
 		return( 0 );
 	}
+	if( libfdata_list_element_get_data_range(
+	     values_list_element,
+	     &file_index,
+	     &offset,
+	     &size,
+	     &flags,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve value data range.",
+		 function );
+
+		return( -1 );
+	}
+	/* The offset is relative from the start of the hive bins list
+	 * and points to the start of the corresponding hive bin cell
+	 */
+	offset += internal_key->io_handle->hive_bins_list_offset + 4;
+
 	if( libregf_value_initialize(
 	     value,
 	     internal_key->io_handle,
 	     internal_key->file_io_handle,
-	     values_list_element,
-	     key_item->values_cache,
+	     offset,
+	     value_item,
 	     error ) != 1 )
 	{
 		libcerror_error_set(

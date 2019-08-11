@@ -23,6 +23,7 @@
 #include <memory.h>
 #include <types.h>
 
+#include "libregf_data_block_stream.h"
 #include "libregf_debug.h"
 #include "libregf_definitions.h"
 #include "libregf_hive_bin_cell.h"
@@ -181,254 +182,129 @@ int libregf_value_item_free(
 	return( result );
 }
 
-/* Retrieves the data size
+/* Clones (duplicates) the value item
  * Returns 1 if successful or -1 on error
  */
-int libregf_value_item_get_data_size(
-     libregf_value_item_t *value_item,
-     size_t *data_size,
+int libregf_value_item_clone(
+     libregf_value_item_t **destination_value_item,
+     libregf_value_item_t *source_value_item,
      libcerror_error_t **error )
 {
-	static char *function    = "libregf_value_item_get_data_size";
-	size64_t value_data_size = 0;
+	static char *function = "libregf_value_item_clone";
 
-	if( value_item == NULL )
+	if( destination_value_item == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid value item.",
+		 "%s: invalid destination value item.",
 		 function );
 
 		return( -1 );
 	}
-	if( ( value_item->data_type != 0 )
-	 && ( value_item->data_type != LIBREGF_VALUE_ITEM_DATA_TYPE_BUFFER )
-	 && ( value_item->data_type != LIBREGF_VALUE_ITEM_DATA_TYPE_BLOCK ) )
+	if( *destination_value_item != NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported value item data type: 0x%02" PRIx8 ".",
-		 function,
-		 value_item->data_type );
-
-		return( -1 );
-	}
-	if( data_size == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid data size.",
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: destination value item already set.",
 		 function );
 
 		return( -1 );
 	}
-	if( ( value_item->data_type == LIBREGF_VALUE_ITEM_DATA_TYPE_BLOCK )
-	 && ( value_item->data_buffer == NULL ) )
+	if( source_value_item == NULL )
 	{
-		if( libfdata_stream_get_size(
-		     value_item->data_stream,
-		     &value_data_size,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve size from data stream.",
-			 function );
+		*destination_value_item = NULL;
 
-			return( -1 );
-		}
-		if( value_data_size > (size64_t) SSIZE_MAX )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-			 "%s: invalid stream data size value out of bounds.",
-			 function );
-
-			return( -1 );
-		}
+		return( 1 );
 	}
-	else if( value_item->data_type != 0 )
-	{
-		value_data_size = value_item->data_buffer_size;
-	}
-	*data_size = (size_t) value_data_size;
-
-	return( 1 );
-}
-
-/* Retrieves the data
- * Returns 1 if successful or -1 on error
- */
-int libregf_value_item_get_data(
-     libregf_value_item_t *value_item,
-     libbfio_handle_t *file_io_handle,
-     uint8_t **data,
-     size_t *data_size,
-     libcerror_error_t **error )
-{
-	static char *function     = "libregf_value_item_get_data";
-	size64_t stream_data_size = 0;
-	ssize_t read_count        = 0;
-
-	if( value_item == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid value item.",
-		 function );
-
-		return( -1 );
-	}
-	if( ( value_item->data_type != 0 )
-	 && ( value_item->data_type != LIBREGF_VALUE_ITEM_DATA_TYPE_BUFFER )
-	 && ( value_item->data_type != LIBREGF_VALUE_ITEM_DATA_TYPE_BLOCK ) )
+	if( libregf_value_item_initialize(
+	     destination_value_item,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported value item data type: 0x%02" PRIx8 ".",
-		 function,
-		 value_item->data_type );
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create destination value item.",
+		 function );
 
-		return( -1 );
+		goto on_error;
 	}
-	if( data == NULL )
+	if( libregf_value_key_clone(
+	     &( ( *destination_value_item )->value_key ),
+	     source_value_item->value_key,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid data.",
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to clone value key.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
-	if( data_size == NULL )
+	if( source_value_item->data_buffer != NULL )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid data size.",
-		 function );
+		( *destination_value_item )->data_buffer = (uint8_t *) memory_allocate(
+		                                                        sizeof( uint8_t ) * (size_t) source_value_item->data_buffer_size );
 
-		return( -1 );
-	}
-	if( ( value_item->data_type == LIBREGF_VALUE_ITEM_DATA_TYPE_BLOCK )
-	 && ( value_item->data_buffer == NULL ) )
-	{
-		if( libfdata_stream_get_size(
-		     value_item->data_stream,
-		     &stream_data_size,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve size from data stream.",
-			 function );
-
-			goto on_error;
-		}
-		if( stream_data_size > (size64_t) SSIZE_MAX )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-			 "%s: invalid stream data size value out of bounds.",
-			 function );
-
-			goto on_error;
-		}
-		/* Cache the whole stream this should not happen very often "normal" files
-		 */
-		value_item->data_buffer = (uint8_t *) memory_allocate(
-		                                       sizeof( uint8_t ) * (size_t) stream_data_size );
-
-		if( value_item->data_buffer == NULL )
+		if( ( *destination_value_item )->data_buffer == NULL )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_MEMORY,
 			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-			 "%s: unable to create data buffer.",
+			 "%s: unable to create value data buffer.",
 			 function );
 
 			goto on_error;
 		}
-		value_item->data_buffer_size = (size_t) stream_data_size;
-
-		if( libfdata_stream_seek_offset(
-		     value_item->data_stream,
-		     0,
-		     SEEK_SET,
-		     error ) == -1 )
+		if( memory_copy(
+		     ( *destination_value_item )->data_buffer,
+		     source_value_item->data_buffer,
+		     (size_t) source_value_item->data_buffer_size ) == NULL )
 		{
 			libcerror_error_set(
 			 error,
-			 LIBCERROR_ERROR_DOMAIN_IO,
-			 LIBCERROR_IO_ERROR_SEEK_FAILED,
-			 "%s: unable to seek start of data stream.",
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+			 "%s: unable to copy value data buffer.",
 			 function );
 
 			goto on_error;
 		}
-		read_count = libfdata_stream_read_buffer(
-		              value_item->data_stream,
-		              (intptr_t *) file_io_handle,
-		              value_item->data_buffer,
-		              value_item->data_buffer_size,
-		              0,
-		              error );
-
-		if( read_count != (ssize_t) value_item->data_buffer_size )
+		( *destination_value_item )->data_buffer_size = source_value_item->data_buffer_size;
+	}
+	if( source_value_item->data_stream != NULL )
+	{
+		if( libfdata_stream_clone(
+		     &( ( *destination_value_item )->data_stream ),
+		     source_value_item->data_stream,
+		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
-			 LIBCERROR_ERROR_DOMAIN_IO,
-			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read data from data stream.",
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to clone data stream.",
 			 function );
 
 			goto on_error;
 		}
 	}
-	if( value_item->data_type != 0 )
-	{
-		*data      = value_item->data_buffer;
-		*data_size = value_item->data_buffer_size;
-	}
-	else
-	{
-		*data      = NULL;
-		*data_size = 0;
-	}
+	( *destination_value_item )->data_type  = source_value_item->data_type;
+	( *destination_value_item )->item_flags = source_value_item->item_flags;
+
 	return( 1 );
 
 on_error:
-	if( value_item->data_buffer != NULL )
-	{
-		memory_free(
-		 value_item->data_buffer );
-
-		value_item->data_buffer = NULL;
-	}
-	value_item->data_buffer_size = 0;
+	libregf_value_item_free(
+	 destination_value_item,
+	 NULL );
 
 	return( -1 );
 }
@@ -493,8 +369,9 @@ int libregf_value_item_read_value_key(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve hive bin at offset: %" PRIu32 ".",
+		 "%s: unable to retrieve hive bin at offset: %" PRIu32 " (0x%08" PRIx32 ").",
 		 function,
+		 value_key_offset,
 		 value_key_offset );
 
 		goto on_error;
@@ -1133,9 +1010,9 @@ int libregf_value_item_read_data_block_list(
 	     NULL,
 	     NULL,
 	     NULL,
-	     (ssize_t (*)(intptr_t *, intptr_t *, int, int, uint8_t *, size_t, uint32_t, uint8_t, libcerror_error_t **)) &libregf_io_handle_read_segment_data,
+	     (ssize_t (*)(intptr_t *, intptr_t *, int, int, uint8_t *, size_t, uint32_t, uint8_t, libcerror_error_t **)) &libregf_data_block_stream_read_segment_data,
 	     NULL,
-	     (off64_t (*)(intptr_t *, intptr_t *, int, int, off64_t, libcerror_error_t **)) &libregf_io_handle_seek_segment_offset,
+	     (off64_t (*)(intptr_t *, intptr_t *, int, int, off64_t, libcerror_error_t **)) &libregf_data_block_stream_seek_segment_offset,
 	     0,
 	     error ) != 1 )
 	{
@@ -1830,6 +1707,258 @@ int libregf_value_item_get_value_type(
 		return( -1 );
 	}
 	return( 1 );
+}
+
+/* Retrieves the data size
+ * Returns 1 if successful or -1 on error
+ */
+int libregf_value_item_get_data_size(
+     libregf_value_item_t *value_item,
+     size_t *data_size,
+     libcerror_error_t **error )
+{
+	static char *function    = "libregf_value_item_get_data_size";
+	size64_t value_data_size = 0;
+
+	if( value_item == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid value item.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( value_item->data_type != 0 )
+	 && ( value_item->data_type != LIBREGF_VALUE_ITEM_DATA_TYPE_BUFFER )
+	 && ( value_item->data_type != LIBREGF_VALUE_ITEM_DATA_TYPE_BLOCK ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported value item data type: 0x%02" PRIx8 ".",
+		 function,
+		 value_item->data_type );
+
+		return( -1 );
+	}
+	if( data_size == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid data size.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( value_item->data_type == LIBREGF_VALUE_ITEM_DATA_TYPE_BLOCK )
+	 && ( value_item->data_buffer == NULL ) )
+	{
+		if( libfdata_stream_get_size(
+		     value_item->data_stream,
+		     &value_data_size,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve size from data stream.",
+			 function );
+
+			return( -1 );
+		}
+		if( value_data_size > (size64_t) SSIZE_MAX )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: invalid stream data size value out of bounds.",
+			 function );
+
+			return( -1 );
+		}
+	}
+	else if( value_item->data_type != 0 )
+	{
+		value_data_size = value_item->data_buffer_size;
+	}
+	*data_size = (size_t) value_data_size;
+
+	return( 1 );
+}
+
+/* Retrieves the data
+ * Returns 1 if successful or -1 on error
+ */
+int libregf_value_item_get_data(
+     libregf_value_item_t *value_item,
+     libbfio_handle_t *file_io_handle,
+     uint8_t **data,
+     size_t *data_size,
+     libcerror_error_t **error )
+{
+	static char *function     = "libregf_value_item_get_data";
+	size64_t stream_data_size = 0;
+	ssize_t read_count        = 0;
+
+	if( value_item == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid value item.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( value_item->data_type != 0 )
+	 && ( value_item->data_type != LIBREGF_VALUE_ITEM_DATA_TYPE_BUFFER )
+	 && ( value_item->data_type != LIBREGF_VALUE_ITEM_DATA_TYPE_BLOCK ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
+		 "%s: unsupported value item data type: 0x%02" PRIx8 ".",
+		 function,
+		 value_item->data_type );
+
+		return( -1 );
+	}
+	if( data == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid data.",
+		 function );
+
+		return( -1 );
+	}
+	if( data_size == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid data size.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( value_item->data_type == LIBREGF_VALUE_ITEM_DATA_TYPE_BLOCK )
+	 && ( value_item->data_buffer == NULL ) )
+	{
+		if( libfdata_stream_get_size(
+		     value_item->data_stream,
+		     &stream_data_size,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve size from data stream.",
+			 function );
+
+			goto on_error;
+		}
+		if( stream_data_size > (size64_t) SSIZE_MAX )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: invalid stream data size value out of bounds.",
+			 function );
+
+			goto on_error;
+		}
+		/* Cache the whole stream this should not happen very often "normal" files
+		 */
+		value_item->data_buffer = (uint8_t *) memory_allocate(
+		                                       sizeof( uint8_t ) * (size_t) stream_data_size );
+
+		if( value_item->data_buffer == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create data buffer.",
+			 function );
+
+			goto on_error;
+		}
+		value_item->data_buffer_size = (size_t) stream_data_size;
+
+		if( libfdata_stream_seek_offset(
+		     value_item->data_stream,
+		     0,
+		     SEEK_SET,
+		     error ) == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_SEEK_FAILED,
+			 "%s: unable to seek start of data stream.",
+			 function );
+
+			goto on_error;
+		}
+		read_count = libfdata_stream_read_buffer(
+		              value_item->data_stream,
+		              (intptr_t *) file_io_handle,
+		              value_item->data_buffer,
+		              value_item->data_buffer_size,
+		              0,
+		              error );
+
+		if( read_count != (ssize_t) value_item->data_buffer_size )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read data from data stream.",
+			 function );
+
+			goto on_error;
+		}
+	}
+	if( value_item->data_type != 0 )
+	{
+		*data      = value_item->data_buffer;
+		*data_size = value_item->data_buffer_size;
+	}
+	else
+	{
+		*data      = NULL;
+		*data_size = 0;
+	}
+	return( 1 );
+
+on_error:
+	if( value_item->data_buffer != NULL )
+	{
+		memory_free(
+		 value_item->data_buffer );
+
+		value_item->data_buffer = NULL;
+	}
+	value_item->data_buffer_size = 0;
+
+	return( -1 );
 }
 
 /* Retrieves the 32-bit value

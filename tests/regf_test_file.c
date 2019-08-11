@@ -266,6 +266,8 @@ int regf_test_file_initialize(
 	          &file,
 	          &error );
 
+	file = NULL;
+
 	REGF_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
@@ -277,8 +279,6 @@ int regf_test_file_initialize(
 
 	libcerror_error_free(
 	 &error );
-
-	file = NULL;
 
 #if defined( HAVE_REGF_TEST_MEMORY )
 

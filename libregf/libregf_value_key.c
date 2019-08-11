@@ -152,6 +152,137 @@ int libregf_value_key_free(
 	return( 1 );
 }
 
+/* Clones (duplicates) the value key
+ * Returns 1 if successful or -1 on error
+ */
+int libregf_value_key_clone(
+     libregf_value_key_t **destination_value_key,
+     libregf_value_key_t *source_value_key,
+     libcerror_error_t **error )
+{
+	static char *function = "libregf_value_key_clone";
+
+	if( destination_value_key == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid destination value key.",
+		 function );
+
+		return( -1 );
+	}
+	if( *destination_value_key != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: destination value key already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( source_value_key == NULL )
+	{
+		*destination_value_key = NULL;
+
+		return( 1 );
+	}
+	if( libregf_value_key_initialize(
+	     destination_value_key,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create destination value key.",
+		 function );
+
+		goto on_error;
+	}
+	if( source_value_key->name != NULL )
+	{
+		( *destination_value_key )->name = (uint8_t *) memory_allocate(
+		                                                sizeof( uint8_t ) * (size_t) source_value_key->name_size );
+
+		if( ( *destination_value_key )->name == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create value name.",
+			 function );
+
+			goto on_error;
+		}
+		if( memory_copy(
+		     ( *destination_value_key )->name,
+		     source_value_key->name,
+		     (size_t) source_value_key->name_size ) == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+			 "%s: unable to copy value name.",
+			 function );
+
+			goto on_error;
+		}
+		( *destination_value_key )->name_size = source_value_key->name_size;
+		( *destination_value_key )->name_hash = source_value_key->name_hash;
+	}
+	if( source_value_key->data != NULL )
+	{
+		( *destination_value_key )->data = (uint8_t *) memory_allocate(
+		                                                sizeof( uint8_t ) * (size_t) source_value_key->data_size );
+
+		if( ( *destination_value_key )->data == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create value data.",
+			 function );
+
+			goto on_error;
+		}
+		if( memory_copy(
+		     ( *destination_value_key )->data,
+		     source_value_key->data,
+		     (size_t) source_value_key->data_size ) == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+			 "%s: unable to copy value data.",
+			 function );
+
+			goto on_error;
+		}
+		( *destination_value_key )->data_size = source_value_key->data_size;
+	}
+	( *destination_value_key )->value_type  = source_value_key->value_type;
+	( *destination_value_key )->flags       = source_value_key->flags;
+	( *destination_value_key )->data_offset = source_value_key->data_offset;
+	( *destination_value_key )->data_in_key = source_value_key->data_in_key;
+
+	return( 1 );
+
+on_error:
+	libregf_value_key_free(
+	 destination_value_key,
+	 NULL );
+
+	return( -1 );
+}
+
 /* Reads a value key
  * Returns 1 if successful, 0 if the signature does not match or -1 on error
  */

@@ -73,16 +73,9 @@ int libregf_value_item_free(
      libregf_value_item_t **value_item,
      libcerror_error_t **error );
 
-int libregf_value_item_get_data_size(
-     libregf_value_item_t *value_item,
-     size_t *data_size,
-     libcerror_error_t **error );
-
-int libregf_value_item_get_data(
-     libregf_value_item_t *value_item,
-     libbfio_handle_t *file_io_handle,
-     uint8_t **data,
-     size_t *data_size,
+int libregf_value_item_clone(
+     libregf_value_item_t **destination_value_item,
+     libregf_value_item_t *source_value_item,
      libcerror_error_t **error );
 
 int libregf_value_item_read_value_key(
@@ -181,6 +174,18 @@ int libregf_value_item_compare_name_with_utf16_string(
 int libregf_value_item_get_value_type(
      libregf_value_item_t *value_item,
      uint32_t *value_type,
+     libcerror_error_t **error );
+
+int libregf_value_item_get_data_size(
+     libregf_value_item_t *value_item,
+     size_t *data_size,
+     libcerror_error_t **error );
+
+int libregf_value_item_get_data(
+     libregf_value_item_t *value_item,
+     libbfio_handle_t *file_io_handle,
+     uint8_t **data,
+     size_t *data_size,
      libcerror_error_t **error );
 
 int libregf_value_item_get_value_32bit(

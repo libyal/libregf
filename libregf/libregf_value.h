@@ -30,9 +30,8 @@
 #include "libregf_libbfio.h"
 #include "libregf_libcerror.h"
 #include "libregf_libcthreads.h"
-#include "libregf_libfcache.h"
-#include "libregf_libfdata.h"
 #include "libregf_types.h"
+#include "libregf_value_item.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -50,13 +49,13 @@ struct libregf_internal_value
 	 */
 	libbfio_handle_t *file_io_handle;
 
-	/* The values list element
+	/* The file offset
 	 */
-	libfdata_list_element_t *values_list_element;
+	off64_t file_offset;
 
-	/* The values cache
+	/* The value item
 	 */
-	libfcache_cache_t *values_cache;
+	libregf_value_item_t *value_item;
 
 #if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
 	/* The read/write lock
@@ -69,8 +68,8 @@ int libregf_value_initialize(
      libregf_value_t **value,
      libregf_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
-     libfdata_list_element_t *values_list_element,
-     libfcache_cache_t *values_cache,
+     off64_t file_offset,
+     libregf_value_item_t *value_item,
      libcerror_error_t **error );
 
 LIBREGF_EXTERN \

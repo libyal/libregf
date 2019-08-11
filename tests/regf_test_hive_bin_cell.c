@@ -113,6 +113,8 @@ int regf_test_hive_bin_cell_initialize(
 	          &hive_bin_cell,
 	          &error );
 
+	hive_bin_cell = NULL;
+
 	REGF_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
@@ -124,8 +126,6 @@ int regf_test_hive_bin_cell_initialize(
 
 	libcerror_error_free(
 	 &error );
-
-	hive_bin_cell = NULL;
 
 #if defined( HAVE_REGF_TEST_MEMORY )
 

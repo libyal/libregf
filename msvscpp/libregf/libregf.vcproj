@@ -182,6 +182,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libregf\libregf_data_block_stream.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libregf\libregf_data_type.c"
 				>
 			</File>
@@ -281,6 +285,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libregf\libregf_data_block_key.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libregf\libregf_data_block_stream.h"
 				>
 			</File>
 			<File

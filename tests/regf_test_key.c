@@ -33,7 +33,289 @@
 #include "regf_test_memory.h"
 #include "regf_test_unused.h"
 
+#include "../libregf/libregf_io_handle.h"
 #include "../libregf/libregf_key.h"
+
+#if defined( __GNUC__ ) && !defined( LIBREGF_DLL_IMPORT )
+
+/* Tests the libregf_key_initialize function
+ * Returns 1 if successful or 0 if not
+ */
+int regf_test_key_initialize(
+     void )
+{
+	libcerror_error_t *error        = NULL;
+	libregf_io_handle_t *io_handle  = NULL;
+	libregf_key_t *key              = NULL;
+	int result                      = 0;
+
+#if defined( HAVE_REGF_TEST_MEMORY )
+	int number_of_malloc_fail_tests = 1;
+	int number_of_memset_fail_tests = 1;
+	int test_number                 = 0;
+#endif
+
+	/* Test regular cases
+	 */
+	result = libregf_io_handle_initialize(
+	          &io_handle,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "io_handle",
+	 io_handle );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libregf_key_initialize(
+	          &key,
+	          io_handle,
+	          NULL,
+	          NULL,
+	          NULL,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "key",
+	 key );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libregf_key_free(
+	          &key,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "key",
+	 key );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libregf_key_initialize(
+	          NULL,
+	          io_handle,
+	          NULL,
+	          NULL,
+	          NULL,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	key = (libregf_key_t *) 0x12345678UL;
+
+	result = libregf_key_initialize(
+	          &key,
+	          io_handle,
+	          NULL,
+	          NULL,
+	          NULL,
+	          &error );
+
+	key = NULL;
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libregf_key_initialize(
+	          &key,
+	          NULL,
+	          NULL,
+	          NULL,
+	          NULL,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+#if defined( HAVE_REGF_TEST_MEMORY )
+
+	for( test_number = 0;
+	     test_number < number_of_malloc_fail_tests;
+	     test_number++ )
+	{
+		/* Test libregf_key_initialize with malloc failing
+		 */
+		regf_test_malloc_attempts_before_fail = test_number;
+
+		result = libregf_key_initialize(
+		          &key,
+		          io_handle,
+		          NULL,
+		          NULL,
+		          NULL,
+		          &error );
+
+		if( regf_test_malloc_attempts_before_fail != -1 )
+		{
+			regf_test_malloc_attempts_before_fail = -1;
+
+			if( key != NULL )
+			{
+				libregf_key_free(
+				 &key,
+				 NULL );
+			}
+		}
+		else
+		{
+			REGF_TEST_ASSERT_EQUAL_INT(
+			 "result",
+			 result,
+			 -1 );
+
+			REGF_TEST_ASSERT_IS_NULL(
+			 "key",
+			 key );
+
+			REGF_TEST_ASSERT_IS_NOT_NULL(
+			 "error",
+			 error );
+
+			libcerror_error_free(
+			 &error );
+		}
+	}
+	for( test_number = 0;
+	     test_number < number_of_memset_fail_tests;
+	     test_number++ )
+	{
+		/* Test libregf_key_initialize with memset failing
+		 */
+		regf_test_memset_attempts_before_fail = test_number;
+
+		result = libregf_key_initialize(
+		          &key,
+		          io_handle,
+		          NULL,
+		          NULL,
+		          NULL,
+		          &error );
+
+		if( regf_test_memset_attempts_before_fail != -1 )
+		{
+			regf_test_memset_attempts_before_fail = -1;
+
+			if( key != NULL )
+			{
+				libregf_key_free(
+				 &key,
+				 NULL );
+			}
+		}
+		else
+		{
+			REGF_TEST_ASSERT_EQUAL_INT(
+			 "result",
+			 result,
+			 -1 );
+
+			REGF_TEST_ASSERT_IS_NULL(
+			 "key",
+			 key );
+
+			REGF_TEST_ASSERT_IS_NOT_NULL(
+			 "error",
+			 error );
+
+			libcerror_error_free(
+			 &error );
+		}
+	}
+#endif /* defined( HAVE_REGF_TEST_MEMORY ) */
+
+	/* Clean up
+	 */
+	result = libregf_io_handle_free(
+	          &io_handle,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "io_handle",
+	 io_handle );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( key != NULL )
+	{
+		libregf_key_free(
+		 &key,
+		 NULL );
+	}
+	if( io_handle != NULL )
+	{
+		libregf_io_handle_free(
+		 &io_handle,
+		 NULL );
+	}
+	return( 0 );
+}
+
+#endif /* defined( __GNUC__ ) && !defined( LIBREGF_DLL_IMPORT ) */
 
 /* Tests the libregf_key_free function
  * Returns 1 if successful or 0 if not
@@ -971,9 +1253,10 @@ int main(
 {
 #if defined( __GNUC__ ) && !defined( LIBREGF_DLL_IMPORT )
 
-	libcerror_error_t *error = NULL;
-	libregf_key_t *key       = NULL;
-	int result               = 0;
+	libcerror_error_t *error       = NULL;
+	libregf_io_handle_t *io_handle = NULL;
+	libregf_key_t *key             = NULL;
+	int result                     = 0;
 
 #endif /* defined( __GNUC__ ) && !defined( LIBREGF_DLL_IMPORT ) */
 
@@ -996,6 +1279,23 @@ int main(
 
 	/* Initialize test
 	 */
+	result = libregf_io_handle_initialize(
+	          &io_handle,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "io_handle",
+	 io_handle );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
 /* TODO: implement */
 
 	/* Run tests
@@ -1111,6 +1411,23 @@ int main(
 	 error );
 */
 
+	result = libregf_io_handle_free(
+	          &io_handle,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "io_handle",
+	 io_handle );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
 #endif /* !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 ) */
 
 #endif /* defined( __GNUC__ ) && !defined( LIBREGF_DLL_IMPORT ) */
@@ -1124,6 +1441,12 @@ on_error:
 	{
 		libregf_key_free(
 		 &key,
+		 NULL );
+	}
+	if( io_handle != NULL )
+	{
+		libregf_io_handle_free(
+		 &io_handle,
 		 NULL );
 	}
 	if( error != NULL )

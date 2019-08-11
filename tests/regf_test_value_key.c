@@ -128,6 +128,8 @@ int regf_test_value_key_initialize(
 	          &value_key,
 	          &error );
 
+	value_key = NULL;
+
 	REGF_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
@@ -139,8 +141,6 @@ int regf_test_value_key_initialize(
 
 	libcerror_error_free(
 	 &error );
-
-	value_key = NULL;
 
 #if defined( HAVE_REGF_TEST_MEMORY )
 
@@ -1575,6 +1575,8 @@ int main(
 	REGF_TEST_RUN(
 	 "libregf_value_key_free",
 	 regf_test_value_key_free );
+
+	/* TODO add tests for libregf_value_key_clone */
 
 	REGF_TEST_RUN(
 	 "libregf_value_key_read_data",

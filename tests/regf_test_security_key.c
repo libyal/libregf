@@ -128,6 +128,8 @@ int regf_test_security_key_initialize(
 	          &security_key,
 	          &error );
 
+	security_key = NULL;
+
 	REGF_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
@@ -139,8 +141,6 @@ int regf_test_security_key_initialize(
 
 	libcerror_error_free(
 	 &error );
-
-	security_key = NULL;
 
 #if defined( HAVE_REGF_TEST_MEMORY )
 

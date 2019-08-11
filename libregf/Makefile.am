@@ -25,6 +25,7 @@ libregf_la_SOURCES = \
 	libregf_checksum.c libregf_checksum.h \
 	libregf_codepage.h \
 	libregf_data_block_key.c libregf_data_block_key.h \
+	libregf_data_block_stream.c libregf_data_block_stream.h \
 	libregf_data_type.c libregf_data_type.h \
 	libregf_debug.c libregf_debug.h \
 	libregf_definitions.h \

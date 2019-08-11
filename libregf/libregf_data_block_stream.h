@@ -1,5 +1,5 @@
 /*
- * Input/Output (IO) handle
+ * Data block stream functions
  *
  * Copyright (C) 2009-2019, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -19,64 +19,41 @@
  * along with this software.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBREGF_IO_HANDLE_H )
-#define _LIBREGF_IO_HANDLE_H
+#if !defined( _LIBREGF_DATA_BLOCK_STREAM_H )
+#define _LIBREGF_DATA_BLOCK_STREAM_H
 
 #include <common.h>
 #include <types.h>
 
+#include "libregf_libbfio.h"
 #include "libregf_libcerror.h"
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
-extern const char *regf_file_signature;
+ssize_t libregf_data_block_stream_read_segment_data(
+         intptr_t *data_handle,
+         libbfio_handle_t *file_io_handle,
+         int segment_index,
+         int segment_file_index,
+         uint8_t *segment_data,
+         size_t segment_data_size,
+         uint32_t segment_flags,
+         uint8_t read_flags,
+         libcerror_error_t **error );
 
-typedef struct libregf_io_handle libregf_io_handle_t;
-
-struct libregf_io_handle
-{
-	/* The major version
-	 */
-	uint32_t major_version;
-
-	/* The minor version
-	 */
-	uint32_t minor_version;
-
-	/* The file type
-	 */
-	uint32_t file_type;
-
-	/* The hive bins list offset
-	 */
-	off64_t hive_bins_list_offset;
-
-	/* Various flags
-	 */
-	uint8_t flags;
-
-	/* The codepage of the extended ASCII strings
-	 */
-	int ascii_codepage;
-};
-
-int libregf_io_handle_initialize(
-     libregf_io_handle_t **io_handle,
-     libcerror_error_t **error );
-
-int libregf_io_handle_free(
-     libregf_io_handle_t **io_handle,
-     libcerror_error_t **error );
-
-int libregf_io_handle_clear(
-     libregf_io_handle_t *io_handle,
-     libcerror_error_t **error );
+off64_t libregf_data_block_stream_seek_segment_offset(
+         intptr_t *data_handle,
+         libbfio_handle_t *file_io_handle,
+         int segment_index,
+         int segment_file_index,
+         off64_t segment_offset,
+         libcerror_error_t **error );
 
 #if defined( __cplusplus )
 }
 #endif
 
-#endif /* !defined( _LIBREGF_IO_HANDLE_H ) */
+#endif /* !defined( _LIBREGF_DATA_BLOCK_STREAM_H ) */
 

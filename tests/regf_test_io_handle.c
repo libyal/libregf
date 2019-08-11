@@ -429,12 +429,6 @@ int main(
 	 "libregf_io_handle_clear",
 	 regf_test_io_handle_clear );
 
-	/* TODO: add tests for libregf_io_handle_read_file_header */
-
-	/* TODO: add tests for libregf_io_handle_read_segment_data */
-
-	/* TODO: add tests for libregf_io_handle_seek_segment_offset */
-
 #endif /* defined( __GNUC__ ) && !defined( LIBREGF_DLL_IMPORT ) */
 
 	return( EXIT_SUCCESS );

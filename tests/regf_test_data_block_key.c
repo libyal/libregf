@@ -117,6 +117,8 @@ int regf_test_data_block_key_initialize(
 	          &data_block_key,
 	          &error );
 
+	data_block_key = NULL;
+
 	REGF_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
@@ -128,8 +130,6 @@ int regf_test_data_block_key_initialize(
 
 	libcerror_error_free(
 	 &error );
-
-	data_block_key = NULL;
 
 #if defined( HAVE_REGF_TEST_MEMORY )
 

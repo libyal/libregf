@@ -27,9 +27,6 @@
 #include "libregf_io_handle.h"
 #include "libregf_libbfio.h"
 #include "libregf_libcerror.h"
-#include "libregf_libfcache.h"
-#include "libregf_libfdata.h"
-#include "libregf_libuna.h"
 #include "libregf_multi_string.h"
 #include "libregf_value.h"
 #include "libregf_value_item.h"
@@ -42,8 +39,8 @@ int libregf_value_initialize(
      libregf_value_t **value,
      libregf_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
-     libfdata_list_element_t *values_list_element,
-     libfcache_cache_t *values_cache,
+     off64_t file_offset,
+     libregf_value_item_t *value_item,
      libcerror_error_t **error )
 {
 	libregf_internal_value_t *internal_value = NULL;
@@ -71,13 +68,13 @@ int libregf_value_initialize(
 
 		return( -1 );
 	}
-	if( values_list_element == NULL )
+	if( value_item == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid values list element.",
+		 "%s: invalid value item.",
 		 function );
 
 		return( -1 );
@@ -113,6 +110,20 @@ int libregf_value_initialize(
 
 		return( -1 );
 	}
+	if( libregf_value_item_clone(
+	     &( internal_value->value_item ),
+	     value_item,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to clone value item.",
+		 function );
+
+		goto on_error;
+	}
 #if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_initialize(
 	     &( internal_value->read_write_lock ),
@@ -128,10 +139,9 @@ int libregf_value_initialize(
 		goto on_error;
 	}
 #endif
-	internal_value->file_io_handle      = file_io_handle;
-	internal_value->io_handle           = io_handle;
-	internal_value->values_list_element = values_list_element;
-	internal_value->values_cache        = values_cache;
+	internal_value->file_io_handle = file_io_handle;
+	internal_value->io_handle      = io_handle;
+	internal_value->file_offset    = file_offset;
 
 	*value = (libregf_value_t *) internal_value;
 
@@ -140,6 +150,12 @@ int libregf_value_initialize(
 on_error:
 	if( internal_value != NULL )
 	{
+		if( internal_value->value_item != NULL )
+		{
+			libregf_value_item_free(
+			 &( internal_value->value_item ),
+			 NULL );
+		}
 		memory_free(
 		 internal_value );
 	}
@@ -188,7 +204,20 @@ int libregf_value_free(
 			result = -1;
 		}
 #endif
-		/* The io_handle, file_io_handle and values_list_element references are freed elsewhere
+		if( libregf_value_item_free(
+		     &( internal_value->value_item ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free value item.",
+			 function );
+
+			result = -1;
+		}
+		/* The io_handle and file_io_handle references are freed elsewhere
 		 */
 		memory_free(
 		 internal_value );
@@ -204,7 +233,6 @@ int libregf_value_is_corrupted(
      libcerror_error_t **error )
 {
 	libregf_internal_value_t *internal_value = NULL;
-	libregf_value_item_t *value_item         = NULL;
 	static char *function                    = "libregf_value_is_corrupted";
 	int result                               = 1;
 
@@ -222,7 +250,7 @@ int libregf_value_is_corrupted(
 	internal_value = (libregf_internal_value_t *) value;
 
 #if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
-	if( libcthreads_read_write_lock_grab_for_write(
+	if( libcthreads_read_write_lock_grab_for_read(
 	     internal_value->read_write_lock,
 	     error ) != 1 )
 	{
@@ -230,49 +258,29 @@ int libregf_value_is_corrupted(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to grab read/write lock for writing.",
+		 "%s: unable to grab read/write lock for reading.",
 		 function );
 
 		return( -1 );
 	}
 #endif
-	if( libfdata_list_element_get_element_value(
-	     internal_value->values_list_element,
-	     (intptr_t *) internal_value->file_io_handle,
-	     (libfdata_cache_t *) internal_value->values_cache,
-	     (intptr_t **) &value_item,
-	     0,
-	     error ) != 1 )
+	result = libregf_value_item_is_corrupted(
+	          internal_value->value_item,
+	          error );
+
+	if( result == -1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve value item.",
+		 "%s: unable to determine if value is corrupted.",
 		 function );
 
 		result = -1;
 	}
-	else
-	{
-		result = libregf_value_item_is_corrupted(
-		          value_item,
-		          error );
-
-		if( result == -1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to determine if value is corrupted.",
-			 function );
-
-			result = -1;
-		}
-	}
 #if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
-	if( libcthreads_read_write_lock_release_for_write(
+	if( libcthreads_read_write_lock_release_for_read(
 	     internal_value->read_write_lock,
 	     error ) != 1 )
 	{
@@ -280,7 +288,7 @@ int libregf_value_is_corrupted(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to release read/write lock for writing.",
+		 "%s: unable to release read/write lock for reading.",
 		 function );
 
 		return( -1 );
@@ -299,9 +307,6 @@ int libregf_value_get_offset(
 {
 	libregf_internal_value_t *internal_value = NULL;
 	static char *function                    = "libregf_value_get_offset";
-	size64_t size                            = 0;
-	uint32_t flags                           = 0;
-	int file_index                           = 0;
 	int result                               = 1;
 
 	if( value == NULL )
@@ -340,7 +345,7 @@ int libregf_value_get_offset(
 		return( -1 );
 	}
 #if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
-	if( libcthreads_read_write_lock_grab_for_write(
+	if( libcthreads_read_write_lock_grab_for_read(
 	     internal_value->read_write_lock,
 	     error ) != 1 )
 	{
@@ -348,38 +353,16 @@ int libregf_value_get_offset(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to grab read/write lock for writing.",
+		 "%s: unable to grab read/write lock for reading.",
 		 function );
 
 		return( -1 );
 	}
 #endif
-	if( libfdata_list_element_get_data_range(
-	     internal_value->values_list_element,
-	     &file_index,
-	     offset,
-	     &size,
-	     &flags,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve value data range.",
-		 function );
+	*offset = internal_value->file_offset;
 
-		result = -1;
-	}
-	else
-	{
-		/* The offset is relative from the start of the hive bins list
-		 * and points to the start of the corresponding hive bin cell
-		 */
-		*offset += internal_value->io_handle->hive_bins_list_offset + 4;
-	}
 #if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
-	if( libcthreads_read_write_lock_release_for_write(
+	if( libcthreads_read_write_lock_release_for_read(
 	     internal_value->read_write_lock,
 	     error ) != 1 )
 	{
@@ -387,7 +370,7 @@ int libregf_value_get_offset(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to release read/write lock for writing.",
+		 "%s: unable to release read/write lock for reading.",
 		 function );
 
 		return( -1 );
@@ -405,7 +388,6 @@ int libregf_value_get_name_size(
      libcerror_error_t **error )
 {
 	libregf_internal_value_t *internal_value = NULL;
-	libregf_value_item_t *value_item         = NULL;
 	static char *function                    = "libregf_value_get_name_size";
 	int result                               = 1;
 
@@ -423,7 +405,7 @@ int libregf_value_get_name_size(
 	internal_value = (libregf_internal_value_t *) value;
 
 #if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
-	if( libcthreads_read_write_lock_grab_for_write(
+	if( libcthreads_read_write_lock_grab_for_read(
 	     internal_value->read_write_lock,
 	     error ) != 1 )
 	{
@@ -431,33 +413,16 @@ int libregf_value_get_name_size(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to grab read/write lock for writing.",
+		 "%s: unable to grab read/write lock for reading.",
 		 function );
 
 		return( -1 );
 	}
 #endif
-	if( libfdata_list_element_get_element_value(
-	     internal_value->values_list_element,
-	     (intptr_t *) internal_value->file_io_handle,
-	     (libfdata_cache_t *) internal_value->values_cache,
-	     (intptr_t **) &value_item,
-	     0,
+	if( libregf_value_item_get_name_size(
+	     internal_value->value_item,
+	     name_size,
 	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve value item.",
-		 function );
-
-		result = -1;
-	}
-	else if( libregf_value_item_get_name_size(
-	          value_item,
-	          name_size,
-	          error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -469,7 +434,7 @@ int libregf_value_get_name_size(
 		result = -1;
 	}
 #if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
-	if( libcthreads_read_write_lock_release_for_write(
+	if( libcthreads_read_write_lock_release_for_read(
 	     internal_value->read_write_lock,
 	     error ) != 1 )
 	{
@@ -477,7 +442,7 @@ int libregf_value_get_name_size(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to release read/write lock for writing.",
+		 "%s: unable to release read/write lock for reading.",
 		 function );
 
 		return( -1 );
@@ -496,7 +461,6 @@ int libregf_value_get_name(
      libcerror_error_t **error )
 {
 	libregf_internal_value_t *internal_value = NULL;
-	libregf_value_item_t *value_item         = NULL;
 	static char *function                    = "libregf_value_get_name";
 	int result                               = 1;
 
@@ -514,7 +478,7 @@ int libregf_value_get_name(
 	internal_value = (libregf_internal_value_t *) value;
 
 #if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
-	if( libcthreads_read_write_lock_grab_for_write(
+	if( libcthreads_read_write_lock_grab_for_read(
 	     internal_value->read_write_lock,
 	     error ) != 1 )
 	{
@@ -522,34 +486,17 @@ int libregf_value_get_name(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to grab read/write lock for writing.",
+		 "%s: unable to grab read/write lock for reading.",
 		 function );
 
 		return( -1 );
 	}
 #endif
-	if( libfdata_list_element_get_element_value(
-	     internal_value->values_list_element,
-	     (intptr_t *) internal_value->file_io_handle,
-	     (libfdata_cache_t *) internal_value->values_cache,
-	     (intptr_t **) &value_item,
-	     0,
+	if( libregf_value_item_get_name(
+	     internal_value->value_item,
+	     name,
+	     name_size,
 	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve value item.",
-		 function );
-
-		result = -1;
-	}
-	else if( libregf_value_item_get_name(
-	          value_item,
-	          name,
-	          name_size,
-	          error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -561,7 +508,7 @@ int libregf_value_get_name(
 		result = -1;
 	}
 #if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
-	if( libcthreads_read_write_lock_release_for_write(
+	if( libcthreads_read_write_lock_release_for_read(
 	     internal_value->read_write_lock,
 	     error ) != 1 )
 	{
@@ -569,7 +516,7 @@ int libregf_value_get_name(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to release read/write lock for writing.",
+		 "%s: unable to release read/write lock for reading.",
 		 function );
 
 		return( -1 );
@@ -588,7 +535,6 @@ int libregf_value_get_utf8_name_size(
      libcerror_error_t **error )
 {
 	libregf_internal_value_t *internal_value = NULL;
-	libregf_value_item_t *value_item         = NULL;
 	static char *function                    = "libregf_value_get_utf8_name_size";
 	int result                               = 1;
 
@@ -617,7 +563,7 @@ int libregf_value_get_utf8_name_size(
 		return( -1 );
 	}
 #if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
-	if( libcthreads_read_write_lock_grab_for_write(
+	if( libcthreads_read_write_lock_grab_for_read(
 	     internal_value->read_write_lock,
 	     error ) != 1 )
 	{
@@ -625,34 +571,17 @@ int libregf_value_get_utf8_name_size(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to grab read/write lock for writing.",
+		 "%s: unable to grab read/write lock for reading.",
 		 function );
 
 		return( -1 );
 	}
 #endif
-	if( libfdata_list_element_get_element_value(
-	     internal_value->values_list_element,
-	     (intptr_t *) internal_value->file_io_handle,
-	     (libfdata_cache_t *) internal_value->values_cache,
-	     (intptr_t **) &value_item,
-	     0,
+	if( libregf_value_item_get_utf8_name_size(
+	     internal_value->value_item,
+	     utf8_name_size,
+	     internal_value->io_handle->ascii_codepage,
 	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve value item.",
-		 function );
-
-		result = -1;
-	}
-	else if( libregf_value_item_get_utf8_name_size(
-	          value_item,
-	          utf8_name_size,
-	          internal_value->io_handle->ascii_codepage,
-	          error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -664,7 +593,7 @@ int libregf_value_get_utf8_name_size(
 		result = -1;
 	}
 #if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
-	if( libcthreads_read_write_lock_release_for_write(
+	if( libcthreads_read_write_lock_release_for_read(
 	     internal_value->read_write_lock,
 	     error ) != 1 )
 	{
@@ -672,7 +601,7 @@ int libregf_value_get_utf8_name_size(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to release read/write lock for writing.",
+		 "%s: unable to release read/write lock for reading.",
 		 function );
 
 		return( -1 );
@@ -693,7 +622,6 @@ int libregf_value_get_utf8_name(
      libcerror_error_t **error )
 {
 	libregf_internal_value_t *internal_value = NULL;
-	libregf_value_item_t *value_item         = NULL;
 	static char *function                    = "libregf_value_get_utf8_name";
 	int result                               = 1;
 
@@ -722,7 +650,7 @@ int libregf_value_get_utf8_name(
 		return( -1 );
 	}
 #if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
-	if( libcthreads_read_write_lock_grab_for_write(
+	if( libcthreads_read_write_lock_grab_for_read(
 	     internal_value->read_write_lock,
 	     error ) != 1 )
 	{
@@ -730,35 +658,18 @@ int libregf_value_get_utf8_name(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to grab read/write lock for writing.",
+		 "%s: unable to grab read/write lock for reading.",
 		 function );
 
 		return( -1 );
 	}
 #endif
-	if( libfdata_list_element_get_element_value(
-	     internal_value->values_list_element,
-	     (intptr_t *) internal_value->file_io_handle,
-	     (libfdata_cache_t *) internal_value->values_cache,
-	     (intptr_t **) &value_item,
-	     0,
+	if( libregf_value_item_get_utf8_name(
+	     internal_value->value_item,
+	     utf8_name,
+	     utf8_name_size,
+	     internal_value->io_handle->ascii_codepage,
 	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve value item.",
-		 function );
-
-		result = -1;
-	}
-	else if( libregf_value_item_get_utf8_name(
-	          value_item,
-	          utf8_name,
-	          utf8_name_size,
-	          internal_value->io_handle->ascii_codepage,
-	          error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -770,7 +681,7 @@ int libregf_value_get_utf8_name(
 		result = -1;
 	}
 #if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
-	if( libcthreads_read_write_lock_release_for_write(
+	if( libcthreads_read_write_lock_release_for_read(
 	     internal_value->read_write_lock,
 	     error ) != 1 )
 	{
@@ -778,7 +689,7 @@ int libregf_value_get_utf8_name(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to release read/write lock for writing.",
+		 "%s: unable to release read/write lock for reading.",
 		 function );
 
 		return( -1 );
@@ -797,7 +708,6 @@ int libregf_value_get_utf16_name_size(
      libcerror_error_t **error )
 {
 	libregf_internal_value_t *internal_value = NULL;
-	libregf_value_item_t *value_item         = NULL;
 	static char *function                    = "libregf_value_get_utf16_name_size";
 	int result                               = 1;
 
@@ -826,7 +736,7 @@ int libregf_value_get_utf16_name_size(
 		return( -1 );
 	}
 #if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
-	if( libcthreads_read_write_lock_grab_for_write(
+	if( libcthreads_read_write_lock_grab_for_read(
 	     internal_value->read_write_lock,
 	     error ) != 1 )
 	{
@@ -834,34 +744,17 @@ int libregf_value_get_utf16_name_size(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to grab read/write lock for writing.",
+		 "%s: unable to grab read/write lock for reading.",
 		 function );
 
 		return( -1 );
 	}
 #endif
-	if( libfdata_list_element_get_element_value(
-	     internal_value->values_list_element,
-	     (intptr_t *) internal_value->file_io_handle,
-	     (libfdata_cache_t *) internal_value->values_cache,
-	     (intptr_t **) &value_item,
-	     0,
+	if( libregf_value_item_get_utf16_name_size(
+	     internal_value->value_item,
+	     utf16_name_size,
+	     internal_value->io_handle->ascii_codepage,
 	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve value item.",
-		 function );
-
-		result = -1;
-	}
-	else if( libregf_value_item_get_utf16_name_size(
-	          value_item,
-	          utf16_name_size,
-	          internal_value->io_handle->ascii_codepage,
-	          error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -873,7 +766,7 @@ int libregf_value_get_utf16_name_size(
 		result = -1;
 	}
 #if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
-	if( libcthreads_read_write_lock_release_for_write(
+	if( libcthreads_read_write_lock_release_for_read(
 	     internal_value->read_write_lock,
 	     error ) != 1 )
 	{
@@ -881,7 +774,7 @@ int libregf_value_get_utf16_name_size(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to release read/write lock for writing.",
+		 "%s: unable to release read/write lock for reading.",
 		 function );
 
 		return( -1 );
@@ -902,7 +795,6 @@ int libregf_value_get_utf16_name(
      libcerror_error_t **error )
 {
 	libregf_internal_value_t *internal_value = NULL;
-	libregf_value_item_t *value_item         = NULL;
 	static char *function                    = "libregf_value_get_utf16_name";
 	int result                               = 1;
 
@@ -931,7 +823,7 @@ int libregf_value_get_utf16_name(
 		return( -1 );
 	}
 #if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
-	if( libcthreads_read_write_lock_grab_for_write(
+	if( libcthreads_read_write_lock_grab_for_read(
 	     internal_value->read_write_lock,
 	     error ) != 1 )
 	{
@@ -939,35 +831,18 @@ int libregf_value_get_utf16_name(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to grab read/write lock for writing.",
+		 "%s: unable to grab read/write lock for reading.",
 		 function );
 
 		return( -1 );
 	}
 #endif
-	if( libfdata_list_element_get_element_value(
-	     internal_value->values_list_element,
-	     (intptr_t *) internal_value->file_io_handle,
-	     (libfdata_cache_t *) internal_value->values_cache,
-	     (intptr_t **) &value_item,
-	     0,
+	if( libregf_value_item_get_utf16_name(
+	     internal_value->value_item,
+	     utf16_name,
+	     utf16_name_size,
+	     internal_value->io_handle->ascii_codepage,
 	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve value item.",
-		 function );
-
-		result = -1;
-	}
-	else if( libregf_value_item_get_utf16_name(
-	          value_item,
-	          utf16_name,
-	          utf16_name_size,
-	          internal_value->io_handle->ascii_codepage,
-	          error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -979,7 +854,7 @@ int libregf_value_get_utf16_name(
 		result = -1;
 	}
 #if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
-	if( libcthreads_read_write_lock_release_for_write(
+	if( libcthreads_read_write_lock_release_for_read(
 	     internal_value->read_write_lock,
 	     error ) != 1 )
 	{
@@ -987,7 +862,7 @@ int libregf_value_get_utf16_name(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to release read/write lock for writing.",
+		 "%s: unable to release read/write lock for reading.",
 		 function );
 
 		return( -1 );
@@ -1005,7 +880,6 @@ int libregf_value_get_value_type(
      libcerror_error_t **error )
 {
 	libregf_internal_value_t *internal_value = NULL;
-	libregf_value_item_t *value_item         = NULL;
 	static char *function                    = "libregf_value_get_value_type";
 	int result                               = 1;
 
@@ -1023,7 +897,7 @@ int libregf_value_get_value_type(
 	internal_value = (libregf_internal_value_t *) value;
 
 #if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
-	if( libcthreads_read_write_lock_grab_for_write(
+	if( libcthreads_read_write_lock_grab_for_read(
 	     internal_value->read_write_lock,
 	     error ) != 1 )
 	{
@@ -1031,33 +905,16 @@ int libregf_value_get_value_type(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to grab read/write lock for writing.",
+		 "%s: unable to grab read/write lock for reading.",
 		 function );
 
 		return( -1 );
 	}
 #endif
-	if( libfdata_list_element_get_element_value(
-	     internal_value->values_list_element,
-	     (intptr_t *) internal_value->file_io_handle,
-	     (libfdata_cache_t *) internal_value->values_cache,
-	     (intptr_t **) &value_item,
-	     0,
+	if( libregf_value_item_get_value_type(
+	     internal_value->value_item,
+	     value_type,
 	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve value item.",
-		 function );
-
-		result = -1;
-	}
-	else if( libregf_value_item_get_value_type(
-	          value_item,
-	          value_type,
-	          error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -1069,7 +926,7 @@ int libregf_value_get_value_type(
 		result = -1;
 	}
 #if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
-	if( libcthreads_read_write_lock_release_for_write(
+	if( libcthreads_read_write_lock_release_for_read(
 	     internal_value->read_write_lock,
 	     error ) != 1 )
 	{
@@ -1077,7 +934,7 @@ int libregf_value_get_value_type(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to release read/write lock for writing.",
+		 "%s: unable to release read/write lock for reading.",
 		 function );
 
 		return( -1 );
@@ -1095,7 +952,6 @@ int libregf_value_get_value_data_size(
      libcerror_error_t **error )
 {
 	libregf_internal_value_t *internal_value = NULL;
-	libregf_value_item_t *value_item         = NULL;
 	static char *function                    = "libregf_value_get_value_data_size";
 	int result                               = 1;
 
@@ -1113,7 +969,7 @@ int libregf_value_get_value_data_size(
 	internal_value = (libregf_internal_value_t *) value;
 
 #if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
-	if( libcthreads_read_write_lock_grab_for_write(
+	if( libcthreads_read_write_lock_grab_for_read(
 	     internal_value->read_write_lock,
 	     error ) != 1 )
 	{
@@ -1121,33 +977,16 @@ int libregf_value_get_value_data_size(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to grab read/write lock for writing.",
+		 "%s: unable to grab read/write lock for reading.",
 		 function );
 
 		return( -1 );
 	}
 #endif
-	if( libfdata_list_element_get_element_value(
-	     internal_value->values_list_element,
-	     (intptr_t *) internal_value->file_io_handle,
-	     (libfdata_cache_t *) internal_value->values_cache,
-	     (intptr_t **) &value_item,
-	     0,
+	if( libregf_value_item_get_data_size(
+	     internal_value->value_item,
+	     value_data_size,
 	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve value item.",
-		 function );
-
-		result = -1;
-	}
-	else if( libregf_value_item_get_data_size(
-	          value_item,
-	          value_data_size,
-	          error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -1159,7 +998,7 @@ int libregf_value_get_value_data_size(
 		result = -1;
 	}
 #if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
-	if( libcthreads_read_write_lock_release_for_write(
+	if( libcthreads_read_write_lock_release_for_read(
 	     internal_value->read_write_lock,
 	     error ) != 1 )
 	{
@@ -1167,7 +1006,7 @@ int libregf_value_get_value_data_size(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to release read/write lock for writing.",
+		 "%s: unable to release read/write lock for reading.",
 		 function );
 
 		return( -1 );
@@ -1186,10 +1025,10 @@ int libregf_value_get_value_data(
      libcerror_error_t **error )
 {
 	libregf_internal_value_t *internal_value = NULL;
-	libregf_value_item_t *value_item         = NULL;
 	uint8_t *data                            = NULL;
 	static char *function                    = "libregf_value_get_value_data";
 	size_t data_size                         = 0;
+	int result                               = 1;
 
 	if( value == NULL )
 	{
@@ -1226,26 +1065,23 @@ int libregf_value_get_value_data(
 
 		return( -1 );
 	}
-/* TODO add thread lock support */
-	if( libfdata_list_element_get_element_value(
-	     internal_value->values_list_element,
-	     (intptr_t *) internal_value->file_io_handle,
-	     (libfdata_cache_t *) internal_value->values_cache,
-	     (intptr_t **) &value_item,
-	     0,
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_value->read_write_lock,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve value item.",
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
 		 function );
 
 		return( -1 );
 	}
+#endif
 	if( libregf_value_item_get_data(
-	     value_item,
+	     internal_value->value_item,
 	     internal_value->file_io_handle,
 	     &data,
 	     &data_size,
@@ -1258,9 +1094,9 @@ int libregf_value_get_value_data(
 		 "%s: unable to retrieve value data.",
 		 function );
 
-		return( -1 );
+		result = -1;
 	}
-	if( value_data_size < data_size )
+	else if( value_data_size < data_size )
 	{
 		libcerror_error_set(
 		 error,
@@ -1269,12 +1105,12 @@ int libregf_value_get_value_data(
 		 "%s: invalid value data size value out of bounds.",
 		 function );
 
-		return( -1 );
+		result = -1;
 	}
-	if( memory_copy(
-	     value_data,
-	     data,
-	     data_size ) == NULL )
+	else if( memory_copy(
+	          value_data,
+	          data,
+	          data_size ) == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -1283,9 +1119,24 @@ int libregf_value_get_value_data(
 		 "%s: unable to copy value data.",
 		 function );
 
+		result = -1;
+	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_value->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
 		return( -1 );
 	}
-	return( 1 );
+#endif
+	return( result );
 }
 
 /* Retrieves the 32-bit value
@@ -1297,7 +1148,6 @@ int libregf_value_get_value_32bit(
      libcerror_error_t **error )
 {
 	libregf_internal_value_t *internal_value = NULL;
-	libregf_value_item_t *value_item         = NULL;
 	static char *function                    = "libregf_value_get_value_32bit";
 	int result                               = 1;
 
@@ -1329,28 +1179,11 @@ int libregf_value_get_value_32bit(
 		return( -1 );
 	}
 #endif
-	if( libfdata_list_element_get_element_value(
-	     internal_value->values_list_element,
-	     (intptr_t *) internal_value->file_io_handle,
-	     (libfdata_cache_t *) internal_value->values_cache,
-	     (intptr_t **) &value_item,
-	     0,
+	if( libregf_value_item_get_value_32bit(
+	     internal_value->value_item,
+	     internal_value->file_io_handle,
+	     value_32bit,
 	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve value item.",
-		 function );
-
-		result = -1;
-	}
-	else if( libregf_value_item_get_value_32bit(
-	          value_item,
-	          internal_value->file_io_handle,
-	          value_32bit,
-	          error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -1388,7 +1221,6 @@ int libregf_value_get_value_64bit(
      libcerror_error_t **error )
 {
 	libregf_internal_value_t *internal_value = NULL;
-	libregf_value_item_t *value_item         = NULL;
 	static char *function                    = "libregf_value_get_value_64bit";
 	int result                               = 1;
 
@@ -1420,28 +1252,11 @@ int libregf_value_get_value_64bit(
 		return( -1 );
 	}
 #endif
-	if( libfdata_list_element_get_element_value(
-	     internal_value->values_list_element,
-	     (intptr_t *) internal_value->file_io_handle,
-	     (libfdata_cache_t *) internal_value->values_cache,
-	     (intptr_t **) &value_item,
-	     0,
+	if( libregf_value_item_get_value_64bit(
+	     internal_value->value_item,
+	     internal_value->file_io_handle,
+	     value_64bit,
 	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve value item.",
-		 function );
-
-		result = -1;
-	}
-	else if( libregf_value_item_get_value_64bit(
-	          value_item,
-	          internal_value->file_io_handle,
-	          value_64bit,
-	          error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -1480,7 +1295,6 @@ int libregf_value_get_value_utf8_string_size(
      libcerror_error_t **error )
 {
 	libregf_internal_value_t *internal_value = NULL;
-	libregf_value_item_t *value_item         = NULL;
 	static char *function                    = "libregf_value_get_value_utf8_string_size";
 	int result                               = 1;
 
@@ -1512,28 +1326,11 @@ int libregf_value_get_value_utf8_string_size(
 		return( -1 );
 	}
 #endif
-	if( libfdata_list_element_get_element_value(
-	     internal_value->values_list_element,
-	     (intptr_t *) internal_value->file_io_handle,
-	     (libfdata_cache_t *) internal_value->values_cache,
-	     (intptr_t **) &value_item,
-	     0,
+	if( libregf_value_item_get_value_utf8_string_size(
+	     internal_value->value_item,
+	     internal_value->file_io_handle,
+	     utf8_string_size,
 	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve value item.",
-		 function );
-
-		result = -1;
-	}
-	else if( libregf_value_item_get_value_utf8_string_size(
-	          value_item,
-	          internal_value->file_io_handle,
-	          utf8_string_size,
-	          error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -1574,7 +1371,6 @@ int libregf_value_get_value_utf8_string(
      libcerror_error_t **error )
 {
 	libregf_internal_value_t *internal_value = NULL;
-	libregf_value_item_t *value_item         = NULL;
 	static char *function                    = "libregf_value_get_value_utf8_string";
 	int result                               = 1;
 
@@ -1606,29 +1402,12 @@ int libregf_value_get_value_utf8_string(
 		return( -1 );
 	}
 #endif
-	if( libfdata_list_element_get_element_value(
-	     internal_value->values_list_element,
-	     (intptr_t *) internal_value->file_io_handle,
-	     (libfdata_cache_t *) internal_value->values_cache,
-	     (intptr_t **) &value_item,
-	     0,
+	if( libregf_value_item_get_value_utf8_string(
+	     internal_value->value_item,
+	     internal_value->file_io_handle,
+	     utf8_string,
+	     utf8_string_size,
 	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve value item.",
-		 function );
-
-		result = -1;
-	}
-	else if( libregf_value_item_get_value_utf8_string(
-	          value_item,
-	          internal_value->file_io_handle,
-	          utf8_string,
-	          utf8_string_size,
-	          error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -1667,7 +1446,6 @@ int libregf_value_get_value_utf16_string_size(
      libcerror_error_t **error )
 {
 	libregf_internal_value_t *internal_value = NULL;
-	libregf_value_item_t *value_item         = NULL;
 	static char *function                    = "libregf_value_get_value_utf16_string_size";
 	int result                               = 1;
 
@@ -1699,28 +1477,11 @@ int libregf_value_get_value_utf16_string_size(
 		return( -1 );
 	}
 #endif
-	if( libfdata_list_element_get_element_value(
-	     internal_value->values_list_element,
-	     (intptr_t *) internal_value->file_io_handle,
-	     (libfdata_cache_t *) internal_value->values_cache,
-	     (intptr_t **) &value_item,
-	     0,
+	if( libregf_value_item_get_value_utf16_string_size(
+	     internal_value->value_item,
+	     internal_value->file_io_handle,
+	     utf16_string_size,
 	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve value item.",
-		 function );
-
-		result = -1;
-	}
-	else if( libregf_value_item_get_value_utf16_string_size(
-	          value_item,
-	          internal_value->file_io_handle,
-	          utf16_string_size,
-	          error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -1761,7 +1522,6 @@ int libregf_value_get_value_utf16_string(
      libcerror_error_t **error )
 {
 	libregf_internal_value_t *internal_value = NULL;
-	libregf_value_item_t *value_item         = NULL;
 	static char *function                    = "libregf_value_get_value_utf16_string";
 	int result                               = 1;
 
@@ -1793,29 +1553,12 @@ int libregf_value_get_value_utf16_string(
 		return( -1 );
 	}
 #endif
-	if( libfdata_list_element_get_element_value(
-	     internal_value->values_list_element,
-	     (intptr_t *) internal_value->file_io_handle,
-	     (libfdata_cache_t *) internal_value->values_cache,
-	     (intptr_t **) &value_item,
-	     0,
+	if( libregf_value_item_get_value_utf16_string(
+	     internal_value->value_item,
+	     internal_value->file_io_handle,
+	     utf16_string,
+	     utf16_string_size,
 	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve value item.",
-		 function );
-
-		result = -1;
-	}
-	else if( libregf_value_item_get_value_utf16_string(
-	          value_item,
-	          internal_value->file_io_handle,
-	          utf16_string,
-	          utf16_string_size,
-	          error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -1853,7 +1596,6 @@ int libregf_value_get_value_binary_data_size(
      libcerror_error_t **error )
 {
 	libregf_internal_value_t *internal_value = NULL;
-	libregf_value_item_t *value_item         = NULL;
 	static char *function                    = "libregf_value_get_value_binary_data_size";
 	int result                               = 1;
 
@@ -1885,27 +1627,10 @@ int libregf_value_get_value_binary_data_size(
 		return( -1 );
 	}
 #endif
-	if( libfdata_list_element_get_element_value(
-	     internal_value->values_list_element,
-	     (intptr_t *) internal_value->file_io_handle,
-	     (libfdata_cache_t *) internal_value->values_cache,
-	     (intptr_t **) &value_item,
-	     0,
+	if( libregf_value_item_get_value_binary_data_size(
+	     internal_value->value_item,
+	     size,
 	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve value item.",
-		 function );
-
-		result = -1;
-	}
-	else if( libregf_value_item_get_value_binary_data_size(
-	          value_item,
-	          size,
-	          error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -1944,7 +1669,6 @@ int libregf_value_get_value_binary_data(
      libcerror_error_t **error )
 {
 	libregf_internal_value_t *internal_value = NULL;
-	libregf_value_item_t *value_item         = NULL;
 	static char *function                    = "libregf_value_get_value_binary_data";
 	int result                               = 1;
 
@@ -1976,29 +1700,12 @@ int libregf_value_get_value_binary_data(
 		return( -1 );
 	}
 #endif
-	if( libfdata_list_element_get_element_value(
-	     internal_value->values_list_element,
-	     (intptr_t *) internal_value->file_io_handle,
-	     (libfdata_cache_t *) internal_value->values_cache,
-	     (intptr_t **) &value_item,
-	     0,
+	if( libregf_value_item_get_value_binary_data(
+	     internal_value->value_item,
+	     internal_value->file_io_handle,
+	     binary_data,
+	     size,
 	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve value item.",
-		 function );
-
-		result = -1;
-	}
-	else if( libregf_value_item_get_value_binary_data(
-	          value_item,
-	          internal_value->file_io_handle,
-	          binary_data,
-	          size,
-	          error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
@@ -2037,7 +1744,6 @@ int libregf_value_get_value_multi_string(
      libcerror_error_t **error )
 {
 	libregf_internal_value_t *internal_value = NULL;
-	libregf_value_item_t *value_item         = NULL;
 	static char *function                    = "libregf_value_get_value_multi_string";
 	int result                               = 1;
 
@@ -2091,28 +1797,11 @@ int libregf_value_get_value_multi_string(
 		return( -1 );
 	}
 #endif
-	if( libfdata_list_element_get_element_value(
-	     internal_value->values_list_element,
-	     (intptr_t *) internal_value->file_io_handle,
-	     (libfdata_cache_t *) internal_value->values_cache,
-	     (intptr_t **) &value_item,
-	     0,
+	if( libregf_value_item_get_value_multi_string(
+	     internal_value->value_item,
+	     internal_value->file_io_handle,
+	     multi_string,
 	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve value item.",
-		 function );
-
-		result = -1;
-	}
-	else if( libregf_value_item_get_value_multi_string(
-	          value_item,
-	          internal_value->file_io_handle,
-	          multi_string,
-	          error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,

@@ -63,7 +63,7 @@ struct libregf_value_key
 	 */
 	uint8_t *data;
 
-	/* The value data offset
+	/* The value data size
 	 */
 	uint32_t data_size;
 
@@ -78,6 +78,11 @@ int libregf_value_key_initialize(
 
 int libregf_value_key_free(
      libregf_value_key_t **value_key,
+     libcerror_error_t **error );
+
+int libregf_value_key_clone(
+     libregf_value_key_t **destination_value_key,
+     libregf_value_key_t *source_value_key,
      libcerror_error_t **error );
 
 int libregf_value_key_read_data(

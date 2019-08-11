@@ -192,6 +192,12 @@ int libregf_key_get_number_of_values(
      int *number_of_values,
      libcerror_error_t **error );
 
+int libregf_internal_key_get_value(
+     libregf_internal_key_t *internal_key,
+     int value_index,
+     libregf_value_t **value,
+     libcerror_error_t **error );
+
 LIBREGF_EXTERN \
 int libregf_key_get_value(
      libregf_key_t *key,

@@ -23,10 +23,6 @@
 #include <memory.h>
 #include <types.h>
 
-#if defined( HAVE_WCTYPE_H )
-#include <wctype.h>
-#endif
-
 #include "libregf_debug.h"
 #include "libregf_definitions.h"
 #include "libregf_hive_bins_list.h"
@@ -141,10 +137,21 @@ int libregf_key_item_free(
 	}
 	if( *key_item != NULL )
 	{
-		if( ( *key_item )->name != NULL )
+		if( ( *key_item )->named_key != NULL )
 		{
-			memory_free(
-			 ( *key_item )->name );
+			if( libregf_named_key_free(
+			     &( ( *key_item )->named_key ),
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+				 "%s: unable to free the named key.",
+				 function );
+
+				result = -1;
+			}
 		}
 		if( ( *key_item )->class_name != NULL )
 		{
@@ -209,7 +216,6 @@ int libregf_key_item_read_named_key(
      libcerror_error_t **error )
 {
 	libregf_hive_bin_cell_t *hive_bin_cell = NULL;
-	libregf_named_key_t *named_key         = NULL;
 	static char *function                  = "libregf_key_item_read_named_key";
 	int hive_bin_index                     = 0;
 	int result                             = 0;
@@ -225,13 +231,13 @@ int libregf_key_item_read_named_key(
 
 		return( -1 );
 	}
-	if( key_item->name != NULL )
+	if( key_item->named_key != NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid key item - name value already set.",
+		 "%s: invalid key item - named key value already set.",
 		 function );
 
 		return( -1 );
@@ -299,7 +305,7 @@ int libregf_key_item_read_named_key(
 		goto on_error;
 	}
 	if( libregf_named_key_initialize(
-	     &named_key,
+	     &( key_item->named_key ),
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -312,7 +318,7 @@ int libregf_key_item_read_named_key(
 		goto on_error;
 	}
 	if( libregf_named_key_read_data(
-	     named_key,
+	     key_item->named_key,
 	     hive_bin_cell->data,
 	     hive_bin_cell->size,
 	     named_key_hash,
@@ -330,43 +336,32 @@ int libregf_key_item_read_named_key(
 
 		goto on_error;
 	}
-	key_item->flags             = named_key->flags;
-	key_item->last_written_time = named_key->last_written_time;
-	key_item->name              = named_key->name;
-	key_item->name_size         = named_key->name_size;
-
-	named_key->name      = NULL;
-	named_key->name_size = 0;
-
-	if( named_key->class_name_offset != 0xffffffffUL )
+	if( libregf_key_item_read_class_name(
+	     key_item,
+	     file_io_handle,
+	     hive_bins_list,
+	     key_item->named_key->class_name_offset,
+	     key_item->named_key->class_name_size,
+	     error ) != 1 )
 	{
-		if( libregf_key_item_read_class_name(
-		     key_item,
-		     file_io_handle,
-		     hive_bins_list,
-		     named_key->class_name_offset,
-		     named_key->class_name_size,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_IO,
-			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read class name at offset: %" PRIu32 " (0x%08" PRIx32 ").",
-			 function,
-			 named_key->class_name_offset,
-			 named_key->class_name_offset );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read class name at offset: %" PRIu32 " (0x%08" PRIx32 ").",
+		 function,
+		 key_item->named_key->class_name_offset,
+		 key_item->named_key->class_name_offset );
 
-			goto on_error;
-		}
+		goto on_error;
 	}
-	if( named_key->security_key_offset != 0xffffffffUL )
+	if( key_item->named_key->security_key_offset != 0xffffffffUL )
 	{
 		if( libregf_key_item_read_security_key(
 		     key_item,
 		     file_io_handle,
 		     hive_bins_list,
-		     named_key->security_key_offset,
+		     key_item->named_key->security_key_offset,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -375,13 +370,13 @@ int libregf_key_item_read_named_key(
 			 LIBCERROR_IO_ERROR_READ_FAILED,
 			 "%s: unable to read security key at offset: %" PRIu32 " (0x%08" PRIx32 ").",
 			 function,
-			 named_key->security_key_offset,
-			 named_key->security_key_offset );
+			 key_item->named_key->security_key_offset,
+			 key_item->named_key->security_key_offset );
 
 			goto on_error;
 		}
 	}
-	if( named_key->number_of_sub_keys > 0 )
+	if( key_item->named_key->number_of_sub_keys > 0 )
 	{
 		result = libfdata_tree_node_sub_nodes_data_range_is_set(
 		          key_tree_node,
@@ -402,7 +397,7 @@ int libregf_key_item_read_named_key(
 		{
 			result = libregf_hive_bins_list_get_index_at_offset(
 			          hive_bins_list,
-			          (off64_t) named_key->sub_keys_list_offset,
+			          (off64_t) key_item->named_key->sub_keys_list_offset,
 			          &hive_bin_index,
 			          error );
 
@@ -419,14 +414,14 @@ int libregf_key_item_read_named_key(
 			}
 			else if( result == 0 )
 			{
-				key_item->flags |= LIBREGF_KEY_ITEM_FLAG_IS_CORRUPTED;
+				key_item->item_flags |= LIBREGF_KEY_ITEM_FLAG_IS_CORRUPTED;
 			}
 			else
 			{
 				if( libfdata_tree_node_set_sub_nodes_data_range(
 				     key_tree_node,
 				     0,
-				     (off64_t) named_key->sub_keys_list_offset,
+				     (off64_t) key_item->named_key->sub_keys_list_offset,
 				     0,
 				     0,
 				     error ) != 1 )
@@ -479,7 +474,7 @@ int libregf_key_item_read_named_key(
 	}
 	result = libregf_hive_bins_list_get_index_at_offset(
 	          hive_bins_list,
-	          (off64_t) named_key->values_list_offset,
+	          (off64_t) key_item->named_key->values_list_offset,
 	          &hive_bin_index,
 	          error );
 
@@ -496,7 +491,7 @@ int libregf_key_item_read_named_key(
 	}
 	else if( result == 0 )
 	{
-		key_item->flags |= LIBREGF_KEY_ITEM_FLAG_IS_CORRUPTED;
+		key_item->item_flags |= LIBREGF_KEY_ITEM_FLAG_IS_CORRUPTED;
 	}
 	else
 	{
@@ -504,8 +499,8 @@ int libregf_key_item_read_named_key(
 		     key_item,
 		     file_io_handle,
 		     hive_bins_list,
-		     named_key->values_list_offset,
-		     named_key->number_of_values,
+		     key_item->named_key->values_list_offset,
+		     key_item->named_key->number_of_values,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -514,27 +509,14 @@ int libregf_key_item_read_named_key(
 			 LIBCERROR_IO_ERROR_READ_FAILED,
 			 "%s: unable to read values list at offset: %" PRIu32 " (0x%08" PRIx32 ").",
 			 function,
-			 named_key->values_list_offset,
-			 named_key->values_list_offset );
+			 key_item->named_key->values_list_offset,
+			 key_item->named_key->values_list_offset );
 
 			goto on_error;
 		}
 	}
 	/* The values and sub keys are read on demand
 	 */
-	if( libregf_named_key_free(
-	     &named_key,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-		 "%s: unable to free named key.",
-		 function );
-
-		goto on_error;
-	}
 	return( 1 );
 
 on_error:
@@ -550,21 +532,175 @@ on_error:
 		 &( key_item->values_list ),
 		 NULL );
 	}
-	if( key_item->name != NULL )
-	{
-		memory_free(
-		 key_item->name );
-
-		key_item->name = NULL;
-	}
-	key_item->name_size = 0;
-
-	if( named_key != NULL )
+	if( key_item->named_key != NULL )
 	{
 		libregf_named_key_free(
-		 &named_key,
+		 &( key_item->named_key ),
 		 NULL );
 	}
+	return( -1 );
+}
+
+/* Reads a class name
+ * Returns 1 if successful or -1 on error
+ */
+int libregf_key_item_read_class_name_data(
+     libregf_key_item_t *key_item,
+     const uint8_t *data,
+     size_t data_size,
+     uint16_t class_name_size,
+     libcerror_error_t **error )
+{
+	static char *function = "libregf_key_item_read_class_name_data";
+
+	if( key_item == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid key item.",
+		 function );
+
+		return( -1 );
+	}
+	if( key_item->class_name != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid key item - class name value already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( data == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid data.",
+		 function );
+
+		return( -1 );
+	}
+	if( data_size > (size_t) SSIZE_MAX )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid data size value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libcnotify_verbose != 0 )
+	{
+		libcnotify_printf(
+		 "%s: data:\n",
+		 function );
+		libcnotify_print_data(
+		 data,
+		 data_size,
+		 0 );
+	}
+#endif
+	if( ( class_name_size == 0 )
+	 || ( (size_t) class_name_size > data_size ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid class name size value out of bounds.",
+		 function );
+
+		goto on_error;
+	}
+	key_item->class_name = (uint8_t *) memory_allocate(
+	                                    sizeof( uint8_t ) * (size_t) class_name_size );
+
+	if( key_item->class_name == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create class name.",
+		 function );
+
+		goto on_error;
+	}
+	if( memory_copy(
+	     key_item->class_name,
+	     data,
+	     (size_t) class_name_size ) == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+		 "%s: unable to class name.",
+		 function );
+
+		goto on_error;
+	}
+	key_item->class_name_size = class_name_size;
+
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libcnotify_verbose != 0 )
+	{
+		if( libregf_debug_print_utf16_string_value(
+		     function,
+		     "class name\t\t\t",
+		     key_item->class_name,
+		     (size_t) key_item->class_name_size,
+		     LIBUNA_ENDIAN_LITTLE,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+			 "%s: unable to print UTF-16 string value.",
+			 function );
+
+			goto on_error;
+		}
+		if( (size_t) class_name_size < data_size )
+		{
+			libcnotify_printf(
+			 "%s: padding:\n",
+			 function );
+			libcnotify_print_data(
+			 &( data[ (size_t) class_name_size ] ),
+			 data_size - (size_t) class_name_size,
+			 0 );
+		}
+		else
+		{
+			libcnotify_printf(
+			 "\n" );
+		}
+	}
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
+
+	return( 1 );
+
+on_error:
+	if( key_item->class_name != NULL )
+	{
+		memory_free(
+		 key_item->class_name );
+
+		key_item->class_name = NULL;
+	}
+	key_item->class_name_size = 0;
+
 	return( -1 );
 }
 
@@ -580,9 +716,7 @@ int libregf_key_item_read_class_name(
      libcerror_error_t **error )
 {
 	libregf_hive_bin_cell_t *hive_bin_cell = NULL;
-	const uint8_t *hive_bin_cell_data      = NULL;
 	static char *function                  = "libregf_key_item_read_class_name";
-	size_t hive_bin_cell_size              = 0;
 
 	if( key_item == NULL )
 	{
@@ -617,13 +751,16 @@ int libregf_key_item_read_class_name(
 
 		return( -1 );
 	}
+	if( class_name_offset == 0xffffffffUL )
+	{
+		return( 1 );
+	}
 	if( ( class_name_offset == 0 )
 	 && ( class_name_size == 0 ) )
 	{
 		return( 1 );
 	}
-	if( ( class_name_offset == 0 )
-	 || ( class_name_offset == 0xffffffffUL ) )
+	if( class_name_offset == 0 )
 	{
 		libcerror_error_set(
 		 error,
@@ -634,6 +771,16 @@ int libregf_key_item_read_class_name(
 
 		return( -1 );
 	}
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libcnotify_verbose != 0 )
+	{
+		libcnotify_printf(
+		 "%s: reading class name at offset: %" PRIi64 " (0x%08" PRIx64 ").",
+		 function,
+		 class_name_offset,
+		 class_name_offset );
+	}
+#endif
 	if( libregf_hive_bins_list_get_cell_at_offset(
 	     hive_bins_list,
 	     file_io_handle,
@@ -650,133 +797,27 @@ int libregf_key_item_read_class_name(
 		 class_name_offset,
 		 class_name_offset );
 
-		goto on_error;
+		return( -1 );
 	}
-	hive_bin_cell_data = hive_bin_cell->data;
-	hive_bin_cell_size = hive_bin_cell->size;
-
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
-	{
-		libcnotify_printf(
-		 "%s: data:\n",
-		 function );
-		libcnotify_print_data(
-		 hive_bin_cell_data,
-		 hive_bin_cell_size,
-		 0 );
-	}
-#endif
-	if( class_name_size > hive_bin_cell_size )
+	if( libregf_key_item_read_class_name_data(
+	     key_item,
+	     hive_bin_cell->data,
+	     hive_bin_cell->size,
+	     class_name_size,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid class name size value exceeds hive bin cell size.",
-		 function );
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read class name at offset: %" PRIu32 " (0x%08" PRIx32 ").",
+		 function,
+		 class_name_offset,
+		 class_name_offset );
 
-		goto on_error;
+		return( -1 );
 	}
-	if( class_name_size == 0 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-		 "%s: invalid value class name size.",
-		 function );
-
-		goto on_error;
-	}
-	key_item->class_name_size = class_name_size;
-
-	key_item->class_name = (uint8_t *) memory_allocate(
-	                                    sizeof( uint8_t ) * (size_t) key_item->class_name_size );
-
-	if( key_item->class_name == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_MEMORY,
-		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create key class name.",
-		 function );
-
-		goto on_error;
-	}
-	if( memory_copy(
-	     key_item->class_name,
-	     hive_bin_cell_data,
-	     (size_t) key_item->class_name_size ) == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_MEMORY,
-		 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-		 "%s: unable to copy hive bin cell data to class name.",
-		 function );
-
-		goto on_error;
-	}
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
-	{
-		if( libregf_debug_print_utf16_string_value(
-		     function,
-		     "class name\t\t\t",
-		     key_item->class_name,
-		     (size_t) key_item->class_name_size,
-		     LIBUNA_ENDIAN_LITTLE,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
-			 "%s: unable to print UTF-16 string value.",
-			 function );
-
-			goto on_error;
-		}
-	}
-	hive_bin_cell_data += key_item->class_name_size;
-	hive_bin_cell_size -= key_item->class_name_size;
-#endif
-
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
-	{
-		if( hive_bin_cell_size > 0 )
-		{
-			libcnotify_printf(
-			 "%s: padding:\n",
-			 function );
-			libcnotify_print_data(
-			 hive_bin_cell_data,
-			 hive_bin_cell_size,
-			 0 );
-		}
-		else
-		{
-			libcnotify_printf(
-			 "\n" );
-		}
-	}
-#endif
 	return( 1 );
-
-on_error:
-	if( key_item->class_name != NULL )
-	{
-		memory_free(
-		 key_item->class_name );
-
-		key_item->class_name = NULL;
-	}
-	key_item->class_name_size = 0;
-
-	return( -1 );
 }
 
 /* Reads a security key
@@ -1060,7 +1101,7 @@ int libregf_key_item_read_values_list(
 		}
 		else if( result == 0 )
 		{
-			key_item->flags |= LIBREGF_KEY_ITEM_FLAG_IS_CORRUPTED;
+			key_item->item_flags |= LIBREGF_KEY_ITEM_FLAG_IS_CORRUPTED;
 		}
 		else if( libfdata_list_append_element(
 		          key_item->values_list,
@@ -1644,24 +1685,15 @@ int libregf_key_item_get_number_of_values(
 	return( 1 );
 }
 
-/* Compares the key name with UTF-8 string
- * Returns 1 if the names match, 0 if not or -1 on error
+/* Retrieves the key name size
+ * Returns 1 if successful or -1 on error
  */
-int libregf_key_item_compare_name_with_utf8_string(
+int libregf_key_item_get_name_size(
      libregf_key_item_t *key_item,
-     uint32_t name_hash,
-     const uint8_t *utf8_string,
-     size_t utf8_string_length,
-     int ascii_codepage,
+     size_t *name_size,
      libcerror_error_t **error )
 {
-	static char *function                       = "libregf_key_item_compare_name_with_utf8_string";
-	libuna_unicode_character_t name_character   = 0;
-	libuna_unicode_character_t string_character = 0;
-	size_t name_index                           = 0;
-	size_t utf8_string_index                    = 0;
-	int character_compare_result                = 0;
-	int result                                  = 0;
+	static char *function = "libregf_key_item_get_name_size";
 
 	if( key_item == NULL )
 	{
@@ -1674,113 +1706,278 @@ int libregf_key_item_compare_name_with_utf8_string(
 
 		return( -1 );
 	}
-	if( key_item->name == NULL )
+	if( libregf_named_key_get_name_size(
+	     key_item->named_key,
+	     name_size,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid key item - missing name.",
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve name size.",
 		 function );
 
 		return( -1 );
 	}
-	if( utf8_string == NULL )
+	return( 1 );
+}
+
+/* Retrieves the key name
+ * Returns 1 if successful or -1 on error
+ */
+int libregf_key_item_get_name(
+     libregf_key_item_t *key_item,
+     uint8_t *name,
+     size_t name_size,
+     libcerror_error_t **error )
+{
+	static char *function = "libregf_key_item_get_name";
+
+	if( key_item == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid UTF-8 string.",
+		 "%s: invalid key item.",
 		 function );
 
 		return( -1 );
 	}
-	if( utf8_string_length > (size_t) SSIZE_MAX )
+	if( libregf_named_key_get_name(
+	     key_item->named_key,
+	     name,
+	     name_size,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid UTF-8 string length value exceeds maximum.",
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve name.",
 		 function );
 
 		return( -1 );
 	}
-	/* Do a full compare if there no name hash was provided or the name hash matches
-	 */
-	if( ( name_hash == 0 )
-	 || ( key_item->name_hash == 0 )
-	 || ( key_item->name_hash == name_hash ) )
+	return( 1 );
+}
+
+/* Retrieves the UTF-8 string size of the key name
+ * The returned size includes the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+int libregf_key_item_get_utf8_name_size(
+     libregf_key_item_t *key_item,
+     size_t *utf8_string_size,
+     int ascii_codepage,
+     libcerror_error_t **error )
+{
+	static char *function = "libregf_key_item_get_utf8_name_size";
+
+	if( key_item == NULL )
 	{
-		while( name_index < (size_t) key_item->name_size )
-		{
-			if( utf8_string_index >= utf8_string_length )
-			{
-				break;
-			}
-			if( ( key_item->flags & LIBREGF_NAMED_KEY_FLAG_NAME_IS_ASCII ) != 0 )
-			{
-				result = libuna_unicode_character_copy_from_byte_stream(
-					  &name_character,
-					  key_item->name,
-					  (size_t) key_item->name_size,
-					  &name_index,
-					  ascii_codepage,
-					  error );
-			}
-			else
-			{
-				result = libuna_unicode_character_copy_from_utf16_stream(
-					  &name_character,
-					  key_item->name,
-					  (size_t) key_item->name_size,
-					  &name_index,
-					  LIBUNA_ENDIAN_LITTLE,
-					  error );
-			}
-			if( result != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
-				 "%s: unable to copy key name to Unicode character.",
-				 function );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid key item.",
+		 function );
 
-				return( -1 );
-			}
-			if( libuna_unicode_character_copy_from_utf8(
-			     &string_character,
-			     utf8_string,
-			     utf8_string_length,
-			     &utf8_string_index,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
-				 "%s: unable to copy UTF-8 string to Unicode character.",
-				 function );
-
-				return( -1 );
-			}
-			character_compare_result = towupper( (wint_t) name_character ) == towupper( (wint_t) string_character );
-
-			if( character_compare_result == 0 )
-			{
-				break;
-			}
-		}
-		if( ( character_compare_result != 0 )
-		 && ( name_index == (size_t) key_item->name_size )
-		 && ( utf8_string_index == utf8_string_length ) )
-		{
-			return( 1 );
-		}
+		return( -1 );
 	}
-	return( 0 );
+	if( libregf_named_key_get_utf8_name_size(
+	     key_item->named_key,
+	     utf8_string_size,
+	     ascii_codepage,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve UTF-8 name size.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the UTF-8 string value of the key name
+ * The function uses a codepage if necessary, it uses the codepage set for the library
+ * The size should include the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+int libregf_key_item_get_utf8_name(
+     libregf_key_item_t *key_item,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
+     int ascii_codepage,
+     libcerror_error_t **error )
+{
+	static char *function = "libregf_key_item_get_utf8_name";
+
+	if( key_item == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid key item.",
+		 function );
+
+		return( -1 );
+	}
+	if( libregf_named_key_get_utf8_name(
+	     key_item->named_key,
+	     utf8_string,
+	     utf8_string_size,
+	     ascii_codepage,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve UTF-8 name.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the UTF-16 string size of the key name
+ * The returned size includes the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+int libregf_key_item_get_utf16_name_size(
+     libregf_key_item_t *key_item,
+     size_t *utf16_string_size,
+     int ascii_codepage,
+     libcerror_error_t **error )
+{
+	static char *function = "libregf_key_item_get_utf16_name_size";
+
+	if( key_item == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid key item.",
+		 function );
+
+		return( -1 );
+	}
+	if( libregf_named_key_get_utf16_name_size(
+	     key_item->named_key,
+	     utf16_string_size,
+	     ascii_codepage,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve UTF-16 name size.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the UTF-16 string value of the key name
+ * The function uses a codepage if necessary, it uses the codepage set for the library
+ * The size should include the end of string character
+ * Returns 1 if successful or -1 on error
+ */
+int libregf_key_item_get_utf16_name(
+     libregf_key_item_t *key_item,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
+     int ascii_codepage,
+     libcerror_error_t **error )
+{
+	static char *function = "libregf_key_item_get_utf16_name";
+
+	if( key_item == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid key item.",
+		 function );
+
+		return( -1 );
+	}
+	if( libregf_named_key_get_utf16_name(
+	     key_item->named_key,
+	     utf16_string,
+	     utf16_string_size,
+	     ascii_codepage,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve UTF-16 name.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Compares the key name with UTF-8 string
+ * Returns 1 if the names match, 0 if not or -1 on error
+ */
+int libregf_key_item_compare_name_with_utf8_string(
+     libregf_key_item_t *key_item,
+     uint32_t name_hash,
+     const uint8_t *utf8_string,
+     size_t utf8_string_length,
+     int ascii_codepage,
+     libcerror_error_t **error )
+{
+	static char *function = "libregf_key_item_compare_name_with_utf8_string";
+	int result            = 0;
+
+	if( key_item == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid key item.",
+		 function );
+
+		return( -1 );
+	}
+	result = libregf_named_key_compare_name_with_utf8_string(
+	          key_item->named_key,
+	          name_hash,
+	          utf8_string,
+	          utf8_string_length,
+	          ascii_codepage,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GENERIC,
+		 "%s: unable to compare sub key name with UTF-8 string.",
+		 function );
+
+		return( -1 );
+	}
+	return( result );
 }
 
 /* Compares the key name with UTF-16 string
@@ -1794,13 +1991,8 @@ int libregf_key_item_compare_name_with_utf16_string(
      int ascii_codepage,
      libcerror_error_t **error )
 {
-	static char *function                       = "libregf_key_item_compare_name_with_utf16_string";
-	libuna_unicode_character_t name_character   = 0;
-	libuna_unicode_character_t string_character = 0;
-	size_t name_index                           = 0;
-	size_t utf16_string_index                   = 0;
-	int character_compare_result                = 0;
-	int result                                  = 0;
+	static char *function = "libregf_key_item_compare_name_with_utf16_string";
+	int result            = 0;
 
 	if( key_item == NULL )
 	{
@@ -1813,112 +2005,63 @@ int libregf_key_item_compare_name_with_utf16_string(
 
 		return( -1 );
 	}
-	if( key_item->name == NULL )
+	result = libregf_named_key_compare_name_with_utf16_string(
+	          key_item->named_key,
+	          name_hash,
+	          utf16_string,
+	          utf16_string_length,
+	          ascii_codepage,
+	          error );
+
+	if( result == -1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid key item - missing name.",
+		 LIBCERROR_RUNTIME_ERROR_GENERIC,
+		 "%s: unable to compare sub key name with UTF-16 string.",
 		 function );
 
 		return( -1 );
 	}
-	if( utf16_string == NULL )
+	return( result );
+}
+
+/* Retrieves the 64-bit FILETIME value of the last written date and time
+ * Returns 1 if successful or -1 on error
+ */
+int libregf_key_item_get_last_written_time(
+     libregf_key_item_t *key_item,
+     uint64_t *filetime,
+     libcerror_error_t **error )
+{
+	static char *function = "libregf_key_item_get_last_written_time";
+
+	if( key_item == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid UTF-16 string.",
+		 "%s: invalid key item.",
 		 function );
 
 		return( -1 );
 	}
-	if( utf16_string_length > (size_t) SSIZE_MAX )
+	if( libregf_named_key_get_last_written_time(
+	     key_item->named_key,
+	     filetime,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid UTF-16 string length value exceeds maximum.",
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve last written time.",
 		 function );
 
 		return( -1 );
 	}
-	/* Do a full compare if there no name hash was provided or the name hash matches
-	 */
-	if( ( name_hash == 0 )
-	 || ( key_item->name_hash == 0 )
-	 || ( key_item->name_hash == name_hash ) )
-	{
-		while( name_index < (size_t) key_item->name_size )
-		{
-			if( utf16_string_index >= utf16_string_length )
-			{
-				break;
-			}
-			if( ( key_item->flags & LIBREGF_NAMED_KEY_FLAG_NAME_IS_ASCII ) != 0 )
-			{
-				result = libuna_unicode_character_copy_from_byte_stream(
-					  &name_character,
-					  key_item->name,
-					  (size_t) key_item->name_size,
-					  &name_index,
-					  ascii_codepage,
-					  error );
-			}
-			else
-			{
-				result = libuna_unicode_character_copy_from_utf16_stream(
-					  &name_character,
-					  key_item->name,
-					  (size_t) key_item->name_size,
-					  &name_index,
-					  LIBUNA_ENDIAN_LITTLE,
-					  error );
-			}
-			if( result != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
-				 "%s: unable to copy key name to Unicode character.",
-				 function );
-
-				return( -1 );
-			}
-			if( libuna_unicode_character_copy_from_utf16(
-			     &string_character,
-			     utf16_string,
-			     utf16_string_length,
-			     &utf16_string_index,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
-				 "%s: unable to copy UTF-16 string to Unicode character.",
-				 function );
-
-				return( -1 );
-			}
-			character_compare_result = towupper( (wint_t) name_character ) == towupper( (wint_t) string_character );
-
-			if( character_compare_result == 0 )
-			{
-				break;
-			}
-		}
-		if( ( character_compare_result != 0 )
-		 && ( name_index == (size_t) key_item->name_size )
-		 && ( utf16_string_index == utf16_string_length ) )
-		{
-			return( 1 );
-		}
-	}
-	return( 0 );
+	return( 1 );
 }
 

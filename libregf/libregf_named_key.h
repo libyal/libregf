@@ -100,6 +100,64 @@ int libregf_named_key_read_data(
      int ascii_codepage,
      libcerror_error_t **error );
 
+int libregf_named_key_get_name_size(
+     libregf_named_key_t *named_key,
+     size_t *name_size,
+     libcerror_error_t **error );
+
+int libregf_named_key_get_name(
+     libregf_named_key_t *named_key,
+     uint8_t *name,
+     size_t name_size,
+     libcerror_error_t **error );
+
+int libregf_named_key_get_utf8_name_size(
+     libregf_named_key_t *named_key,
+     size_t *utf8_string_size,
+     int ascii_codepage,
+     libcerror_error_t **error );
+
+int libregf_named_key_get_utf8_name(
+     libregf_named_key_t *named_key,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
+     int ascii_codepage,
+     libcerror_error_t **error );
+
+int libregf_named_key_get_utf16_name_size(
+     libregf_named_key_t *named_key,
+     size_t *utf16_string_size,
+     int ascii_codepage,
+     libcerror_error_t **error );
+
+int libregf_named_key_get_utf16_name(
+     libregf_named_key_t *named_key,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
+     int ascii_codepage,
+     libcerror_error_t **error );
+
+int libregf_named_key_compare_name_with_utf8_string(
+     libregf_named_key_t *named_key,
+     uint32_t name_hash,
+     const uint8_t *utf8_string,
+     size_t utf8_string_length,
+     int ascii_codepage,
+     libcerror_error_t **error );
+
+int libregf_named_key_compare_name_with_utf16_string(
+     libregf_named_key_t *named_key,
+     uint32_t name_hash,
+     const uint16_t *utf16_string,
+     size_t utf16_string_length,
+     int ascii_codepage,
+     libcerror_error_t **error );
+
+int libregf_named_key_get_last_written_time(
+     libregf_named_key_t *named_key,
+     uint64_t *filetime,
+     libcerror_error_t **error );
+
 #if defined( __cplusplus )
 }
 #endif

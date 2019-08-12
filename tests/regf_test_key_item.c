@@ -36,6 +36,7 @@
 #include "../libregf/libregf_hive_bins_list.h"
 #include "../libregf/libregf_io_handle.h"
 #include "../libregf/libregf_key_item.h"
+#include "../libregf/libregf_named_key.h"
 
 #if defined( __GNUC__ ) && !defined( LIBREGF_DLL_IMPORT )
 
@@ -367,7 +368,7 @@ int regf_test_key_item_read_named_key(
 	libcerror_error_free(
 	 &error );
 
-	key_item->name = (uint8_t *) 0x12345678UL;
+	key_item->named_key = (libregf_named_key_t *) 0x12345678UL;
 
 	result = libregf_key_item_read_named_key(
 	          key_item,
@@ -378,7 +379,7 @@ int regf_test_key_item_read_named_key(
 	          64,
 	          &error );
 
-	key_item->name = NULL;
+	key_item->named_key = NULL;
 
 	REGF_TEST_ASSERT_EQUAL_INT(
 	 "result",
@@ -1245,6 +1246,8 @@ int main(
 	 "libregf_key_item_read_named_key",
 	 regf_test_key_item_read_named_key );
 
+	/* TODO: add tests for libregf_key_item_read_class_name_data */
+
 	REGF_TEST_RUN(
 	 "libregf_key_item_read_class_name",
 	 regf_test_key_item_read_class_name );
@@ -1289,6 +1292,18 @@ int main(
 	 regf_test_key_item_get_number_of_values,
 	 key_item );
 
+	/* TODO add tests for libregf_key_item_get_name_size */
+
+	/* TODO add tests for libregf_key_item_get_name */
+
+	/* TODO add tests for libregf_key_item_get_utf8_name_size */
+
+	/* TODO add tests for libregf_key_item_get_utf8_name */
+
+	/* TODO add tests for libregf_key_item_get_utf16_name_size */
+
+	/* TODO add tests for libregf_key_item_get_utf16_name */
+
 	REGF_TEST_RUN_WITH_ARGS(
 	 "libregf_key_item_compare_name_with_utf8_string",
 	 regf_test_key_item_compare_name_with_utf8_string,
@@ -1298,6 +1313,8 @@ int main(
 	 "libregf_key_item_compare_name_with_utf16_string",
 	 regf_test_key_item_compare_name_with_utf16_string,
 	 key_item );
+
+	/* TODO add tests for libregf_key_item_get_last_written_time */
 
 	/* Clean up
 	 */

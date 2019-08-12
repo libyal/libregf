@@ -17,6 +17,7 @@ MSVSCPP_FILES = \
 	pyregf/pyregf.vcproj \
 	regf_test_checksum/regf_test_checksum.vcproj \
 	regf_test_data_block_key/regf_test_data_block_key.vcproj \
+	regf_test_data_block_stream/regf_test_data_block_stream.vcproj \
 	regf_test_data_type/regf_test_data_type.vcproj \
 	regf_test_error/regf_test_error.vcproj \
 	regf_test_file/regf_test_file.vcproj \

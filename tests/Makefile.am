@@ -44,6 +44,7 @@ EXTRA_DIST = \
 check_PROGRAMS = \
 	regf_test_checksum \
 	regf_test_data_block_key \
+	regf_test_data_block_stream \
 	regf_test_data_type \
 	regf_test_error \
 	regf_test_file \
@@ -86,6 +87,29 @@ regf_test_data_block_key_SOURCES = \
 regf_test_data_block_key_LDADD = \
 	../libregf/libregf.la \
 	@LIBCERROR_LIBADD@
+
+regf_test_data_block_stream_SOURCES = \
+	regf_test_data_block_stream.c \
+	regf_test_functions.c regf_test_functions.h \
+	regf_test_libbfio.h \
+	regf_test_libcerror.h \
+	regf_test_libregf.h \
+	regf_test_macros.h \
+	regf_test_unused.h
+
+regf_test_data_block_stream_LDADD = \
+	@LIBBFIO_LIBADD@ \
+	@LIBCPATH_LIBADD@ \
+	@LIBCFILE_LIBADD@ \
+	@LIBUNA_LIBADD@ \
+	@LIBCSPLIT_LIBADD@ \
+	@LIBCNOTIFY_LIBADD@ \
+	@LIBCLOCALE_LIBADD@ \
+	@LIBCDATA_LIBADD@ \
+	../libregf/libregf.la \
+	@LIBCTHREADS_LIBADD@ \
+	@LIBCERROR_LIBADD@ \
+	@PTHREAD_LIBADD@
 
 regf_test_data_type_SOURCES = \
 	regf_test_data_type.c \

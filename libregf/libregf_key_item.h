@@ -30,6 +30,7 @@
 #include "libregf_libcerror.h"
 #include "libregf_libfcache.h"
 #include "libregf_libfdata.h"
+#include "libregf_named_key.h"
 
 #if defined( __cplusplus )
 extern "C" {
@@ -39,21 +40,9 @@ typedef struct libregf_key_item libregf_key_item_t;
 
 struct libregf_key_item
 {
-	/* The flags
+	/* The named key
 	 */
-	uint16_t flags;
-
-	/* The name hash
-	 */
-	uint32_t name_hash;
-
-	/* The name
-	 */
-	uint8_t *name;
-
-	/* The name size
-	 */
-	uint16_t name_size;
+	libregf_named_key_t *named_key;
 
 	/* The class name
 	 */
@@ -70,10 +59,6 @@ struct libregf_key_item
 	/* The security descriptor size
 	 */
 	size_t security_descriptor_size;
-
-	/* The last written time
-	 */
-	uint64_t last_written_time;
 
 	/* The values list
 	 */
@@ -103,6 +88,13 @@ int libregf_key_item_read_named_key(
      libregf_hive_bins_list_t *hive_bins_list,
      off64_t named_key_offset,
      uint32_t named_key_hash,
+     libcerror_error_t **error );
+
+int libregf_key_item_read_class_name_data(
+     libregf_key_item_t *key_item,
+     const uint8_t *data,
+     size_t data_size,
+     uint16_t class_name_size,
      libcerror_error_t **error );
 
 int libregf_key_item_read_class_name(
@@ -164,6 +156,43 @@ int libregf_key_item_get_number_of_values(
      int *number_of_values,
      libcerror_error_t **error );
 
+int libregf_key_item_get_name_size(
+     libregf_key_item_t *key_item,
+     size_t *name_size,
+     libcerror_error_t **error );
+
+int libregf_key_item_get_name(
+     libregf_key_item_t *key_item,
+     uint8_t *name,
+     size_t name_size,
+     libcerror_error_t **error );
+
+int libregf_key_item_get_utf8_name_size(
+     libregf_key_item_t *key_item,
+     size_t *utf8_string_size,
+     int ascii_codepage,
+     libcerror_error_t **error );
+
+int libregf_key_item_get_utf8_name(
+     libregf_key_item_t *key_item,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
+     int ascii_codepage,
+     libcerror_error_t **error );
+
+int libregf_key_item_get_utf16_name_size(
+     libregf_key_item_t *key_item,
+     size_t *utf16_string_size,
+     int ascii_codepage,
+     libcerror_error_t **error );
+
+int libregf_key_item_get_utf16_name(
+     libregf_key_item_t *key_item,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
+     int ascii_codepage,
+     libcerror_error_t **error );
+
 int libregf_key_item_compare_name_with_utf8_string(
      libregf_key_item_t *key_item,
      uint32_t name_hash,
@@ -178,6 +207,11 @@ int libregf_key_item_compare_name_with_utf16_string(
      const uint16_t *utf16_string,
      size_t utf16_string_length,
      int ascii_codepage,
+     libcerror_error_t **error );
+
+int libregf_key_item_get_last_written_time(
+     libregf_key_item_t *key_item,
+     uint64_t *filetime,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

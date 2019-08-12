@@ -436,17 +436,6 @@ int libregf_key_get_name_size(
 	}
 	internal_key = (libregf_internal_key_t *) key;
 
-	if( name_size == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid name size.",
-		 function );
-
-		return( -1 );
-	}
 #if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_write(
 	     internal_key->read_write_lock,
@@ -479,20 +468,19 @@ int libregf_key_get_name_size(
 
 		result = -1;
 	}
-	else if( key_item == NULL )
+	else if( libregf_key_item_get_name_size(
+	          key_item,
+	          name_size,
+	          error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing key item.",
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve name size.",
 		 function );
 
 		result = -1;
-	}
-	else
-	{
-		*name_size = key_item->name_size;
 	}
 #if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_write(
@@ -512,7 +500,7 @@ int libregf_key_get_name_size(
 	return( result );
 }
 
-/* Retrieves the key name data and size
+/* Retrieves the key name
  * Returns 1 if successful or -1 on error
  */
 int libregf_key_get_name(
@@ -539,28 +527,6 @@ int libregf_key_get_name(
 	}
 	internal_key = (libregf_internal_key_t *) key;
 
-	if( name == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid name.",
-		 function );
-
-		return( -1 );
-	}
-	if( name_size > (size_t) SSIZE_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid name size value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
 #if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_write(
 	     internal_key->read_write_lock,
@@ -593,38 +559,17 @@ int libregf_key_get_name(
 
 		result = -1;
 	}
-	else if( key_item == NULL )
+	else if( libregf_key_item_get_name(
+	          key_item,
+	          name,
+	          name_size,
+	          error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing key item.",
-		 function );
-
-		result = -1;
-	}
-	else if( name_size < key_item->name_size )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid name size value out of bounds.",
-		 function );
-
-		result = -1;
-	}
-	else if( memory_copy(
-	          name,
-	          key_item->name,
-	          key_item->name_size ) == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_MEMORY,
-		 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-		 "%s: unable to copy name.",
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve name.",
 		 function );
 
 		result = -1;
@@ -717,59 +662,20 @@ int libregf_key_get_utf8_name_size(
 
 		result = -1;
 	}
-	else if( key_item == NULL )
+	else if( libregf_key_item_get_utf8_name_size(
+	          key_item,
+	          utf8_string_size,
+	          internal_key->io_handle->ascii_codepage,
+	          error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing key item.",
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve UTF-8 name size.",
 		 function );
 
 		result = -1;
-	}
-	else if( key_item->name == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid key item - missing name.",
-		 function );
-
-		result = -1;
-	}
-	else
-	{
-		if( ( key_item->flags & LIBREGF_NAMED_KEY_FLAG_NAME_IS_ASCII ) != 0 )
-		{
-			result = libuna_utf8_string_size_from_byte_stream(
-				  key_item->name,
-				  (size_t) key_item->name_size,
-				  internal_key->io_handle->ascii_codepage,
-				  utf8_string_size,
-				  error );
-		}
-		else
-		{
-			result = libuna_utf8_string_size_from_utf16_stream(
-				  key_item->name,
-				  (size_t) key_item->name_size,
-				  LIBUNA_ENDIAN_LITTLE,
-				  utf8_string_size,
-				  error );
-		}
-		if( result != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve UTF-8 string size.",
-			 function );
-
-			result = -1;
-		}
 	}
 #if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_write(
@@ -861,61 +767,21 @@ int libregf_key_get_utf8_name(
 
 		result = -1;
 	}
-	else if( key_item == NULL )
+	else if( libregf_key_item_get_utf8_name(
+	          key_item,
+	          utf8_string,
+	          utf8_string_size,
+	          internal_key->io_handle->ascii_codepage,
+	          error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing key item.",
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve UTF-8 name.",
 		 function );
 
 		result = -1;
-	}
-	else if( key_item->name == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid key item - missing name.",
-		 function );
-
-		result = -1;
-	}
-	else
-	{
-		if( ( key_item->flags & LIBREGF_NAMED_KEY_FLAG_NAME_IS_ASCII ) != 0 )
-		{
-			result = libuna_utf8_string_copy_from_byte_stream(
-				  utf8_string,
-				  utf8_string_size,
-				  key_item->name,
-				  (size_t) key_item->name_size,
-				  internal_key->io_handle->ascii_codepage,
-				  error );
-		}
-		else
-		{
-			result = libuna_utf8_string_copy_from_utf16_stream(
-				  utf8_string,
-				  utf8_string_size,
-				  key_item->name,
-				  (size_t) key_item->name_size,
-				  LIBUNA_ENDIAN_LITTLE,
-				  error );
-		}
-		if( result != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve UTF-8 string.",
-			 function );
-
-			result = -1;
-		}
 	}
 #if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_write(
@@ -1005,59 +871,20 @@ int libregf_key_get_utf16_name_size(
 
 		result = -1;
 	}
-	else if( key_item == NULL )
+	else if( libregf_key_item_get_utf16_name_size(
+	          key_item,
+	          utf16_string_size,
+	          internal_key->io_handle->ascii_codepage,
+	          error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing key item.",
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve UTF-16 name size.",
 		 function );
 
 		result = -1;
-	}
-	else if( key_item->name == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid key item - missing name.",
-		 function );
-
-		result = -1;
-	}
-	else
-	{
-		if( ( key_item->flags & LIBREGF_NAMED_KEY_FLAG_NAME_IS_ASCII ) != 0 )
-		{
-			result = libuna_utf16_string_size_from_byte_stream(
-				  key_item->name,
-				  (size_t) key_item->name_size,
-				  internal_key->io_handle->ascii_codepage,
-				  utf16_string_size,
-				  error );
-		}
-		else
-		{
-			result = libuna_utf16_string_size_from_utf16_stream(
-				  key_item->name,
-				  (size_t) key_item->name_size,
-				  LIBUNA_ENDIAN_LITTLE,
-				  utf16_string_size,
-				  error );
-		}
-		if( result != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve UTF-16 string size.",
-			 function );
-
-			result = -1;
-		}
 	}
 #if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_write(
@@ -1149,61 +976,21 @@ int libregf_key_get_utf16_name(
 
 		result = -1;
 	}
-	else if( key_item == NULL )
+	else if( libregf_key_item_get_utf16_name(
+	          key_item,
+	          utf16_string,
+	          utf16_string_size,
+	          internal_key->io_handle->ascii_codepage,
+	          error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing key item.",
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve UTF-16 name.",
 		 function );
 
 		result = -1;
-	}
-	else if( key_item->name == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid key item - missing name.",
-		 function );
-
-		result = -1;
-	}
-	else
-	{
-		if( ( key_item->flags & LIBREGF_NAMED_KEY_FLAG_NAME_IS_ASCII ) != 0 )
-		{
-			result = libuna_utf16_string_copy_from_byte_stream(
-				  utf16_string,
-				  utf16_string_size,
-				  key_item->name,
-				  (size_t) key_item->name_size,
-				  internal_key->io_handle->ascii_codepage,
-				  error );
-		}
-		else
-		{
-			result = libuna_utf16_string_copy_from_utf16_stream(
-				  utf16_string,
-				  utf16_string_size,
-				  key_item->name,
-				  (size_t) key_item->name_size,
-				  LIBUNA_ENDIAN_LITTLE,
-				  error );
-		}
-		if( result != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve UTF-16 string.",
-			 function );
-
-			result = -1;
-		}
 	}
 #if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_write(
@@ -1945,17 +1732,6 @@ int libregf_key_get_last_written_time(
 	}
 	internal_key = (libregf_internal_key_t *) key;
 
-	if( filetime == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid filetime.",
-		 function );
-
-		return( -1 );
-	}
 #if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_write(
 	     internal_key->read_write_lock,
@@ -1988,20 +1764,19 @@ int libregf_key_get_last_written_time(
 
 		result = -1;
 	}
-	else if( key_item == NULL )
+	else if( libregf_key_item_get_last_written_time(
+	          key_item,
+	          filetime,
+	          error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing key item.",
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve last written time.",
 		 function );
 
 		result = -1;
-	}
-	else
-	{
-		*filetime = key_item->last_written_time;
 	}
 #if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_write(

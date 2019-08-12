@@ -129,6 +129,7 @@ stamp-h[1-9]
 /tests/input
 /tests/regf_test_checksum
 /tests/regf_test_data_block_key
+/tests/regf_test_data_block_stream
 /tests/regf_test_data_type
 /tests/regf_test_error
 /tests/regf_test_file

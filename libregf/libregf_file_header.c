@@ -34,7 +34,7 @@
 
 #include "regf_file_header.h"
 
-/* Creates file header
+/* Creates a file header
  * Make sure the value file_header is referencing, is set to NULL
  * Returns 1 if successful or -1 on error
  */
@@ -107,7 +107,7 @@ on_error:
 	return( -1 );
 }
 
-/* Frees file header
+/* Frees a file header
  * Returns 1 if successful or -1 on error
  */
 int libregf_file_header_free(
@@ -202,7 +202,7 @@ int libregf_file_header_read_data(
 	if( libcnotify_verbose != 0 )
 	{
 		libcnotify_printf(
-		 "%s: file header:\n",
+		 "%s: file header data:\n",
 		 function );
 		libcnotify_print_data(
 		 data,

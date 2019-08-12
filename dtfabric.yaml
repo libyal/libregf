@@ -62,7 +62,6 @@ members:
 - name: secondary_sequence_number
   data_type: uint32
 - name: modification_time
-  description: Last modification date and time
   data_type: filetime
 - name: major_format_version
   data_type: uint32
@@ -74,7 +73,7 @@ members:
   data_type: uint32
 - name: root_key_offset
   data_type: uint32
-- name: hive_bins_data_size
+- name: hive_bins_size
   data_type: uint32
 - name: unknown2
   data_type: uint32

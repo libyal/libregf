@@ -276,6 +276,285 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the libregf_value_item_clone function
+ * Returns 1 if successful or 0 if not
+ */
+int regf_test_value_item_clone(
+     void )
+{
+	libregf_value_item_t *destination_value_item = NULL;
+	libregf_value_item_t *source_value_item      = NULL;
+	libcerror_error_t *error                     = NULL;
+	int result                                   = 0;
+
+#if defined( HAVE_REGF_TEST_MEMORY )
+	int number_of_malloc_fail_tests              = 5;
+	int test_number                              = 0;
+
+#if defined( OPTIMIZATION_DISABLED )
+	int number_of_memcpy_fail_tests              = 4;
+#endif
+#endif
+
+	/* Initialize test
+	 */
+	result = libregf_value_item_initialize(
+	          &source_value_item,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "source_value_item",
+	 source_value_item );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test libregf_value_item_clone on initialized value_item
+	 */
+	result = libregf_value_item_clone(
+	          &destination_value_item,
+	          source_value_item,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "destination_value_item",
+	 destination_value_item );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libregf_value_item_free(
+	          &destination_value_item,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "destination_value_item",
+	 destination_value_item );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test libregf_value_item_clone on non-initialized value_item
+	 */
+	result = libregf_value_item_clone(
+	          &destination_value_item,
+	          NULL,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "destination_value_item",
+	 destination_value_item );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libregf_value_item_clone(
+	          NULL,
+	          source_value_item,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "destination_value_item",
+	 destination_value_item );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	destination_value_item = (libregf_value_item_t *) 0x12345678UL;
+
+	result = libregf_value_item_clone(
+	          &destination_value_item,
+	          source_value_item,
+	          &error );
+
+	destination_value_item = NULL;
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "destination_value_item",
+	 destination_value_item );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+#if defined( HAVE_REGF_TEST_MEMORY )
+
+	for( test_number = 0;
+	     test_number < number_of_malloc_fail_tests;
+	     test_number++ )
+	{
+		/* Test libregf_value_item_clone with malloc failing
+		 */
+		regf_test_malloc_attempts_before_fail = test_number;
+
+		result = libregf_value_item_clone(
+		          &destination_value_item,
+		          source_value_item,
+		          &error );
+
+		if( regf_test_malloc_attempts_before_fail != -1 )
+		{
+			regf_test_malloc_attempts_before_fail = -1;
+
+			if( destination_value_item != NULL )
+			{
+				libregf_value_item_free(
+				 &destination_value_item,
+				 NULL );
+			}
+		}
+		else
+		{
+			REGF_TEST_ASSERT_EQUAL_INT(
+			 "result",
+			 result,
+			 -1 );
+
+			REGF_TEST_ASSERT_IS_NULL(
+			 "destination_value_item",
+			 destination_value_item );
+
+			REGF_TEST_ASSERT_IS_NOT_NULL(
+			 "error",
+			 error );
+
+			libcerror_error_free(
+			 &error );
+		}
+	}
+#if defined( OPTIMIZATION_DISABLED )
+
+	for( test_number = 0;
+	     test_number < number_of_memcpy_fail_tests;
+	     test_number++ )
+	{
+		/* Test libregf_value_item_clone with memcpy failing
+		 */
+		regf_test_memcpy_attempts_before_fail = 0;
+
+		result = libregf_value_item_clone(
+		          &destination_value_item,
+		          source_value_item,
+		          &error );
+
+		if( regf_test_memcpy_attempts_before_fail != -1 )
+		{
+			regf_test_memcpy_attempts_before_fail = -1;
+
+			if( destination_value_item != NULL )
+			{
+				libregf_value_item_free(
+				 &destination_value_item,
+				 NULL );
+			}
+		}
+		else
+		{
+			REGF_TEST_ASSERT_EQUAL_INT(
+			 "result",
+			 result,
+			 -1 );
+
+			REGF_TEST_ASSERT_IS_NULL(
+			 "destination_value_item",
+			 destination_value_item );
+
+			REGF_TEST_ASSERT_IS_NOT_NULL(
+			 "error",
+			 error );
+
+			libcerror_error_free(
+			 &error );
+		}
+	}
+#endif /* defined( OPTIMIZATION_DISABLED ) */
+#endif /* defined( HAVE_REGF_TEST_MEMORY ) */
+
+	/* Clean up
+	 */
+	result = libregf_value_item_free(
+	          &source_value_item,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "source_value_item",
+	 source_value_item );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( destination_value_item != NULL )
+	{
+		libregf_value_item_free(
+		 &destination_value_item,
+		 NULL );
+	}
+	if( source_value_item != NULL )
+	{
+		libregf_value_item_free(
+		 &source_value_item,
+		 NULL );
+	}
+	return( 0 );
+}
+
 /* Tests the libregf_value_item_read_value_key function
  * Returns 1 if successful or 0 if not
  */
@@ -572,7 +851,9 @@ int main(
 	 "libregf_value_item_free",
 	 regf_test_value_item_free );
 
-	/* TODO add tests for libregf_value_item_clone */
+	REGF_TEST_RUN(
+	 "libregf_value_item_clone",
+	 regf_test_value_item_clone );
 
 #if !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 )
 

@@ -335,6 +335,17 @@ int libregf_value_item_read_value_key(
 
 		return( -1 );
 	}
+	if( value_item->value_key != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid value item - value key value already set.",
+		 function );
+
+		return( -1 );
+	}
 	if( hive_bins_list == NULL )
 	{
 		libcerror_error_set(
@@ -342,6 +353,17 @@ int libregf_value_item_read_value_key(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid hive bins list.",
+		 function );
+
+		return( -1 );
+	}
+	if( hive_bins_list->io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid hive bins list - missing IO handle.",
 		 function );
 
 		return( -1 );
@@ -588,6 +610,17 @@ int libregf_value_item_read_value_data(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid hive bins list.",
+		 function );
+
+		return( -1 );
+	}
+	if( hive_bins_list->io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid hive bins list - missing IO handle.",
 		 function );
 
 		return( -1 );

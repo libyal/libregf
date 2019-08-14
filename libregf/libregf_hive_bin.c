@@ -306,6 +306,8 @@ int libregf_hive_bin_read_cells_data(
 #endif
 		flags = 0;
 
+/* TODO check and handle cell_size < 4 */
+
 		if( (int32_t) cell_size < 0 )
 		{
 			cell_size = (uint32_t) ( -1 * (int32_t) cell_size );
@@ -394,6 +396,8 @@ int libregf_hive_bin_read_cells_data(
 
 		cell_index++;
 	}
+/* TODO check cell offset == bin size */
+
 	return( 1 );
 
 on_error:

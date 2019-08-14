@@ -365,9 +365,13 @@ int main(
 	 "libregf_hive_bins_list_free",
 	 regf_test_hive_bins_list_free );
 
+	/* TODO: add tests for libregf_hive_bins_list_read */
+
 	/* TODO: add tests for libregf_hive_bins_list_get_index_at_offset */
 
-	/* TODO: add tests for libregf_hive_bins_list_read */
+	/* TODO: add tests for libregf_hive_bins_list_get_cell_at_offset */
+
+	/* TODO: add tests for libregf_hive_bins_list_append_bin */
 
 	/* TODO: add tests for libregf_hive_bins_list_read_element_data */
 

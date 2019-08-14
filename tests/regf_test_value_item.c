@@ -35,11 +35,16 @@
 #include "regf_test_memory.h"
 #include "regf_test_unused.h"
 
+#include "../libregf/libregf_hive_bins_list.h"
+#include "../libregf/libregf_io_handle.h"
 #include "../libregf/libregf_value_item.h"
 
-uint8_t regf_test_value_item_data1[ 28 ] = {
-	0x76, 0x6b, 0x02, 0x00, 0x04, 0x00, 0x00, 0x80, 0x30, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00,
-	0x01, 0x00, 0x00, 0x00, 0x4f, 0x6e, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+uint8_t regf_test_value_item_data1[ 4096 ] = {
+	0x68, 0x62, 0x69, 0x6e, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0xe0, 0xff, 0xff, 0xff, 0x76, 0x6b, 0x02, 0x00, 0x04, 0x00, 0x00, 0x80, 0x30, 0x00, 0x00, 0x00,
+	0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x4f, 0x6e, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0xc0, 0x0f, 0x00, 0x00 };
 
 #if defined( __GNUC__ ) && !defined( LIBREGF_DLL_IMPORT )
 
@@ -561,13 +566,65 @@ on_error:
 int regf_test_value_item_read_value_key(
      void )
 {
-	libbfio_handle_t *file_io_handle = NULL;
-	libcerror_error_t *error         = NULL;
-	libregf_value_item_t *value_item = NULL;
-	int result                       = 0;
+	libbfio_handle_t *file_io_handle         = NULL;
+	libregf_hive_bins_list_t *hive_bins_list = NULL;
+	libregf_io_handle_t *io_handle           = NULL;
+	libcerror_error_t *error                 = NULL;
+	libregf_value_item_t *value_item         = NULL;
+	int result                               = 0;
 
 	/* Initialize test
 	 */
+	result = libregf_io_handle_initialize(
+	          &io_handle,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "io_handle",
+	 io_handle );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libregf_hive_bins_list_initialize(
+	          &hive_bins_list,
+	          io_handle,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "hive_bins_list",
+	 hive_bins_list );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libregf_hive_bins_list_append_bin(
+	          hive_bins_list,
+	          0,
+	          4096,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
 	result = libregf_value_item_initialize(
 	          &value_item,
 	          &error );
@@ -590,7 +647,7 @@ int regf_test_value_item_read_value_key(
 	result = regf_test_open_file_io_handle(
 	          &file_io_handle,
 	          regf_test_value_item_data1,
-	          28,
+	          4096,
 	          &error );
 
 	REGF_TEST_ASSERT_EQUAL_INT(
@@ -608,13 +665,14 @@ int regf_test_value_item_read_value_key(
 
 	/* Test regular cases
 	 */
-/* TODO implement tests
 	result = libregf_value_item_read_value_key(
 	          value_item,
 	          file_io_handle,
-	          NULL,
-	          0,
+	          hive_bins_list,
+	          32,
 	          &error );
+
+REGF_TEST_FPRINT_ERROR( error );
 
 	REGF_TEST_ASSERT_EQUAL_INT(
 	 "result",
@@ -624,15 +682,14 @@ int regf_test_value_item_read_value_key(
 	REGF_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
-*/
 
 	/* Test error cases
 	 */
 	result = libregf_value_item_read_value_key(
 	          NULL,
 	          file_io_handle,
-	          NULL,
-	          0,
+	          hive_bins_list,
+	          32,
 	          &error );
 
 	REGF_TEST_ASSERT_EQUAL_INT(
@@ -650,8 +707,8 @@ int regf_test_value_item_read_value_key(
 	result = libregf_value_item_read_value_key(
 	          value_item,
 	          NULL,
-	          NULL,
-	          0,
+	          hive_bins_list,
+	          32,
 	          &error );
 
 	REGF_TEST_ASSERT_EQUAL_INT(
@@ -670,7 +727,26 @@ int regf_test_value_item_read_value_key(
 	          value_item,
 	          file_io_handle,
 	          NULL,
-	          0,
+	          32,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libregf_value_item_read_value_key(
+	          value_item,
+	          file_io_handle,
+	          hive_bins_list,
+	          0xffffffffUL,
 	          &error );
 
 	REGF_TEST_ASSERT_EQUAL_INT(
@@ -719,6 +795,40 @@ int regf_test_value_item_read_value_key(
 	 "error",
 	 error );
 
+	result = libregf_hive_bins_list_free(
+	          &hive_bins_list,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "hive_bins_list",
+	 hive_bins_list );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libregf_io_handle_free(
+	          &io_handle,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "io_handle",
+	 io_handle );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
 	return( 1 );
 
 on_error:
@@ -737,6 +847,18 @@ on_error:
 	{
 		libregf_value_item_free(
 		 &value_item,
+		 NULL );
+	}
+	if( hive_bins_list != NULL )
+	{
+		libregf_hive_bins_list_free(
+		 &hive_bins_list,
+		 NULL );
+	}
+	if( io_handle != NULL )
+	{
+		libregf_io_handle_free(
+		 &io_handle,
 		 NULL );
 	}
 	return( 0 );

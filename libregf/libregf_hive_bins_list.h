@@ -66,12 +66,6 @@ int libregf_hive_bins_list_free(
      libregf_hive_bins_list_t **hive_bins_list,
      libcerror_error_t **error );
 
-int libregf_hive_bins_list_get_index_at_offset(
-     libregf_hive_bins_list_t *hive_bins_list,
-     off64_t offset,
-     int *hive_bin_index,
-     libcerror_error_t **error );
-
 int libregf_hive_bins_list_read(
      libregf_hive_bins_list_t *hive_bins_list,
      libbfio_handle_t *file_io_handle,
@@ -79,11 +73,23 @@ int libregf_hive_bins_list_read(
      uint32_t hive_bins_size,
      libcerror_error_t **error );
 
+int libregf_hive_bins_list_get_index_at_offset(
+     libregf_hive_bins_list_t *hive_bins_list,
+     off64_t offset,
+     int *hive_bin_index,
+     libcerror_error_t **error );
+
 int libregf_hive_bins_list_get_cell_at_offset(
      libregf_hive_bins_list_t *hive_bins_list,
      libbfio_handle_t *file_io_handle,
      uint32_t hive_bin_cell_offset,
      libregf_hive_bin_cell_t **hive_bin_cell,
+     libcerror_error_t **error );
+
+int libregf_hive_bins_list_append_bin(
+     libregf_hive_bins_list_t *hive_bins_list,
+     off64_t offset,
+     uint32_t size,
      libcerror_error_t **error );
 
 int libregf_hive_bins_list_read_element_data(

@@ -232,53 +232,6 @@ int libregf_hive_bins_list_free(
 	return( result );
 }
 
-/* Retrieves the hive bin index for a specific offset
- * Returns 1 if successful, 0 if not or -1 on error
- */
-int libregf_hive_bins_list_get_index_at_offset(
-     libregf_hive_bins_list_t *hive_bins_list,
-     off64_t offset,
-     int *hive_bin_index,
-     libcerror_error_t **error )
-{
-	static char *function       = "libregf_hive_bins_list_get_index_at_offset";
-	off64_t element_data_offset = 0;
-	int result                  = 0;
-
-	if( hive_bins_list == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid hive bins list.",
-		 function );
-
-		return( -1 );
-	}
-	result = libfdata_list_get_element_index_at_offset(
-	          hive_bins_list->data_list,
-	          offset,
-	          hive_bin_index,
-	          &element_data_offset,
-	          error );
-
-	if( result == -1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve data list element index at offset: %" PRIi64 " (0x%08" PRIx64 ").",
-		 function,
-		 offset,
-		 offset );
-
-		return( -1 );
-	}
-	return( result );
-}
-
 /* Reads the hive bins
  * Returns 1 if successful, 0 if no hive bin signature was found or -1 on error
  */
@@ -401,20 +354,17 @@ int libregf_hive_bins_list_read(
 #endif
 			alignment_size = file_offset - ( 4096 + hive_bin_header->offset );
 		}
-		if( libfdata_list_append_element(
-		     hive_bins_list->data_list,
-		     &hive_bin_index,
-		     0,
+		if( libregf_hive_bins_list_append_bin(
+		     hive_bins_list,
 		     file_offset,
-		     (size64_t) hive_bin_header->size,
-		     0,
+		     hive_bin_header->size,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-			 "%s: unable to append hive bin: %d to data list.",
+			 "%s: unable to append hive bin: %d.",
 			 function,
 			 hive_bin_index );
 
@@ -470,6 +420,53 @@ on_error:
 		 NULL );
 	}
 	return( -1 );
+}
+
+/* Retrieves the hive bin index for a specific offset
+ * Returns 1 if successful, 0 if not or -1 on error
+ */
+int libregf_hive_bins_list_get_index_at_offset(
+     libregf_hive_bins_list_t *hive_bins_list,
+     off64_t offset,
+     int *hive_bin_index,
+     libcerror_error_t **error )
+{
+	static char *function       = "libregf_hive_bins_list_get_index_at_offset";
+	off64_t element_data_offset = 0;
+	int result                  = 0;
+
+	if( hive_bins_list == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid hive bins list.",
+		 function );
+
+		return( -1 );
+	}
+	result = libfdata_list_get_element_index_at_offset(
+	          hive_bins_list->data_list,
+	          offset,
+	          hive_bin_index,
+	          &element_data_offset,
+	          error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve data list element index at offset: %" PRIi64 " (0x%08" PRIx64 ").",
+		 function,
+		 offset,
+		 offset );
+
+		return( -1 );
+	}
+	return( result );
 }
 
 /* Retrives a hive bin cell at a specific offset
@@ -534,6 +531,50 @@ int libregf_hive_bins_list_get_cell_at_offset(
 		 function,
 		 hive_bin_cell_offset,
 		 hive_bin_cell_offset );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Appends a hive bin to the list
+ * Returns 1 if successful or -1 on error
+ */
+int libregf_hive_bins_list_append_bin(
+     libregf_hive_bins_list_t *hive_bins_list,
+     off64_t offset,
+     uint32_t size,
+     libcerror_error_t **error )
+{
+	static char *function = "libregf_hive_bins_list_append_bin";
+	int element_index     = 0;
+
+	if( hive_bins_list == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid hive bins list.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfdata_list_append_element(
+	     hive_bins_list->data_list,
+	     &element_index,
+	     0,
+	     offset,
+	     (size64_t) size,
+	     0,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
+		 "%s: unable to append hive bin to data list.",
+		 function );
 
 		return( -1 );
 	}

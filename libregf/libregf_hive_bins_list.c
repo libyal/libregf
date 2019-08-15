@@ -232,6 +232,42 @@ int libregf_hive_bins_list_free(
 	return( result );
 }
 
+/* Empties the cache of a hive bins list
+ * Returns 1 if successful or -1 on error
+ */
+int libregf_hive_bins_list_empty_cache(
+     libregf_hive_bins_list_t *hive_bins_list,
+     libcerror_error_t **error )
+{
+	static char *function = "libregf_hive_bins_list_empty_cache";
+
+	if( hive_bins_list == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid hive bins list.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfcache_cache_empty(
+	     hive_bins_list->data_cache,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to empty data cache.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
 /* Reads the hive bins
  * Returns 1 if successful, 0 if no hive bin signature was found or -1 on error
  */

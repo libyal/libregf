@@ -365,6 +365,8 @@ int main(
 	 "libregf_hive_bins_list_free",
 	 regf_test_hive_bins_list_free );
 
+	/* TODO: add tests for libregf_hive_bins_list_empty_cache */
+
 	/* TODO: add tests for libregf_hive_bins_list_read */
 
 	/* TODO: add tests for libregf_hive_bins_list_get_index_at_offset */

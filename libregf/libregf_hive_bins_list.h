@@ -66,6 +66,10 @@ int libregf_hive_bins_list_free(
      libregf_hive_bins_list_t **hive_bins_list,
      libcerror_error_t **error );
 
+int libregf_hive_bins_list_empty_cache(
+     libregf_hive_bins_list_t *hive_bins_list,
+     libcerror_error_t **error );
+
 int libregf_hive_bins_list_read(
      libregf_hive_bins_list_t *hive_bins_list,
      libbfio_handle_t *file_io_handle,

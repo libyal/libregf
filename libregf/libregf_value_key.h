@@ -130,11 +130,6 @@ int libregf_value_key_get_utf16_name(
      int ascii_codepage,
      libcerror_error_t **error );
 
-int libregf_value_key_get_value_type(
-     libregf_value_key_t *value_key,
-     uint32_t *value_type,
-     libcerror_error_t **error );
-
 int libregf_value_key_compare_name_with_utf8_string(
      libregf_value_key_t *value_key,
      uint32_t name_hash,
@@ -149,6 +144,11 @@ int libregf_value_key_compare_name_with_utf16_string(
      const uint16_t *utf16_string,
      size_t utf16_string_length,
      int ascii_codepage,
+     libcerror_error_t **error );
+
+int libregf_value_key_get_value_type(
+     libregf_value_key_t *value_key,
+     uint32_t *value_type,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

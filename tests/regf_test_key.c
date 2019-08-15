@@ -1437,6 +1437,11 @@ int main(
 on_error:
 #if defined( __GNUC__ ) && !defined( LIBREGF_DLL_IMPORT )
 
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
 	if( key != NULL )
 	{
 		libregf_key_free(
@@ -1448,11 +1453,6 @@ on_error:
 		libregf_io_handle_free(
 		 &io_handle,
 		 NULL );
-	}
-	if( error != NULL )
-	{
-		libcerror_error_free(
-		 &error );
 	}
 #endif /* defined( __GNUC__ ) && !defined( LIBREGF_DLL_IMPORT ) */
 

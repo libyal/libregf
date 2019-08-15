@@ -1494,84 +1494,6 @@ on_error:
 	return( 0 );
 }
 
-/* Tests the libregf_value_key_get_value_type function
- * Returns 1 if successful or 0 if not
- */
-int regf_test_value_key_get_value_type(
-     libregf_value_key_t *value_key )
-{
-	libcerror_error_t *error = NULL;
-	uint32_t value_type      = 0;
-	int result               = 0;
-
-	/* Test regular cases
-	 */
-	result = libregf_value_key_get_value_type(
-	          value_key,
-	          &value_type,
-	          &error );
-
-	REGF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 1 );
-
-	REGF_TEST_ASSERT_EQUAL_UINT32(
-	 "value_type",
-	 value_type,
-	 1 );
-
-	REGF_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	/* Test error cases
-	 */
-	result = libregf_value_key_get_value_type(
-	          NULL,
-	          &value_type,
-	          &error );
-
-	REGF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	REGF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	result = libregf_value_key_get_value_type(
-	          value_key,
-	          NULL,
-	          &error );
-
-	REGF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	REGF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	return( 1 );
-
-on_error:
-	if( error != NULL )
-	{
-		libcerror_error_free(
-		 &error );
-	}
-	return( 0 );
-}
-
 /* Tests the libregf_value_key_compare_name_with_utf8_string function
  * Returns 1 if successful or 0 if not
  */
@@ -1820,6 +1742,84 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the libregf_value_key_get_value_type function
+ * Returns 1 if successful or 0 if not
+ */
+int regf_test_value_key_get_value_type(
+     libregf_value_key_t *value_key )
+{
+	libcerror_error_t *error = NULL;
+	uint32_t value_type      = 0;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libregf_value_key_get_value_type(
+	          value_key,
+	          &value_type,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	REGF_TEST_ASSERT_EQUAL_UINT32(
+	 "value_type",
+	 value_type,
+	 1 );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libregf_value_key_get_value_type(
+	          NULL,
+	          &value_type,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libregf_value_key_get_value_type(
+	          value_key,
+	          NULL,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
 #endif /* defined( __GNUC__ ) && !defined( LIBREGF_DLL_IMPORT ) */
 
 /* The main program
@@ -1934,11 +1934,6 @@ int main(
 	 value_key );
 
 	REGF_TEST_RUN_WITH_ARGS(
-	 "libregf_value_key_get_value_type",
-	 regf_test_value_key_get_value_type,
-	 value_key );
-
-	REGF_TEST_RUN_WITH_ARGS(
 	 "libregf_value_key_compare_name_with_utf8_string",
 	 regf_test_value_key_compare_name_with_utf8_string,
 	 value_key );
@@ -1946,6 +1941,11 @@ int main(
 	REGF_TEST_RUN_WITH_ARGS(
 	 "libregf_value_key_compare_name_with_utf16_string",
 	 regf_test_value_key_compare_name_with_utf16_string,
+	 value_key );
+
+	REGF_TEST_RUN_WITH_ARGS(
+	 "libregf_value_key_get_value_type",
+	 regf_test_value_key_get_value_type,
 	 value_key );
 
 	/* Clean up
@@ -1976,16 +1976,16 @@ int main(
 on_error:
 #if defined( __GNUC__ ) && !defined( LIBREGF_DLL_IMPORT )
 
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
 	if( value_key != NULL )
 	{
 		libregf_value_key_free(
 		 &value_key,
 		 NULL );
-	}
-	if( error != NULL )
-	{
-		libcerror_error_free(
-		 &error );
 	}
 #endif /* defined( __GNUC__ ) && !defined( LIBREGF_DLL_IMPORT ) */
 

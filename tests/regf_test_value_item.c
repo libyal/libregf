@@ -288,6 +288,9 @@ on_error:
 int regf_test_value_item_clone(
      void )
 {
+	libbfio_handle_t *file_io_handle             = NULL;
+	libregf_hive_bins_list_t *hive_bins_list     = NULL;
+	libregf_io_handle_t *io_handle               = NULL;
 	libregf_value_item_t *destination_value_item = NULL;
 	libregf_value_item_t *source_value_item      = NULL;
 	libcerror_error_t *error                     = NULL;
@@ -304,6 +307,79 @@ int regf_test_value_item_clone(
 
 	/* Initialize test
 	 */
+	result = libregf_io_handle_initialize(
+	          &io_handle,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "io_handle",
+	 io_handle );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libregf_hive_bins_list_initialize(
+	          &hive_bins_list,
+	          io_handle,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "hive_bins_list",
+	 hive_bins_list );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libregf_hive_bins_list_append_bin(
+	          hive_bins_list,
+	          0,
+	          4096,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Initialize file IO handle
+	 */
+	result = regf_test_open_file_io_handle(
+	          &file_io_handle,
+	          regf_test_value_item_data1,
+	          4096,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "file_io_handle",
+	 file_io_handle );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Initialize test
+	 */
 	result = libregf_value_item_initialize(
 	          &source_value_item,
 	          &error );
@@ -316,6 +392,22 @@ int regf_test_value_item_clone(
 	REGF_TEST_ASSERT_IS_NOT_NULL(
 	 "source_value_item",
 	 source_value_item );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libregf_value_item_read_value_key(
+	          source_value_item,
+	          file_io_handle,
+	          hive_bins_list,
+	          32,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
 
 	REGF_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -538,6 +630,40 @@ int regf_test_value_item_clone(
 	 "error",
 	 error );
 
+	result = libregf_hive_bins_list_free(
+	          &hive_bins_list,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "hive_bins_list",
+	 hive_bins_list );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	result = libregf_io_handle_free(
+	          &io_handle,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "io_handle",
+	 io_handle );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
 	return( 1 );
 
 on_error:
@@ -556,6 +682,24 @@ on_error:
 	{
 		libregf_value_item_free(
 		 &source_value_item,
+		 NULL );
+	}
+	if( file_io_handle != NULL )
+	{
+		libbfio_handle_free(
+		 &file_io_handle,
+		 NULL );
+	}
+	if( hive_bins_list != NULL )
+	{
+		libregf_hive_bins_list_free(
+		 &hive_bins_list,
+		 NULL );
+	}
+	if( io_handle != NULL )
+	{
+		libregf_io_handle_free(
+		 &io_handle,
 		 NULL );
 	}
 	return( 0 );
@@ -1308,79 +1452,6 @@ on_error:
 		libregf_io_handle_free(
 		 &io_handle,
 		 NULL );
-	}
-	return( 0 );
-}
-
-/* Tests the libregf_value_item_get_data_size function
- * Returns 1 if successful or 0 if not
- */
-int regf_test_value_item_get_data_size(
-     libregf_value_item_t *value_item )
-{
-	libcerror_error_t *error = NULL;
-	size_t data_size         = 0;
-	int result               = 0;
-
-	/* Test regular cases
-	 */
-	result = libregf_value_item_get_data_size(
-	          value_item,
-	          &data_size,
-	          &error );
-
-	REGF_TEST_ASSERT_NOT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	REGF_TEST_ASSERT_IS_NULL(
-	 "error",
-	 error );
-
-	/* Test error cases
-	 */
-	result = libregf_value_item_get_data_size(
-	          NULL,
-	          &data_size,
-	          &error );
-
-	REGF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	REGF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	result = libregf_value_item_get_data_size(
-	          value_item,
-	          NULL,
-	          &error );
-
-	REGF_TEST_ASSERT_EQUAL_INT(
-	 "result",
-	 result,
-	 -1 );
-
-	REGF_TEST_ASSERT_IS_NOT_NULL(
-	 "error",
-	 error );
-
-	libcerror_error_free(
-	 &error );
-
-	return( 1 );
-
-on_error:
-	if( error != NULL )
-	{
-		libcerror_error_free(
-		 &error );
 	}
 	return( 0 );
 }
@@ -2280,6 +2351,234 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the libregf_value_item_get_data_size function
+ * Returns 1 if successful or 0 if not
+ */
+int regf_test_value_item_get_data_size(
+     libregf_value_item_t *value_item )
+{
+	libcerror_error_t *error = NULL;
+	size_t data_size         = 0;
+	uint8_t data_type        = 0;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libregf_value_item_get_data_size(
+	          value_item,
+	          &data_size,
+	          &error );
+
+	REGF_TEST_ASSERT_NOT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	REGF_TEST_ASSERT_EQUAL_SIZE(
+	 "data_size",
+	 data_size,
+	 (size_t) 4 );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libregf_value_item_get_data_size(
+	          NULL,
+	          &data_size,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	data_type = value_item->data_type;
+
+	value_item->data_type = 0xff;
+
+	result = libregf_value_item_get_data_size(
+	          value_item,
+	          NULL,
+	          &error );
+
+	value_item->data_type = data_type;
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libregf_value_item_get_data_size(
+	          value_item,
+	          NULL,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libregf_value_item_get_data function
+ * Returns 1 if successful or 0 if not
+ */
+int regf_test_value_item_get_data(
+     libregf_value_item_t *value_item,
+     libbfio_handle_t *file_io_handle )
+{
+	libcerror_error_t *error = NULL;
+	uint8_t *data            = NULL;
+	size_t data_size         = 0;
+	uint8_t data_type        = 0;
+	int result               = 0;
+
+	/* Test regular cases
+	 */
+	result = libregf_value_item_get_data(
+	          value_item,
+	          file_io_handle,
+	          &data,
+	          &data_size,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libregf_value_item_get_data(
+	          NULL,
+	          file_io_handle,
+	          &data,
+	          &data_size,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	data_type = value_item->data_type;
+
+	value_item->data_type = 0xff;
+
+	result = libregf_value_item_get_data(
+	          value_item,
+	          file_io_handle,
+	          &data,
+	          &data_size,
+	          &error );
+
+	value_item->data_type = data_type;
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libregf_value_item_get_data(
+	          value_item,
+	          file_io_handle,
+	          NULL,
+	          &data_size,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libregf_value_item_get_data(
+	          value_item,
+	          file_io_handle,
+	          &data,
+	          NULL,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
 #endif /* defined( __GNUC__ ) && !defined( LIBREGF_DLL_IMPORT ) */
 
 /* The main program
@@ -2501,7 +2800,11 @@ int main(
 	 regf_test_value_item_get_data_size,
 	 value_item );
 
-	/* TODO: add tests for libregf_value_item_get_data */
+	REGF_TEST_RUN_WITH_ARGS(
+	 "libregf_value_item_get_data",
+	 regf_test_value_item_get_data,
+	 value_item,
+	 file_io_handle );
 
 	/* TODO: add tests for libregf_value_item_get_value_32bit */
 

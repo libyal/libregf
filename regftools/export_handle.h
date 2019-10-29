@@ -96,6 +96,12 @@ int export_handle_export_key(
      log_handle_t *log_handle,
      libcerror_error_t **error );
 
+int export_handle_export_key_path(
+     export_handle_t *export_handle,
+     const system_character_t *key_path,
+     log_handle_t *log_handle,
+     libcerror_error_t **error );
+
 int export_handle_export_file(
      export_handle_t *export_handle,
      log_handle_t *log_handle,

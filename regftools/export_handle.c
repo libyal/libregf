@@ -108,7 +108,7 @@ int export_handle_initialize(
 		goto on_error;
 	}
 	( *export_handle )->ascii_codepage = LIBREGF_CODEPAGE_WINDOWS_1252;
-	( *export_handle )->notify_stream = EXPORT_HANDLE_NOTIFY_STREAM;
+	( *export_handle )->notify_stream  = EXPORT_HANDLE_NOTIFY_STREAM;
 
 	return( 1 );
 
@@ -568,10 +568,10 @@ int export_handle_export_key(
      log_handle_t *log_handle,
      libcerror_error_t **error )
 {
-	system_character_t *sub_key_path = NULL;
-	system_character_t *value_string = NULL;
 	libregf_key_t *sub_key           = NULL;
 	libregf_value_t *value           = NULL;
+	system_character_t *sub_key_path = NULL;
+	system_character_t *value_string = NULL;
 	uint8_t *data                    = NULL;
 	static char *function            = "export_handle_export_key";
 	size_t data_size                 = 0;
@@ -610,7 +610,7 @@ int export_handle_export_key(
 
 		return( -1 );
 	}
-	if( key_path_length > (size_t) ( SSIZE_MAX - 1 ) )
+	if( key_path_length > ( (size_t) SSIZE_MAX - 1 ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -643,7 +643,7 @@ int export_handle_export_key(
 
 		goto on_error;
 	}
-	if( value_string_size > (size_t) ( SSIZE_MAX / sizeof( system_character_t ) ) )
+	if( value_string_size > ( (size_t) SSIZE_MAX / sizeof( system_character_t ) ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -664,7 +664,7 @@ int export_handle_export_key(
 		}
 		sub_key_path_length += value_string_size - 1;
 	}
-	if( sub_key_path_length > (size_t) ( SSIZE_MAX / sizeof( system_character_t ) ) )
+	if( sub_key_path_length > ( (size_t) SSIZE_MAX / sizeof( system_character_t ) ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -708,7 +708,7 @@ int export_handle_export_key(
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_MEMORY,
-		 LIBREGF_MEMORY_ERROR_COPY_FAILED,
+		 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
 		 "%s: unable to copy key path to sub key path.",
 		 function );
 
@@ -786,7 +786,7 @@ int export_handle_export_key(
 	if( ( result != 0 )
 	 && ( value_string_size > 0 ) )
 	{
-		if( value_string_size > (size_t) ( SSIZE_MAX / sizeof( system_character_t ) ) )
+		if( value_string_size > ( (size_t) SSIZE_MAX / sizeof( system_character_t ) ) )
 		{
 			libcerror_error_set(
 			 error,
@@ -903,7 +903,7 @@ int export_handle_export_key(
 		}
 		if( value_string_size > 0 )
 		{
-			if( value_string_size > (size_t) ( SSIZE_MAX / sizeof( system_character_t ) ) )
+			if( value_string_size > ( (size_t) SSIZE_MAX / sizeof( system_character_t ) ) )
 			{
 				libcerror_error_set(
 				 error,
@@ -1112,7 +1112,7 @@ int export_handle_export_key(
 				}
 				if( value_string_size > 0 )
 				{
-					if( value_string_size > (size_t) ( SSIZE_MAX / sizeof( system_character_t ) ) )
+					if( value_string_size > ( (size_t) SSIZE_MAX / sizeof( system_character_t ) ) )
 					{
 						libcerror_error_set(
 						 error,
@@ -1466,7 +1466,128 @@ on_error:
 	return( -1 );
 }
 
-/* Exports the keys and values from the file
+/* Exports keys and values from the file for a specific key path
+ * Returns the 1 if succesful or -1 on error
+ */
+int export_handle_export_key_path(
+     export_handle_t *export_handle,
+     const system_character_t *key_path,
+     log_handle_t *log_handle,
+     libcerror_error_t **error )
+{
+	libregf_key_t *key      = NULL;
+	static char *function   = "export_handle_export_key_path";
+	size_t key_path_length  = 0;
+	int result              = 0;
+
+	if( export_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid export handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( key_path == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid key path.",
+		 function );
+
+		return( -1 );
+	}
+	key_path_length = system_string_length(
+	                   key_path );
+
+#if defined( HAVE_WIDE_SYSTEM_CHARACTER )
+	result = libregf_file_get_key_by_utf16_path(
+	          export_handle->input_file,
+	          (uint16_t *) key_path,
+	          key_path_length,
+	          &key,
+	          error );
+#else
+	result = libregf_file_get_key_by_utf8_path(
+	          export_handle->input_file,
+	          (uint8_t *) key_path,
+	          key_path_length,
+	          &key,
+	          error );
+#endif
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve key by path.",
+		 function );
+
+		goto on_error;
+	}
+	else if( result == 0 )
+	{
+		fprintf(
+		 export_handle->notify_stream,
+		 "No key with path: %" PRIs_SYSTEM "\n",
+		 key_path );
+	}
+	else
+	{
+		if( export_handle_export_key(
+		     export_handle,
+		     key_path,
+		     key_path_length,
+		     key,
+		     log_handle,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GENERIC,
+			 "%s: unable to export key.",
+			 function );
+
+			goto on_error;
+		}
+		if( libregf_key_free(
+		     &key,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free key.",
+			 function );
+
+			goto on_error;
+		}
+	}
+	fprintf(
+	 export_handle->notify_stream,
+	 "\n" );
+
+	return( 1 );
+
+on_error:
+	if( key != NULL )
+	{
+		libregf_key_free(
+		 &key,
+		 NULL );
+	}
+	return( -1 );
+}
+
+/* Exports keys and values from the file
  * Returns the 1 if succesful or -1 on error
  */
 int export_handle_export_file(
@@ -1505,7 +1626,13 @@ int export_handle_export_file(
 
 		goto on_error;
 	}
-	else if( result != 0 )
+	else if( result == 0 )
+	{
+		fprintf(
+		 export_handle->notify_stream,
+		 "No root key\n" );
+	}
+	else
 	{
 		if( export_handle_export_key(
 		     export_handle,
@@ -1537,10 +1664,11 @@ int export_handle_export_file(
 
 			goto on_error;
 		}
-		fprintf(
-		 export_handle->notify_stream,
-		 "\n" );
 	}
+	fprintf(
+	 export_handle->notify_stream,
+	 "\n" );
+
 	return( 1 );
 
 on_error:

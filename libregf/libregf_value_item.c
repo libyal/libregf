@@ -589,7 +589,6 @@ int libregf_value_item_read_value_data(
 	size_t utf16_string_size                 = 0;
 	uint32_t calculated_value_data_size      = 0;
 	uint32_t value_type                      = 0;
-	uint16_t number_of_segments              = 0;
 	int hive_bin_index                       = 0;
 	int result                               = 0;
 
@@ -724,7 +723,7 @@ int libregf_value_item_read_value_data(
 			     file_io_handle,
 			     hive_bins_list,
 			     data_block_key->data_block_list_offset,
-			     number_of_segments,
+			     data_block_key->number_of_segments,
 			     value_data_size,
 			     error ) == -1 )
 			{
@@ -1034,7 +1033,7 @@ int libregf_value_item_read_data_block_list(
 		 LIBCNOTIFY_PRINT_DATA_FLAG_GROUP_DATA );
 	}
 #endif
-	if( hive_bin_cell_size < (size_t) ( number_of_segments * 4 ) )
+	if( hive_bin_cell_size < ( (size_t) number_of_segments * 4 ) )
 	{
 		libcerror_error_set(
 		 error,

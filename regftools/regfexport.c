@@ -63,8 +63,8 @@ void usage_fprint(
 	fprintf( stream, "Use regfexport to export information from a Windows NT\n"
 	                 "Registry File (REGF).\n\n" );
 
-	fprintf( stream, "Usage: regfexport [ -c codepage ] [ -l logfile ] [ -hvV ]\n"
-	                 "                  source\n\n" );
+	fprintf( stream, "Usage: regfexport [ -c codepage ] [ -K key_path ] [ -l logfile ]\n"
+	                 "                  [ -hvV ] source\n\n" );
 
 	fprintf( stream, "\tsource: the source file\n\n" );
 
@@ -74,6 +74,7 @@ void usage_fprint(
 	                 "\t        windows-1253, windows-1254, windows-1255, windows-1256\n"
 	                 "\t        windows-1257 or windows-1258\n" );
 	fprintf( stream, "\t-h:     shows this help\n" );
+	fprintf( stream, "\t-K:     show information about a specific key path.\n" );
 	fprintf( stream, "\t-l:     logs information about the exported items\n" );
 	fprintf( stream, "\t-v:     verbose output to stderr\n" );
 	fprintf( stream, "\t-V:     print version\n" );
@@ -85,7 +86,7 @@ void regfexport_signal_handler(
       regftools_signal_t signal REGFTOOLS_ATTRIBUTE_UNUSED )
 {
 	libcerror_error_t *error = NULL;
-	static char *function   = "regfexport_signal_handler";
+	static char *function    = "regfexport_signal_handler";
 
 	REGFTOOLS_UNREFERENCED_PARAMETER( signal )
 
@@ -134,6 +135,7 @@ int main( int argc, char * const argv[] )
 	libcerror_error_t *error                  = NULL;
 	log_handle_t *log_handle                  = NULL;
 	system_character_t *option_ascii_codepage = NULL;
+	system_character_t *key_path              = NULL;
 	system_character_t *log_filename          = NULL;
 	system_character_t *source                = NULL;
 	char *program                             = "regfexport";
@@ -175,7 +177,7 @@ int main( int argc, char * const argv[] )
 	while( ( option = regftools_getopt(
 	                   argc,
 	                   argv,
-	                   _SYSTEM_STRING( "c:hl:vV" ) ) ) != (system_integer_t) -1 )
+	                   _SYSTEM_STRING( "c:hK:l:vV" ) ) ) != (system_integer_t) -1 )
 	{
 		switch( option )
 		{
@@ -201,6 +203,11 @@ int main( int argc, char * const argv[] )
 				 stdout );
 
 				return( EXIT_SUCCESS );
+
+			case (system_integer_t) 'K':
+				key_path = optarg;
+
+				break;
 
 			case (system_integer_t) 'l':
 				log_filename = optarg;
@@ -306,16 +313,34 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-	if( export_handle_export_file(
-	     regfexport_export_handle,
-	     log_handle,
-	     &error ) != 1 )
+	if( key_path != NULL )
 	{
-		fprintf(
-		 stderr,
-		 "Unable to export file.\n" );
+		if( export_handle_export_key_path(
+		     regfexport_export_handle,
+		     key_path,
+		     log_handle,
+		     &error ) != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to export key path.\n" );
 
-		goto on_error;
+			goto on_error;
+		}
+	}
+	else
+	{
+		if( export_handle_export_file(
+		     regfexport_export_handle,
+		     log_handle,
+		     &error ) != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to export file.\n" );
+
+			goto on_error;
+		}
 	}
 	if( export_handle_close_input(
 	     regfexport_export_handle,

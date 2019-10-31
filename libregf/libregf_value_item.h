@@ -30,6 +30,7 @@
 #include "libregf_libcerror.h"
 #include "libregf_libfcache.h"
 #include "libregf_libfdata.h"
+#include "libregf_types.h"
 #include "libregf_value_key.h"
 
 #if defined( __cplusplus )

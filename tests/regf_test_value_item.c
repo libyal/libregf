@@ -611,6 +611,21 @@ int regf_test_value_item_clone(
 #endif /* defined( OPTIMIZATION_DISABLED ) */
 #endif /* defined( HAVE_REGF_TEST_MEMORY ) */
 
+	/* Clean up file IO handle
+	 */
+	result = regf_test_close_file_io_handle(
+	          &file_io_handle,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 0 );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
 	/* Clean up
 	 */
 	result = libregf_value_item_free(

@@ -36,6 +36,7 @@ Tools:
   - export specific paths
   - create .reg similar output?
 * regfinfo
+  - print hive bins list size
   - add option to control print of entire hierarchy
   - print file type
   - print last part of filename stored in header?

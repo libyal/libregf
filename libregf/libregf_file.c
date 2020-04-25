@@ -792,13 +792,13 @@ int libregf_file_close(
 	}
 	internal_file = (libregf_internal_file_t *) file;
 
-	if( internal_file->io_handle == NULL )
+	if( internal_file->file_io_handle == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file - missing IO handle.",
+		 "%s: invalid file - missing file IO handle.",
 		 function );
 
 		return( -1 );

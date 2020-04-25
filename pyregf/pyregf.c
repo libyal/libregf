@@ -34,6 +34,7 @@
 #include "pyregf_file_types.h"
 #include "pyregf_key.h"
 #include "pyregf_keys.h"
+#include "pyregf_libbfio.h"
 #include "pyregf_libcerror.h"
 #include "pyregf_libregf.h"
 #include "pyregf_multi_string.h"
@@ -563,6 +564,11 @@ PyMODINIT_FUNC initpyregf(
 	 */
 	pyregf_file_types_type_object.tp_new = PyType_GenericNew;
 
+	if( pyregf_file_types_init_type(
+	     &pyregf_file_types_type_object ) != 1 )
+	{
+		goto on_error;
+	}
 	if( PyType_Ready(
 	     &pyregf_file_types_type_object ) < 0 )
 	{
@@ -648,6 +654,11 @@ PyMODINIT_FUNC initpyregf(
 	 */
 	pyregf_value_types_type_object.tp_new = PyType_GenericNew;
 
+	if( pyregf_value_types_init_type(
+	     &pyregf_value_types_type_object ) != 1 )
+	{
+		goto on_error;
+	}
 	if( PyType_Ready(
 	     &pyregf_value_types_type_object ) < 0 )
 	{

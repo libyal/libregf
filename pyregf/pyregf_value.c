@@ -299,9 +299,11 @@ PyObject *pyregf_value_new(
 	pyregf_value->value         = value;
 	pyregf_value->parent_object = parent_object;
 
-	Py_IncRef(
-	 (PyObject *) pyregf_value->parent_object );
-
+	if( pyregf_value->parent_object != NULL )
+	{
+		Py_IncRef(
+		 (PyObject *) pyregf_value->parent_object );
+	}
 	return( (PyObject *) pyregf_value );
 
 on_error:

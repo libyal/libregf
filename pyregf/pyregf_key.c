@@ -335,9 +335,11 @@ PyObject *pyregf_key_new(
 	pyregf_key->key           = key;
 	pyregf_key->parent_object = parent_object;
 
-	Py_IncRef(
-	 (PyObject *) pyregf_key->parent_object );
-
+	if( pyregf_key->parent_object != NULL )
+	{
+		Py_IncRef(
+		 (PyObject *) pyregf_key->parent_object );
+	}
 	return( (PyObject *) pyregf_key );
 
 on_error:

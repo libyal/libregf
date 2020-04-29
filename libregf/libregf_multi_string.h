@@ -58,6 +58,10 @@ struct libregf_internal_multi_string
 	 */
 	size_t *string_sizes;
 
+	/* Various item flags
+	 */
+	uint8_t item_flags;
+
 #if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
 	/* The read/write lock
 	 */

@@ -434,7 +434,7 @@ int libregf_hive_bins_list_read(
 		if( libcnotify_verbose != 0 )
 		{
 			libcnotify_printf(
-			 "%s: missing hive bin at offset: %" PRIi64 " (0x%08" PRIx64 ").",
+			 "%s: missing hive bin at offset: %" PRIi64 " (0x%08" PRIx64 ").\n",
 			 function,
 			 file_offset,
 			 file_offset );

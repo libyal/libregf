@@ -280,7 +280,7 @@ int libregf_key_item_read_named_key(
 	if( libcnotify_verbose != 0 )
 	{
 		libcnotify_printf(
-		 "%s: reading named key at offset: %" PRIi64 " (0x%08" PRIx64 ").",
+		 "%s: reading named key at offset: %" PRIi64 " (0x%08" PRIx64 ").\n",
 		 function,
 		 named_key_offset,
 		 named_key_offset );
@@ -414,7 +414,7 @@ int libregf_key_item_read_named_key(
 			}
 			else if( result == 0 )
 			{
-				key_item->item_flags |= LIBREGF_KEY_ITEM_FLAG_IS_CORRUPTED;
+				key_item->item_flags |= LIBREGF_ITEM_FLAG_IS_CORRUPTED;
 			}
 			else
 			{
@@ -491,7 +491,7 @@ int libregf_key_item_read_named_key(
 	}
 	else if( result == 0 )
 	{
-		key_item->item_flags |= LIBREGF_KEY_ITEM_FLAG_IS_CORRUPTED;
+		key_item->item_flags |= LIBREGF_ITEM_FLAG_IS_CORRUPTED;
 	}
 	else
 	{
@@ -775,7 +775,7 @@ int libregf_key_item_read_class_name(
 	if( libcnotify_verbose != 0 )
 	{
 		libcnotify_printf(
-		 "%s: reading class name at offset: %" PRIi64 " (0x%08" PRIx64 ").",
+		 "%s: reading class name at offset: %" PRIi64 " (0x%08" PRIx64 ").\n",
 		 function,
 		 class_name_offset,
 		 class_name_offset );
@@ -1101,7 +1101,7 @@ int libregf_key_item_read_values_list(
 		}
 		else if( result == 0 )
 		{
-			key_item->item_flags |= LIBREGF_KEY_ITEM_FLAG_IS_CORRUPTED;
+			key_item->item_flags |= LIBREGF_ITEM_FLAG_IS_CORRUPTED;
 		}
 		else if( libfdata_list_append_element(
 		          key_item->values_list,

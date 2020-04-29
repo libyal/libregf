@@ -23,7 +23,9 @@
 #include <memory.h>
 #include <types.h>
 
+#include "libregf_definitions.h"
 #include "libregf_libcerror.h"
+#include "libregf_libcnotify.h"
 #include "libregf_libuna.h"
 #include "libregf_multi_string.h"
 #include "libregf_types.h"
@@ -189,12 +191,13 @@ int libregf_internal_multi_string_read_data(
      size_t data_size,
      libcerror_error_t **error )
 {
-	uint8_t *string_start = NULL;
-	static char *function = "libregf_multi_string_get_number_of_strings";
-	size_t data_offset    = 0;
-	size_t string_size    = 0;
-	int number_of_strings = 0;
-	int string_index      = 0;
+	uint8_t *string_start   = NULL;
+	static char *function   = "libregf_multi_string_get_number_of_strings";
+	size_t data_offset      = 0;
+	size_t string_size      = 0;
+	int found_end_of_string = 0;
+	int number_of_strings   = 0;
+	int string_index        = 0;
 
 	if( internal_multi_string == NULL )
 	{
@@ -245,7 +248,8 @@ int libregf_internal_multi_string_read_data(
 
 	while( data_offset < data_size )
 	{
-		string_size = 0;
+		found_end_of_string = 0;
+		string_size         = 0;
 
 		while( data_offset < data_size )
 		{
@@ -254,11 +258,25 @@ int libregf_internal_multi_string_read_data(
 			if( ( data[ data_offset ] == 0 )
 			 && ( data[ data_offset + 1 ] == 0 ) )
 			{
-				data_offset += 2;
+				data_offset        += 2;
+				found_end_of_string = 1;
 
 				break;
 			}
 			data_offset += 2;
+		}
+		if( found_end_of_string == 0 )
+		{
+#if defined( HAVE_DEBUG_OUTPUT )
+			if( libcnotify_verbose != 0 )
+			{
+				libcnotify_printf(
+				 "%s: multi string: %d missing end-of-string character.\n",
+				 function,
+				 number_of_strings );
+			}
+#endif
+			internal_multi_string->item_flags |= LIBREGF_ITEM_FLAG_IS_CORRUPTED;
 		}
 		if( string_size == 2 )
 		{
@@ -269,14 +287,15 @@ int libregf_internal_multi_string_read_data(
 	if( ( data[ data_offset - 2 ] != 0 )
 	 || ( data[ data_offset - 1 ] != 0 ) )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_UNSUPPORTED_VALUE,
-		 "%s: invalid end of multi string.",
-		 function );
-
-		goto on_error;
+#if defined( HAVE_DEBUG_OUTPUT )
+		if( libcnotify_verbose != 0 )
+		{
+			libcnotify_printf(
+			 "%s: multi string without terminating empty string.\n",
+			 function );
+		}
+#endif
+		internal_multi_string->item_flags |= LIBREGF_ITEM_FLAG_IS_CORRUPTED;
 	}
 	internal_multi_string->data = (uint8_t *) memory_allocate(
 	                                           sizeof( uint8_t ) * data_size );
@@ -335,7 +354,6 @@ int libregf_internal_multi_string_read_data(
 		goto on_error;
 	}
 	data_offset = 0;
-	data_size  -= 2;
 
 	while( data_offset < data_size )
 	{

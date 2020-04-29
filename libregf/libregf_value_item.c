@@ -405,11 +405,11 @@ int libregf_value_item_read_value_key(
 		if( libcnotify_verbose != 0 )
 		{
 			libcnotify_printf(
-			 "%s: invalid hive bin cell size value too small.",
+			 "%s: invalid hive bin cell size value too small.\n",
 			 function );
 		}
 #endif
-		value_item->item_flags |= LIBREGF_VALUE_ITEM_FLAG_IS_CORRUPTED;
+		value_item->item_flags |= LIBREGF_ITEM_FLAG_IS_CORRUPTED;
 
 		return( 1 );
 	}
@@ -454,11 +454,11 @@ int libregf_value_item_read_value_key(
 		if( libcnotify_verbose != 0 )
 		{
 			libcnotify_printf(
-			 "%s: unsupported value key signature.",
+			 "%s: unsupported value key signature.\n",
 			 function );
 		}
 #endif
-		value_item->item_flags |= LIBREGF_VALUE_ITEM_FLAG_IS_CORRUPTED;
+		value_item->item_flags |= LIBREGF_ITEM_FLAG_IS_CORRUPTED;
 
 		return( 1 );
 	}
@@ -469,11 +469,11 @@ int libregf_value_item_read_value_key(
 			if( libcnotify_verbose != 0 )
 			{
 				libcnotify_printf(
-				 "%s: invalid value name size value out of bounds.",
+				 "%s: invalid value name size value out of bounds.\n",
 				 function );
 			}
 #endif
-			value_item->item_flags |= LIBREGF_VALUE_ITEM_FLAG_IS_CORRUPTED;
+			value_item->item_flags |= LIBREGF_ITEM_FLAG_IS_CORRUPTED;
 
 			return( 1 );
 		}
@@ -488,11 +488,11 @@ int libregf_value_item_read_value_key(
 			if( libcnotify_verbose != 0 )
 			{
 				libcnotify_printf(
-				 "%s: invalid data size value out of bounds.",
+				 "%s: invalid data size value out of bounds.\n",
 				 function );
 			}
 #endif
-			value_item->item_flags |= LIBREGF_VALUE_ITEM_FLAG_IS_CORRUPTED;
+			value_item->item_flags |= LIBREGF_ITEM_FLAG_IS_CORRUPTED;
 
 			return( 1 );
 		}
@@ -527,7 +527,7 @@ int libregf_value_item_read_value_key(
 		}
 		else if( result == 0 )
 		{
-			value_item->item_flags |= LIBREGF_VALUE_ITEM_FLAG_IS_CORRUPTED;
+			value_item->item_flags |= LIBREGF_ITEM_FLAG_IS_CORRUPTED;
 		}
 		else if( libregf_value_item_read_value_data(
 		          value_item,
@@ -714,7 +714,7 @@ int libregf_value_item_read_value_data(
 		}
 		else if( result == 0 )
 		{
-			value_item->item_flags |= LIBREGF_VALUE_ITEM_FLAG_IS_CORRUPTED;
+			value_item->item_flags |= LIBREGF_ITEM_FLAG_IS_CORRUPTED;
 		}
 		else
 		{
@@ -779,7 +779,7 @@ int libregf_value_item_read_value_data(
 				 hive_bin_cell_size );
 			}
 #endif
-			value_item->item_flags |= LIBREGF_VALUE_ITEM_FLAG_IS_CORRUPTED;
+			value_item->item_flags |= LIBREGF_ITEM_FLAG_IS_CORRUPTED;
 
 			if( hive_bin_cell_size > (size_t) UINT32_MAX )
 			{
@@ -1009,12 +1009,12 @@ int libregf_value_item_read_data_block_list(
 		if( libcnotify_verbose != 0 )
 		{
 			libcnotify_printf(
-			 "%s: unable to retrieve hive bin cell at offset: %" PRIu32 ".",
+			 "%s: unable to retrieve hive bin cell at offset: %" PRIu32 ".\n",
 			 function,
 			 data_block_list_offset );
 		}
 #endif
-		value_item->item_flags |= LIBREGF_VALUE_ITEM_FLAG_IS_CORRUPTED;
+		value_item->item_flags |= LIBREGF_ITEM_FLAG_IS_CORRUPTED;
 
 		return( 0 );
 	}
@@ -1116,12 +1116,12 @@ int libregf_value_item_read_data_block_list(
 				if( libcnotify_verbose != 0 )
 				{
 					libcnotify_printf(
-					 "%s: unable to retrieve hive bin cell at offset: %" PRIu32 ".",
+					 "%s: unable to retrieve hive bin cell at offset: %" PRIu32 ".\n",
 					 function,
 					 element_offset );
 				}
 #endif
-				value_item->item_flags |= LIBREGF_VALUE_ITEM_FLAG_IS_CORRUPTED;
+				value_item->item_flags |= LIBREGF_ITEM_FLAG_IS_CORRUPTED;
 
 /* TODO return partial stream or 0-byte the missing data ? */
 				libfdata_stream_free(
@@ -1310,7 +1310,7 @@ int libregf_value_item_read_element_data(
 
 		goto on_error;
 	}
-	if( ( value_item->item_flags & LIBREGF_VALUE_ITEM_FLAG_IS_CORRUPTED ) != 0 )
+	if( ( value_item->item_flags & LIBREGF_ITEM_FLAG_IS_CORRUPTED ) != 0 )
 	{
 		hive_bins_list->io_handle->flags |= LIBREGF_IO_HANDLE_FLAG_IS_CORRUPTED;
 	}
@@ -1364,7 +1364,7 @@ int libregf_value_item_is_corrupted(
 
 		return( -1 );
 	}
-	if( ( value_item->item_flags & LIBREGF_VALUE_ITEM_FLAG_IS_CORRUPTED ) != 0 )
+	if( ( value_item->item_flags & LIBREGF_ITEM_FLAG_IS_CORRUPTED ) != 0 )
 	{
 		return( 1 );
 	}
@@ -2095,7 +2095,7 @@ int libregf_value_item_get_value_32bit(
 	}
 	else if( value_data_size > 4 )
 	{
-		value_item->item_flags |= LIBREGF_VALUE_ITEM_FLAG_IS_CORRUPTED;
+		value_item->item_flags |= LIBREGF_ITEM_FLAG_IS_CORRUPTED;
 	}
 	if( value_type == LIBREGF_VALUE_TYPE_INTEGER_32BIT_BIG_ENDIAN )
 	{
@@ -2203,7 +2203,7 @@ int libregf_value_item_get_value_64bit(
 	}
 	else if( value_data_size > 8 )
 	{
-		value_item->item_flags |= LIBREGF_VALUE_ITEM_FLAG_IS_CORRUPTED;
+		value_item->item_flags |= LIBREGF_ITEM_FLAG_IS_CORRUPTED;
 	}
 	byte_stream_copy_to_uint64_little_endian(
 	 value_data,

@@ -93,7 +93,7 @@ enum LIBREGF_VALUE_TYPES
 	LIBREGF_VALUE_TYPE_INTEGER_64BIT_LITTLE_ENDIAN	= 11
 };
 
-#endif
+#endif /* !defined( HAVE_LOCAL_LIBREGF ) */
 
 /* The IO handle flags
  */
@@ -113,13 +113,13 @@ enum LIBREGF_HIVE_BINS_FLAGS
 	LIBREGF_HIVE_BINS_FLAG_IS_CORRUPTED		= 0x01
 };
 
-/* The key item flags
+/* The item flags
  */
-enum LIBREGF_KEY_ITEM_FLAGS
+enum LIBREGF_ITEM_FLAGS
 {
-	/* The key item is corrupted
+	/* The item is corrupted
 	 */
-	LIBREGF_KEY_ITEM_FLAG_IS_CORRUPTED		= 0x01
+	LIBREGF_ITEM_FLAG_IS_CORRUPTED			= 0x01
 };
 
 /* The value item data types
@@ -128,15 +128,6 @@ enum LIBREGF_VALUE_ITEM_DATA_TYPES
 {
 	LIBREGF_VALUE_ITEM_DATA_TYPE_BUFFER		= 1,
 	LIBREGF_VALUE_ITEM_DATA_TYPE_BLOCK		= 2
-};
-
-/* The value item flags
- */
-enum LIBREGF_VALUE_ITEM_FLAGS
-{
-	/* The value item is corrupted
-	 */
-	LIBREGF_VALUE_ITEM_FLAG_IS_CORRUPTED		= 0x01
 };
 
 /* The hive bin cell flags
@@ -164,5 +155,5 @@ enum LIBREGF_VALUE_KEY_FLAGS
 #define LIBREGF_MAXIMUM_CACHE_ENTRIES_KEYS		256 * 1024
 #define LIBREGF_MAXIMUM_CACHE_ENTRIES_VALUES		128
 
-#endif
+#endif /* !defined( _LIBREGF_INTERNAL_DEFINITIONS_H ) */
 

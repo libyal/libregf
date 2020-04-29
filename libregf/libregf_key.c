@@ -281,7 +281,7 @@ int libregf_key_is_corrupted(
 
 		result = -1;
 	}
-	else if( ( key_item->item_flags & LIBREGF_KEY_ITEM_FLAG_IS_CORRUPTED ) == 0 )
+	else if( ( key_item->item_flags & LIBREGF_ITEM_FLAG_IS_CORRUPTED ) == 0 )
 	{
 		result = 0;
 	}

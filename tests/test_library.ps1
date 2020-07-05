@@ -1,6 +1,6 @@
 # Tests library functions and types.
 #
-# Version: 20200413
+# Version: 20200427
 
 $ExitSuccess = 0
 $ExitFailure = 1
@@ -8,7 +8,7 @@ $ExitIgnore = 77
 
 $LibraryTests = "checksum data_block_key data_block_stream data_type error file_header hive_bin hive_bin_cell hive_bin_header hive_bins_list io_handle key key_item multi_string named_key notify security_key value value_item value_key"
 $LibraryTestsWithInput = "file support"
-$OptionSets = "";
+$OptionSets = ""
 
 $InputGlob = "*"
 

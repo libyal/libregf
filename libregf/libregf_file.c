@@ -106,7 +106,10 @@ int libregf_file_initialize(
 		 "%s: unable to clear file.",
 		 function );
 
-		goto on_error;
+		memory_free(
+		 internal_file );
+
+		return( -1 );
 	}
 	if( libregf_io_handle_initialize(
 	     &( internal_file->io_handle ),
@@ -143,6 +146,12 @@ int libregf_file_initialize(
 on_error:
 	if( internal_file != NULL )
 	{
+		if( internal_file->io_handle != NULL )
+		{
+			libregf_io_handle_free(
+			 &( internal_file->io_handle ),
+			 NULL );
+		}
 		memory_free(
 		 internal_file );
 	}

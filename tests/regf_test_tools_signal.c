@@ -1,5 +1,5 @@
 /*
- * Library error functions test program
+ * Tools signal functions test program
  *
  * Copyright (C) 2009-2020, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -27,84 +27,81 @@
 #include <stdlib.h>
 #endif
 
-#include "regf_test_libregf.h"
+#include "regf_test_libcerror.h"
 #include "regf_test_macros.h"
 #include "regf_test_unused.h"
 
-/* Tests the libregf_error_free function
- * Returns 1 if successful or 0 if not
- */
-int regf_test_error_free(
-     void )
-{
-	/* Test invocation of function only
-	 */
-	libregf_error_free(
-	 NULL );
+#include "../regftools/regftools_signal.h"
 
-	return( 1 );
+void regf_test_tools_signal_handler(
+      regftools_signal_t signal REGF_TEST_ATTRIBUTE_UNUSED )
+{
+	REGF_TEST_UNREFERENCED_PARAMETER( signal )
 }
 
-/* Tests the libregf_error_fprint function
+/* Tests the regftools_signal_attach and function
  * Returns 1 if successful or 0 if not
  */
-int regf_test_error_fprint(
+int regf_test_tools_signal_attach(
      void )
 {
-	/* Test invocation of function only
-	 */
-	libregf_error_fprint(
-	 NULL,
-	 NULL );
+	libcerror_error_t *error = NULL;
+	int result               = 0;
+
+	result = regftools_signal_attach(
+	          regf_test_tools_signal_handler,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
 }
 
-/* Tests the libregf_error_sprint function
+/* Tests the regftools_signal_detach and function
  * Returns 1 if successful or 0 if not
  */
-int regf_test_error_sprint(
+int regf_test_tools_signal_detach(
      void )
 {
-	/* Test invocation of function only
-	 */
-	libregf_error_sprint(
-	 NULL,
-	 NULL,
-	 0 );
+	libcerror_error_t *error = NULL;
+	int result               = 0;
+
+	result = regftools_signal_detach(
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
 
 	return( 1 );
-}
 
-/* Tests the libregf_error_backtrace_fprint function
- * Returns 1 if successful or 0 if not
- */
-int regf_test_error_backtrace_fprint(
-     void )
-{
-	/* Test invocation of function only
-	 */
-	libregf_error_backtrace_fprint(
-	 NULL,
-	 NULL );
-
-	return( 1 );
-}
-
-/* Tests the libregf_error_backtrace_sprint function
- * Returns 1 if successful or 0 if not
- */
-int regf_test_error_backtrace_sprint(
-     void )
-{
-	/* Test invocation of function only
-	 */
-	libregf_error_backtrace_sprint(
-	 NULL,
-	 NULL,
-	 0 );
-
-	return( 1 );
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
 }
 
 /* The main program
@@ -122,25 +119,23 @@ int main(
 	REGF_TEST_UNREFERENCED_PARAMETER( argc )
 	REGF_TEST_UNREFERENCED_PARAMETER( argv )
 
-	REGF_TEST_RUN(
-	 "libregf_error_free",
-	 regf_test_error_free );
+#if defined( WINAPI )
+
+	/* TODO add tests for regftools_signal_handler */
+#endif
+
+#if defined( WINAPI ) && defined( _MSC_VER )
+
+	/* TODO add tests for regftools_signal_initialize_memory_debug */
+#endif
 
 	REGF_TEST_RUN(
-	 "libregf_error_fprint",
-	 regf_test_error_fprint );
+	 "regftools_signal_attach",
+	 regf_test_tools_signal_attach )
 
 	REGF_TEST_RUN(
-	 "libregf_error_sprint",
-	 regf_test_error_sprint );
-
-	REGF_TEST_RUN(
-	 "libregf_error_backtrace_fprint",
-	 regf_test_error_backtrace_fprint );
-
-	REGF_TEST_RUN(
-	 "libregf_error_backtrace_sprint",
-	 regf_test_error_backtrace_sprint );
+	 "regftools_signal_detach",
+	 regf_test_tools_signal_detach )
 
 	return( EXIT_SUCCESS );
 

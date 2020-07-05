@@ -157,22 +157,19 @@ int libregf_hive_bin_free(
 	}
 	if( *hive_bin != NULL )
 	{
-		if( ( *hive_bin )->cells_array != NULL )
+		if( libcdata_array_free(
+		     &( ( *hive_bin )->cells_array ),
+		     (int (*)(intptr_t **, libcerror_error_t **)) &libregf_hive_bin_cell_free,
+		     error ) != 1 )
 		{
-			if( libcdata_array_free(
-			     &( ( *hive_bin )->cells_array ),
-			     (int (*)(intptr_t **, libcerror_error_t **)) &libregf_hive_bin_cell_free,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-				 "%s: unable to free the hive bin cells array.",
-				 function );
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free the hive bin cells array.",
+			 function );
 
-				result = -1;
-			}
+			result = -1;
 		}
 		if( ( *hive_bin )->data != NULL )
 		{

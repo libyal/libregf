@@ -1,3 +1,5 @@
+AUTOMAKE_OPTIONS = subdir-objects
+
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/include \
 	-I$(top_srcdir)/common \
@@ -25,6 +27,7 @@ endif
 
 TESTS = \
 	test_library.sh \
+	test_tools.sh \
 	test_regfinfo.sh \
 	test_regfexport.sh \
 	$(TESTS_PYREGF)
@@ -36,7 +39,8 @@ check_SCRIPTS = \
 	test_python_module.sh \
 	test_regfexport.sh \
 	test_regfinfo.sh \
-	test_runner.sh
+	test_runner.sh \
+	test_tools.sh
 
 EXTRA_DIST = \
 	$(check_SCRIPTS)
@@ -61,6 +65,9 @@ check_PROGRAMS = \
 	regf_test_notify \
 	regf_test_security_key \
 	regf_test_support \
+	regf_test_tools_info_handle \
+	regf_test_tools_output \
+	regf_test_tools_signal \
 	regf_test_value \
 	regf_test_value_item \
 	regf_test_value_key
@@ -367,6 +374,41 @@ regf_test_support_LDADD = \
 	@LIBCNOTIFY_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
 	@LIBCDATA_LIBADD@ \
+	../libregf/libregf.la \
+	@LIBCERROR_LIBADD@
+
+regf_test_tools_info_handle_SOURCES = \
+	../regftools/info_handle.c ../regftools/info_handle.h \
+	regf_test_libcerror.h \
+	regf_test_macros.h \
+	regf_test_memory.c regf_test_memory.h \
+	regf_test_tools_info_handle.c \
+	regf_test_unused.h
+
+regf_test_tools_info_handle_LDADD = \
+	@LIBCLOCALE_LIBADD@ \
+	../libregf/libregf.la \
+	@LIBCERROR_LIBADD@
+
+regf_test_tools_output_SOURCES = \
+	../regftools/regftools_output.c ../regftools/regftools_output.h \
+	regf_test_libcerror.h \
+	regf_test_macros.h \
+	regf_test_tools_output.c \
+	regf_test_unused.h
+
+regf_test_tools_output_LDADD = \
+	../libregf/libregf.la \
+	@LIBCERROR_LIBADD@
+
+regf_test_tools_signal_SOURCES = \
+	../regftools/regftools_signal.c ../regftools/regftools_signal.h \
+	regf_test_libcerror.h \
+	regf_test_macros.h \
+	regf_test_tools_signal.c \
+	regf_test_unused.h
+
+regf_test_tools_signal_LDADD = \
 	../libregf/libregf.la \
 	@LIBCERROR_LIBADD@
 

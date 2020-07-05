@@ -432,19 +432,47 @@ PyObject *pyregf_open_new_file(
            PyObject *arguments,
            PyObject *keywords )
 {
-	PyObject *pyregf_file = NULL;
+	pyregf_file_t *pyregf_file = NULL;
+	static char *function      = "pyregf_open_new_file";
 
 	PYREGF_UNREFERENCED_PARAMETER( self )
 
-	pyregf_file_init(
-	 (pyregf_file_t *) pyregf_file );
+	/* PyObject_New does not invoke tp_init
+	 */
+	pyregf_file = PyObject_New(
+	               struct pyregf_file,
+	               &pyregf_file_type_object );
 
-	pyregf_file_open(
-	 (pyregf_file_t *) pyregf_file,
-	 arguments,
-	 keywords );
+	if( pyregf_file == NULL )
+	{
+		PyErr_Format(
+		 PyExc_MemoryError,
+		 "%s: unable to create file.",
+		 function );
 
-	return( pyregf_file );
+		goto on_error;
+	}
+	if( pyregf_file_init(
+	     pyregf_file ) != 0 )
+	{
+		goto on_error;
+	}
+	if( pyregf_file_open(
+	     pyregf_file,
+	     arguments,
+	     keywords ) == NULL )
+	{
+		goto on_error;
+	}
+	return( (PyObject *) pyregf_file );
+
+on_error:
+	if( pyregf_file != NULL )
+	{
+		Py_DecRef(
+		 (PyObject *) pyregf_file );
+	}
+	return( NULL );
 }
 
 /* Creates a new file object and opens it using a file-like object
@@ -455,19 +483,47 @@ PyObject *pyregf_open_new_file_with_file_object(
            PyObject *arguments,
            PyObject *keywords )
 {
-	PyObject *pyregf_file = NULL;
+	pyregf_file_t *pyregf_file = NULL;
+	static char *function      = "pyregf_open_new_file_with_file_object";
 
 	PYREGF_UNREFERENCED_PARAMETER( self )
 
-	pyregf_file_init(
-	 (pyregf_file_t *) pyregf_file );
+	/* PyObject_New does not invoke tp_init
+	 */
+	pyregf_file = PyObject_New(
+	               struct pyregf_file,
+	               &pyregf_file_type_object );
 
-	pyregf_file_open_file_object(
-	 (pyregf_file_t *) pyregf_file,
-	 arguments,
-	 keywords );
+	if( pyregf_file == NULL )
+	{
+		PyErr_Format(
+		 PyExc_MemoryError,
+		 "%s: unable to create file.",
+		 function );
 
-	return( pyregf_file );
+		goto on_error;
+	}
+	if( pyregf_file_init(
+	     pyregf_file ) != 0 )
+	{
+		goto on_error;
+	}
+	if( pyregf_file_open_file_object(
+	     pyregf_file,
+	     arguments,
+	     keywords ) == NULL )
+	{
+		goto on_error;
+	}
+	return( (PyObject *) pyregf_file );
+
+on_error:
+	if( pyregf_file != NULL )
+	{
+		Py_DecRef(
+		 (PyObject *) pyregf_file );
+	}
+	return( NULL );
 }
 
 #if PY_MAJOR_VERSION >= 3

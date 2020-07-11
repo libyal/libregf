@@ -325,6 +325,17 @@ int libregf_security_key_read_data(
 #endif
 	if( security_descriptor_size > 0 )
 	{
+		if( security_descriptor_size > (uint32_t) MEMORY_MAXIMUM_ALLOCATION_SIZE )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+			 "%s: invalid security descriptor size value exceeds maximum allocation size.",
+			 function );
+
+			goto on_error;
+		}
 		security_key->security_descriptor = (uint8_t *) memory_allocate(
 		                                                 sizeof( uint8_t ) * security_descriptor_size );
 

@@ -1101,103 +1101,102 @@ int export_handle_export_key(
 #endif
 				if( result != 1 )
 				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-					 "%s: unable to retrieve value string size.",
-					 function );
-
-					goto on_error;
+					libcerror_error_free(
+					 error );
 				}
-				if( value_string_size > 0 )
+				else
 				{
-					if( value_string_size > ( (size_t) SSIZE_MAX / sizeof( system_character_t ) ) )
+					fprintf(
+					 export_handle->notify_stream,
+					 "Data:" );
+
+					if( value_string_size > 0 )
 					{
-						libcerror_error_set(
-						 error,
-						 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-						 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
-						 "%s: invalid value string size value exceeds maximum.",
-						 function );
+						if( value_string_size > ( (size_t) SSIZE_MAX / sizeof( system_character_t ) ) )
+						{
+							libcerror_error_set(
+							 error,
+							 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+							 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+							 "%s: invalid value string size value exceeds maximum.",
+							 function );
 
-						goto on_error;
-					}
-					value_string = system_string_allocate(
-							value_string_size );
+							goto on_error;
+						}
+						value_string = system_string_allocate(
+								value_string_size );
 
-					if( value_string == NULL )
-					{
-						libcerror_error_set(
-						 error,
-						 LIBCERROR_ERROR_DOMAIN_MEMORY,
-						 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-						 "%s: unable to create value string.",
-						 function );
+						if( value_string == NULL )
+						{
+							libcerror_error_set(
+							 error,
+							 LIBCERROR_ERROR_DOMAIN_MEMORY,
+							 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+							 "%s: unable to create value string.",
+							 function );
 
-						goto on_error;
-					}
+							goto on_error;
+						}
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-					result = libregf_value_get_value_utf16_string(
-						  value,
-						  (uint16_t *) value_string,
-						  value_string_size,
-						  error );
+						result = libregf_value_get_value_utf16_string(
+							  value,
+							  (uint16_t *) value_string,
+							  value_string_size,
+							  error );
 #else
-					result = libregf_value_get_value_utf8_string(
-						  value,
-						  (uint8_t *) value_string,
-						  value_string_size,
-						  error );
+						result = libregf_value_get_value_utf8_string(
+							  value,
+							  (uint8_t *) value_string,
+							  value_string_size,
+							  error );
 #endif
+						if( result != 1 )
+						{
+							libcerror_error_set(
+							 error,
+							 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+							 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+							 "%s: unable to retrieve value string.",
+							 function );
+
+							goto on_error;
+						}
+						fprintf(
+						 export_handle->notify_stream,
+						 " %" PRIs_SYSTEM "",
+						 value_string );
+
+						memory_free(
+						 value_string );
+
+						value_string = NULL;
+					}
+					fprintf(
+					 export_handle->notify_stream,
+					 "\n" );
+
+					result = libregf_value_get_value_utf16_string_size(
+						  value,
+						  &expected_data_size,
+						  error );
+
 					if( result != 1 )
 					{
 						libcerror_error_set(
 						 error,
 						 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 						 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-						 "%s: unable to retrieve value string.",
+						 "%s: unable to retrieve value UTF-16 string size.",
 						 function );
 
 						goto on_error;
 					}
-					fprintf(
-					 export_handle->notify_stream,
-					 "Data: %" PRIs_SYSTEM "\n",
-					 value_string );
+					expected_data_size *= 2;
 
-					memory_free(
-					 value_string );
-
-					value_string = NULL;
-				}
-				else
-				{
-					fprintf(
-					 export_handle->notify_stream,
-					 "Data:\n" );
-				}
-				result = libregf_value_get_value_utf16_string_size(
-					  value,
-					  &expected_data_size,
-					  error );
-
-				if( result != 1 )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-					 "%s: unable to retrieve value UTF-16 string size.",
-					 function );
-
-					goto on_error;
-				}
-				expected_data_size *= 2;
-
-				if( expected_data_size == ( data_size + 2 ) )
-				{
-					expected_data_size -= 2;
+					if( expected_data_size == ( data_size + 2 ) )
+					{
+						expected_data_size -= 2;
+					}
 				}
 				break;
 

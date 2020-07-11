@@ -336,7 +336,7 @@ int libregf_debug_print_utf16_string_value(
 	 || ( byte_stream_size == 0 ) )
 	{
 		libcnotify_printf(
-		 "%s: %s: \n",
+		 "%s: %s:\n",
 		 function_name,
 		 value_name );
 
@@ -344,18 +344,18 @@ int libregf_debug_print_utf16_string_value(
 	}
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
 	result = libuna_utf16_string_size_from_utf16_stream(
-		  byte_stream,
-		  byte_stream_size,
-		  byte_order,
-		  &string_size,
-		  error );
+	          byte_stream,
+	          byte_stream_size,
+	          byte_order,
+	          &string_size,
+	          error );
 #else
 	result = libuna_utf8_string_size_from_utf16_stream(
-		  byte_stream,
-		  byte_stream_size,
-		  byte_order,
-		  &string_size,
-		  error );
+	          byte_stream,
+	          byte_stream_size,
+	          byte_order,
+	          &string_size,
+	          error );
 #endif
 	if( result != 1 )
 	{
@@ -368,8 +368,7 @@ int libregf_debug_print_utf16_string_value(
 
 		goto on_error;
 	}
-	if( ( string_size > (size_t) SSIZE_MAX )
-	 || ( ( sizeof( system_character_t ) * string_size ) > (size_t) SSIZE_MAX ) )
+	if( string_size > ( (size_t) SSIZE_MAX / sizeof( system_character_t ) ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -380,56 +379,64 @@ int libregf_debug_print_utf16_string_value(
 
 		goto on_error;
 	}
-	string = system_string_allocate(
-	          string_size );
+	libcnotify_printf(
+	 "%s: %s:",
+	 function_name,
+	 value_name );
 
-	if( string == NULL )
+	if( string_size > 0 )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_MEMORY,
-		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create string.",
-		 function );
+		string = system_string_allocate(
+		          string_size );
 
-		goto on_error;
-	}
+		if( string == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create string.",
+			 function );
+
+			goto on_error;
+		}
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
-	result = libuna_utf16_string_copy_from_utf16_stream(
-		  (libuna_utf16_character_t *) string,
-		  string_size,
-		  byte_stream,
-		  byte_stream_size,
-		  byte_order,
-		  error );
+		result = libuna_utf16_string_copy_from_utf16_stream(
+		          (libuna_utf16_character_t *) string,
+		          string_size,
+		          byte_stream,
+		          byte_stream_size,
+		          byte_order,
+		          error );
 #else
-	result = libuna_utf8_string_copy_from_utf16_stream(
-		  (libuna_utf8_character_t *) string,
-		  string_size,
-		  byte_stream,
-		  byte_stream_size,
-		  byte_order,
-		  error );
+		result = libuna_utf8_string_copy_from_utf16_stream(
+		          (libuna_utf8_character_t *) string,
+		          string_size,
+		          byte_stream,
+		          byte_stream_size,
+		          byte_order,
+		          error );
 #endif
-	if( result != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set string.",
-		 function );
+		if( result != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set string.",
+			 function );
 
-		goto on_error;
+			goto on_error;
+		}
+		libcnotify_printf(
+		 " %s",
+		 string );
+
+		memory_free(
+		 string );
 	}
 	libcnotify_printf(
-	 "%s: %s: %s\n",
-	 function_name,
-	 value_name,
-	 string );
-
-	memory_free(
-	 string );
+	 "\n" );
 
 	return( 1 );
 

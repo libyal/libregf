@@ -1310,19 +1310,18 @@ int libregf_key_item_read_sub_keys_list(
 
 		goto on_error;
 	}
-#if SIZEOF_SIZE_T <= 4
-	if( hive_bin_cell->size > (uint32_t) SSIZE_MAX )
+	if( ( hive_bin_cell->size == 0 )
+	 || ( hive_bin_cell->size > (uint32_t) MEMORY_MAXIMUM_ALLOCATION_SIZE ) )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid hive bin cell - size value exceeds maximum.",
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid hive bin cell - size value out of bounds.",
 		 function );
 
 		return( -1 );
 	}
-#endif
 	/* Make a local copy of the data in case the hive bin cell gets cached out
 	 * while reading the sub keys
 	 */

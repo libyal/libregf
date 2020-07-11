@@ -444,7 +444,8 @@ int libregf_named_key_read_data(
 		 function,
 		 named_key->class_name_size );
 	}
-#endif
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
+
 	data_offset = sizeof( regf_named_key_t );
 
 	if( ( named_key->name_size == 0 )

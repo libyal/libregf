@@ -452,17 +452,14 @@ int libregf_hive_bin_read_cells_file_io_handle(
 
 		return( -1 );
 	}
-#if SIZEOF_SIZE_T <= 4
-	if( hive_bin->size > (size_t) SSIZE_MAX )
-#else
-	if( hive_bin->size > (uint32_t) SSIZE_MAX )
-#endif
+	if( ( hive_bin->size == 0 )
+	 || ( hive_bin->size > (uint32_t) MEMORY_MAXIMUM_ALLOCATION_SIZE ) )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid hive bin - size value exceeds maximum.",
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid hive bin - size value out of bounds.",
 		 function );
 
 		return( -1 );

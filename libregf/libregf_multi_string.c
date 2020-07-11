@@ -233,7 +233,7 @@ int libregf_internal_multi_string_read_data(
 		return( -1 );
 	}
 	if( ( data_size < 2 )
-	 || ( data_size > (size_t) SSIZE_MAX ) )
+	 || ( data_size > (size_t) MEMORY_MAXIMUM_ALLOCATION_SIZE ) )
 	{
 		libcerror_error_set(
 		 error,

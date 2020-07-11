@@ -341,13 +341,14 @@ int libregf_hive_bins_list_read(
 
 			goto on_error;
 		}
-		else if( result == 0 )
+		if( ( result == 0 )
+		 || ( hive_bin_header->size == 0 ) )
 		{
 #if defined( HAVE_DEBUG_OUTPUT )
 			if( libcnotify_verbose != 0 )
 			{
 				libcnotify_printf(
-				 "%s: missing hive bin: %d header at offset: %" PRIi64 " (0x%08" PRIx64 ").\n",
+				 "%s: invalid hive bin: %d header at offset: %" PRIi64 " (0x%08" PRIx64 ").\n",
 				 function,
 				 hive_bin_index,
 				 file_offset,

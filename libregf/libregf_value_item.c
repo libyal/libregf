@@ -250,8 +250,20 @@ int libregf_value_item_clone(
 	}
 	if( source_value_item->data_buffer != NULL )
 	{
+		if( ( source_value_item->data_buffer_size == 0 )
+		 || ( source_value_item->data_buffer_size > (size_t) MEMORY_MAXIMUM_ALLOCATION_SIZE ) )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: invalid source value item - invalid data buffer size value out of bounds.",
+			 function );
+
+			goto on_error;
+		}
 		( *destination_value_item )->data_buffer = (uint8_t *) memory_allocate(
-		                                                        sizeof( uint8_t ) * (size_t) source_value_item->data_buffer_size );
+		                                                        sizeof( uint8_t ) * source_value_item->data_buffer_size );
 
 		if( ( *destination_value_item )->data_buffer == NULL )
 		{
@@ -861,6 +873,17 @@ int libregf_value_item_read_value_data(
 
 		if( value_data_size > 0 )
 		{
+			if( value_data_size > (size_t) MEMORY_MAXIMUM_ALLOCATION_SIZE )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+				 "%s: invalid value data size value exceeds maximum allocation size.",
+				 function );
+
+				goto on_error;
+			}
 			value_item->data_buffer = (uint8_t *) memory_allocate(
 			                                       sizeof( uint8_t ) * (size_t) value_data_size );
 
@@ -1914,7 +1937,8 @@ int libregf_value_item_get_data(
 
 			goto on_error;
 		}
-		if( stream_data_size > (size64_t) SSIZE_MAX )
+		if( ( stream_data_size == 0 )
+		 || ( stream_data_size > (size64_t) MEMORY_MAXIMUM_ALLOCATION_SIZE ) )
 		{
 			libcerror_error_set(
 			 error,

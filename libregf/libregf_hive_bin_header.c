@@ -68,7 +68,7 @@ int libregf_hive_bin_header_initialize(
 		return( -1 );
 	}
 	*hive_bin_header = memory_allocate_structure(
-	                libregf_hive_bin_header_t );
+	                    libregf_hive_bin_header_t );
 
 	if( *hive_bin_header == NULL )
 	{

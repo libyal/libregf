@@ -205,6 +205,17 @@ int libregf_value_key_clone(
 	}
 	if( source_value_key->name != NULL )
 	{
+		if( source_value_key->name_size == 0 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: invalid source value key - invalid name size value out of bounds.",
+			 function );
+
+			goto on_error;
+		}
 		( *destination_value_key )->name = (uint8_t *) memory_allocate(
 		                                                sizeof( uint8_t ) * (size_t) source_value_key->name_size );
 
@@ -238,6 +249,18 @@ int libregf_value_key_clone(
 	}
 	if( source_value_key->data != NULL )
 	{
+		if( ( source_value_key->data_size == 0 )
+		 || ( source_value_key->data_size > (size_t) MEMORY_MAXIMUM_ALLOCATION_SIZE ) )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: invalid source value key - invalid data size value out of bounds.",
+			 function );
+
+			goto on_error;
+		}
 		( *destination_value_key )->data = (uint8_t *) memory_allocate(
 		                                                sizeof( uint8_t ) * (size_t) source_value_key->data_size );
 
@@ -516,6 +539,17 @@ int libregf_value_key_read_data(
 
 					value_key->data_size += 1;
 				}
+			}
+			if( value_key->data_size > (size_t) MEMORY_MAXIMUM_ALLOCATION_SIZE )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+				 "%s: invalid value key - invalid data size value exceeds maximum allocation size.",
+				 function );
+
+				goto on_error;
 			}
 			value_key->data = (uint8_t *) memory_allocate(
 			                               sizeof( uint8_t ) * value_key->data_size );

@@ -2,7 +2,7 @@ AC_PREREQ( 2.59 )
 
 AC_INIT(
  [libregf],
- [20200711],
+ [20200714],
  [joachim.metz@gmail.com])
 
 AC_CONFIG_SRCDIR(
@@ -21,6 +21,7 @@ AC_LIBTOOL_WIN32_DLL
 dnl Checks for programs
 AC_PROG_CC
 AC_PROG_GCC_TRADITIONAL
+AC_PROG_CXX
 AC_PROG_MAKE_SET
 AC_PROG_INSTALL
 
@@ -44,6 +45,9 @@ AC_SYS_LARGEFILE
 
 dnl Check if shared library support should be disabled
 AX_COMMON_CHECK_DISABLE_SHARED_LIBS
+
+dnl Check if tools should be build as static executables
+AX_COMMON_CHECK_ENABLE_STATIC_EXECUTABLES
 
 dnl Check if WINAPI support should be enabled
 AX_COMMON_CHECK_ENABLE_WINAPI
@@ -130,32 +134,12 @@ AX_LIBFUSE_CHECK_ENABLE
 dnl Check if regftools required headers and functions are available
 AX_REGFTOOLS_CHECK_LOCAL
 
+dnl Check if DLL support is needed
+AX_LIBREGF_CHECK_DLL_SUPPORT
+
 dnl Check if tests required headers and functions are available
 AX_TESTS_CHECK_LOCAL
-
-dnl Check if DLL support is needed
-AS_IF(
- [test "x$enable_shared" = xyes],
- [AS_CASE(
-  [$host],
-  [*cygwin* | *mingw* | *msys*],
-  [AC_DEFINE(
-   [HAVE_DLLMAIN],
-   [1],
-   [Define to 1 to enable the DllMain function.])
-  AC_SUBST(
-   [HAVE_DLLMAIN],
-   [1])
-
-  AC_SUBST(
-   [LIBREGF_DLL_EXPORT],
-   ["-DLIBREGF_DLL_EXPORT"])
-
-  AC_SUBST(
-   [LIBREGF_DLL_IMPORT],
-   ["-DLIBREGF_DLL_IMPORT"])
-  ])
- ])
+AX_TESTS_CHECK_OSSFUZZ
 
 dnl Set additional compiler flags
 CFLAGS="$CFLAGS -Wall";

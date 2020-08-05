@@ -221,6 +221,28 @@ int libregf_internal_multi_string_read_data(
 
 		return( -1 );
 	}
+	if( internal_multi_string->strings != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid multi string - strings already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_multi_string->string_sizes != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid multi string - string sizes already set.",
+		 function );
+
+		return( -1 );
+	}
 	if( data == NULL )
 	{
 		libcerror_error_set(
@@ -244,6 +266,18 @@ int libregf_internal_multi_string_read_data(
 
 		return( -1 );
 	}
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libcnotify_verbose != 0 )
+	{
+		libcnotify_printf(
+		 "%s: multi string data:\n",
+		 function );
+		libcnotify_print_data(
+		 data,
+		 data_size,
+		 LIBCNOTIFY_PRINT_DATA_FLAG_GROUP_DATA );
+	}
+#endif
 	data_offset = 0;
 
 	while( data_offset < data_size )
@@ -251,7 +285,7 @@ int libregf_internal_multi_string_read_data(
 		found_end_of_string = 0;
 		string_size         = 0;
 
-		while( data_offset < data_size )
+		while( data_offset <= ( data_size - 2 ) )
 		{
 			string_size += 2;
 
@@ -325,62 +359,79 @@ int libregf_internal_multi_string_read_data(
 
 		goto on_error;
 	}
-	internal_multi_string->strings = (uint8_t **) memory_allocate(
-	                                               sizeof( uint8_t * ) * number_of_strings );
+	internal_multi_string->data_size = data_size;
 
-	if( internal_multi_string->strings == NULL )
+	if( number_of_strings > 0 )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_MEMORY,
-		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create strings.",
-		 function );
+		internal_multi_string->strings = (uint8_t **) memory_allocate(
+		                                               sizeof( uint8_t * ) * number_of_strings );
 
-		goto on_error;
-	}
-	internal_multi_string->string_sizes = (size_t *) memory_allocate(
-	                                                  sizeof( size_t ) * number_of_strings );
+		if( internal_multi_string->strings == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create strings.",
+			 function );
 
-	if( internal_multi_string->string_sizes == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_MEMORY,
-		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create string sizes.",
-		 function );
+			goto on_error;
+		}
+		internal_multi_string->string_sizes = (size_t *) memory_allocate(
+		                                                  sizeof( size_t ) * number_of_strings );
 
-		goto on_error;
-	}
-	data_offset = 0;
+		if( internal_multi_string->string_sizes == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_MEMORY,
+			 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+			 "%s: unable to create string sizes.",
+			 function );
 
-	while( data_offset < data_size )
-	{
-		string_start = &( ( internal_multi_string->data )[ data_offset ] );
-		string_size  = 0;
+			goto on_error;
+		}
+		data_offset = 0;
 
 		while( data_offset < data_size )
 		{
-			string_size += 2;
+			string_start = &( ( internal_multi_string->data )[ data_offset ] );
+			string_size  = 0;
 
-			if( ( data[ data_offset ] == 0 )
-			 && ( data[ data_offset + 1 ] == 0 ) )
+			while( data_offset <= ( data_size - 2 ) )
 			{
-				data_offset += 2;
+				string_size += 2;
 
+				if( ( data[ data_offset ] == 0 )
+				 && ( data[ data_offset + 1 ] == 0 ) )
+				{
+					data_offset += 2;
+
+					break;
+				}
+				data_offset += 2;
+			}
+			if( ( string_index < 0 )
+			 || ( string_index >= number_of_strings ) )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+				 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+				 "%s: invalid string index value out of bounds.",
+				 function );
+
+				goto on_error;
+			}
+			internal_multi_string->strings[ string_index ]      = string_start;
+			internal_multi_string->string_sizes[ string_index ] = string_size;
+
+			string_index++;
+
+			if( string_index >= number_of_strings )
+			{
 				break;
 			}
-			data_offset += 2;
-		}
-		internal_multi_string->strings[ string_index ]      = string_start;
-		internal_multi_string->string_sizes[ string_index ] = string_size;
-
-		string_index++;
-
-		if( string_index >= number_of_strings )
-		{
-			break;
 		}
 	}
 	internal_multi_string->number_of_strings = number_of_strings;

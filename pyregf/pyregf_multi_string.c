@@ -273,9 +273,10 @@ int pyregf_multi_string_init(
 void pyregf_multi_string_free(
       pyregf_multi_string_t *sequence_object )
 {
-	libcerror_error_t *error    = NULL;
 	struct _typeobject *ob_type = NULL;
+	libcerror_error_t *error    = NULL;
 	static char *function       = "pyregf_multi_string_free";
+	int result                  = 0;
 
 	if( sequence_object == NULL )
 	{
@@ -307,18 +308,27 @@ void pyregf_multi_string_free(
 
 		return;
 	}
-	if( libregf_multi_string_free(
-	     &( sequence_object->multi_string ),
-	     &error ) != 1 )
+	if( sequence_object->multi_string != NULL )
 	{
-		pyregf_error_raise(
-		 error,
-		 PyExc_IOError,
-		 "%s: unable to free libregf multi string.",
-		 function );
+		Py_BEGIN_ALLOW_THREADS
 
-		libcerror_error_free(
-		 &error );
+		result = libregf_multi_string_free(
+		          &( sequence_object->multi_string ),
+		          &error );
+
+		Py_END_ALLOW_THREADS
+
+		if( result != 1 )
+		{
+			pyregf_error_raise(
+			 error,
+			 PyExc_MemoryError,
+			 "%s: unable to free libregf multi string.",
+			 function );
+
+			libcerror_error_free(
+			 &error );
+		}
 	}
 	if( sequence_object->parent_object != NULL )
 	{

@@ -29,6 +29,7 @@ libregf_la_SOURCES = \
 	libregf_data_type.c libregf_data_type.h \
 	libregf_debug.c libregf_debug.h \
 	libregf_definitions.h \
+	libregf_dirty_vector.c libregf_dirty_vector.h \
 	libregf_error.c libregf_error.h \
 	libregf_extern.h \
 	libregf_file.c libregf_file.h \

@@ -26,6 +26,7 @@
 #include <types.h>
 
 #include "libregf_extern.h"
+#include "libregf_dirty_vector.h"
 #include "libregf_file_header.h"
 #include "libregf_hive_bins_list.h"
 #include "libregf_io_handle.h"
@@ -55,6 +56,10 @@ struct libregf_internal_file
 	/* The file header
 	 */
 	libregf_file_header_t *file_header;
+
+	/* The dirty vector
+	 */
+	libregf_dirty_vector_t *dirty_vector;
 
 	/* The hive bins list
 	 */
@@ -133,6 +138,16 @@ int libregf_file_close(
      libcerror_error_t **error );
 
 int libregf_internal_file_open_read(
+     libregf_internal_file_t *internal_file,
+     libbfio_handle_t *file_io_handle,
+     libcerror_error_t **error );
+
+int libregf_internal_file_read_hive_bins(
+     libregf_internal_file_t *internal_file,
+     libbfio_handle_t *file_io_handle,
+     libcerror_error_t **error );
+
+int libregf_internal_file_read_dirty_vector(
      libregf_internal_file_t *internal_file,
      libbfio_handle_t *file_io_handle,
      libcerror_error_t **error );

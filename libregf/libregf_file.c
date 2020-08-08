@@ -911,6 +911,22 @@ int libregf_file_close(
 			result = -1;
 		}
 	}
+	if( internal_file->dirty_vector != NULL )
+	{
+		if( libregf_dirty_vector_free(
+		     &( internal_file->dirty_vector ),
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free dirty vector.",
+			 function );
+
+			result = -1;
+		}
+	}
 	if( internal_file->hive_bins_list != NULL )
 	{
 		if( libregf_hive_bins_list_free(
@@ -987,7 +1003,6 @@ int libregf_internal_file_open_read(
 {
 	static char *function = "libregf_internal_file_open_read";
 	size64_t file_size    = 0;
-	int result            = 0;
 
 	if( internal_file == NULL )
 	{
@@ -1017,29 +1032,7 @@ int libregf_internal_file_open_read(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid file - file header already set.",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_file->hive_bins_list != NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid file - hive bins list already set.",
-		 function );
-
-		return( -1 );
-	}
-	if( internal_file->key_tree != NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid file - key tree already set.",
+		 "%s: invalid file - file header value already set.",
 		 function );
 
 		return( -1 );
@@ -1106,93 +1099,210 @@ int libregf_internal_file_open_read(
 			 "Reading hive bins:\n" );
 		}
 #endif
-		internal_file->io_handle->hive_bins_list_offset = 4096;
+		if( libregf_internal_file_read_hive_bins(
+		     internal_file,
+		     file_io_handle,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read file header.",
+			 function );
 
-		if( libregf_hive_bins_list_initialize(
-		     &( internal_file->hive_bins_list ),
-		     internal_file->io_handle,
+			goto on_error;
+		}
+	}
+	else if( ( internal_file->file_header->file_type == LIBREGF_FILE_TYPE_TRANSACTION_LOG1 )
+	      || ( internal_file->file_header->file_type == LIBREGF_FILE_TYPE_TRANSACTION_LOG2 ) )
+	{
+#if defined( HAVE_DEBUG_OUTPUT )
+		if( libcnotify_verbose != 0 )
+		{
+			libcnotify_printf(
+			 "Reading dirty vector:\n" );
+		}
+#endif
+		if( libregf_internal_file_read_dirty_vector(
+		     internal_file,
+		     file_io_handle,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read dirty vector.",
+			 function );
+
+			goto on_error;
+		}
+	}
+	return( 1 );
+
+on_error:
+	if( internal_file->file_header != NULL )
+	{
+		libregf_file_header_free(
+		 &( internal_file->file_header ),
+		 NULL );
+	}
+	return( -1 );
+}
+
+/* Reads the hive bins
+ * Returns 1 if successful or -1 on error
+ */
+int libregf_internal_file_read_hive_bins(
+     libregf_internal_file_t *internal_file,
+     libbfio_handle_t *file_io_handle,
+     libcerror_error_t **error )
+{
+	static char *function = "libregf_internal_file_read_hive_bins";
+	int result            = 0;
+
+	if( internal_file == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_file->io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid file - missing IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_file->file_header == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid file - missing file header.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_file->hive_bins_list != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid file - hive bins list value already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_file->key_tree != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid file - key tree value already set.",
+		 function );
+
+		return( -1 );
+	}
+	internal_file->io_handle->hive_bins_list_offset = 4096;
+
+	if( libregf_hive_bins_list_initialize(
+	     &( internal_file->hive_bins_list ),
+	     internal_file->io_handle,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create hive bins list.",
+		 function );
+
+		goto on_error;
+	}
+	result = libregf_hive_bins_list_read(
+		  internal_file->hive_bins_list,
+		  file_io_handle,
+		  internal_file->io_handle->hive_bins_list_offset,
+		  internal_file->file_header->hive_bins_size,
+		  error );
+
+	if( result == -1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read hive bins.",
+		 function );
+
+		goto on_error;
+	}
+	else if( result != 0 )
+	{
+/* TODO free & clone function */
+		if( libfdata_tree_initialize(
+		     &( internal_file->key_tree ),
+		     (intptr_t *) internal_file->hive_bins_list,
+		     NULL,
+		     NULL,
+		     (int (*)(intptr_t *, intptr_t *, libfdata_tree_node_t *, libfdata_cache_t *, int, off64_t, size64_t, uint32_t, uint8_t, libcerror_error_t **)) &libregf_key_item_read_node_data,
+		     (int (*)(intptr_t *, intptr_t *, libfdata_tree_node_t *, libfdata_cache_t *, int, off64_t, size64_t, uint32_t, uint8_t, libcerror_error_t **)) &libregf_key_item_read_sub_nodes,
+		     LIBFDATA_DATA_HANDLE_FLAG_NON_MANAGED,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create hive bins list.",
+			 "%s: unable to create key tree.",
 			 function );
 
 			goto on_error;
 		}
-		result = libregf_hive_bins_list_read(
-		          internal_file->hive_bins_list,
-		          file_io_handle,
-		          internal_file->io_handle->hive_bins_list_offset,
-		          internal_file->file_header->hive_bins_size,
-		          error );
-
-		if( result == -1 )
+		if( libfcache_cache_initialize(
+		     &( internal_file->key_cache ),
+		     LIBREGF_MAXIMUM_CACHE_ENTRIES_KEYS,
+		     error ) != 1 )
 		{
 			libcerror_error_set(
 			 error,
-			 LIBCERROR_ERROR_DOMAIN_IO,
-			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read hive bins.",
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create key cache.",
 			 function );
 
 			goto on_error;
 		}
-		else if( result != 0 )
+		if( libfdata_tree_set_root_node(
+		     internal_file->key_tree,
+		     0,
+		     (off64_t) internal_file->file_header->root_key_offset,
+		     0,
+		     0,
+		     error ) != 1 )
 		{
-/* TODO free & clone function */
-			if( libfdata_tree_initialize(
-			     &( internal_file->key_tree ),
-			     (intptr_t *) internal_file->hive_bins_list,
-			     NULL,
-			     NULL,
-			     (int (*)(intptr_t *, intptr_t *, libfdata_tree_node_t *, libfdata_cache_t *, int, off64_t, size64_t, uint32_t, uint8_t, libcerror_error_t **)) &libregf_key_item_read_node_data,
-			     (int (*)(intptr_t *, intptr_t *, libfdata_tree_node_t *, libfdata_cache_t *, int, off64_t, size64_t, uint32_t, uint8_t, libcerror_error_t **)) &libregf_key_item_read_sub_nodes,
-			     LIBFDATA_DATA_HANDLE_FLAG_NON_MANAGED,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-				 "%s: unable to create key tree.",
-				 function );
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+			 "%s: unable to set key tree root node.",
+			 function );
 
-				goto on_error;
-			}
-			if( libfcache_cache_initialize(
-			     &( internal_file->key_cache ),
-			     LIBREGF_MAXIMUM_CACHE_ENTRIES_KEYS,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-				 "%s: unable to create key cache.",
-				 function );
-
-				goto on_error;
-			}
-			if( libfdata_tree_set_root_node(
-			     internal_file->key_tree,
-			     0,
-			     (off64_t) internal_file->file_header->root_key_offset,
-			     0,
-			     0,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-				 "%s: unable to set key tree root node.",
-				 function );
-
-				goto on_error;
-			}
+			goto on_error;
 		}
 	}
 	return( 1 );
@@ -1216,10 +1326,88 @@ on_error:
 		 &( internal_file->hive_bins_list ),
 		 NULL );
 	}
-	if( internal_file->file_header != NULL )
+	return( -1 );
+}
+
+/* Reads the dirty vector
+ * Returns 1 if successful or -1 on error
+ */
+int libregf_internal_file_read_dirty_vector(
+     libregf_internal_file_t *internal_file,
+     libbfio_handle_t *file_io_handle,
+     libcerror_error_t **error )
+{
+	static char *function = "libregf_internal_file_read_dirty_vector";
+
+	if( internal_file == NULL )
 	{
-		libregf_file_header_free(
-		 &( internal_file->file_header ),
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid file.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_file->file_header == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid file - missing file header.",
+		 function );
+
+		return( -1 );
+	}
+	if( internal_file->dirty_vector != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: invalid file - dirtry vector value already set.",
+		 function );
+
+		return( -1 );
+	}
+	if( libregf_dirty_vector_initialize(
+	     &( internal_file->dirty_vector ),
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create dirty vector.",
+		 function );
+
+		goto on_error;
+	}
+	if( libregf_dirty_vector_read_file_io_handle(
+	     internal_file->dirty_vector,
+	     file_io_handle,
+	     512,
+	     internal_file->file_header->hive_bins_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read dirty vector.",
+		 function );
+
+		goto on_error;
+	}
+	return( 1 );
+
+on_error:
+	if( internal_file->dirty_vector != NULL )
+	{
+		libregf_dirty_vector_free(
+		 &( internal_file->dirty_vector ),
 		 NULL );
 	}
 	return( -1 );

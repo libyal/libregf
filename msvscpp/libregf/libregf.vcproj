@@ -194,6 +194,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\libregf\libregf_dirty_vector.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\libregf\libregf_error.c"
 				>
 			</File>
@@ -301,6 +305,10 @@
 			</File>
 			<File
 				RelativePath="..\..\libregf\libregf_definitions.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\libregf\libregf_dirty_vector.h"
 				>
 			</File>
 			<File

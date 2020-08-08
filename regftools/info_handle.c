@@ -800,11 +800,14 @@ int info_handle_file_fprint(
 		 info_handle->notify_stream,
 		 "Registry" );
 	}
-	else if( file_type == LIBREGF_FILE_TYPE_TRANSACTION_LOG )
+	else if( ( file_type == LIBREGF_FILE_TYPE_TRANSACTION_LOG1 )
+	      || ( file_type == LIBREGF_FILE_TYPE_TRANSACTION_LOG2 )
+	      || ( file_type == LIBREGF_FILE_TYPE_TRANSACTION_LOG6 ) )
 	{
 		fprintf(
 		 info_handle->notify_stream,
-		 "Transaction log" );
+		 "Transaction log (%d)",
+		 file_type );
 	}
 	else
 	{

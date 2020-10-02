@@ -420,14 +420,13 @@ int info_handle_key_fprint(
 	}
 	if( name_size > 0 )
 	{
-		if( ( name_size > (size_t) SSIZE_MAX )
-		 || ( ( sizeof( system_character_t ) * name_size ) > (size_t) SSIZE_MAX ) )
+		if( name_size > ( (size_t) MEMORY_MAXIMUM_ALLOCATION_SIZE / sizeof( system_character_t ) ) )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
-			 "%s: invalid name size value exceeds maximum.",
+			 "%s: invalid name size value exceeds maximum allocation size.",
 			 function );
 
 			goto on_error;
@@ -554,14 +553,13 @@ int info_handle_key_fprint(
 		}
 		if( name_size > 0 )
 		{
-			if( ( name_size > (size_t) SSIZE_MAX )
-			 || ( ( sizeof( system_character_t ) * name_size ) > (size_t) SSIZE_MAX ) )
+			if( name_size > ( (size_t) MEMORY_MAXIMUM_ALLOCATION_SIZE / sizeof( system_character_t ) ) )
 			{
 				libcerror_error_set(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
-				 "%s: invalid name size value exceeds maximum.",
+				 "%s: invalid name size value exceeds maximum allocation size.",
 				 function );
 
 				goto on_error;

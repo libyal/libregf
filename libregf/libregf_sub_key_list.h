@@ -1,5 +1,5 @@
 /*
- * Key tree functions
+ * Sub key list functions
  *
  * Copyright (C) 2009-2020, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -19,41 +19,49 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBREGF_KEY_TREE_H )
-#define _LIBREGF_KEY_TREE_H
+#if !defined( _LIBREGF_SUB_KEY_LIST_H )
+#define _LIBREGF_SUB_KEY_LIST_H
 
 #include <common.h>
 #include <types.h>
 
+#include "libregf_libcdata.h"
 #include "libregf_libcerror.h"
 
 #if defined( __cplusplus )
 extern "C" {
 #endif
 
-int libregf_key_tree_get_sub_key_by_utf8_path(
-     libregf_io_handle_t *io_handle,
-     libbfio_handle_t *file_io_handle,
-     libregf_hive_bins_list_t *hive_bins_list,
-     uint32_t key_offset,
-     const uint8_t *utf8_string,
-     size_t utf8_string_length,
-     libregf_key_t **sub_key,
+typedef struct libregf_sub_key_list libregf_sub_key_list_t;
+
+struct libregf_sub_key_list
+{
+	/* The sub key descriptors 
+	 */
+	libcdata_array_t *sub_key_descriptors;
+
+	/* Value to indicates the sub key list is at leaf level
+	 */
+	uint8_t at_leaf_level;
+};
+
+int libregf_sub_key_list_initialize(
+     libregf_sub_key_list_t **sub_key_list,
      libcerror_error_t **error );
 
-int libregf_key_tree_get_sub_key_by_utf16_path(
-     libregf_io_handle_t *io_handle,
-     libbfio_handle_t *file_io_handle,
-     libregf_hive_bins_list_t *hive_bins_list,
-     uint32_t key_offset,
-     const uint16_t *utf16_string,
-     size_t utf16_string_length,
-     libregf_key_t **sub_key,
+int libregf_sub_key_list_free(
+     libregf_sub_key_list_t **sub_key_list,
+     libcerror_error_t **error );
+
+int libregf_sub_key_list_read_data(
+     libregf_sub_key_list_t *sub_key_list,
+     const uint8_t *data,
+     size_t data_size,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )
 }
 #endif
 
-#endif /* !defined( _LIBREGF_KEY_TREE_H ) */
+#endif /* !defined( _LIBREGF_SUB_KEY_LIST_H ) */
 

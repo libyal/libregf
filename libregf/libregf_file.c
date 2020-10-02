@@ -25,10 +25,6 @@
 #include <types.h>
 #include <wide_string.h>
 
-#if defined( HAVE_WCTYPE_H )
-#include <wctype.h>
-#endif
-
 #include "libregf_codepage.h"
 #include "libregf_debug.h"
 #include "libregf_definitions.h"
@@ -943,38 +939,6 @@ int libregf_file_close(
 			result = -1;
 		}
 	}
-	if( internal_file->key_tree != NULL )
-	{
-		if( libfdata_tree_free(
-		     &( internal_file->key_tree ),
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free key tree.",
-			 function );
-
-			result = -1;
-		}
-	}
-	if( internal_file->key_cache != NULL )
-	{
-		if( libfcache_cache_free(
-		     &( internal_file->key_cache ),
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-			 "%s: unable to free key cache.",
-			 function );
-
-			result = -1;
-		}
-	}
 #if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_write(
 	     internal_file->read_write_lock,
@@ -1206,17 +1170,6 @@ int libregf_internal_file_read_hive_bins(
 
 		return( -1 );
 	}
-	if( internal_file->key_tree != NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
-		 "%s: invalid file - key tree value already set.",
-		 function );
-
-		return( -1 );
-	}
 	internal_file->io_handle->hive_bins_list_offset = 4096;
 
 	if( libregf_hive_bins_list_initialize(
@@ -1251,75 +1204,9 @@ int libregf_internal_file_read_hive_bins(
 
 		goto on_error;
 	}
-	else if( result != 0 )
-	{
-/* TODO free & clone function */
-		if( libfdata_tree_initialize(
-		     &( internal_file->key_tree ),
-		     (intptr_t *) internal_file->hive_bins_list,
-		     NULL,
-		     NULL,
-		     (int (*)(intptr_t *, intptr_t *, libfdata_tree_node_t *, libfdata_cache_t *, int, off64_t, size64_t, uint32_t, uint8_t, libcerror_error_t **)) &libregf_key_item_read_node_data,
-		     (int (*)(intptr_t *, intptr_t *, libfdata_tree_node_t *, libfdata_cache_t *, int, off64_t, size64_t, uint32_t, uint8_t, libcerror_error_t **)) &libregf_key_item_read_sub_nodes,
-		     LIBFDATA_DATA_HANDLE_FLAG_NON_MANAGED,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create key tree.",
-			 function );
-
-			goto on_error;
-		}
-		if( libfcache_cache_initialize(
-		     &( internal_file->key_cache ),
-		     LIBREGF_MAXIMUM_CACHE_ENTRIES_KEYS,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create key cache.",
-			 function );
-
-			goto on_error;
-		}
-		if( libfdata_tree_set_root_node(
-		     internal_file->key_tree,
-		     0,
-		     (off64_t) internal_file->file_header->root_key_offset,
-		     0,
-		     0,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-			 "%s: unable to set key tree root node.",
-			 function );
-
-			goto on_error;
-		}
-	}
 	return( 1 );
 
 on_error:
-	if( internal_file->key_cache != NULL )
-	{
-		libfcache_cache_free(
-		 &( internal_file->key_cache ),
-		 NULL );
-	}
-	if( internal_file->key_tree != NULL )
-	{
-		libfdata_tree_free(
-		 &( internal_file->key_tree ),
-		 NULL );
-	}
 	if( internal_file->hive_bins_list != NULL )
 	{
 		libregf_hive_bins_list_free(
@@ -1845,10 +1732,9 @@ int libregf_file_get_root_key(
      libregf_key_t **key,
      libcerror_error_t **error )
 {
-	libfdata_tree_node_t *key_tree_root_node = NULL;
-	libregf_internal_file_t *internal_file   = NULL;
-	static char *function                    = "libregf_file_get_root_key";
-	int result                               = 0;
+	libregf_internal_file_t *internal_file = NULL;
+	static char *function                  = "libregf_file_get_root_key";
+	int result                             = 0;
 
 	if( file == NULL )
 	{
@@ -1912,29 +1798,17 @@ int libregf_file_get_root_key(
 	}
 #endif
 	if( ( internal_file->file_header->file_type == LIBREGF_FILE_TYPE_REGISTRY )
-	 && ( internal_file->key_tree != NULL ) )
+	 && ( internal_file->file_header->root_key_offset != 0 ) )
 	{
-		if( libfdata_tree_get_root_node(
-		     internal_file->key_tree,
-		     &key_tree_root_node,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve key tree root node.",
-			 function );
-
-			result = -1;
-		}
-		else if( libregf_key_initialize(
+		result = libregf_key_initialize(
 		          key,
 		          internal_file->io_handle,
 		          internal_file->file_io_handle,
-		          key_tree_root_node,
-		          internal_file->key_cache,
-		          error ) != 1 )
+		          internal_file->file_header->root_key_offset,
+		          internal_file->hive_bins_list,
+		          error );
+
+		if( result != 1 )
 		{
 			libcerror_error_set(
 			 error,
@@ -1944,10 +1818,6 @@ int libregf_file_get_root_key(
 			 function );
 
 			result = -1;
-		}
-		else
-		{
-			result = 1;
 		}
 	}
 #if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
@@ -1973,26 +1843,18 @@ int libregf_file_get_root_key(
  * Creates a new key
  * Returns 1 if successful, 0 if no such key or -1 on error
  */
-int libregf_internal_file_get_key_by_utf8_path(
-     libregf_internal_file_t *internal_file,
+int libregf_file_get_key_by_utf8_path(
+     libregf_file_t *file,
      const uint8_t *utf8_string,
      size_t utf8_string_length,
      libregf_key_t **key,
      libcerror_error_t **error )
 {
-	libfdata_tree_node_t *key_tree_node          = NULL;
-	libfdata_tree_node_t *key_tree_sub_node      = NULL;
-	libregf_key_item_t *key_item                 = NULL;
-	libregf_key_item_t *sub_key_item             = NULL;
-	uint8_t *utf8_string_segment                 = NULL;
-	static char *function                        = "libregf_internal_file_get_key_by_utf8_path";
-	libuna_unicode_character_t unicode_character = 0;
-	size_t utf8_string_index                     = 0;
-	size_t utf8_string_segment_length            = 0;
-	uint32_t name_hash                           = 0;
-	int result                                   = 0;
+	libregf_internal_file_t *internal_file = NULL;
+	static char *function                  = "libregf_file_get_key_by_utf8_path";
+	int result                             = 0;
 
-	if( internal_file == NULL )
+	if( file == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -2003,13 +1865,15 @@ int libregf_internal_file_get_key_by_utf8_path(
 
 		return( -1 );
 	}
-	if( internal_file->io_handle == NULL )
+	internal_file = (libregf_internal_file_t *) file;
+
+	if( internal_file->file_header == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file - missing IO handle.",
+		 "%s: invalid file - missing file header.",
 		 function );
 
 		return( -1 );
@@ -2058,184 +1922,6 @@ int libregf_internal_file_get_key_by_utf8_path(
 
 		return( -1 );
 	}
-	if( utf8_string_length > 0 )
-	{
-		/* Ignore a leading separator
-		 */
-		if( utf8_string[ utf8_string_index ] == (uint8_t) LIBREGF_SEPARATOR )
-		{
-			utf8_string_index++;
-		}
-	}
-	if( libfdata_tree_get_root_node(
-	     internal_file->key_tree,
-	     &key_tree_node,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve key tree root node.",
-		 function );
-
-		return( -1 );
-	}
-	if( libfdata_tree_node_get_node_value(
-	     key_tree_node,
-	     (intptr_t *) internal_file->file_io_handle,
-	     (libfdata_cache_t *) internal_file->key_cache,
-	     (intptr_t **) &key_item,
-	     0,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve root key item.",
-		 function );
-
-		return( -1 );
-	}
-	if( key_item == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing root key item.",
-		 function );
-
-		return( -1 );
-	}
-	if( utf8_string_length == utf8_string_index )
-	{
-		result = 1;
-	}
-	else while( utf8_string_index < utf8_string_length )
-	{
-		utf8_string_segment        = (uint8_t *) &( utf8_string[ utf8_string_index ] );
-		utf8_string_segment_length = utf8_string_index;
-		name_hash                  = 0;
-
-		while( utf8_string_index < utf8_string_length )
-		{
-			if( libuna_unicode_character_copy_from_utf8(
-			     &unicode_character,
-			     utf8_string,
-			     utf8_string_length,
-			     &utf8_string_index,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
-				 "%s: unable to copy UTF-8 string to Unicode character.",
-				 function );
-
-				return( -1 );
-			}
-			if( ( unicode_character == (libuna_unicode_character_t) LIBREGF_SEPARATOR )
-			 || ( unicode_character == 0 ) )
-			{
-				utf8_string_segment_length += 1;
-
-				break;
-			}
-			name_hash *= 37;
-			name_hash += (uint32_t) towupper( (wint_t) unicode_character );
-		}
-		utf8_string_segment_length = utf8_string_index - utf8_string_segment_length;
-
-		if( utf8_string_segment_length == 0 )
-		{
-			result = 0;
-		}
-		else
-		{
-			result = libregf_key_tree_get_sub_key_values_by_utf8_name(
-				  key_tree_node,
-				  internal_file->file_io_handle,
-				  internal_file->key_cache,
-				  name_hash,
-				  utf8_string_segment,
-				  utf8_string_segment_length,
-				  internal_file->io_handle->ascii_codepage,
-				  &key_tree_sub_node,
-				  &sub_key_item,
-				  error );
-		}
-		if( result == -1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve sub key values by name.",
-			 function );
-
-			return( -1 );
-		}
-		else if( result == 0 )
-		{
-			break;
-		}
-		key_tree_node = key_tree_sub_node;
-	}
-	if( result != 0 )
-	{
-		if( libregf_key_initialize(
-		     key,
-		     internal_file->io_handle,
-		     internal_file->file_io_handle,
-		     key_tree_node,
-		     internal_file->key_cache,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create key.",
-			 function );
-
-			return( -1 );
-		}
-	}
-	return( result );
-}
-
-/* Retrieves the key for the specific UTF-8 encoded path
- * The path separator is the \ character
- * Creates a new key
- * Returns 1 if successful, 0 if no such key or -1 on error
- */
-int libregf_file_get_key_by_utf8_path(
-     libregf_file_t *file,
-     const uint8_t *utf8_string,
-     size_t utf8_string_length,
-     libregf_key_t **key,
-     libcerror_error_t **error )
-{
-	libregf_internal_file_t *internal_file = NULL;
-	static char *function                  = "libregf_file_get_key_by_utf8_path";
-	int result                             = 0;
-
-	if( file == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid file.",
-		 function );
-
-		return( -1 );
-	}
-	internal_file = (libregf_internal_file_t *) file;
-
 #if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_write(
 	     internal_file->read_write_lock,
@@ -2251,23 +1937,29 @@ int libregf_file_get_key_by_utf8_path(
 		return( -1 );
 	}
 #endif
-	result = libregf_internal_file_get_key_by_utf8_path(
-	          internal_file,
-	          utf8_string,
-	          utf8_string_length,
-	          key,
-		  error );
-
-	if( result == -1 )
+	if( internal_file->file_header->file_type == LIBREGF_FILE_TYPE_REGISTRY )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve key by UTF-8 path.",
-		 function );
+		result = libregf_key_tree_get_sub_key_by_utf8_path(
+		          internal_file->io_handle,
+		          internal_file->file_io_handle,
+		          internal_file->hive_bins_list,
+		          internal_file->file_header->root_key_offset,
+		          utf8_string,
+		          utf8_string_length,
+		          key,
+			  error );
 
-		result = -1;
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve key by UTF-8 path.",
+			 function );
+
+			result = -1;
+		}
 	}
 #if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_write(
@@ -2292,26 +1984,18 @@ int libregf_file_get_key_by_utf8_path(
  * Creates a new key
  * Returns 1 if successful, 0 if no such key or -1 on error
  */
-int libregf_internal_file_get_key_by_utf16_path(
-     libregf_internal_file_t *internal_file,
+int libregf_file_get_key_by_utf16_path(
+     libregf_file_t *file,
      const uint16_t *utf16_string,
      size_t utf16_string_length,
      libregf_key_t **key,
      libcerror_error_t **error )
 {
-	libfdata_tree_node_t *key_tree_node          = NULL;
-	libfdata_tree_node_t *key_tree_sub_node      = NULL;
-	libregf_key_item_t *key_item                 = NULL;
-	libregf_key_item_t *sub_key_item             = NULL;
-	uint16_t *utf16_string_segment               = NULL;
-	static char *function                        = "libregf_file_get_key_by_utf16_path";
-	libuna_unicode_character_t unicode_character = 0;
-	size_t utf16_string_index                    = 0;
-	size_t utf16_string_segment_length           = 0;
-	uint32_t name_hash                           = 0;
-	int result                                   = 0;
+	libregf_internal_file_t *internal_file = NULL;
+	static char *function                  = "libregf_file_get_key_by_utf16_path";
+	int result                             = 0;
 
-	if( internal_file == NULL )
+	if( file == NULL )
 	{
 		libcerror_error_set(
 		 error,
@@ -2322,13 +2006,15 @@ int libregf_internal_file_get_key_by_utf16_path(
 
 		return( -1 );
 	}
-	if( internal_file->io_handle == NULL )
+	internal_file = (libregf_internal_file_t *) file;
+
+	if( internal_file->file_header == NULL )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid file - missing IO handle.",
+		 "%s: invalid file - missing file header.",
 		 function );
 
 		return( -1 );
@@ -2377,184 +2063,6 @@ int libregf_internal_file_get_key_by_utf16_path(
 
 		return( -1 );
 	}
-	if( utf16_string_length > 0 )
-	{
-		/* Ignore a leading separator
-		 */
-		if( utf16_string[ utf16_string_index ] == (uint16_t) LIBREGF_SEPARATOR )
-		{
-			utf16_string_index++;
-		}
-	}
-	if( libfdata_tree_get_root_node(
-	     internal_file->key_tree,
-	     &key_tree_node,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve key tree root node.",
-		 function );
-
-		return( -1 );
-	}
-	if( libfdata_tree_node_get_node_value(
-	     key_tree_node,
-	     (intptr_t *) internal_file->file_io_handle,
-	     (libfdata_cache_t *) internal_file->key_cache,
-	     (intptr_t **) &key_item,
-	     0,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve root key item.",
-		 function );
-
-		return( -1 );
-	}
-	if( key_item == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: missing root key item.",
-		 function );
-
-		return( -1 );
-	}
-	if( utf16_string_length == utf16_string_index )
-	{
-		result = 1;
-	}
-	else while( utf16_string_index < utf16_string_length )
-	{
-		utf16_string_segment        = (uint16_t *) &( utf16_string[ utf16_string_index ] );
-		utf16_string_segment_length = utf16_string_index;
-		name_hash                   = 0;
-
-		while( utf16_string_index < utf16_string_length )
-		{
-			if( libuna_unicode_character_copy_from_utf16(
-			     &unicode_character,
-			     utf16_string,
-			     utf16_string_length,
-			     &utf16_string_index,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
-				 "%s: unable to copy UTF-16 string to Unicode character.",
-				 function );
-
-				return( -1 );
-			}
-			if( ( unicode_character == (libuna_unicode_character_t) LIBREGF_SEPARATOR )
-			 || ( unicode_character == 0 ) )
-			{
-				utf16_string_segment_length += 1;
-
-				break;
-			}
-			name_hash *= 37;
-			name_hash += (uint32_t) towupper( (wint_t) unicode_character );
-		}
-		utf16_string_segment_length = utf16_string_index - utf16_string_segment_length;
-
-		if( utf16_string_segment_length == 0 )
-		{
-			result = 0;
-		}
-		else
-		{
-			result = libregf_key_tree_get_sub_key_values_by_utf16_name(
-				  key_tree_node,
-				  internal_file->file_io_handle,
-				  internal_file->key_cache,
-				  name_hash,
-				  utf16_string_segment,
-				  utf16_string_segment_length,
-				  internal_file->io_handle->ascii_codepage,
-				  &key_tree_sub_node,
-				  &sub_key_item,
-				  error );
-		}
-		if( result == -1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to retrieve sub key values by name.",
-			 function );
-
-			return( -1 );
-		}
-		else if( result == 0 )
-		{
-			break;
-		}
-		key_tree_node = key_tree_sub_node;
-	}
-	if( result != 0 )
-	{
-		if( libregf_key_initialize(
-		     key,
-		     internal_file->io_handle,
-		     internal_file->file_io_handle,
-		     key_tree_node,
-		     internal_file->key_cache,
-		     error ) != 1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-			 "%s: unable to create key.",
-			 function );
-
-			return( -1 );
-		}
-	}
-	return( result );
-}
-
-/* Retrieves the key for the specific UTF-16 encoded path
- * The path separator is the \ character
- * Creates a new key
- * Returns 1 if successful, 0 if no such key or -1 on error
- */
-int libregf_file_get_key_by_utf16_path(
-     libregf_file_t *file,
-     const uint16_t *utf16_string,
-     size_t utf16_string_length,
-     libregf_key_t **key,
-     libcerror_error_t **error )
-{
-	libregf_internal_file_t *internal_file = NULL;
-	static char *function                  = "libregf_file_get_key_by_utf16_path";
-	int result                             = 0;
-
-	if( file == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid file.",
-		 function );
-
-		return( -1 );
-	}
-	internal_file = (libregf_internal_file_t *) file;
-
 #if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_grab_for_write(
 	     internal_file->read_write_lock,
@@ -2570,23 +2078,29 @@ int libregf_file_get_key_by_utf16_path(
 		return( -1 );
 	}
 #endif
-	result = libregf_internal_file_get_key_by_utf16_path(
-	          internal_file,
-	          utf16_string,
-	          utf16_string_length,
-	          key,
-		  error );
-
-	if( result == -1 )
+	if( internal_file->file_header->file_type == LIBREGF_FILE_TYPE_REGISTRY )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve key by UTF-16 path.",
-		 function );
+		result = libregf_key_tree_get_sub_key_by_utf16_path(
+		          internal_file->io_handle,
+		          internal_file->file_io_handle,
+		          internal_file->hive_bins_list,
+		          internal_file->file_header->root_key_offset,
+		          utf16_string,
+		          utf16_string_length,
+		          key,
+			  error );
 
-		result = -1;
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve key by UTF-16 path.",
+			 function );
+
+			result = -1;
+		}
 	}
 #if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
 	if( libcthreads_read_write_lock_release_for_write(

@@ -24,13 +24,10 @@
 #include <memory.h>
 #include <types.h>
 
-#include "libregf_debug.h"
-#include "libregf_definitions.h"
 #include "libregf_libcerror.h"
 #include "libregf_libcnotify.h"
 #include "libregf_libfwnt.h"
 #include "libregf_security_key.h"
-#include "libregf_unused.h"
 
 #include "regf_cell_values.h"
 
@@ -228,7 +225,7 @@ int libregf_security_key_read_data(
 		 0 );
 	}
 #endif
-	/* Check if the cell signature matches that of a security key: "sk"
+	/* Check if the signature matches that of a security key: "sk"
 	 */
 	if( ( data[ 0 ] != (uint8_t) 's' )
 	 || ( data[ 1 ] != (uint8_t) 'k' ) )

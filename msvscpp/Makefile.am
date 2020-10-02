@@ -28,11 +28,13 @@ MSVSCPP_FILES = \
 	regf_test_hive_bins_list/regf_test_hive_bins_list.vcproj \
 	regf_test_io_handle/regf_test_io_handle.vcproj \
 	regf_test_key/regf_test_key.vcproj \
+	regf_test_key_descriptor/regf_test_key_descriptor.vcproj \
 	regf_test_key_item/regf_test_key_item.vcproj \
 	regf_test_multi_string/regf_test_multi_string.vcproj \
 	regf_test_named_key/regf_test_named_key.vcproj \
 	regf_test_notify/regf_test_notify.vcproj \
 	regf_test_security_key/regf_test_security_key.vcproj \
+	regf_test_sub_key_list/regf_test_sub_key_list.vcproj \
 	regf_test_support/regf_test_support.vcproj \
 	regf_test_tools_info_handle/regf_test_tools_info_handle.vcproj \
 	regf_test_tools_output/regf_test_tools_output.vcproj \

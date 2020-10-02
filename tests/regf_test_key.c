@@ -74,11 +74,12 @@ int regf_test_key_initialize(
 	 "error",
 	 error );
 
+/* TODO pass file IO handle */
 	result = libregf_key_initialize(
 	          &key,
 	          io_handle,
 	          NULL,
-	          NULL,
+	          0,
 	          NULL,
 	          &error );
 
@@ -118,7 +119,7 @@ int regf_test_key_initialize(
 	          NULL,
 	          io_handle,
 	          NULL,
-	          NULL,
+	          0,
 	          NULL,
 	          &error );
 
@@ -140,7 +141,7 @@ int regf_test_key_initialize(
 	          &key,
 	          io_handle,
 	          NULL,
-	          NULL,
+	          0,
 	          NULL,
 	          &error );
 
@@ -162,7 +163,7 @@ int regf_test_key_initialize(
 	          &key,
 	          NULL,
 	          NULL,
-	          NULL,
+	          0,
 	          NULL,
 	          &error );
 
@@ -192,7 +193,7 @@ int regf_test_key_initialize(
 		          &key,
 		          io_handle,
 		          NULL,
-		          NULL,
+		          0,
 		          NULL,
 		          &error );
 
@@ -238,7 +239,7 @@ int regf_test_key_initialize(
 		          &key,
 		          io_handle,
 		          NULL,
-		          NULL,
+		          0,
 		          NULL,
 		          &error );
 
@@ -1265,7 +1266,11 @@ int main(
 
 #if defined( __GNUC__ ) && !defined( LIBREGF_DLL_IMPORT )
 
-	/* TODO: add tests for libregf_key_initialize */
+/* TODO
+	REGF_TEST_RUN(
+	 "libregf_key_initialize",
+	 regf_test_key_initialize );
+*/
 
 #endif /* defined( __GNUC__ ) && !defined( LIBREGF_DLL_IMPORT ) */
 

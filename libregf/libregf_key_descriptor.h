@@ -1,5 +1,5 @@
 /*
- * Key tree functions
+ * Key descriptor functions
  *
  * Copyright (C) 2009-2020, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -19,8 +19,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#if !defined( _LIBREGF_KEY_TREE_H )
-#define _LIBREGF_KEY_TREE_H
+#if !defined( _LIBREGF_KEY_DESCRIPTOR_H )
+#define _LIBREGF_KEY_DESCRIPTOR_H
 
 #include <common.h>
 #include <types.h>
@@ -31,29 +31,30 @@
 extern "C" {
 #endif
 
-int libregf_key_tree_get_sub_key_by_utf8_path(
-     libregf_io_handle_t *io_handle,
-     libbfio_handle_t *file_io_handle,
-     libregf_hive_bins_list_t *hive_bins_list,
-     uint32_t key_offset,
-     const uint8_t *utf8_string,
-     size_t utf8_string_length,
-     libregf_key_t **sub_key,
+typedef struct libregf_key_descriptor libregf_key_descriptor_t;
+
+struct libregf_key_descriptor
+{
+	/* The key offset
+	 */
+	uint32_t key_offset;
+
+	/* The hash value
+	 */
+	uint32_t hash_value;
+};
+
+int libregf_key_descriptor_initialize(
+     libregf_key_descriptor_t **key_descriptor,
      libcerror_error_t **error );
 
-int libregf_key_tree_get_sub_key_by_utf16_path(
-     libregf_io_handle_t *io_handle,
-     libbfio_handle_t *file_io_handle,
-     libregf_hive_bins_list_t *hive_bins_list,
-     uint32_t key_offset,
-     const uint16_t *utf16_string,
-     size_t utf16_string_length,
-     libregf_key_t **sub_key,
+int libregf_key_descriptor_free(
+     libregf_key_descriptor_t **key_descriptor,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )
 }
 #endif
 
-#endif /* !defined( _LIBREGF_KEY_TREE_H ) */
+#endif /* !defined( _LIBREGF_KEY_DESCRIPTOR_H ) */
 

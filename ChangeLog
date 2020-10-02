@@ -1,6 +1,5 @@
 TODO
 * change value item handle missing value name
-* have key use key_item reduce calls to libfdata_tree_node_get_node_value
 * fix:
   - multiple successive open of transaction regf file
 * clean up

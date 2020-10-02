@@ -26,12 +26,12 @@
 #include <types.h>
 
 #include "libregf_extern.h"
+#include "libregf_hive_bins_list.h"
 #include "libregf_io_handle.h"
+#include "libregf_key_item.h"
 #include "libregf_libbfio.h"
 #include "libregf_libcerror.h"
 #include "libregf_libcthreads.h"
-#include "libregf_libfcache.h"
-#include "libregf_libfdata.h"
 #include "libregf_types.h"
 
 #if defined( __cplusplus )
@@ -50,13 +50,17 @@ struct libregf_internal_key
 	 */
 	libbfio_handle_t *file_io_handle;
 
-	/* The key tree node
+	/* The key offset
 	 */
-	libfdata_tree_node_t *key_tree_node;
+	uint32_t key_offset;
 
-	/* The key cache
+	/* The hive bins list
 	 */
-	libfcache_cache_t *key_cache;
+	libregf_hive_bins_list_t *hive_bins_list;
+
+	/* The key item
+	 */
+	libregf_key_item_t *key_item;
 
 #if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
 	/* The read/write lock
@@ -69,8 +73,8 @@ int libregf_key_initialize(
      libregf_key_t **key,
      libregf_io_handle_t *io_handle,
      libbfio_handle_t *file_io_handle,
-     libfdata_tree_node_t *key_tree_node,
-     libfcache_cache_t *key_cache,
+     uint32_t key_offset,
+     libregf_hive_bins_list_t *hive_bins_list,
      libcerror_error_t **error );
 
 LIBREGF_EXTERN \
@@ -263,13 +267,6 @@ int libregf_key_get_sub_key_by_utf8_name(
      libregf_key_t **sub_key,
      libcerror_error_t **error );
 
-int libregf_internal_key_get_sub_key_by_utf8_path(
-     libregf_internal_key_t *internal_key,
-     const uint8_t *utf8_string,
-     size_t utf8_string_length,
-     libregf_key_t **sub_key,
-     libcerror_error_t **error );
-
 LIBREGF_EXTERN \
 int libregf_key_get_sub_key_by_utf8_path(
      libregf_key_t *key,
@@ -288,13 +285,6 @@ int libregf_internal_key_get_sub_key_by_utf16_name(
 LIBREGF_EXTERN \
 int libregf_key_get_sub_key_by_utf16_name(
      libregf_key_t *key,
-     const uint16_t *utf16_string,
-     size_t utf16_string_length,
-     libregf_key_t **sub_key,
-     libcerror_error_t **error );
-
-int libregf_internal_key_get_sub_key_by_utf16_path(
-     libregf_internal_key_t *internal_key,
      const uint16_t *utf16_string,
      size_t utf16_string_length,
      libregf_key_t **sub_key,

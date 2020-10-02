@@ -27,8 +27,10 @@
 #include "libregf_definitions.h"
 #include "libregf_hive_bins_list.h"
 #include "libregf_io_handle.h"
+#include "libregf_key_descriptor.h"
 #include "libregf_key_item.h"
 #include "libregf_libbfio.h"
+#include "libregf_libcdata.h"
 #include "libregf_libcerror.h"
 #include "libregf_libcnotify.h"
 #include "libregf_libfcache.h"
@@ -36,6 +38,7 @@
 #include "libregf_libuna.h"
 #include "libregf_named_key.h"
 #include "libregf_security_key.h"
+#include "libregf_sub_key_list.h"
 #include "libregf_unused.h"
 #include "libregf_value_item.h"
 
@@ -97,6 +100,20 @@ int libregf_key_item_initialize(
 		 LIBCERROR_ERROR_DOMAIN_MEMORY,
 		 LIBCERROR_MEMORY_ERROR_SET_FAILED,
 		 "%s: unable to clear key item.",
+		 function );
+
+		goto on_error;
+	}
+	if( libcdata_array_initialize(
+	     &( ( *key_item )->sub_key_descriptors ),
+	     0,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create sub key descriptors.",
 		 function );
 
 		goto on_error;
@@ -195,6 +212,20 @@ int libregf_key_item_free(
 				result = -1;
 			}
 		}
+		if( libcdata_array_free(
+		     &( ( *key_item )->sub_key_descriptors ),
+		     (int (*)(intptr_t **, libcerror_error_t **)) &libregf_key_descriptor_free,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free sub key descriptors.",
+			 function );
+
+			result = -1;
+		}
 		memory_free(
 		 *key_item );
 
@@ -203,22 +234,20 @@ int libregf_key_item_free(
 	return( result );
 }
 
-/* Reads a named key
+/* Reads a key item
  * Returns the number of bytes read if successful or -1 on error
  */
-int libregf_key_item_read_named_key(
+int libregf_key_item_read(
      libregf_key_item_t *key_item,
-     libfdata_tree_node_t *key_tree_node,
      libbfio_handle_t *file_io_handle,
      libregf_hive_bins_list_t *hive_bins_list,
-     off64_t named_key_offset,
+     off64_t key_offset,
      uint32_t named_key_hash,
      libcerror_error_t **error )
 {
-	libregf_hive_bin_cell_t *hive_bin_cell = NULL;
-	static char *function                  = "libregf_key_item_read_named_key";
-	int hive_bin_index                     = 0;
-	int result                             = 0;
+	static char *function = "libregf_key_item_read";
+	int hive_bin_index    = 0;
+	int result            = 0;
 
 	if( key_item == NULL )
 	{
@@ -242,68 +271,6 @@ int libregf_key_item_read_named_key(
 
 		return( -1 );
 	}
-	if( hive_bins_list == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid hive bins list.",
-		 function );
-
-		return( -1 );
-	}
-	if( hive_bins_list->io_handle == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
-		 "%s: invalid hive bins list - missing IO handle.",
-		 function );
-
-		return( -1 );
-	}
-	if( ( named_key_offset == 0 )
-	 || ( named_key_offset >= (off64_t) 0xffffffffUL ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-		 "%s: invalid named key offset.",
-		 function );
-
-		return( -1 );
-	}
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
-	{
-		libcnotify_printf(
-		 "%s: reading named key at offset: %" PRIi64 " (0x%08" PRIx64 ").\n",
-		 function,
-		 named_key_offset,
-		 named_key_offset );
-	}
-#endif
-	if( libregf_hive_bins_list_get_cell_at_offset(
-	     hive_bins_list,
-	     file_io_handle,
-	     (uint32_t) named_key_offset,
-	     &hive_bin_cell,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve hive bin cell at offset: %" PRIi64 " (0x%08" PRIx64 ").",
-		 function,
-		 named_key_offset,
-		 named_key_offset );
-
-		goto on_error;
-	}
 	if( libregf_named_key_initialize(
 	     &( key_item->named_key ),
 	     error ) != 1 )
@@ -317,12 +284,12 @@ int libregf_key_item_read_named_key(
 
 		goto on_error;
 	}
-	if( libregf_named_key_read_data(
+	if( libregf_key_item_read_named_key(
 	     key_item->named_key,
-	     hive_bin_cell->data,
-	     hive_bin_cell->size,
+	     file_io_handle,
+	     hive_bins_list,
+	     key_offset,
 	     named_key_hash,
-	     hive_bins_list->io_handle->ascii_codepage,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -331,8 +298,8 @@ int libregf_key_item_read_named_key(
 		 LIBCERROR_IO_ERROR_READ_FAILED,
 		 "%s: unable to read named key at offset: %" PRIi64 " (0x%08" PRIx64 ").",
 		 function,
-		 named_key_offset,
-		 named_key_offset );
+		 key_offset,
+		 key_offset );
 
 		goto on_error;
 	}
@@ -378,64 +345,29 @@ int libregf_key_item_read_named_key(
 	}
 	if( key_item->named_key->number_of_sub_keys > 0 )
 	{
-		result = libfdata_tree_node_sub_nodes_data_range_is_set(
-		          key_tree_node,
+		result = libregf_key_item_read_sub_keys_list(
+		          key_item->sub_key_descriptors,
+		          file_io_handle,
+		          hive_bins_list,
+		          (off64_t) key_item->named_key->sub_keys_list_offset,
 		          error );
 
 		if( result == -1 )
 		{
 			libcerror_error_set(
 			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to determine if sub nodes data range is set.",
-			 function );
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read sub keys list at offset: %" PRIu32 " (0x%08" PRIx32 ").",
+			 function,
+			 key_item->named_key->sub_keys_list_offset,
+			 key_item->named_key->sub_keys_list_offset );
 
 			goto on_error;
 		}
 		else if( result == 0 )
 		{
-			result = libregf_hive_bins_list_get_index_at_offset(
-			          hive_bins_list,
-			          (off64_t) key_item->named_key->sub_keys_list_offset,
-			          &hive_bin_index,
-			          error );
-
-			if( result == -1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to determine if sub keys list offset is valid.",
-				 function );
-
-				goto on_error;
-			}
-			else if( result == 0 )
-			{
-				key_item->item_flags |= LIBREGF_ITEM_FLAG_IS_CORRUPTED;
-			}
-			else
-			{
-				if( libfdata_tree_node_set_sub_nodes_data_range(
-				     key_tree_node,
-				     0,
-				     (off64_t) key_item->named_key->sub_keys_list_offset,
-				     0,
-				     0,
-				     error ) != 1 )
-				{
-					libcerror_error_set(
-					 error,
-					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-					 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-					 "%s: unable to set sub keys list as sub nodes range.",
-					 function );
-
-					goto on_error;
-				}
-			}
+			key_item->item_flags |= LIBREGF_ITEM_FLAG_IS_CORRUPTED;
 		}
 	}
 /* TODO clone function */
@@ -532,13 +464,134 @@ on_error:
 		 &( key_item->values_list ),
 		 NULL );
 	}
+	if( key_item->security_descriptor != NULL )
+	{
+		memory_free(
+		 key_item->security_descriptor );
+
+		key_item->security_descriptor = NULL;
+	}
+	key_item->class_name_size = 0;
+
+	if( key_item->class_name != NULL )
+	{
+		memory_free(
+		 key_item->class_name );
+
+		key_item->class_name = NULL;
+	}
+	key_item->class_name_size = 0;
+
 	if( key_item->named_key != NULL )
 	{
 		libregf_named_key_free(
 		 &( key_item->named_key ),
 		 NULL );
 	}
+	libcdata_array_empty(
+	 key_item->sub_key_descriptors,
+	 (int (*)(intptr_t **, libcerror_error_t **)) &libregf_key_descriptor_free,
+	 NULL );
+
 	return( -1 );
+}
+
+/* Reads a named key
+ * Returns the number of bytes read if successful or -1 on error
+ */
+int libregf_key_item_read_named_key(
+     libregf_named_key_t *named_key,
+     libbfio_handle_t *file_io_handle,
+     libregf_hive_bins_list_t *hive_bins_list,
+     off64_t named_key_offset,
+     uint32_t named_key_hash,
+     libcerror_error_t **error )
+{
+	libregf_hive_bin_cell_t *hive_bin_cell = NULL;
+	static char *function                  = "libregf_key_item_read_named_key";
+
+	if( hive_bins_list == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid hive bins list.",
+		 function );
+
+		return( -1 );
+	}
+	if( hive_bins_list->io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid hive bins list - missing IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( named_key_offset == 0 )
+	 || ( named_key_offset >= (off64_t) 0xffffffffUL ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+		 "%s: invalid named key offset.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_DEBUG_OUTPUT )
+	if( libcnotify_verbose != 0 )
+	{
+		libcnotify_printf(
+		 "%s: reading named key at offset: %" PRIi64 " (0x%08" PRIx64 ").\n",
+		 function,
+		 named_key_offset,
+		 named_key_offset );
+	}
+#endif
+	if( libregf_hive_bins_list_get_cell_at_offset(
+	     hive_bins_list,
+	     file_io_handle,
+	     (uint32_t) named_key_offset,
+	     &hive_bin_cell,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve hive bin cell at offset: %" PRIi64 " (0x%08" PRIx64 ").",
+		 function,
+		 named_key_offset,
+		 named_key_offset );
+
+		return( -1 );
+	}
+	if( libregf_named_key_read_data(
+	     named_key,
+	     hive_bin_cell->data,
+	     hive_bin_cell->size,
+	     named_key_hash,
+	     hive_bins_list->io_handle->ascii_codepage,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read named key at offset: %" PRIi64 " (0x%08" PRIx64 ").",
+		 function,
+		 named_key_offset,
+		 named_key_offset );
+
+		return( -1 );
+	}
+	return( 1 );
 }
 
 /* Reads a class name
@@ -856,17 +909,6 @@ int libregf_key_item_read_security_key(
 
 		return( -1 );
 	}
-	if( hive_bins_list == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
-		 "%s: invalid hive bins list.",
-		 function );
-
-		return( -1 );
-	}
 	if( ( security_key_offset == 0 )
 	 || ( security_key_offset == 0xffffffffUL ) )
 	{
@@ -1146,128 +1188,26 @@ int libregf_key_item_read_values_list(
 	return( 1 );
 }
 
-/* Reads a key
- * Returns 1 if successful or -1 on error
- */
-int libregf_key_item_read_node_data(
-     libregf_hive_bins_list_t *hive_bins_list,
-     libbfio_handle_t *file_io_handle,
-     libfdata_tree_node_t *node,
-     libfdata_cache_t *cache,
-     int node_data_file_index LIBREGF_ATTRIBUTE_UNUSED,
-     off64_t node_data_offset,
-     size64_t node_data_size,
-     uint32_t node_data_flags LIBREGF_ATTRIBUTE_UNUSED,
-     uint8_t read_flags LIBREGF_ATTRIBUTE_UNUSED,
-     libcerror_error_t **error )
-{
-	libregf_key_item_t *key_item = NULL;
-	static char *function        = "libregf_key_item_read_node_data";
-
-	LIBREGF_UNREFERENCED_PARAMETER( node_data_file_index )
-	LIBREGF_UNREFERENCED_PARAMETER( node_data_flags )
-	LIBREGF_UNREFERENCED_PARAMETER( read_flags )
-
-	if( libregf_key_item_initialize(
-	     &key_item,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-		 "%s: unable to create key item.",
-		 function );
-
-		goto on_error;
-	}
-	/* The size contains the hash of the name
-	 */
-	if( node_data_size > (size64_t) UINT32_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid node data size value exceeds maximum.",
-		 function );
-
-		goto on_error;
-	}
-	if( libregf_key_item_read_named_key(
-	     key_item,
-	     node,
-	     file_io_handle,
-	     hive_bins_list,
-	     node_data_offset,
-	     (uint32_t) node_data_size,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read named key at offset: %" PRIi64 " (0x%08" PRIx64 ").",
-		 function,
-		 node_data_offset,
-		 node_data_offset );
-
-		goto on_error;
-	}
-	if( libfdata_tree_node_set_node_value(
-	     node,
-	     cache,
-	     (intptr_t *) key_item,
-	     (int (*)(intptr_t **, libcerror_error_t **)) &libregf_key_item_free,
-	     LIBFDATA_TREE_NODE_VALUE_FLAG_MANAGED,
-	     error ) != 1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
-		 "%s: unable to set key item as node value.",
-		 function );
-
-		goto on_error;
-	}
-	return( 1 );
-
-on_error:
-	if( key_item != NULL )
-	{
-		libregf_key_item_free(
-		 &key_item,
-		 NULL );
-	}
-	return( -1 );
-}
-
 /* Reads a sub keys list
  * Returns 1 if successful, 0 if not or -1 on error
  */
 int libregf_key_item_read_sub_keys_list(
-     libfdata_tree_node_t *key_tree_node,
+     libcdata_array_t *sub_key_descriptors,
      libbfio_handle_t *file_io_handle,
      libregf_hive_bins_list_t *hive_bins_list,
      off64_t sub_keys_list_offset,
      libcerror_error_t **error )
 {
-	libregf_hive_bin_cell_t *hive_bin_cell    = NULL;
-	const uint8_t *hive_bin_cell_data         = NULL;
-	const uint8_t *sub_keys_list_data         = NULL;
-	static char *function                     = "libregf_key_item_read_sub_keys_list";
-	size_t hive_bin_cell_size                 = 0;
-	uint32_t element_hash                     = 0;
-	uint32_t sub_keys_list_element_offset     = 0;
-	uint16_t number_of_sub_keys_list_elements = 0;
-	uint16_t sub_keys_list_element_iterator   = 0;
-	uint8_t sub_keys_list_element_size        = 0;
-	uint8_t at_leaf_level                     = 0;
-	int corruption_detected                   = 0;
-	int hive_bin_index                        = 0;
-	int result                                = 0;
-	int sub_node_index                        = 0;
+	libregf_hive_bin_cell_t *hive_bin_cell       = NULL;
+	libregf_key_descriptor_t *sub_key_descriptor = NULL;
+	libregf_sub_key_list_t *sub_key_list         = NULL;
+	static char *function                        = "libregf_key_item_read_sub_keys_list";
+	int corruption_detected                      = 0;
+	int entry_index                              = 0;
+	int hive_bin_index                           = 0;
+	int number_of_sub_key_descriptors            = 0;
+	int result                                   = 0;
+	int sub_key_descriptor_index                 = 0;
 
 	if( hive_bins_list == NULL )
 	{
@@ -1310,187 +1250,85 @@ int libregf_key_item_read_sub_keys_list(
 
 		goto on_error;
 	}
-	if( ( hive_bin_cell->size == 0 )
-	 || ( hive_bin_cell->size > (uint32_t) MEMORY_MAXIMUM_ALLOCATION_SIZE ) )
+	if( libregf_sub_key_list_initialize(
+	     &sub_key_list,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid hive bin cell - size value out of bounds.",
-		 function );
-
-		return( -1 );
-	}
-	/* Make a local copy of the data in case the hive bin cell gets cached out
-	 * while reading the sub keys
-	 */
-	hive_bin_cell_data = memory_allocate(
-	                      sizeof( uint8_t ) * hive_bin_cell->size );
-
-	if( hive_bin_cell_data == NULL )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_MEMORY,
-		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
-		 "%s: unable to create hive bin cell data.",
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create sub key list.",
 		 function );
 
 		goto on_error;
 	}
-	hive_bin_cell_size = hive_bin_cell->size;
-
-	if( memory_copy(
-	     hive_bin_cell_data,
+	if( libregf_sub_key_list_read_data(
+	     sub_key_list,
 	     hive_bin_cell->data,
-	     hive_bin_cell->size ) == NULL )
+	     hive_bin_cell->size,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_MEMORY,
-		 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
-		 "%s: unable to copy hive bin cell data.",
-		 function );
-
-		goto on_error;
-	}
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
-	{
-		libcnotify_printf(
-		 "%s: data:\n",
-		 function );
-		libcnotify_print_data(
-		 hive_bin_cell_data,
-		 hive_bin_cell_size,
-		 0 );
-	}
-#endif
-	if( hive_bin_cell_size < sizeof( regf_sub_key_list_t ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid hive bin cell size too small.",
-		 function );
-
-		goto on_error;
-	}
-	/* Check if the cell signature matches that of a sub keys list: "lf", "lh", "li" or "ri"
-	 */
-	if( ( hive_bin_cell_data[ 0 ] == (uint8_t) 'r' )
-	 && ( hive_bin_cell_data[ 1 ] == (uint8_t) 'i' ) )
-	{
-		sub_keys_list_element_size = 4;
-		at_leaf_level              = 0;
-	}
-	else if( ( hive_bin_cell_data[ 0 ] == (uint8_t) 'l' )
-	      && ( hive_bin_cell_data[ 1 ] == (uint8_t) 'i' ) )
-	{
-		sub_keys_list_element_size = 4;
-		at_leaf_level              = 1;
-	}
-	else if( ( hive_bin_cell_data[ 0 ] == (uint8_t) 'l' )
-	      && ( ( hive_bin_cell_data[ 1 ] == (uint8_t) 'f' )
-	        || ( hive_bin_cell_data[ 1 ] == (uint8_t) 'h' ) ) )
-	{
-		sub_keys_list_element_size = 8;
-		at_leaf_level              = 1;
-	}
-	else
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
-		 "%s: unsupported sub keys list signature.",
-		 function );
-
-		goto on_error;
-	}
-	byte_stream_copy_to_uint16_little_endian(
-	 ( (regf_sub_key_list_t *) hive_bin_cell_data )->number_of_elements,
-	 number_of_sub_keys_list_elements );
-
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
-	{
-		libcnotify_printf(
-		 "%s: signature\t\t\t\t: %c%c\n",
+		 LIBCERROR_ERROR_DOMAIN_IO,
+		 LIBCERROR_IO_ERROR_READ_FAILED,
+		 "%s: unable to read sub key list at offset: %" PRIi64 " (0x%08" PRIx64 ").",
 		 function,
-		 ( (regf_sub_key_list_t *) hive_bin_cell_data )->signature[ 0 ],
-		 ( (regf_sub_key_list_t *) hive_bin_cell_data )->signature[ 1 ] );
+		 sub_keys_list_offset,
+		 sub_keys_list_offset );
 
-		libcnotify_printf(
-		 "%s: number of elements\t\t\t: %" PRIu16 "\n",
-		 function,
-		 number_of_sub_keys_list_elements );
+		goto on_error;
 	}
-#endif
-	sub_keys_list_data  = &( hive_bin_cell_data[ sizeof( regf_sub_key_list_t ) ] );
-	hive_bin_cell_size -= sizeof( regf_sub_key_list_t );
-
-	if( hive_bin_cell_size < (size_t) ( number_of_sub_keys_list_elements * sub_keys_list_element_size ) )
+	if( libcdata_array_get_number_of_entries(
+	     sub_key_list->sub_key_descriptors,
+	     &number_of_sub_key_descriptors,
+	     error ) != 1 )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid cell size value too small to contain number of elements.",
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve number of entries from sub key descriptors array.",
 		 function );
 
 		goto on_error;
 	}
-	for( sub_keys_list_element_iterator = 0;
-	     sub_keys_list_element_iterator < number_of_sub_keys_list_elements;
-	     sub_keys_list_element_iterator++ )
+	for( sub_key_descriptor_index = 0;
+	     sub_key_descriptor_index < number_of_sub_key_descriptors;
+	     sub_key_descriptor_index++ )
 	{
-		byte_stream_copy_to_uint32_little_endian(
-		 sub_keys_list_data,
-		 sub_keys_list_element_offset );
-
-		sub_keys_list_data += 4;
-		hive_bin_cell_size -= 4;
-
-#if defined( HAVE_DEBUG_OUTPUT )
-		if( libcnotify_verbose != 0 )
+		if( libcdata_array_get_entry_by_index(
+		     sub_key_list->sub_key_descriptors,
+		     sub_key_descriptor_index,
+		     (intptr_t **) &sub_key_descriptor,
+		     error ) != 1 )
 		{
-			libcnotify_printf(
-			 "%s: element: %03" PRIu16 " offset\t\t: 0x%08" PRIx32 "\n",
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve sub key descriptor: %d from array.",
 			 function,
-			 sub_keys_list_element_iterator,
-			 sub_keys_list_element_offset );
-		}
-#endif
-		if( sub_keys_list_element_size == 8 )
-		{
-			byte_stream_copy_to_uint32_little_endian(
-			 sub_keys_list_data,
-			 element_hash );
+			 sub_key_descriptor_index );
 
-			sub_keys_list_data += 4;
-			hive_bin_cell_size -= 4;
-
-#if defined( HAVE_DEBUG_OUTPUT )
-			if( libcnotify_verbose != 0 )
-			{
-				libcnotify_printf(
-				 "%s: element: %03" PRIu16 " hash\t\t\t: 0x%08" PRIx32 "\n",
-				 function,
-				 sub_keys_list_element_iterator,
-				 element_hash );
-			}
-#endif
+			goto on_error;
 		}
-		else
+		if( sub_key_descriptor == NULL )
 		{
-			element_hash = 0;
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: missing sub key descriptor: %d.",
+			 function,
+			 sub_key_descriptor_index );
+
+			goto on_error;
 		}
 		result = libregf_hive_bins_list_get_index_at_offset(
 		          hive_bins_list,
-		          (off64_t) sub_keys_list_element_offset,
+		          (off64_t) sub_key_descriptor->key_offset,
 		          &hive_bin_index,
 		          error );
 
@@ -1500,41 +1338,60 @@ int libregf_key_item_read_sub_keys_list(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-			 "%s: unable to determine if sub keys list element offset is valid.",
-			 function );
+			 "%s: unable to determine if sub keys list element: %d offset is valid.",
+			 function,
+			 sub_key_descriptor_index );
 
 			goto on_error;
 		}
 		else if( result != 0 )
 		{
-			if( at_leaf_level != 0 )
+			if( sub_key_list->at_leaf_level != 0 )
 			{
-				if( libfdata_tree_node_append_sub_node(
-				     key_tree_node,
-				     &sub_node_index,
-				     0,
-				     (off64_t) sub_keys_list_element_offset,
-				     (size64_t) element_hash,
-				     0,
+				if( libcdata_array_set_entry_by_index(
+				     sub_key_list->sub_key_descriptors,
+				     sub_key_descriptor_index,
+				     NULL,
+				     error ) != 1 )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+					 "%s: unable to set sub key descriptor: %d in array.",
+					 function,
+					 sub_key_descriptor_index );
+
+					goto on_error;
+				}
+				if( libcdata_array_append_entry(
+				     sub_key_descriptors,
+				     &entry_index,
+				     (intptr_t *) sub_key_descriptor,
 				     error ) != 1 )
 				{
 					libcerror_error_set(
 					 error,
 					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 					 LIBCERROR_RUNTIME_ERROR_APPEND_FAILED,
-					 "%s: unable to append sub node.",
+					 "%s: unable to append sub key descriptor to array.",
 					 function );
+
+					libregf_key_descriptor_free(
+					 &sub_key_descriptor,
+					 NULL );
 
 					goto on_error;
 				}
+				sub_key_descriptor = NULL;
 			}
 			else
 			{
 				result = libregf_key_item_read_sub_keys_list(
-					  key_tree_node,
+					  sub_key_descriptors,
 					  file_io_handle,
 					  hive_bins_list,
-					  (off64_t) sub_keys_list_element_offset,
+				          (off64_t) sub_key_descriptor->key_offset,
 					  error );
 
 				if( result == -1 )
@@ -1545,8 +1402,8 @@ int libregf_key_item_read_sub_keys_list(
 					 LIBCERROR_IO_ERROR_READ_FAILED,
 					 "%s: unable to read sub keys list at offset: %" PRIu32 " (0x%08" PRIx32 ").",
 					 function,
-					 sub_keys_list_element_offset,
-					 sub_keys_list_element_offset );
+					 sub_key_descriptor->key_offset,
+					 sub_key_descriptor->key_offset );
 
 					goto on_error;
 				}
@@ -1557,29 +1414,19 @@ int libregf_key_item_read_sub_keys_list(
 			corruption_detected = 1;
 		}
 	}
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( libcnotify_verbose != 0 )
+	if( libregf_sub_key_list_free(
+	     &sub_key_list,
+	     error ) != 1 )
 	{
-		if( hive_bin_cell_size > 0 )
-		{
-			libcnotify_printf(
-			 "%s: padding:\n",
-			 function );
-			libcnotify_print_data(
-			 sub_keys_list_data,
-			 hive_bin_cell_size,
-			 0 );
-		}
-		else
-		{
-			libcnotify_printf(
-			 "\n" );
-		}
-	}
-#endif
-	memory_free(
-	 hive_bin_cell_data );
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free sub key list.",
+		 function );
 
+		goto on_error;
+	}
 	if( corruption_detected != 0 )
 	{
 		return( 0 );
@@ -1587,74 +1434,28 @@ int libregf_key_item_read_sub_keys_list(
 	return( 1 );
 
 on_error:
-	if( hive_bin_cell_data != NULL )
+	if( sub_key_list != NULL )
 	{
-		memory_free(
-		 hive_bin_cell_data );
+		libregf_sub_key_list_free(
+		 &sub_key_list,
+		 NULL );
 	}
+	libcdata_array_empty(
+	 sub_key_descriptors,
+	 (int (*)(intptr_t **, libcerror_error_t **)) &libregf_key_descriptor_free,
+	 NULL );
+
 	return( -1 );
 }
 
-/* Reads the sub keys
- * Returns 1 if successful or -1 on error
+/* Determines if the key item is corrupted
+ * Returns 1 if corrupted, 0 if not or -1 on error
  */
-int libregf_key_item_read_sub_nodes(
-     libregf_hive_bins_list_t *hive_bins_list,
-     libbfio_handle_t *file_io_handle,
-     libfdata_tree_node_t *node,
-     libfdata_cache_t *cache LIBREGF_ATTRIBUTE_UNUSED,
-     int sub_nodes_data_file_index LIBREGF_ATTRIBUTE_UNUSED,
-     off64_t sub_nodes_data_offset,
-     size64_t sub_nodes_data_size LIBREGF_ATTRIBUTE_UNUSED,
-     uint32_t sub_nodes_data_flags LIBREGF_ATTRIBUTE_UNUSED,
-     uint8_t read_flags LIBREGF_ATTRIBUTE_UNUSED,
-     libcerror_error_t **error )
-{
-	static char *function = "libregf_key_item_read_sub_nodes";
-	int result            = 0;
-
-	LIBREGF_UNREFERENCED_PARAMETER( cache )
-	LIBREGF_UNREFERENCED_PARAMETER( sub_nodes_data_file_index )
-	LIBREGF_UNREFERENCED_PARAMETER( sub_nodes_data_size )
-	LIBREGF_UNREFERENCED_PARAMETER( sub_nodes_data_flags )
-	LIBREGF_UNREFERENCED_PARAMETER( read_flags )
-
-	result = libregf_key_item_read_sub_keys_list(
-	          node,
-	          file_io_handle,
-	          hive_bins_list,
-	          sub_nodes_data_offset,
-	          error );
-
-	if( result == -1 )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_IO,
-		 LIBCERROR_IO_ERROR_READ_FAILED,
-		 "%s: unable to read sub keys list at offset: %" PRIi64 " (0x%08" PRIx64 ").",
-		 function,
-		 sub_nodes_data_offset,
-		 sub_nodes_data_offset );
-
-		return( -1 );
-	}
-	else if( result == 0 )
-	{
-/* TODO signal corruption */
-	}
-	return( 1 );
-}
-
-/* Retrieves the number of key item
- * Returns 1 if successful or -1 on error
- */
-int libregf_key_item_get_number_of_values(
+int libregf_key_item_is_corrupted(
      libregf_key_item_t *key_item,
-     int *number_of_values,
      libcerror_error_t **error )
 {
-	static char *function = "libregf_key_item_get_number_of_values";
+	static char *function = "libregf_key_item_is_corrupted";
 
 	if( key_item == NULL )
 	{
@@ -1667,21 +1468,11 @@ int libregf_key_item_get_number_of_values(
 
 		return( -1 );
 	}
-	if( libfdata_list_get_number_of_elements(
-	     key_item->values_list,
-	     number_of_values,
-	     error ) != 1 )
+	if( ( key_item->item_flags & LIBREGF_ITEM_FLAG_IS_CORRUPTED ) != 0 )
 	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-		 "%s: unable to retrieve number of elements from values data list.",
-		 function );
-
-		return( -1 );
+		return( 1 );
 	}
-	return( 1 );
+	return( 0 );
 }
 
 /* Retrieves the key name size
@@ -1932,19 +1723,15 @@ int libregf_key_item_get_utf16_name(
 	return( 1 );
 }
 
-/* Compares the key name with UTF-8 string
- * Returns 1 if the names match, 0 if not or -1 on error
+/* Retrieves the class name size
+ * Returns 1 if successful, 0 if no such value or -1 on error
  */
-int libregf_key_item_compare_name_with_utf8_string(
+int libregf_key_item_get_class_name_size(
      libregf_key_item_t *key_item,
-     uint32_t name_hash,
-     const uint8_t *utf8_string,
-     size_t utf8_string_length,
-     int ascii_codepage,
+     size_t *class_name_size,
      libcerror_error_t **error )
 {
-	static char *function = "libregf_key_item_compare_name_with_utf8_string";
-	int result            = 0;
+	static char *function = "libregf_key_item_get_class_name_size";
 
 	if( key_item == NULL )
 	{
@@ -1957,41 +1744,37 @@ int libregf_key_item_compare_name_with_utf8_string(
 
 		return( -1 );
 	}
-	result = libregf_named_key_compare_name_with_utf8_string(
-	          key_item->named_key,
-	          name_hash,
-	          utf8_string,
-	          utf8_string_length,
-	          ascii_codepage,
-	          error );
-
-	if( result == -1 )
+	if( class_name_size == NULL )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GENERIC,
-		 "%s: unable to compare sub key name with UTF-8 string.",
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid class name size.",
 		 function );
 
 		return( -1 );
 	}
-	return( result );
+	if( ( key_item->class_name == NULL )
+	 || ( key_item->class_name_size == 0 ) )
+	{
+		return( 0 );
+	}
+	*class_name_size = key_item->class_name_size;
+
+	return( 1 );
 }
 
-/* Compares the key name with UTF-16 string
- * Returns 1 if the names match, 0 if not or -1 on error
+/* Retrieves the class name
+ * Returns 1 if successful, 0 if no such value or -1 on error
  */
-int libregf_key_item_compare_name_with_utf16_string(
+int libregf_key_item_get_class_name(
      libregf_key_item_t *key_item,
-     uint32_t name_hash,
-     const uint16_t *utf16_string,
-     size_t utf16_string_length,
-     int ascii_codepage,
+     uint8_t *class_name,
+     size_t class_name_size,
      libcerror_error_t **error )
 {
-	static char *function = "libregf_key_item_compare_name_with_utf16_string";
-	int result            = 0;
+	static char *function = "libregf_key_item_get_class_name";
 
 	if( key_item == NULL )
 	{
@@ -2004,26 +1787,253 @@ int libregf_key_item_compare_name_with_utf16_string(
 
 		return( -1 );
 	}
-	result = libregf_named_key_compare_name_with_utf16_string(
-	          key_item->named_key,
-	          name_hash,
-	          utf16_string,
-	          utf16_string_length,
-	          ascii_codepage,
-	          error );
-
-	if( result == -1 )
+	if( class_name == NULL )
 	{
 		libcerror_error_set(
 		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_GENERIC,
-		 "%s: unable to compare sub key name with UTF-16 string.",
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid class name.",
 		 function );
 
 		return( -1 );
 	}
-	return( result );
+	if( class_name_size > (size_t) SSIZE_MAX )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid class name size value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( key_item->class_name == NULL )
+	 || ( key_item->class_name_size == 0 ) )
+	{
+		return( 0 );
+	}
+	if( class_name_size < key_item->class_name_size )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid class name size value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+	if( memory_copy(
+	     class_name,
+	     key_item->class_name,
+	     key_item->class_name_size ) == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+		 "%s: unable to copy class name.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the UTF-8 string size of the class name
+ * The returned size includes the end of string character
+ * Returns 1 if successful, 0 if no such value or -1 on error
+ */
+int libregf_key_item_get_utf8_class_name_size(
+     libregf_key_item_t *key_item,
+     size_t *utf8_string_size,
+     int ascii_codepage,
+     libcerror_error_t **error )
+{
+	static char *function = "libregf_key_item_get_utf8_class_name_size";
+
+	if( key_item == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid key item.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( key_item->class_name == NULL )
+	 || ( key_item->class_name_size == 0 ) )
+	{
+		return( 0 );
+	}
+	if( libuna_utf8_string_size_from_utf16_stream(
+	     key_item->class_name,
+	     (size_t) key_item->class_name_size,
+	     LIBUNA_ENDIAN_LITTLE,
+	     utf8_string_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve UTF-8 string size.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the UTF-8 string value of the class name
+ * The function uses a codepage if necessary, it uses the codepage set for the library
+ * The size should include the end of string character
+ * Returns 1 if successful, 0 if no such value or -1 on error
+ */
+int libregf_key_item_get_utf8_class_name(
+     libregf_key_item_t *key_item,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
+     int ascii_codepage,
+     libcerror_error_t **error )
+{
+	static char *function = "libregf_key_item_get_utf8_class_name";
+
+	if( key_item == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid key item.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( key_item->class_name == NULL )
+	 || ( key_item->class_name_size == 0 ) )
+	{
+		return( 0 );
+	}
+	if( libuna_utf8_string_copy_from_utf16_stream(
+	     utf8_string,
+	     utf8_string_size,
+	     key_item->class_name,
+	     (size_t) key_item->class_name_size,
+	     LIBUNA_ENDIAN_LITTLE,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve UTF-8 string.",
+		 function );
+
+		return( 1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the UTF-16 string size of the class name
+ * The returned size includes the end of string character
+ * Returns 1 if successful, 0 if no such value or -1 on error
+ */
+int libregf_key_item_get_utf16_class_name_size(
+     libregf_key_item_t *key_item,
+     size_t *utf16_string_size,
+     int ascii_codepage,
+     libcerror_error_t **error )
+{
+	static char *function = "libregf_key_item_get_utf16_class_name_size";
+
+	if( key_item == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid key item.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( key_item->class_name == NULL )
+	 || ( key_item->class_name_size == 0 ) )
+	{
+		return( 0 );
+	}
+	if( libuna_utf16_string_size_from_utf16_stream(
+	     key_item->class_name,
+	     (size_t) key_item->class_name_size,
+	     LIBUNA_ENDIAN_LITTLE,
+	     utf16_string_size,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve UTF-16 string size.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the UTF-16 string value of the class name
+ * The function uses a codepage if necessary, it uses the codepage set for the library
+ * The size should include the end of string character
+ * Returns 1 if successful, 0 if no such value or -1 on error
+ */
+int libregf_key_item_get_utf16_class_name(
+     libregf_key_item_t *key_item,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
+     int ascii_codepage,
+     libcerror_error_t **error )
+{
+	static char *function = "libregf_key_item_get_utf16_class_name";
+
+	if( key_item == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid key item.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( key_item->class_name == NULL )
+	 || ( key_item->class_name_size == 0 ) )
+	{
+		return( 0 );
+	}
+	if( libuna_utf16_string_copy_from_utf16_stream(
+	     utf16_string,
+	     utf16_string_size,
+	     key_item->class_name,
+	     (size_t) key_item->class_name_size,
+	     LIBUNA_ENDIAN_LITTLE,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve UTF-16 string.",
+		 function );
+
+		return( 1 );
+	}
+	return( 1 );
 }
 
 /* Retrieves the 64-bit FILETIME value of the last written date and time
@@ -2062,5 +2072,623 @@ int libregf_key_item_get_last_written_time(
 		return( -1 );
 	}
 	return( 1 );
+}
+
+/* Retrieves the security descriptor size
+ * Returns 1 if successful, 0 if no such value or -1 on error
+ */
+int libregf_key_item_get_security_descriptor_size(
+     libregf_key_item_t *key_item,
+     size_t *security_descriptor_size,
+     libcerror_error_t **error )
+{
+	static char *function = "libregf_key_item_get_security_descriptor_size";
+
+	if( key_item == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid key item.",
+		 function );
+
+		return( -1 );
+	}
+	if( security_descriptor_size == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid security descriptor size.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( key_item->security_descriptor == NULL )
+	 || ( key_item->security_descriptor_size == 0 ) )
+	{
+		return( 0 );
+	}
+	*security_descriptor_size = key_item->security_descriptor_size;
+
+	return( 1 );
+}
+
+/* Retrieves the security descriptor
+ * Returns 1 if successful, 0 if no such value or -1 on error
+ */
+int libregf_key_item_get_security_descriptor(
+     libregf_key_item_t *key_item,
+     uint8_t *security_descriptor,
+     size_t security_descriptor_size,
+     libcerror_error_t **error )
+{
+	static char *function = "libregf_key_item_get_security_descriptor";
+
+	if( key_item == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid key item.",
+		 function );
+
+		return( -1 );
+	}
+	if( security_descriptor == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid security descriptor.",
+		 function );
+
+		return( -1 );
+	}
+	if( security_descriptor_size > (size_t) SSIZE_MAX )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
+		 "%s: invalid security descriptor size value exceeds maximum.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( key_item->security_descriptor == NULL )
+	 || ( key_item->security_descriptor_size == 0 ) )
+	{
+		return( 0 );
+	}
+	if( security_descriptor_size < key_item->security_descriptor_size )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid security descriptor size value out of bounds.",
+		 function );
+
+		return( -1 );
+	}
+	if( memory_copy(
+	     security_descriptor,
+	     key_item->security_descriptor,
+	     key_item->security_descriptor_size ) == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+		 "%s: unable to copy security descriptor.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the number of values
+ * Returns 1 if successful or -1 on error
+ */
+int libregf_key_item_get_number_of_values(
+     libregf_key_item_t *key_item,
+     int *number_of_values,
+     libcerror_error_t **error )
+{
+	static char *function = "libregf_key_item_get_number_of_values";
+
+	if( key_item == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid key item.",
+		 function );
+
+		return( -1 );
+	}
+	if( libfdata_list_get_number_of_elements(
+	     key_item->values_list,
+	     number_of_values,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve number of elements from values data list.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the number of sub key descriptors
+ * Returns 1 if successful or -1 on error
+ */
+int libregf_key_item_get_number_of_sub_key_descriptors(
+     libregf_key_item_t *key_item,
+     int *number_of_sub_key_descriptors,
+     libcerror_error_t **error )
+{
+	static char *function = "libregf_key_item_get_number_of_sub_key_descriptors";
+
+	if( key_item == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid key item.",
+		 function );
+
+		return( -1 );
+	}
+	if( libcdata_array_get_number_of_entries(
+	     key_item->sub_key_descriptors,
+	     number_of_sub_key_descriptors,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve number of sub key descriptors.",
+		 function );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves a specific sub key descriptor
+ * Returns 1 if successful or -1 on error
+ */
+int libregf_key_item_get_sub_key_descriptor_by_index(
+     libregf_key_item_t *key_item,
+     int sub_key_descriptor_index,
+     libregf_key_descriptor_t **sub_key_descriptor,
+     libcerror_error_t **error )
+{
+	static char *function = "libregf_key_item_get_sub_key_descriptor_by_index";
+
+	if( key_item == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid key item.",
+		 function );
+
+		return( -1 );
+	}
+	if( libcdata_array_get_entry_by_index(
+	     key_item->sub_key_descriptors,
+             sub_key_descriptor_index,
+	     (intptr_t **) sub_key_descriptor,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve sub key descriptor: %d.",
+		 function,
+		 sub_key_descriptor_index );
+
+		return( -1 );
+	}
+	return( 1 );
+}
+
+/* Retrieves the sub key descriptor for the specific UTF-8 encoded name
+ * Returns 1 if successful, 0 if no such value or -1 on error
+ */
+int libregf_key_item_get_sub_key_descriptor_by_utf8_name(
+     libregf_key_item_t *key_item,
+     libbfio_handle_t *file_io_handle,
+     libregf_hive_bins_list_t *hive_bins_list,
+     uint32_t name_hash,
+     const uint8_t *utf8_string,
+     size_t utf8_string_length,
+     libregf_key_descriptor_t **sub_key_descriptor,
+     libcerror_error_t **error )
+{
+	libregf_key_descriptor_t *safe_sub_key_descriptor = NULL;
+	libregf_named_key_t *named_key                    = NULL;
+	static char *function                             = "libregf_key_item_get_sub_key_descriptor_by_utf8_name";
+	int number_of_sub_key_descriptors                 = 0;
+	int result                                        = 0;
+	int sub_key_descriptor_index                      = 0;
+
+	if( key_item == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid key item.",
+		 function );
+
+		return( -1 );
+	}
+	if( hive_bins_list == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid hive bins list.",
+		 function );
+
+		return( -1 );
+	}
+	if( hive_bins_list->io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid hive bins list - missing IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	*sub_key_descriptor = NULL;
+
+/* TODO think of caching and/or optimization
+ * e.g. mapping sub key descriptors to name search tree?
+ */
+	if( libcdata_array_get_number_of_entries(
+	     key_item->sub_key_descriptors,
+	     &number_of_sub_key_descriptors,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve number of entries from sub key descriptors array.",
+		 function );
+
+		goto on_error;
+	}
+	for( sub_key_descriptor_index = 0;
+	     sub_key_descriptor_index < number_of_sub_key_descriptors;
+	     sub_key_descriptor_index++ )
+	{
+		if( libcdata_array_get_entry_by_index(
+		     key_item->sub_key_descriptors,
+		     sub_key_descriptor_index,
+		     (intptr_t **) &safe_sub_key_descriptor,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve sub key descriptor: %d from array.",
+			 function,
+			 sub_key_descriptor_index );
+
+			goto on_error;
+		}
+		if( safe_sub_key_descriptor == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: missing sub key descriptor: %d.",
+			 function,
+			 sub_key_descriptor_index );
+
+			goto on_error;
+		}
+		if( libregf_named_key_initialize(
+		     &named_key,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create named key.",
+			 function );
+
+			goto on_error;
+		}
+		if( libregf_key_item_read_named_key(
+		     named_key,
+		     file_io_handle,
+		     hive_bins_list,
+		     safe_sub_key_descriptor->key_offset,
+		     safe_sub_key_descriptor->hash_value,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read named key at offset: %" PRIu32 " (0x%08" PRIx32 ").",
+			 function,
+			 safe_sub_key_descriptor->key_offset,
+			 safe_sub_key_descriptor->key_offset );
+
+			goto on_error;
+		}
+		result = libregf_named_key_compare_name_with_utf8_string(
+		          named_key,
+		          name_hash,
+		          utf8_string,
+		          utf8_string_length,
+		          hive_bins_list->io_handle->ascii_codepage,
+		          error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GENERIC,
+			 "%s: unable to compare named key with UTF-8 string.",
+			 function );
+
+			goto on_error;
+		}
+		if( libregf_named_key_free(
+		     &named_key,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free named key.",
+			 function );
+
+			goto on_error;
+		}
+		if( result != 0 )
+		{
+			break;
+		}
+	}
+	if( sub_key_descriptor_index >= number_of_sub_key_descriptors )
+	{
+		return( 0 );
+	}
+	*sub_key_descriptor = safe_sub_key_descriptor;
+
+	return( 1 );
+
+on_error:
+	if( named_key != NULL )
+	{
+		libregf_named_key_free(
+		 &named_key,
+		 NULL );
+	}
+	return( -1 );
+}
+
+/* Retrieves the sub key descriptor for the specific UTF-16 encoded name
+ * Returns 1 if successful, 0 if no such value or -1 on error
+ */
+int libregf_key_item_get_sub_key_descriptor_by_utf16_name(
+     libregf_key_item_t *key_item,
+     libbfio_handle_t *file_io_handle,
+     libregf_hive_bins_list_t *hive_bins_list,
+     uint32_t name_hash,
+     const uint16_t *utf16_string,
+     size_t utf16_string_length,
+     libregf_key_descriptor_t **sub_key_descriptor,
+     libcerror_error_t **error )
+{
+	libregf_key_descriptor_t *safe_sub_key_descriptor = NULL;
+	libregf_named_key_t *named_key                    = NULL;
+	static char *function                             = "libregf_key_item_get_sub_key_descriptor_by_utf16_name";
+	int number_of_sub_key_descriptors                 = 0;
+	int result                                        = 0;
+	int sub_key_descriptor_index                      = 0;
+
+	if( key_item == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid key item.",
+		 function );
+
+		return( -1 );
+	}
+	if( hive_bins_list == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid hive bins list.",
+		 function );
+
+		return( -1 );
+	}
+	if( hive_bins_list->io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid hive bins list - missing IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	*sub_key_descriptor = NULL;
+
+/* TODO think of caching and/or optimization
+ * e.g. mapping sub key descriptors to name search tree?
+ */
+	if( libcdata_array_get_number_of_entries(
+	     key_item->sub_key_descriptors,
+	     &number_of_sub_key_descriptors,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve number of entries from sub key descriptors array.",
+		 function );
+
+		goto on_error;
+	}
+	for( sub_key_descriptor_index = 0;
+	     sub_key_descriptor_index < number_of_sub_key_descriptors;
+	     sub_key_descriptor_index++ )
+	{
+		if( libcdata_array_get_entry_by_index(
+		     key_item->sub_key_descriptors,
+		     sub_key_descriptor_index,
+		     (intptr_t **) &safe_sub_key_descriptor,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to retrieve sub key descriptor: %d from array.",
+			 function,
+			 sub_key_descriptor_index );
+
+			goto on_error;
+		}
+		if( safe_sub_key_descriptor == NULL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+			 "%s: missing sub key descriptor: %d.",
+			 function,
+			 sub_key_descriptor_index );
+
+			goto on_error;
+		}
+		if( libregf_named_key_initialize(
+		     &named_key,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+			 "%s: unable to create named key.",
+			 function );
+
+			goto on_error;
+		}
+		if( libregf_key_item_read_named_key(
+		     named_key,
+		     file_io_handle,
+		     hive_bins_list,
+		     safe_sub_key_descriptor->key_offset,
+		     safe_sub_key_descriptor->hash_value,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_IO,
+			 LIBCERROR_IO_ERROR_READ_FAILED,
+			 "%s: unable to read named key at offset: %" PRIu32 " (0x%08" PRIx32 ").",
+			 function,
+			 safe_sub_key_descriptor->key_offset,
+			 safe_sub_key_descriptor->key_offset );
+
+			goto on_error;
+		}
+		result = libregf_named_key_compare_name_with_utf16_string(
+		          named_key,
+		          name_hash,
+		          utf16_string,
+		          utf16_string_length,
+		          hive_bins_list->io_handle->ascii_codepage,
+		          error );
+
+		if( result == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GENERIC,
+			 "%s: unable to compare named key with UTF-16 string.",
+			 function );
+
+			goto on_error;
+		}
+		if( libregf_named_key_free(
+		     &named_key,
+		     error ) != 1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+			 "%s: unable to free named key.",
+			 function );
+
+			goto on_error;
+		}
+		if( result != 0 )
+		{
+			break;
+		}
+	}
+	if( sub_key_descriptor_index >= number_of_sub_key_descriptors )
+	{
+		return( 0 );
+	}
+	*sub_key_descriptor = safe_sub_key_descriptor;
+
+	return( 1 );
+
+on_error:
+	if( named_key != NULL )
+	{
+		libregf_named_key_free(
+		 &named_key,
+		 NULL );
+	}
+	return( -1 );
 }
 

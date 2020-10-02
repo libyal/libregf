@@ -65,14 +65,6 @@ struct libregf_internal_file
 	 */
 	libregf_hive_bins_list_t *hive_bins_list;
 
-	/* The key tree
-	 */
-	libfdata_tree_t *key_tree;
-
-	/* The key cache
-	 */
-	libfcache_cache_t *key_cache;
-
 	/* Value to indicate if the file IO handle was created inside the library
 	 */
 	uint8_t file_io_handle_created_in_library;
@@ -188,25 +180,11 @@ int libregf_file_get_root_key(
      libregf_key_t **key,
      libcerror_error_t **error );
 
-int libregf_internal_file_get_key_by_utf8_path(
-     libregf_internal_file_t *internal_file,
-     const uint8_t *utf8_string,
-     size_t utf8_string_length,
-     libregf_key_t **key,
-     libcerror_error_t **error );
-
 LIBREGF_EXTERN \
 int libregf_file_get_key_by_utf8_path(
      libregf_file_t *file,
      const uint8_t *utf8_string,
      size_t utf8_string_length,
-     libregf_key_t **key,
-     libcerror_error_t **error );
-
-int libregf_internal_file_get_key_by_utf16_path(
-     libregf_internal_file_t *internal_file,
-     const uint16_t *utf16_string,
-     size_t utf16_string_length,
      libregf_key_t **key,
      libcerror_error_t **error );
 

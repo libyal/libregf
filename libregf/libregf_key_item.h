@@ -26,7 +26,9 @@
 #include <types.h>
 
 #include "libregf_hive_bins_list.h"
+#include "libregf_key_descriptor.h"
 #include "libregf_libbfio.h"
+#include "libregf_libcdata.h"
 #include "libregf_libcerror.h"
 #include "libregf_libfcache.h"
 #include "libregf_libfdata.h"
@@ -68,6 +70,10 @@ struct libregf_key_item
 	 */
 	libfcache_cache_t *values_cache;
 
+	/* The sub key descriptors
+	 */
+	libcdata_array_t *sub_key_descriptors;
+
 	/* Various item flags
 	 */
 	uint8_t item_flags;
@@ -81,9 +87,16 @@ int libregf_key_item_free(
      libregf_key_item_t **key_item,
      libcerror_error_t **error );
 
-int libregf_key_item_read_named_key(
+int libregf_key_item_read(
      libregf_key_item_t *key_item,
-     libfdata_tree_node_t *key_tree_node,
+     libbfio_handle_t *file_io_handle,
+     libregf_hive_bins_list_t *hive_bins_list,
+     off64_t key_offset,
+     uint32_t named_key_hash,
+     libcerror_error_t **error );
+
+int libregf_key_item_read_named_key(
+     libregf_named_key_t *named_key,
      libbfio_handle_t *file_io_handle,
      libregf_hive_bins_list_t *hive_bins_list,
      off64_t named_key_offset,
@@ -120,40 +133,15 @@ int libregf_key_item_read_values_list(
      uint32_t number_of_values_list_elements,
      libcerror_error_t **error );
 
-int libregf_key_item_read_node_data(
-     libregf_hive_bins_list_t *hive_bins_list,
-     libbfio_handle_t *file_io_handle,
-     libfdata_tree_node_t *node,
-     libfdata_cache_t *cache,
-     int node_data_file_index,
-     off64_t node_data_offset,
-     size64_t node_data_size,
-     uint32_t node_data_flags,
-     uint8_t read_flags,
-     libcerror_error_t **error );
-
 int libregf_key_item_read_sub_keys_list(
-     libfdata_tree_node_t *key_tree_node,
+     libcdata_array_t *sub_key_descriptors,
      libbfio_handle_t *file_io_handle,
      libregf_hive_bins_list_t *hive_bins_list,
      off64_t sub_keys_list_offset,
      libcerror_error_t **error );
 
-int libregf_key_item_read_sub_nodes(
-     libregf_hive_bins_list_t *hive_bins_list,
-     libbfio_handle_t *file_io_handle,
-     libfdata_tree_node_t *node,
-     libfdata_cache_t *cache,
-     int sub_nodes_data_file_index,
-     off64_t sub_nodes_data_offset,
-     size64_t sub_nodes_data_size,
-     uint32_t sub_nodes_data_flags,
-     uint8_t read_flags,
-     libcerror_error_t **error );
-
-int libregf_key_item_get_number_of_values(
+int libregf_key_item_is_corrupted(
      libregf_key_item_t *key_item,
-     int *number_of_values,
      libcerror_error_t **error );
 
 int libregf_key_item_get_name_size(
@@ -193,25 +181,93 @@ int libregf_key_item_get_utf16_name(
      int ascii_codepage,
      libcerror_error_t **error );
 
-int libregf_key_item_compare_name_with_utf8_string(
+int libregf_key_item_get_class_name_size(
      libregf_key_item_t *key_item,
-     uint32_t name_hash,
-     const uint8_t *utf8_string,
-     size_t utf8_string_length,
+     size_t *class_name_size,
+     libcerror_error_t **error );
+
+int libregf_key_item_get_class_name(
+     libregf_key_item_t *key_item,
+     uint8_t *class_name,
+     size_t class_name_size,
+     libcerror_error_t **error );
+
+int libregf_key_item_get_utf8_class_name_size(
+     libregf_key_item_t *key_item,
+     size_t *utf8_string_size,
      int ascii_codepage,
      libcerror_error_t **error );
 
-int libregf_key_item_compare_name_with_utf16_string(
+int libregf_key_item_get_utf8_class_name(
      libregf_key_item_t *key_item,
-     uint32_t name_hash,
-     const uint16_t *utf16_string,
-     size_t utf16_string_length,
+     uint8_t *utf8_string,
+     size_t utf8_string_size,
+     int ascii_codepage,
+     libcerror_error_t **error );
+
+int libregf_key_item_get_utf16_class_name_size(
+     libregf_key_item_t *key_item,
+     size_t *utf16_string_size,
+     int ascii_codepage,
+     libcerror_error_t **error );
+
+int libregf_key_item_get_utf16_class_name(
+     libregf_key_item_t *key_item,
+     uint16_t *utf16_string,
+     size_t utf16_string_size,
      int ascii_codepage,
      libcerror_error_t **error );
 
 int libregf_key_item_get_last_written_time(
      libregf_key_item_t *key_item,
      uint64_t *filetime,
+     libcerror_error_t **error );
+
+int libregf_key_item_get_security_descriptor_size(
+     libregf_key_item_t *key_item,
+     size_t *security_descriptor_size,
+     libcerror_error_t **error );
+
+int libregf_key_item_get_security_descriptor(
+     libregf_key_item_t *key_item,
+     uint8_t *security_descriptor,
+     size_t security_descriptor_size,
+     libcerror_error_t **error );
+
+int libregf_key_item_get_number_of_values(
+     libregf_key_item_t *key_item,
+     int *number_of_values,
+     libcerror_error_t **error );
+
+int libregf_key_item_get_number_of_sub_key_descriptors(
+     libregf_key_item_t *key_item,
+     int *number_of_sub_key_descriptors,
+     libcerror_error_t **error );
+
+int libregf_key_item_get_sub_key_descriptor_by_index(
+     libregf_key_item_t *key_item,
+     int sub_key_descriptor_index,
+     libregf_key_descriptor_t **sub_key_descriptor,
+     libcerror_error_t **error );
+
+int libregf_key_item_get_sub_key_descriptor_by_utf8_name(
+     libregf_key_item_t *key_item,
+     libbfio_handle_t *file_io_handle,
+     libregf_hive_bins_list_t *hive_bins_list,
+     uint32_t name_hash,
+     const uint8_t *utf8_string,
+     size_t utf8_string_length,
+     libregf_key_descriptor_t **sub_key_descriptor,
+     libcerror_error_t **error );
+
+int libregf_key_item_get_sub_key_descriptor_by_utf16_name(
+     libregf_key_item_t *key_item,
+     libbfio_handle_t *file_io_handle,
+     libregf_hive_bins_list_t *hive_bins_list,
+     uint32_t name_hash,
+     const uint16_t *utf16_string,
+     size_t utf16_string_length,
+     libregf_key_descriptor_t **sub_key_descriptor,
      libcerror_error_t **error );
 
 #if defined( __cplusplus )

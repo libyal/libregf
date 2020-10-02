@@ -40,6 +40,7 @@ libregf_la_SOURCES = \
 	libregf_hive_bins_list.c libregf_hive_bins_list.h \
 	libregf_io_handle.c libregf_io_handle.h \
 	libregf_key.c libregf_key.h \
+	libregf_key_descriptor.c libregf_key_descriptor.h \
 	libregf_key_item.c libregf_key_item.h \
 	libregf_key_tree.c libregf_key_tree.h \
 	libregf_libbfio.h \
@@ -57,6 +58,7 @@ libregf_la_SOURCES = \
 	libregf_named_key.c libregf_named_key.h \
 	libregf_notify.c libregf_notify.h \
 	libregf_security_key.c libregf_security_key.h \
+	libregf_sub_key_list.c libregf_sub_key_list.h \
 	libregf_support.c libregf_support.h \
 	libregf_types.h \
 	libregf_unused.h \

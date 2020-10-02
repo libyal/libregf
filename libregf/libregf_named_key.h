@@ -158,6 +158,11 @@ int libregf_named_key_get_last_written_time(
      uint64_t *filetime,
      libcerror_error_t **error );
 
+int libregf_named_key_get_number_of_sub_keys(
+     libregf_named_key_t *named_key,
+     uint32_t *number_of_sub_keys,
+     libcerror_error_t **error );
+
 #if defined( __cplusplus )
 }
 #endif

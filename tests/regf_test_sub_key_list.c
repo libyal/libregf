@@ -1,5 +1,5 @@
 /*
- * Library hive_bin_cell type test program
+ * Library key_descriptor type test program
  *
  * Copyright (C) 2009-2020, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -33,30 +33,30 @@
 #include "regf_test_memory.h"
 #include "regf_test_unused.h"
 
-#include "../libregf/libregf_hive_bin_cell.h"
+#include "../libregf/libregf_key_descriptor.h"
 
 #if defined( __GNUC__ ) && !defined( LIBREGF_DLL_IMPORT )
 
-/* Tests the libregf_hive_bin_cell_initialize function
+/* Tests the libregf_key_descriptor_initialize function
  * Returns 1 if successful or 0 if not
  */
-int regf_test_hive_bin_cell_initialize(
+int regf_test_key_descriptor_initialize(
      void )
 {
-	libcerror_error_t *error               = NULL;
-	libregf_hive_bin_cell_t *hive_bin_cell = NULL;
-	int result                             = 0;
+	libcerror_error_t *error                 = NULL;
+	libregf_key_descriptor_t *key_descriptor = NULL;
+	int result                               = 0;
 
 #if defined( HAVE_REGF_TEST_MEMORY )
-	int number_of_malloc_fail_tests        = 1;
-	int number_of_memset_fail_tests        = 1;
-	int test_number                        = 0;
+	int number_of_malloc_fail_tests          = 1;
+	int number_of_memset_fail_tests          = 1;
+	int test_number                          = 0;
 #endif
 
 	/* Test regular cases
 	 */
-	result = libregf_hive_bin_cell_initialize(
-	          &hive_bin_cell,
+	result = libregf_key_descriptor_initialize(
+	          &key_descriptor,
 	          &error );
 
 	REGF_TEST_ASSERT_EQUAL_INT(
@@ -65,15 +65,15 @@ int regf_test_hive_bin_cell_initialize(
 	 1 );
 
 	REGF_TEST_ASSERT_IS_NOT_NULL(
-	 "hive_bin_cell",
-	 hive_bin_cell );
+	 "key_descriptor",
+	 key_descriptor );
 
 	REGF_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
 
-	result = libregf_hive_bin_cell_free(
-	          &hive_bin_cell,
+	result = libregf_key_descriptor_free(
+	          &key_descriptor,
 	          &error );
 
 	REGF_TEST_ASSERT_EQUAL_INT(
@@ -82,8 +82,8 @@ int regf_test_hive_bin_cell_initialize(
 	 1 );
 
 	REGF_TEST_ASSERT_IS_NULL(
-	 "hive_bin_cell",
-	 hive_bin_cell );
+	 "key_descriptor",
+	 key_descriptor );
 
 	REGF_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -91,7 +91,7 @@ int regf_test_hive_bin_cell_initialize(
 
 	/* Test error cases
 	 */
-	result = libregf_hive_bin_cell_initialize(
+	result = libregf_key_descriptor_initialize(
 	          NULL,
 	          &error );
 
@@ -107,13 +107,13 @@ int regf_test_hive_bin_cell_initialize(
 	libcerror_error_free(
 	 &error );
 
-	hive_bin_cell = (libregf_hive_bin_cell_t *) 0x12345678UL;
+	key_descriptor = (libregf_key_descriptor_t *) 0x12345678UL;
 
-	result = libregf_hive_bin_cell_initialize(
-	          &hive_bin_cell,
+	result = libregf_key_descriptor_initialize(
+	          &key_descriptor,
 	          &error );
 
-	hive_bin_cell = NULL;
+	key_descriptor = NULL;
 
 	REGF_TEST_ASSERT_EQUAL_INT(
 	 "result",
@@ -133,22 +133,22 @@ int regf_test_hive_bin_cell_initialize(
 	     test_number < number_of_malloc_fail_tests;
 	     test_number++ )
 	{
-		/* Test libregf_hive_bin_cell_initialize with malloc failing
+		/* Test libregf_key_descriptor_initialize with malloc failing
 		 */
 		regf_test_malloc_attempts_before_fail = test_number;
 
-		result = libregf_hive_bin_cell_initialize(
-		          &hive_bin_cell,
+		result = libregf_key_descriptor_initialize(
+		          &key_descriptor,
 		          &error );
 
 		if( regf_test_malloc_attempts_before_fail != -1 )
 		{
 			regf_test_malloc_attempts_before_fail = -1;
 
-			if( hive_bin_cell != NULL )
+			if( key_descriptor != NULL )
 			{
-				libregf_hive_bin_cell_free(
-				 &hive_bin_cell,
+				libregf_key_descriptor_free(
+				 &key_descriptor,
 				 NULL );
 			}
 		}
@@ -160,8 +160,8 @@ int regf_test_hive_bin_cell_initialize(
 			 -1 );
 
 			REGF_TEST_ASSERT_IS_NULL(
-			 "hive_bin_cell",
-			 hive_bin_cell );
+			 "key_descriptor",
+			 key_descriptor );
 
 			REGF_TEST_ASSERT_IS_NOT_NULL(
 			 "error",
@@ -175,22 +175,22 @@ int regf_test_hive_bin_cell_initialize(
 	     test_number < number_of_memset_fail_tests;
 	     test_number++ )
 	{
-		/* Test libregf_hive_bin_cell_initialize with memset failing
+		/* Test libregf_key_descriptor_initialize with memset failing
 		 */
 		regf_test_memset_attempts_before_fail = test_number;
 
-		result = libregf_hive_bin_cell_initialize(
-		          &hive_bin_cell,
+		result = libregf_key_descriptor_initialize(
+		          &key_descriptor,
 		          &error );
 
 		if( regf_test_memset_attempts_before_fail != -1 )
 		{
 			regf_test_memset_attempts_before_fail = -1;
 
-			if( hive_bin_cell != NULL )
+			if( key_descriptor != NULL )
 			{
-				libregf_hive_bin_cell_free(
-				 &hive_bin_cell,
+				libregf_key_descriptor_free(
+				 &key_descriptor,
 				 NULL );
 			}
 		}
@@ -202,8 +202,8 @@ int regf_test_hive_bin_cell_initialize(
 			 -1 );
 
 			REGF_TEST_ASSERT_IS_NULL(
-			 "hive_bin_cell",
-			 hive_bin_cell );
+			 "key_descriptor",
+			 key_descriptor );
 
 			REGF_TEST_ASSERT_IS_NOT_NULL(
 			 "error",
@@ -223,19 +223,19 @@ on_error:
 		libcerror_error_free(
 		 &error );
 	}
-	if( hive_bin_cell != NULL )
+	if( key_descriptor != NULL )
 	{
-		libregf_hive_bin_cell_free(
-		 &hive_bin_cell,
+		libregf_key_descriptor_free(
+		 &key_descriptor,
 		 NULL );
 	}
 	return( 0 );
 }
 
-/* Tests the libregf_hive_bin_cell_free function
+/* Tests the libregf_key_descriptor_free function
  * Returns 1 if successful or 0 if not
  */
-int regf_test_hive_bin_cell_free(
+int regf_test_key_descriptor_free(
      void )
 {
 	libcerror_error_t *error = NULL;
@@ -243,7 +243,7 @@ int regf_test_hive_bin_cell_free(
 
 	/* Test error cases
 	 */
-	result = libregf_hive_bin_cell_free(
+	result = libregf_key_descriptor_free(
 	          NULL,
 	          &error );
 
@@ -290,12 +290,12 @@ int main(
 #if defined( __GNUC__ ) && !defined( LIBREGF_DLL_IMPORT )
 
 	REGF_TEST_RUN(
-	 "libregf_hive_bin_cell_initialize",
-	 regf_test_hive_bin_cell_initialize );
+	 "libregf_key_descriptor_initialize",
+	 regf_test_key_descriptor_initialize );
 
 	REGF_TEST_RUN(
-	 "libregf_hive_bin_cell_free",
-	 regf_test_hive_bin_cell_free );
+	 "libregf_key_descriptor_free",
+	 regf_test_key_descriptor_free );
 
 #endif /* defined( __GNUC__ ) && !defined( LIBREGF_DLL_IMPORT ) */
 

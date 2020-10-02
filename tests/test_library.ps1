@@ -6,7 +6,7 @@ $ExitSuccess = 0
 $ExitFailure = 1
 $ExitIgnore = 77
 
-$LibraryTests = "checksum data_block_key data_block_stream data_type error file_header hive_bin hive_bin_cell hive_bin_header hive_bins_list io_handle key key_item multi_string named_key notify security_key value value_item value_key"
+$LibraryTests = "checksum data_block_key data_block_stream data_type error file_header hive_bin hive_bin_cell hive_bin_header hive_bins_list io_handle key key_descriptor key_item multi_string named_key notify security_key sub_key_list value value_item value_key"
 $LibraryTestsWithInput = "file support"
 $OptionSets = ""
 

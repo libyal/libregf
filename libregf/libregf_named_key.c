@@ -204,24 +204,14 @@ int libregf_named_key_read_data(
 
 		return( -1 );
 	}
-	if( data_size > (size_t) SSIZE_MAX )
+	if( ( data_size < sizeof( regf_named_key_t ) )
+	 || ( data_size > (size_t) SSIZE_MAX ) )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid data size value exceeds maximum.",
-		 function );
-
-		return( -1 );
-	}
-	if( data_size < sizeof( regf_named_key_t ) )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-		 "%s: invalid data size value too small.",
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid data size value out of bounds.",
 		 function );
 
 		return( -1 );
@@ -238,7 +228,7 @@ int libregf_named_key_read_data(
 		 0 );
 	}
 #endif
-	/* Check if the cell signature matches that of a named key: "nk"
+	/* Check if the signature matches that of a named key: "nk"
 	 */
 	if( ( data[ 0 ] != (uint8_t) 'n' )
 	 || ( data[ 1 ] != (uint8_t) 'k' ) )
@@ -1286,6 +1276,43 @@ int libregf_named_key_get_last_written_time(
 		return( -1 );
 	}
 	*filetime = named_key->last_written_time;
+
+	return( 1 );
+}
+
+/* Retrieves the number of sub keys
+ * Returns 1 if successful or -1 on error
+ */
+int libregf_named_key_get_number_of_sub_keys(
+     libregf_named_key_t *named_key,
+     uint32_t *number_of_sub_keys,
+     libcerror_error_t **error )
+{
+	static char *function = "libregf_named_key_get_number_of_sub_keys";
+
+	if( named_key == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid named key.",
+		 function );
+
+		return( -1 );
+	}
+	if( number_of_sub_keys == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid number of sub keys.",
+		 function );
+
+		return( -1 );
+	}
+	*number_of_sub_keys = named_key->number_of_sub_keys;
 
 	return( 1 );
 }

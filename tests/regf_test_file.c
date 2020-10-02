@@ -1766,6 +1766,312 @@ on_error:
 	return( 0 );
 }
 
+/* Tests the libregf_file_get_key_by_utf8_path function
+ * Returns 1 if successful or 0 if not
+ */
+int regf_test_file_get_key_by_utf8_path(
+     libregf_file_t *file )
+{
+	uint8_t utf8_key_path[ 7 ] = { 'S', 'e', 'l', 'e', 'c', 't', 0 };
+	libcerror_error_t *error   = NULL;
+	libregf_key_t *key         = 0;
+	int result                 = 0;
+
+	/* Test regular cases
+	 */
+	result = libregf_file_get_key_by_utf8_path(
+	          file,
+	          utf8_key_path,
+	          6,
+	          &key,
+	          &error );
+
+	REGF_TEST_ASSERT_NOT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	if( result != 0 )
+	{
+		REGF_TEST_ASSERT_IS_NOT_NULL(
+		 "key",
+		 key );
+
+		result = libregf_key_free(
+		          &key,
+		          &error );
+
+		REGF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 1 );
+
+		REGF_TEST_ASSERT_IS_NULL(
+		 "error",
+		 error );
+	}
+	/* Test error cases
+	 */
+	result = libregf_file_get_key_by_utf8_path(
+	          NULL,
+	          utf8_key_path,
+	          6,
+	          &key,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "key",
+	 key );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libregf_file_get_key_by_utf8_path(
+	          file,
+	          NULL,
+	          6,
+	          &key,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "key",
+	 key );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libregf_file_get_key_by_utf8_path(
+	          file,
+	          utf8_key_path,
+	          (size_t) SSIZE_MAX + 1,
+	          &key,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "key",
+	 key );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libregf_file_get_key_by_utf8_path(
+	          file,
+	          utf8_key_path,
+	          6,
+	          NULL,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "key",
+	 key );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libregf_file_get_key_by_utf16_path function
+ * Returns 1 if successful or 0 if not
+ */
+int regf_test_file_get_key_by_utf16_path(
+     libregf_file_t *file )
+{
+	uint16_t utf16_key_path[ 7 ] = { 'S', 'e', 'l', 'e', 'c', 't', 0 };
+	libcerror_error_t *error     = NULL;
+	libregf_key_t *key           = 0;
+	int result                   = 0;
+
+	/* Test regular cases
+	 */
+	result = libregf_file_get_key_by_utf16_path(
+	          file,
+	          utf16_key_path,
+	          6,
+	          &key,
+	          &error );
+
+	REGF_TEST_ASSERT_NOT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	if( result != 0 )
+	{
+		REGF_TEST_ASSERT_IS_NOT_NULL(
+		 "key",
+		 key );
+
+		result = libregf_key_free(
+		          &key,
+		          &error );
+
+		REGF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 1 );
+
+		REGF_TEST_ASSERT_IS_NULL(
+		 "error",
+		 error );
+	}
+	/* Test error cases
+	 */
+	result = libregf_file_get_key_by_utf16_path(
+	          NULL,
+	          utf16_key_path,
+	          6,
+	          &key,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "key",
+	 key );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libregf_file_get_key_by_utf16_path(
+	          file,
+	          NULL,
+	          6,
+	          &key,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "key",
+	 key );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libregf_file_get_key_by_utf16_path(
+	          file,
+	          utf16_key_path,
+	          (size_t) SSIZE_MAX + 1,
+	          &key,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "key",
+	 key );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libregf_file_get_key_by_utf16_path(
+	          file,
+	          utf16_key_path,
+	          6,
+	          NULL,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "key",
+	 key );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	return( 0 );
+}
+
 /* The main program
  */
 #if defined( HAVE_WIDE_SYSTEM_CHARACTER )
@@ -1972,13 +2278,15 @@ int main(
 		 regf_test_file_get_root_key,
 		 file );
 
-		/* TODO: add tests for libregf_internal_file_get_key_by_utf8_path */
+		REGF_TEST_RUN_WITH_ARGS(
+		 "libregf_file_get_key_by_utf8_path",
+		 regf_test_file_get_key_by_utf8_path,
+		 file );
 
-		/* TODO: add tests for libregf_file_get_key_by_utf8_path */
-
-		/* TODO: add tests for libregf_internal_file_get_key_by_utf16_path */
-
-		/* TODO: add tests for libregf_file_get_key_by_utf16_path */
+		REGF_TEST_RUN_WITH_ARGS(
+		 "libregf_file_get_key_by_utf16_path",
+		 regf_test_file_get_key_by_utf16_path,
+		 file );
 
 		/* Clean up
 		 */

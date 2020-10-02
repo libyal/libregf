@@ -664,13 +664,13 @@ int export_handle_export_key(
 		}
 		sub_key_path_length += value_string_size - 1;
 	}
-	if( sub_key_path_length > ( (size_t) SSIZE_MAX / sizeof( system_character_t ) ) )
+	if( sub_key_path_length > ( (size_t) MEMORY_MAXIMUM_ALLOCATION_SIZE / sizeof( system_character_t ) ) )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid sub key path length value exceeds maximum.",
+		 "%s: invalid sub key path length value exceeds maximum allocation size.",
 		 function );
 
 		goto on_error;
@@ -786,13 +786,13 @@ int export_handle_export_key(
 	if( ( result != 0 )
 	 && ( value_string_size > 0 ) )
 	{
-		if( value_string_size > ( (size_t) SSIZE_MAX / sizeof( system_character_t ) ) )
+		if( value_string_size > ( (size_t) MEMORY_MAXIMUM_ALLOCATION_SIZE / sizeof( system_character_t ) ) )
 		{
 			libcerror_error_set(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 			 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
-			 "%s: invalid name size value exceeds maximum.",
+			 "%s: invalid name size value exceeds maximum allocation size.",
 			 function );
 
 			goto on_error;
@@ -903,13 +903,13 @@ int export_handle_export_key(
 		}
 		if( value_string_size > 0 )
 		{
-			if( value_string_size > ( (size_t) SSIZE_MAX / sizeof( system_character_t ) ) )
+			if( value_string_size > ( (size_t) MEMORY_MAXIMUM_ALLOCATION_SIZE / sizeof( system_character_t ) ) )
 			{
 				libcerror_error_set(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 				 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
-				 "%s: invalid name size value exceeds maximum.",
+				 "%s: invalid name size value exceeds maximum allocation size.",
 				 function );
 
 				goto on_error;
@@ -1112,13 +1112,13 @@ int export_handle_export_key(
 
 					if( value_string_size > 0 )
 					{
-						if( value_string_size > ( (size_t) SSIZE_MAX / sizeof( system_character_t ) ) )
+						if( value_string_size > ( (size_t) MEMORY_MAXIMUM_ALLOCATION_SIZE / sizeof( system_character_t ) ) )
 						{
 							libcerror_error_set(
 							 error,
 							 LIBCERROR_ERROR_DOMAIN_RUNTIME,
 							 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
-							 "%s: invalid value string size value exceeds maximum.",
+							 "%s: invalid value string size value exceeds maximum allocation size.",
 							 function );
 
 							goto on_error;

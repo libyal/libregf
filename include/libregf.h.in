@@ -351,7 +351,7 @@ int libregf_key_free(
      libregf_key_t **key,
      libregf_error_t **error );
 
-/* Determine if the key corrupted
+/* Determines if the key is corrupted
  * Returns 1 if corrupted, 0 if not or -1 on error
  */
 LIBREGF_EXTERN \
@@ -577,7 +577,7 @@ int libregf_key_get_number_of_sub_keys(
      int *number_of_sub_keys,
      libregf_error_t **error );
 
-/* Retrieves the sub key for the specific index
+/* Retrieves a specific sub key
  * Creates a new key
  * Returns 1 if successful or -1 on error
  */

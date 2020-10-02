@@ -410,7 +410,7 @@ int libregf_value_key_read_data(
 		 LIBCNOTIFY_PRINT_DATA_FLAG_GROUP_DATA );
 	}
 #endif
-	/* Check if the cell signature matches that of a value key: "vk"
+	/* Check if the signature matches that of a value key: "vk"
 	 */
 	if( ( data[ 0 ] != (uint8_t) 'v' )
 	 || ( data[ 1 ] != (uint8_t) 'k' ) )

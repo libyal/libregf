@@ -203,7 +203,7 @@ int libregf_data_block_key_read_data(
 		 0 );
 	}
 #endif
-	/* Check if the cell signature matches that of a data block key: "db"
+	/* Check if the signature matches that of a data block key: "db"
 	 */
 	if( ( data[ 0 ] != (uint8_t) 'd' )
 	 || ( data[ 1 ] != (uint8_t) 'b' ) )

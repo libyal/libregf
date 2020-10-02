@@ -59,11 +59,13 @@ check_PROGRAMS = \
 	regf_test_hive_bins_list \
 	regf_test_io_handle \
 	regf_test_key \
+	regf_test_key_descriptor \
 	regf_test_key_item \
 	regf_test_multi_string \
 	regf_test_named_key \
 	regf_test_notify \
 	regf_test_security_key \
+	regf_test_sub_key_list \
 	regf_test_support \
 	regf_test_tools_info_handle \
 	regf_test_tools_output \
@@ -281,6 +283,18 @@ regf_test_key_LDADD = \
 	../libregf/libregf.la \
 	@LIBCERROR_LIBADD@
 
+regf_test_key_descriptor_SOURCES = \
+	regf_test_key_descriptor.c \
+	regf_test_libcerror.h \
+	regf_test_libregf.h \
+	regf_test_macros.h \
+	regf_test_memory.c regf_test_memory.h \
+	regf_test_unused.h
+
+regf_test_key_descriptor_LDADD = \
+	../libregf/libregf.la \
+	@LIBCERROR_LIBADD@
+
 regf_test_key_item_SOURCES = \
 	regf_test_functions.c regf_test_functions.h \
 	regf_test_key_item.c \
@@ -348,6 +362,18 @@ regf_test_security_key_SOURCES = \
 	regf_test_unused.h
 
 regf_test_security_key_LDADD = \
+	../libregf/libregf.la \
+	@LIBCERROR_LIBADD@
+
+regf_test_sub_key_list_SOURCES = \
+	regf_test_libcerror.h \
+	regf_test_libregf.h \
+	regf_test_macros.h \
+	regf_test_memory.c regf_test_memory.h \
+	regf_test_sub_key_list.c \
+	regf_test_unused.h
+
+regf_test_sub_key_list_LDADD = \
 	../libregf/libregf.la \
 	@LIBCERROR_LIBADD@
 

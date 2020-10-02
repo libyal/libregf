@@ -1,6 +1,6 @@
 # Files to ignore by git
 #
-# Version: 20191220
+# Version: 20200912
 
 # Generic auto-generated build files
 *~
@@ -61,6 +61,7 @@ stamp-h[1-9]
 /m4/gettext.m4
 /m4/glibc21.m4
 /m4/glibc2.m4
+/m4/host-cpu-c-abi.m4
 /m4/iconv.m4
 /m4/intdiv0.m4
 /m4/intldir.m4
@@ -142,11 +143,13 @@ stamp-h[1-9]
 /tests/regf_test_hive_bins_list
 /tests/regf_test_io_handle
 /tests/regf_test_key
+/tests/regf_test_key_descriptor
 /tests/regf_test_key_item
 /tests/regf_test_multi_string
 /tests/regf_test_named_key
 /tests/regf_test_notify
 /tests/regf_test_security_key
+/tests/regf_test_sub_key_list
 /tests/regf_test_support
 /tests/regf_test_tools_info_handle
 /tests/regf_test_tools_output

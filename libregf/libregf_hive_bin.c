@@ -267,7 +267,7 @@ int libregf_hive_bin_read_cells_data(
 		if( libcnotify_verbose != 0 )
 		{
 			libcnotify_printf(
-			 "%s: hive bin cell: %03d offset\t\t\t: 0x%08" PRIx32 "\n",
+			 "%s: hive bin cell: %03d offset\t\t: 0x%08" PRIx32 "\n",
 			 function,
 			 cell_index,
 			 file_offset );
@@ -294,7 +294,7 @@ int libregf_hive_bin_read_cells_data(
 		if( libcnotify_verbose != 0 )
 		{
 			libcnotify_printf(
-			 "%s: hive bin cell: %03d size\t\t\t: 0x%08" PRIx32 " (%" PRIi32 ")\n",
+			 "%s: hive bin cell: %03d size\t\t: 0x%08" PRIx32 " (%" PRIi32 ")\n",
 			 function,
 			 cell_index,
 			 cell_size,

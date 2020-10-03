@@ -289,9 +289,9 @@ on_error:
 int regf_test_named_key_read_data(
      void )
 {
-	libcerror_error_t *error           = NULL;
+	libcerror_error_t *error       = NULL;
 	libregf_named_key_t *named_key = NULL;
-	int result                         = 0;
+	int result                     = 0;
 
 	/* Initialize test
 	 */

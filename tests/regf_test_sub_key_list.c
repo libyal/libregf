@@ -1,5 +1,5 @@
 /*
- * Library key_descriptor type test program
+ * Library sub_key_list type test program
  *
  * Copyright (C) 2009-2020, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -20,6 +20,7 @@
  */
 
 #include <common.h>
+#include <byte_stream.h>
 #include <file_stream.h>
 #include <types.h>
 
@@ -33,30 +34,37 @@
 #include "regf_test_memory.h"
 #include "regf_test_unused.h"
 
-#include "../libregf/libregf_key_descriptor.h"
+#include "../libregf/libregf_sub_key_list.h"
+
+uint8_t regf_test_sub_key_list_data1[ 68 ] = {
+	0x6c, 0x68, 0x08, 0x00, 0x78, 0x01, 0x00, 0x00, 0xa2, 0xa9, 0x3b, 0x8f, 0x98, 0x3d, 0x22, 0x00,
+	0xe5, 0x6c, 0xdd, 0xe9, 0x30, 0xb1, 0x24, 0x00, 0xf0, 0x56, 0x8b, 0x0a, 0x98, 0xdb, 0x24, 0x00,
+	0x2b, 0x07, 0x7a, 0xfc, 0x70, 0xb4, 0x24, 0x00, 0x0f, 0xc2, 0x01, 0x00, 0xe8, 0xde, 0x24, 0x00,
+	0xa0, 0x24, 0x00, 0x5f, 0x28, 0xb6, 0x24, 0x00, 0x81, 0xb8, 0x7c, 0x09, 0x20, 0xc0, 0x24, 0x00,
+	0x10, 0xdd, 0x01, 0x00 };
 
 #if defined( __GNUC__ ) && !defined( LIBREGF_DLL_IMPORT )
 
-/* Tests the libregf_key_descriptor_initialize function
+/* Tests the libregf_sub_key_list_initialize function
  * Returns 1 if successful or 0 if not
  */
-int regf_test_key_descriptor_initialize(
+int regf_test_sub_key_list_initialize(
      void )
 {
-	libcerror_error_t *error                 = NULL;
-	libregf_key_descriptor_t *key_descriptor = NULL;
-	int result                               = 0;
+	libcerror_error_t *error             = NULL;
+	libregf_sub_key_list_t *sub_key_list = NULL;
+	int result                           = 0;
 
 #if defined( HAVE_REGF_TEST_MEMORY )
-	int number_of_malloc_fail_tests          = 1;
-	int number_of_memset_fail_tests          = 1;
-	int test_number                          = 0;
+	int number_of_malloc_fail_tests      = 1;
+	int number_of_memset_fail_tests      = 1;
+	int test_number                      = 0;
 #endif
 
 	/* Test regular cases
 	 */
-	result = libregf_key_descriptor_initialize(
-	          &key_descriptor,
+	result = libregf_sub_key_list_initialize(
+	          &sub_key_list,
 	          &error );
 
 	REGF_TEST_ASSERT_EQUAL_INT(
@@ -65,15 +73,15 @@ int regf_test_key_descriptor_initialize(
 	 1 );
 
 	REGF_TEST_ASSERT_IS_NOT_NULL(
-	 "key_descriptor",
-	 key_descriptor );
+	 "sub_key_list",
+	 sub_key_list );
 
 	REGF_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
 
-	result = libregf_key_descriptor_free(
-	          &key_descriptor,
+	result = libregf_sub_key_list_free(
+	          &sub_key_list,
 	          &error );
 
 	REGF_TEST_ASSERT_EQUAL_INT(
@@ -82,8 +90,8 @@ int regf_test_key_descriptor_initialize(
 	 1 );
 
 	REGF_TEST_ASSERT_IS_NULL(
-	 "key_descriptor",
-	 key_descriptor );
+	 "sub_key_list",
+	 sub_key_list );
 
 	REGF_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -91,7 +99,7 @@ int regf_test_key_descriptor_initialize(
 
 	/* Test error cases
 	 */
-	result = libregf_key_descriptor_initialize(
+	result = libregf_sub_key_list_initialize(
 	          NULL,
 	          &error );
 
@@ -107,13 +115,13 @@ int regf_test_key_descriptor_initialize(
 	libcerror_error_free(
 	 &error );
 
-	key_descriptor = (libregf_key_descriptor_t *) 0x12345678UL;
+	sub_key_list = (libregf_sub_key_list_t *) 0x12345678UL;
 
-	result = libregf_key_descriptor_initialize(
-	          &key_descriptor,
+	result = libregf_sub_key_list_initialize(
+	          &sub_key_list,
 	          &error );
 
-	key_descriptor = NULL;
+	sub_key_list = NULL;
 
 	REGF_TEST_ASSERT_EQUAL_INT(
 	 "result",
@@ -133,22 +141,22 @@ int regf_test_key_descriptor_initialize(
 	     test_number < number_of_malloc_fail_tests;
 	     test_number++ )
 	{
-		/* Test libregf_key_descriptor_initialize with malloc failing
+		/* Test libregf_sub_key_list_initialize with malloc failing
 		 */
 		regf_test_malloc_attempts_before_fail = test_number;
 
-		result = libregf_key_descriptor_initialize(
-		          &key_descriptor,
+		result = libregf_sub_key_list_initialize(
+		          &sub_key_list,
 		          &error );
 
 		if( regf_test_malloc_attempts_before_fail != -1 )
 		{
 			regf_test_malloc_attempts_before_fail = -1;
 
-			if( key_descriptor != NULL )
+			if( sub_key_list != NULL )
 			{
-				libregf_key_descriptor_free(
-				 &key_descriptor,
+				libregf_sub_key_list_free(
+				 &sub_key_list,
 				 NULL );
 			}
 		}
@@ -160,8 +168,8 @@ int regf_test_key_descriptor_initialize(
 			 -1 );
 
 			REGF_TEST_ASSERT_IS_NULL(
-			 "key_descriptor",
-			 key_descriptor );
+			 "sub_key_list",
+			 sub_key_list );
 
 			REGF_TEST_ASSERT_IS_NOT_NULL(
 			 "error",
@@ -175,22 +183,22 @@ int regf_test_key_descriptor_initialize(
 	     test_number < number_of_memset_fail_tests;
 	     test_number++ )
 	{
-		/* Test libregf_key_descriptor_initialize with memset failing
+		/* Test libregf_sub_key_list_initialize with memset failing
 		 */
 		regf_test_memset_attempts_before_fail = test_number;
 
-		result = libregf_key_descriptor_initialize(
-		          &key_descriptor,
+		result = libregf_sub_key_list_initialize(
+		          &sub_key_list,
 		          &error );
 
 		if( regf_test_memset_attempts_before_fail != -1 )
 		{
 			regf_test_memset_attempts_before_fail = -1;
 
-			if( key_descriptor != NULL )
+			if( sub_key_list != NULL )
 			{
-				libregf_key_descriptor_free(
-				 &key_descriptor,
+				libregf_sub_key_list_free(
+				 &sub_key_list,
 				 NULL );
 			}
 		}
@@ -202,8 +210,8 @@ int regf_test_key_descriptor_initialize(
 			 -1 );
 
 			REGF_TEST_ASSERT_IS_NULL(
-			 "key_descriptor",
-			 key_descriptor );
+			 "sub_key_list",
+			 sub_key_list );
 
 			REGF_TEST_ASSERT_IS_NOT_NULL(
 			 "error",
@@ -223,19 +231,19 @@ on_error:
 		libcerror_error_free(
 		 &error );
 	}
-	if( key_descriptor != NULL )
+	if( sub_key_list != NULL )
 	{
-		libregf_key_descriptor_free(
-		 &key_descriptor,
+		libregf_sub_key_list_free(
+		 &sub_key_list,
 		 NULL );
 	}
 	return( 0 );
 }
 
-/* Tests the libregf_key_descriptor_free function
+/* Tests the libregf_sub_key_list_free function
  * Returns 1 if successful or 0 if not
  */
-int regf_test_key_descriptor_free(
+int regf_test_sub_key_list_free(
      void )
 {
 	libcerror_error_t *error = NULL;
@@ -243,7 +251,7 @@ int regf_test_key_descriptor_free(
 
 	/* Test error cases
 	 */
-	result = libregf_key_descriptor_free(
+	result = libregf_sub_key_list_free(
 	          NULL,
 	          &error );
 
@@ -266,6 +274,190 @@ on_error:
 	{
 		libcerror_error_free(
 		 &error );
+	}
+	return( 0 );
+}
+
+/* Tests the libregf_sub_key_list_read_data function
+ * Returns 1 if successful or 0 if not
+ */
+int regf_test_sub_key_list_read_data(
+     void )
+{
+	libcerror_error_t *error             = NULL;
+	libregf_sub_key_list_t *sub_key_list = NULL;
+	int result                           = 0;
+
+	/* Initialize test
+	 */
+	result = libregf_sub_key_list_initialize(
+	          &sub_key_list,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "sub_key_list",
+	 sub_key_list );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test regular cases
+	 */
+	result = libregf_sub_key_list_read_data(
+	          sub_key_list,
+	          regf_test_sub_key_list_data1,
+	          68,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	/* Test error cases
+	 */
+	result = libregf_sub_key_list_read_data(
+	          NULL,
+	          regf_test_sub_key_list_data1,
+	          68,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libregf_sub_key_list_read_data(
+	          sub_key_list,
+	          NULL,
+	          68,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libregf_sub_key_list_read_data(
+	          sub_key_list,
+	          regf_test_sub_key_list_data1,
+	          0,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libregf_sub_key_list_read_data(
+	          sub_key_list,
+	          regf_test_sub_key_list_data1,
+	          (size_t) SSIZE_MAX + 1,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Test error case where signature is invalid
+	 */
+	byte_stream_copy_from_uint16_little_endian(
+	 &( regf_test_sub_key_list_data1[ 0 ] ),
+	 0xffff );
+
+	result = libregf_sub_key_list_read_data(
+	          sub_key_list,
+	          regf_test_sub_key_list_data1,
+	          68,
+	          &error );
+
+	byte_stream_copy_from_uint16_little_endian(
+	 &( regf_test_sub_key_list_data1[ 0 ] ),
+	 0x686c );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	/* Clean up
+	 */
+	result = libregf_sub_key_list_free(
+	          &sub_key_list,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "sub_key_list",
+	 sub_key_list );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	return( 1 );
+
+on_error:
+	if( error != NULL )
+	{
+		libcerror_error_free(
+		 &error );
+	}
+	if( sub_key_list != NULL )
+	{
+		libregf_sub_key_list_free(
+		 &sub_key_list,
+		 NULL );
 	}
 	return( 0 );
 }
@@ -290,12 +482,16 @@ int main(
 #if defined( __GNUC__ ) && !defined( LIBREGF_DLL_IMPORT )
 
 	REGF_TEST_RUN(
-	 "libregf_key_descriptor_initialize",
-	 regf_test_key_descriptor_initialize );
+	 "libregf_sub_key_list_initialize",
+	 regf_test_sub_key_list_initialize );
 
 	REGF_TEST_RUN(
-	 "libregf_key_descriptor_free",
-	 regf_test_key_descriptor_free );
+	 "libregf_sub_key_list_free",
+	 regf_test_sub_key_list_free );
+
+	REGF_TEST_RUN(
+	 "libregf_sub_key_list_read_data",
+	 regf_test_sub_key_list_read_data );
 
 #endif /* defined( __GNUC__ ) && !defined( LIBREGF_DLL_IMPORT ) */
 

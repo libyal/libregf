@@ -311,6 +311,8 @@ int libregf_internal_multi_string_read_data(
 			}
 #endif
 			internal_multi_string->item_flags |= LIBREGF_ITEM_FLAG_IS_CORRUPTED;
+
+			break;
 		}
 		if( string_size == 2 )
 		{

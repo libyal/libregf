@@ -12,9 +12,8 @@ A Windows NT Registry File is used by Microsoft Windows NT (or later) to store
 a part of the Windows Registry. This specification is based on earlier work on
 the format and was complimented by analyzing test data.
 
-This document is intended as a working document for the Windows NT Registry
-File (REGF) format specification. Which should allow existing Open Source
-forensic tooling to be able to process this file type.
+This document is intended as a working document of the data format specification
+for the libregf project.
 
 [preface]
 == Document information
@@ -24,7 +23,7 @@ forensic tooling to be able to process this file type.
 | Author(s): | Joachim Metz <joachim.metz@gmail.com>
 | Abstract: | This document contains information about the Windows NT Registry File format.
 | Classification: | Public
-| Keywords: | Windows Registry File, REGF
+| Keywords: | Windows NT Registry File, REGF
 |===
 
 [preface]
@@ -72,6 +71,7 @@ in the section entitled "GNU Free Documentation License".
 | 0.0.25 | J.B. Metz | July 2019 | Textual changes.
 | 0.0.26 | J.B. Metz | April 2020 | Additional information regarding corruption scenario.
 | 0.0.27 | J.B. Metz | August 2020 | Additional information.
+| 0.0.28 | J.B. Metz | October 2020 | Additional information regarding corruption scenarios.
 |===
 
 :numbered:
@@ -931,14 +931,111 @@ page bitmap is set.
 
 == [[corruption_scenarios]]Corruption scenarios
 
-=== Value data size exceeds hive bin cell value size
+=== Hive bin corruption scenarios
 
-In the value data size exceeds hive bin cell value size scenario the value data
-size exceeds the hive bin cell value size it currently is assumed that the cell
-value size is the one to be used. Seeing it operates on a lower level then the
-value data size.
+==== Empty hive bins
 
-[yellow-background]*Is the next hive bin cell value unallocated?*
+In a Windows 8.1 SYSTEM regf file a scenario was encountered that the last
+part of the hive bins data contained empty (zero byte filled) blocks. The
+hive bins size is 8695808 bytes but the hive bin data ends at file offset
+8388608.
+
+....
+00000000: 72 65 67 66 05 01 00 00  04 01 00 00 53 2e aa ae   regf.... ....S...
+...
+007ffff0  3c 22 08 4e 91 a2 91 d0  11 d4 22 64 00 00 00 00   <".N.... .."d....
+00800000  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00   ........ ........
+*
+00880000
+....
+
+A key refers to an offset (0x0083c1d8) within the empty hive bins data.
+....
+last written time                      : Feb 19, 2014 20:28:38.096939500 UTC
+unknown1                               : 0x00000003 (3)
+parent key offset                      : 0x00000358
+number of sub keys                     : 86
+number of volatile sub keys            : 0
+sub keys list offset                   : 0x0083c1d8
+volatile sub keys list offset          : 0xffffffff
+number of values                       : 0
+values list offset                     : 0xffffffff
+security key offset                    : 0x000009a0
+class name offset                      : 0xffffffff
+largest sub key name size              : 0x0000004c (76)
+largest sub key class name size        : 0x00000000 (0)
+largest value name size                : 0x00000000 (0)
+largest value data size                : 0x00000000 (0)
+unknown6                               : 0x00000008 (8)
+key name size                          : 5
+class name size                        : 0
+key name                               : Class
+key name hash                          : 0x07b82c9a
+....
+
+==== Misaligned hive bins
+
+In a SOFTWARE regf file a scenario was encountered that between hive bins a 512
+byte block of 0xff byte values was stored.
+
+....
+000e4000  68 62 69 6e 00 30 0e 00  00 10 00 00 00 00 00 00  |hbin.0..........|
+...
+000e4ff0  f0 ff ff ff d8 50 16 00  c8 59 16 00 e8 59 16 00  |.....P...Y...Y..|
+000e5000  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff  |................|
+*
+000e5200  68 62 69 6e 00 40 0e 00  00 10 00 00 00 00 00 00  |hbin.@..........|
+....
+
+Repeated every 0x00200000 bytes:
+....
+002e5200  68 62 69 6e 00 40 4e 00  00 10 00 00 00 00 00 00  |hbin.@N.........|
+...
+002e4ff0  36 2e 33 2e 39 36 30 30  2e 31 36 33 38 34 00 00  |6.3.9600.16384..|
+002e5000  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff  |................|
+*
+002e5200  68 62 69 6e 00 40 4e 00  00 10 00 00 00 00 00 00  |hbin.@N.........|
+....
+
+....
+hive bin header:
+00000000: 68 62 69 6e 00 e0 0e 00  00 10 00 00 00 00 00 00   hbin.... ........
+00000010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00   ........ ........
+
+signature                                 : hbin
+hive bin offset                           : 974848
+size                                      : 4096 bytes
+unknown1                                  : 0x00000000 (0)
+unknown2                                  : 0x00000000 (0)
+unknown time                              : Jan 01, 1601 00:00:00.000000000 UTC
+unknown spare                             : 0x00000000 (0)
+
+4096 bytes of other data
+
+hive bin header:
+00000000: d8 4d 48 02 38 1f 3a 03  68 99 09 03 e0 0a ad 03   .MH.8.:. h.......
+00000010: 18 29 0e 00 34 5f 52 54  b0 ff ff ff 76 6b 37 00   .)..4_RT ....vk7.
+
+...
+
+hive bin header:
+00000000: 68 62 69 6e 00 00 0f 00  00 10 00 00 00 00 00 00   hbin.... ........
+00000010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00   ........ ........
+
+signature                                 : hbin
+hive bin offset                           : 983040
+size                                      : 4096 bytes
+unknown1                                  : 0x00000000 (0)
+unknown2                                  : 0x00000000 (0)
+unknown time                              : Jan 01, 1601 00:00:00.000000000 UTC
+unknown spare                             : 0x00000000 (0)
+
+mismatch in hive bin offset (stored: 983040 != calculated: 978944).
+
+8192 bytes jump in the hive bin offset
+....
+
+=== Named and value key corruption scenarios
 
 === Invalid value key
 
@@ -948,6 +1045,96 @@ size of the value key (and unallocated0 and/or the data in the bin cell value
 does not match that of a value key. This corruption scenario has been seen in a
 Registry file that was copied while in-use. The data in the value key cannot be
 trusted and most appropriately should be marked as corrupted.
+
+=== Value key data size - data block segments size mismatch
+
+In the value key data size - data block segments size mismatch scenario a
+REG_BINARY value contains a data block key, but the total size of the data
+block segments does not match the data size in the value key. It seems that the
+data size in the value key is leading.
+
+=== Value key data size - size mismatch
+
+In the value key data size - size mismatch scenario a REG_DWORD_LITTLE_ENDIAN
+value data does not correspond with the size of the data type.
+
+....
+signature                            : vk
+value name size                      : 6
+data size                            : 0x00000008 (8)
+data offset                          : 0x000c1b80
+data type                            : 0x00000004 (REG_DWORD_LITTLE_ENDIAN) Integer 32-bit signed little-endian
+flags                                : 0x0001
+        Value name is an ASCII string (VALUE_COMP_NAME)
+
+unknown1                             : 0x000b (11)
+value name                           : lParam
+value name hash                      : 0x4343bfdd
+padding:
+00000000: 6e 00                                              n.
+....
+
+=== Data block corruption scenarios
+
+==== Data block data segment > 16344 bytes
+
+[NOTE]
+This corruption scenario has only been observed with manually altered Windows
+Registry file.
+
+....
+hive bin cell: 006 offset             : 0x00000258
+hive bin cell: 006 size               : 0xfffffff0 (-16)
+hive bin cell: 006 data:
+00000000: 64 62 02 00 c0 02 00 00  94 74 bb 9d               db...... .t..
+
+signature                             : db
+number of segments                    : 2
+data block list offset                : 0x000002c0
+
+data:
+00000000: 20 30 00 00 20 70 00 00  94 74 bb 9d                0.. p.. .t..
+
+element: 000 offset                   : 0x00003020
+element: 001 offset                   : 0x00007020
+padding:
+00000000: 94 74 bb 9d                                        .t..
+
+hive bin cell: 000 offset             : 0x00003020
+hive bin cell: 000 size               : 0xffffc000 (-16384)
+hive bin cell: 000 data:
+00000000: 53 00 53 00 53 00 53 00  53 00 53 00 53 00 53 00   S.S.S.S. S.S.S.S.
+...
+00003fb0: 53 00 53 00 53 00 53 00  53 00 53 00 53 00 53 00   S.S.S.S. S.S.S.S.
+00003fc0: 53 00 53 00 53 00 53 00  53 00 53 00 75 00 76 00   S.S.S.S. S.S.u.v.
+00003fd0: 77 00 78 00 79 00 7a 00  49 00 4e 00 56 00 41 00   w.x.y.z. I.N.V.A.
+00003fe0: 4c 00 49 00 44 00 44 00  41 00 54 00 41 00 20 00   L.I.D.D. A.T.A. .
+00003ff0: 20 00 20 00 20 00 20 00  20 00 20 00                . . . .  . .
+
+hive bin cell: 001 offset             : 0x00007020
+hive bin cell: 001 size               : 0xffffc020 (-16352)
+hive bin cell: 001 data:
+00000000: 53 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00   S....... ........
+00000010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00   ........ ........
+...
+00003fc0: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00   ........ ........
+00003fd0: 00 00 00 00 00 00 00 00  00 00 00 00               ........ ....
+....
+
+The hive bin cell at offset 0x00003020 is 16380 bytes in size which is larger
+than 16344. The Windows implementation will ignore any additional data beyond
+16344 bytes in a data block data segment.
+
+=== Value data corruption scenarios
+
+==== Value data size exceeds hive bin cell value size
+
+In the value data size exceeds hive bin cell value size scenario the value data
+size exceeds the hive bin cell value size it currently is assumed that the cell
+value size is the one to be used. Seeing it operates on a lower level then the
+value data size.
+
+[yellow-background]*Is the next hive bin cell value unallocated?*
 
 === Integer value data too large
 
@@ -1071,7 +1258,6 @@ data:
 00000000: 65 00 6e 00 2d 00 55 00  53 00 00 00               e.n.-.U. S...
 ....
 
-
 === Multi string value with single string without end-of-string character
 
 Seen on Windows XP.
@@ -1093,134 +1279,32 @@ Data:
 00000020: 31 00 44 00 31 00 2d 00                            1.D.1.-.
 ....
 
-=== Value key data size - data block segments size mismatch
-
-In the value key data size - data block segments size mismatch scenario a
-REG_BINARY value contains a data block key, but the total size of the data
-block segments does not match the data size in the value key. It seems that the
-data size in the value key is leading.
-
-=== Value key data size - size mismatch
-
-In the value key data size - size mismatch scenario a REG_DWORD_LITTLE_ENDIAN
-value data does not correspond with the size of the data type.
+=== Multi string value stored as ASCII string
 
 ....
-signature                            : vk
-value name size                      : 6
-data size                            : 0x00000008 (8)
-data offset                          : 0x000c1b80
-data type                            : 0x00000004 (REG_DWORD_LITTLE_ENDIAN) Integer 32-bit signed little-endian
-flags                                : 0x0001
-        Value name is an ASCII string (VALUE_COMP_NAME)
-
-unknown1                             : 0x000b (11)
-value name                           : lParam
-value name hash                      : 0x4343bfdd
-padding:
-00000000: 6e 00                                              n.
-....
-
-=== Empty hive bins
-
-In a Windows 8.1 SYSTEM regf file a scenario was encountered that the last
-part of the hive bins data contained empty (zero byte filled) blocks. The
-hive bins size is 8695808 bytes but the hive bin data ends at file offset
-8388608.
-
-....
-00000000: 72 65 67 66 05 01 00 00  04 01 00 00 53 2e aa ae   regf.... ....S...
-...
-007ffff0  3c 22 08 4e 91 a2 91 d0  11 d4 22 64 00 00 00 00   <".N.... .."d....
-00800000  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00   ........ ........
-*
-00880000
-....
-
-A key refers to an offset (0x0083c1d8) within the empty hive bins data.
-....
-last written time                      : Feb 19, 2014 20:28:38.096939500 UTC
-unknown1                               : 0x00000003 (3)
-parent key offset                      : 0x00000358
-number of sub keys                     : 86
-number of volatile sub keys            : 0
-sub keys list offset                   : 0x0083c1d8
-volatile sub keys list offset          : 0xffffffff
-number of values                       : 0
-values list offset                     : 0xffffffff
-security key offset                    : 0x000009a0
-class name offset                      : 0xffffffff
-largest sub key name size              : 0x0000004c (76)
-largest sub key class name size        : 0x00000000 (0)
-largest value name size                : 0x00000000 (0)
-largest value data size                : 0x00000000 (0)
-unknown6                               : 0x00000008 (8)
-key name size                          : 5
-class name size                        : 0
-key name                               : Class
-key name hash                          : 0x07b82c9a
-....
-
-=== Misaligned hive bins
-
-In a SOFTWARE regf file a scenario was encountered that between hive bins a 512
-byte block of 0xff byte values was stored.
-
-....
-000e4000  68 62 69 6e 00 30 0e 00  00 10 00 00 00 00 00 00  |hbin.0..........|
-...
-000e4ff0  f0 ff ff ff d8 50 16 00  c8 59 16 00 e8 59 16 00  |.....P...Y...Y..|
-000e5000  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff  |................|
-*
-000e5200  68 62 69 6e 00 40 0e 00  00 10 00 00 00 00 00 00  |hbin.@..........|
-....
-
-Repeated every 0x00200000 bytes:
-....
-002e5200  68 62 69 6e 00 40 4e 00  00 10 00 00 00 00 00 00  |hbin.@N.........|
-...
-002e4ff0  36 2e 33 2e 39 36 30 30  2e 31 36 33 38 34 00 00  |6.3.9600.16384..|
-002e5000  ff ff ff ff ff ff ff ff  ff ff ff ff ff ff ff ff  |................|
-*
-002e5200  68 62 69 6e 00 40 4e 00  00 10 00 00 00 00 00 00  |hbin.@N.........|
-....
-
-....
-hive bin header:
-00000000: 68 62 69 6e 00 e0 0e 00  00 10 00 00 00 00 00 00   hbin.... ........
-00000010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00   ........ ........
-
-signature                                 : hbin
-hive bin offset                           : 974848
-size                                      : 4096 bytes
-unknown1                                  : 0x00000000 (0)
-unknown2                                  : 0x00000000 (0)
-unknown time                              : Jan 01, 1601 00:00:00.000000000 UTC
-unknown spare                             : 0x00000000 (0)
-
-4096 bytes of other data
-
-hive bin header:
-00000000: d8 4d 48 02 38 1f 3a 03  68 99 09 03 e0 0a ad 03   .MH.8.:. h.......
-00000010: 18 29 0e 00 34 5f 52 54  b0 ff ff ff 76 6b 37 00   .)..4_RT ....vk7.
-
-...
-
-hive bin header:
-00000000: 68 62 69 6e 00 00 0f 00  00 10 00 00 00 00 00 00   hbin.... ........
-00000010: 00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00   ........ ........
-
-signature                                 : hbin
-hive bin offset                           : 983040
-size                                      : 4096 bytes
-unknown1                                  : 0x00000000 (0)
-unknown2                                  : 0x00000000 (0)
-unknown time                              : Jan 01, 1601 00:00:00.000000000 UTC
-unknown spare                             : 0x00000000 (0)
-
-mismatch in hive bin offset (stored: 983040 != calculated: 978944).
-
-8192 bytes jump in the hive bin offset
+Key path: ROOT\Software\Microsoft\Windows\CurrentVersion\ActivityDataModel\ReaderRevisionInfo\ReaderRevisionInfo
+Key: ReaderRevisionInfo
+Value: 0 6B589C77-E9D7-028F-C5F7-CAD33E725836
+Type: multi-value string (REG_MULTI_SZ)
+Data size: 269
+Data:
+00000000: 31 00 39 34 39 00 30 00  7b 0a 20 20 20 22 44 61   1.949.0. {.   "Da
+00000010: 74 61 62 61 73 65 49 6e  73 74 61 6e 63 65 49 64   tabaseIn stanceId
+00000020: 22 20 3a 20 34 37 30 33  2c 0a 20 20 20 22 53 65   " : 4703 ,.   "Se
+00000030: 71 75 65 6e 63 65 22 20  3a 20 32 33 37 39 2c 0a   quence"  : 2379,.
+00000040: 20 20 20 22 61 63 74 69  76 69 74 79 53 74 6f 72      "acti vityStor
+00000050: 65 49 64 22 20 3a 20 22  36 42 35 38 39 43 37 37   eId" : " 6B589C77
+00000060: 2d 45 39 44 37 2d 30 32  38 46 2d 43 35 46 37 2d   -E9D7-02 8F-C5F7-
+00000070: 43 41 44 33 33 45 37 32  35 38 33 36 22 2c 0a 20   CAD33E72 5836",. 
+00000080: 20 20 22 66 69 6c 74 65  72 22 20 3a 20 7b 0a 20     "filte r" : {. 
+00000090: 20 20 20 20 20 22 69 73  52 65 61 64 46 69 6c 74        "is ReadFilt
+000000a0: 65 72 22 20 3a 20 30 2c  0a 20 20 20 20 20 20 22   er" : 0, .      "
+000000b0: 6f 72 69 67 69 6e 46 69  6c 74 65 72 4b 65 79 22   originFi lterKey"
+000000c0: 20 3a 20 30 2c 0a 20 20  20 20 20 20 22 73 74 61    : 0,.       "sta
+000000d0: 74 65 46 69 6c 74 65 72  4b 65 79 22 20 3a 20 30   teFilter Key" : 0
+000000e0: 2c 0a 20 20 20 20 20 20  22 75 73 65 72 41 63 74   ,.       "userAct
+000000f0: 69 6f 6e 53 74 61 74 65  46 69 6c 74 65 72 22 20   ionState Filter" 
+00000100: 3a 20 30 0a 20 20 20 7d  0a 7d 0a 00 00            : 0.   } .}...
 ....
 
 === Truncated Registry file

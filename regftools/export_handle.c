@@ -582,6 +582,7 @@ int export_handle_export_key(
 	uint64_t value_64bit             = 0;
 	uint32_t value_32bit             = 0;
 	uint32_t value_type              = 0;
+	int is_corrupted                 = 0;
 	int number_of_sub_keys           = 0;
 	int number_of_values             = 0;
 	int result                       = 0;
@@ -969,6 +970,27 @@ int export_handle_export_key(
 			 export_handle->notify_stream,
 			 "Value: %d (default)\n",
 			 value_index );
+		}
+		is_corrupted = libregf_value_is_corrupted(
+		                value,
+		                error );
+
+		if( is_corrupted == -1 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+			 "%s: unable to determine if value is corrupted.",
+			 function );
+
+			goto on_error;
+		}
+		else if( is_corrupted != 0 )
+		{
+			fprintf(
+			 export_handle->notify_stream,
+			 "Is corrupted\n" );
 		}
 		if( libregf_value_get_value_type(
 		     value,

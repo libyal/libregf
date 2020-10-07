@@ -215,7 +215,7 @@ on_error:
 	return( NULL );
 }
 
-/* Intializes a values sequence and iterator object
+/* Initializes a values sequence and iterator object
  * Returns 0 if successful or -1 on error
  */
 int pyregf_values_init(

@@ -967,9 +967,10 @@ int libregf_value_item_read_data_block_list(
      libcerror_error_t **error )
 {
 	libregf_hive_bin_cell_t *hive_bin_cell = NULL;
-	const uint8_t *hive_bin_cell_data      = NULL;
+	uint8_t *list_data                     = NULL;
 	static char *function                  = "libregf_value_item_read_data_block_list";
-	size_t hive_bin_cell_size              = 0;
+	size_t data_offset                     = 0;
+	size_t list_data_size                  = 0;
 	uint32_t calculated_value_data_size    = 0;
 	uint32_t element_offset                = 0;
 	uint32_t segment_offset                = 0;
@@ -1041,9 +1042,61 @@ int libregf_value_item_read_data_block_list(
 
 		return( 0 );
 	}
-	hive_bin_cell_data = hive_bin_cell->data;
-	hive_bin_cell_size = hive_bin_cell->size;
+	if( hive_bin_cell == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: missing hive bins cell.",
+		 function );
 
+		return( -1 );
+	}
+	list_data_size = (size_t) hive_bin_cell->size;
+
+	if( ( list_data_size == 0 )
+	 || ( list_data_size > (size_t) MEMORY_MAXIMUM_ALLOCATION_SIZE ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid list data size value out of bounds.",
+		 function );
+
+		goto on_error;
+	}
+	/* Make a local copy to prevent the hive bin cell data from being cached out
+	 */
+	list_data = (uint8_t *) memory_allocate(
+	                         sizeof( uint8_t ) * list_data_size );
+
+	if( list_data == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_INSUFFICIENT,
+		 "%s: unable to create list data.",
+		 function );
+
+		goto on_error;
+	}
+	if( memory_copy(
+	     list_data,
+	     hive_bin_cell->data,
+	     list_data_size ) == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_MEMORY,
+		 LIBCERROR_MEMORY_ERROR_COPY_FAILED,
+		 "%s: unable to copy list data.",
+		 function );
+
+		goto on_error;
+	}
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
 	{
@@ -1051,12 +1104,12 @@ int libregf_value_item_read_data_block_list(
 		 "%s: data:\n",
 		 function );
 		libcnotify_print_data(
-		 hive_bin_cell_data,
-		 hive_bin_cell_size,
+		 list_data,
+		 list_data_size,
 		 LIBCNOTIFY_PRINT_DATA_FLAG_GROUP_DATA );
 	}
 #endif
-	if( hive_bin_cell_size < ( (size_t) number_of_segments * 4 ) )
+	if( (size_t) number_of_segments > ( list_data_size / 4 ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -1111,10 +1164,10 @@ int libregf_value_item_read_data_block_list(
 		     element_iterator++ )
 		{
 			byte_stream_copy_to_uint32_little_endian(
-			 &( hive_bin_cell_data[ element_iterator * 4 ] ),
+			 &( list_data[ data_offset ] ),
 			 element_offset );
 
-			hive_bin_cell_size -= 4;
+			data_offset += 4;
 
 #if defined( HAVE_DEBUG_OUTPUT )
 			if( libcnotify_verbose != 0 )
@@ -1139,8 +1192,9 @@ int libregf_value_item_read_data_block_list(
 				if( libcnotify_verbose != 0 )
 				{
 					libcnotify_printf(
-					 "%s: unable to retrieve hive bin cell at offset: %" PRIu32 ".\n",
+					 "%s: unable to retrieve data segment: %" PRIu16 " hive bin cell at offset: %" PRIu32 ".\n",
 					 function,
+					 element_iterator,
 					 element_offset );
 				}
 #endif
@@ -1156,6 +1210,22 @@ int libregf_value_item_read_data_block_list(
 			segment_offset = (uint32_t) ( hive_bins_list->io_handle->hive_bins_list_offset + 4 + element_offset );
 			segment_size   = hive_bin_cell->size - 4;
 
+			if( segment_size > 16344 )
+			{
+#if defined( HAVE_DEBUG_OUTPUT )
+				if( libcnotify_verbose != 0 )
+				{
+					libcnotify_printf(
+					 "%s: data segment: %" PRIu16 " size: %" PRIu32 " exceeds maximum.\n",
+					 function,
+					 element_iterator,
+					 segment_size );
+				}
+#endif
+				value_item->item_flags |= LIBREGF_ITEM_FLAG_IS_CORRUPTED;
+
+				segment_size = 16344;
+			}
 			if( ( calculated_value_data_size + segment_size ) > value_data_size )
 			{
 #if defined( HAVE_DEBUG_OUTPUT )
@@ -1192,40 +1262,19 @@ int libregf_value_item_read_data_block_list(
 				goto on_error;
 			}
 			calculated_value_data_size += segment_size;
-
-			/* Make sure hive_bin_cell_data points to a valid data
-			 */
-			if( libregf_hive_bins_list_get_cell_at_offset(
-			     hive_bins_list,
-			     file_io_handle,
-			     data_block_list_offset,
-			     &hive_bin_cell,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
-				 "%s: unable to retrieve hive bin cell at offset: %" PRIu32 ".",
-				 function,
-				 data_block_list_offset );
-
-				goto on_error;
-			}
-			hive_bin_cell_data = hive_bin_cell->data;
 		}
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
 	{
-		if( hive_bin_cell_size > 0 )
+		if( data_offset < list_data_size )
 		{
 			libcnotify_printf(
 			 "%s: padding:\n",
 			 function );
 			libcnotify_print_data(
-			 hive_bin_cell_data,
-			 hive_bin_cell_size,
+			 &( list_data[ data_offset ] ),
+			 list_data_size - data_offset,
 			 LIBCNOTIFY_PRINT_DATA_FLAG_GROUP_DATA );
 		}
 		else
@@ -1235,6 +1284,9 @@ int libregf_value_item_read_data_block_list(
 		}
 	}
 #endif
+	memory_free(
+	 list_data );
+
 	return( 1 );
 
 on_error:
@@ -1243,6 +1295,11 @@ on_error:
 		libfdata_stream_free(
 		 &( value_item->data_stream ),
 		 NULL );
+	}
+	if( list_data != NULL )
+	{
+		memory_free(
+		 list_data );
 	}
 	return( -1 );
 }

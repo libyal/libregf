@@ -351,7 +351,7 @@ on_error:
 	return( NULL );
 }
 
-/* Intializes a key object
+/* Initializes a key object
  * Returns 0 if successful or -1 on error
  */
 int pyregf_key_init(

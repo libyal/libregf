@@ -315,7 +315,7 @@ on_error:
 	return( NULL );
 }
 
-/* Intializes a value object
+/* Initializes a value object
  * Returns 0 if successful or -1 on error
  */
 int pyregf_value_init(

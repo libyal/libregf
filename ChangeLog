@@ -1,4 +1,7 @@
 TODO
+* regfexport print when key is corrupted, like value
+* when multi value is corrupted flag Registry value as corrupted
+
 * change value item handle missing value name
 * fix:
   - multiple successive open of transaction regf file

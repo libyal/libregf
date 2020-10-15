@@ -34,6 +34,7 @@
 #include "libregf_key_tree.h"
 #include "libregf_libbfio.h"
 #include "libregf_libcerror.h"
+#include "libregf_libcthreads.h"
 #include "libregf_libfdata.h"
 #include "libregf_libuna.h"
 #include "libregf_value.h"

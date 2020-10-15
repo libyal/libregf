@@ -235,7 +235,7 @@ int libregf_key_item_free(
 }
 
 /* Reads a key item
- * Returns the number of bytes read if successful or -1 on error
+ * Returns 1 if successful or -1 on error
  */
 int libregf_key_item_read(
      libregf_key_item_t *key_item,

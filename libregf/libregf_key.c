@@ -178,6 +178,12 @@ int libregf_key_initialize(
 on_error:
 	if( internal_key != NULL )
 	{
+		if( internal_key->key_item != NULL )
+		{
+			libregf_key_item_free(
+			 &( internal_key->key_item ),
+			 NULL );
+		}
 		memory_free(
 		 internal_key );
 	}

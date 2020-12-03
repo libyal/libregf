@@ -258,7 +258,7 @@ int libregf_file_close(
      libregf_file_t *file,
      libregf_error_t **error );
 
-/* Determine if the file corrupted
+/* Determine if the file is corrupted
  * Returns 1 if corrupted, 0 if not or -1 on error
  */
 LIBREGF_EXTERN \
@@ -650,7 +650,7 @@ int libregf_value_free(
      libregf_value_t **value,
      libregf_error_t **error );
 
-/* Determine if the value corrupted
+/* Determine if the value is corrupted
  * Returns 1 if corrupted, 0 if not or -1 on error
  */
 LIBREGF_EXTERN \

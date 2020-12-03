@@ -30,7 +30,11 @@
 
 #include <libregf/extern.h>
 
+#if defined( __CYGWIN__ ) || defined( __MINGW32__ )
+#define LIBREGF_EXTERN_VARIABLE	extern
+#else
 #define LIBREGF_EXTERN_VARIABLE	LIBREGF_EXTERN
+#endif
 
 #else
 #define LIBREGF_EXTERN		/* extern */

@@ -72,6 +72,7 @@ in the section entitled "GNU Free Documentation License".
 | 0.0.26 | J.B. Metz | April 2020 | Additional information regarding corruption scenario.
 | 0.0.27 | J.B. Metz | August 2020 | Additional information.
 | 0.0.28 | J.B. Metz | October 2020 | Additional information regarding corruption scenarios.
+| 0.0.29 | J.B. Metz | December 2020 | Additional information about verion 1.6 files.
 |===
 
 :numbered:
@@ -257,7 +258,7 @@ This is the REG_STANDARD_FORMAT as used by RegSaveKeyEx on Windows 10 2004
 | 1.4 | [yellow-background]*Unknown (mentioned by some sources, but not yet observed)*
 | 1.5 | Seen on Windows XP SP2 and later, typically used for SOFTWARE, SYSTEM +
 This is the REG_LATEST_FORMAT as used by RegSaveKeyEx on Windows 10 2004
-| 1.6 | [yellow-background]*Unknown (mentioned by some sources, but not yet observed)*
+| 1.6 | Seen used by Windows Docker delta Registry files on Windows 10 2004.
 |===
 
 === [[file_types]]File types

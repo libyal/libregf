@@ -34,6 +34,7 @@
 #include "regf_test_memory.h"
 #include "regf_test_unused.h"
 
+#include "../libregf/libregf_io_handle.h"
 #include "../libregf/libregf_security_key.h"
 
 uint8_t regf_test_security_key_data1[ 180 ] = {
@@ -292,11 +293,33 @@ int regf_test_security_key_read_data(
      void )
 {
 	libcerror_error_t *error             = NULL;
+	libregf_io_handle_t *io_handle       = NULL;
 	libregf_security_key_t *security_key = NULL;
 	int result                           = 0;
 
 	/* Initialize test
 	 */
+	result = libregf_io_handle_initialize(
+	          &io_handle,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "io_handle",
+	 io_handle );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	io_handle->major_version  = 1;
+	io_handle->minor_version  = 5;
+	io_handle->ascii_codepage = LIBREGF_CODEPAGE_WINDOWS_1252;
+
 	result = libregf_security_key_initialize(
 	          &security_key,
 	          &error );
@@ -318,6 +341,7 @@ int regf_test_security_key_read_data(
 	 */
 	result = libregf_security_key_read_data(
 	          security_key,
+	          io_handle,
 	          regf_test_security_key_data1,
 	          180,
 	          &error );
@@ -340,6 +364,7 @@ int regf_test_security_key_read_data(
 	 */
 	result = libregf_security_key_read_data(
 	          security_key,
+	          io_handle,
 	          regf_test_security_key_data1,
 	          180,
 	          &error );
@@ -398,6 +423,7 @@ int regf_test_security_key_read_data(
 	 */
 	result = libregf_security_key_read_data(
 	          NULL,
+	          io_handle,
 	          regf_test_security_key_data1,
 	          180,
 	          &error );
@@ -417,6 +443,7 @@ int regf_test_security_key_read_data(
 	result = libregf_security_key_read_data(
 	          security_key,
 	          NULL,
+	          regf_test_security_key_data1,
 	          180,
 	          &error );
 
@@ -434,6 +461,26 @@ int regf_test_security_key_read_data(
 
 	result = libregf_security_key_read_data(
 	          security_key,
+	          io_handle,
+	          NULL,
+	          180,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libregf_security_key_read_data(
+	          security_key,
+	          io_handle,
 	          regf_test_security_key_data1,
 	          0,
 	          &error );
@@ -452,6 +499,7 @@ int regf_test_security_key_read_data(
 
 	result = libregf_security_key_read_data(
 	          security_key,
+	          io_handle,
 	          regf_test_security_key_data1,
 	          (size_t) SSIZE_MAX + 1,
 	          &error );
@@ -476,6 +524,7 @@ int regf_test_security_key_read_data(
 
 	result = libregf_security_key_read_data(
 	          security_key,
+	          io_handle,
 	          regf_test_security_key_data1,
 	          180,
 	          &error );
@@ -506,6 +555,7 @@ int regf_test_security_key_read_data(
 
 	result = libregf_security_key_read_data(
 	          security_key,
+	          io_handle,
 	          regf_test_security_key_data1,
 	          180,
 	          &error );
@@ -539,6 +589,7 @@ int regf_test_security_key_read_data(
 
 	result = libregf_security_key_read_data(
 	          security_key,
+	          io_handle,
 	          regf_test_security_key_data1,
 	          180,
 	          &error );
@@ -578,6 +629,23 @@ int regf_test_security_key_read_data(
 	 "error",
 	 error );
 
+	result = libregf_io_handle_free(
+	          &io_handle,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "io_handle",
+	 io_handle );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
 	return( 1 );
 
 on_error:
@@ -590,6 +658,12 @@ on_error:
 	{
 		libregf_security_key_free(
 		 &security_key,
+		 NULL );
+	}
+	if( io_handle != NULL )
+	{
+		libregf_io_handle_free(
+		 &io_handle,
 		 NULL );
 	}
 	return( 0 );
@@ -630,7 +704,11 @@ int main(
 
 	return( EXIT_SUCCESS );
 
+#if defined( __GNUC__ ) && !defined( LIBREGF_DLL_IMPORT )
+
 on_error:
 	return( EXIT_FAILURE );
+
+#endif /* defined( __GNUC__ ) && !defined( LIBREGF_DLL_IMPORT ) */
 }
 

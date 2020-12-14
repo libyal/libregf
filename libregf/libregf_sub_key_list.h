@@ -25,6 +25,7 @@
 #include <common.h>
 #include <types.h>
 
+#include "libregf_io_handle.h"
 #include "libregf_libcdata.h"
 #include "libregf_libcerror.h"
 
@@ -55,6 +56,7 @@ int libregf_sub_key_list_free(
 
 int libregf_sub_key_list_read_data(
      libregf_sub_key_list_t *sub_key_list,
+     libregf_io_handle_t *io_handle,
      const uint8_t *data,
      size_t data_size,
      libcerror_error_t **error );

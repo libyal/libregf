@@ -293,6 +293,7 @@ int regf_test_key_initialize(
 	REGF_TEST_ASSERT_IS_NULL(
 	 "error",
 	 error );
+
 	return( 1 );
 
 on_error:

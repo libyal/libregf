@@ -25,6 +25,7 @@
 #include <types.h>
 
 #include "libregf_key_descriptor.h"
+#include "libregf_io_handle.h"
 #include "libregf_libcdata.h"
 #include "libregf_libcerror.h"
 #include "libregf_libcnotify.h"
@@ -174,6 +175,7 @@ int libregf_sub_key_list_free(
  */
 int libregf_sub_key_list_read_data(
      libregf_sub_key_list_t *sub_key_list,
+     libregf_io_handle_t *io_handle,
      const uint8_t *data,
      size_t data_size,
      libcerror_error_t **error )
@@ -181,10 +183,15 @@ int libregf_sub_key_list_read_data(
 	libregf_key_descriptor_t *sub_key_descriptor = NULL;
 	static char *function                        = "libregf_sub_key_list_read_data";
 	size_t data_offset                           = 0;
+	size_t sub_key_list_data_size                = 0;
 	uint16_t element_index                       = 0;
 	uint16_t number_of_elements                  = 0;
 	uint8_t element_data_size                    = 0;
 	int entry_index                              = 0;
+
+#if defined( HAVE_DEBUG_OUTPUT )
+	uint32_t value_32bit                         = 0;
+#endif
 
 	if( sub_key_list == NULL )
 	{
@@ -197,6 +204,24 @@ int libregf_sub_key_list_read_data(
 
 		return( -1 );
 	}
+	if( io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	sub_key_list_data_size = sizeof( regf_sub_key_list_t );
+
+	if( ( io_handle->major_version == 1 )
+	 && ( io_handle->minor_version <= 1 ) )
+	{
+		sub_key_list_data_size += 4;
+	}
 	if( data == NULL )
 	{
 		libcerror_error_set(
@@ -208,7 +233,7 @@ int libregf_sub_key_list_read_data(
 
 		return( -1 );
 	}
-	if( ( data_size < sizeof( regf_sub_key_list_t ) )
+	if( ( data_size < sub_key_list_data_size )
 	 || ( data_size > (size_t) SSIZE_MAX ) )
 	{
 		libcerror_error_set(
@@ -232,23 +257,28 @@ int libregf_sub_key_list_read_data(
 		 0 );
 	}
 #endif
+	if( ( io_handle->major_version == 1 )
+	 && ( io_handle->minor_version <= 1 ) )
+	{
+		data_offset += 4;
+	}
 	/* Check if the signature matches that of a sub key list: "lf", "lh", "li" or "ri"
 	 */
-	if( ( data[ 0 ] == (uint8_t) 'r' )
-	 && ( data[ 1 ] == (uint8_t) 'i' ) )
+	if( ( data[ data_offset ] == (uint8_t) 'r' )
+	 && ( data[ data_offset + 1 ] == (uint8_t) 'i' ) )
 	{
 		element_data_size           = 4;
 		sub_key_list->at_leaf_level = 0;
 	}
-	else if( ( data[ 0 ] == (uint8_t) 'l' )
-	      && ( data[ 1 ] == (uint8_t) 'i' ) )
+	else if( ( data[ data_offset ] == (uint8_t) 'l' )
+	      && ( data[ data_offset + 1 ] == (uint8_t) 'i' ) )
 	{
 		element_data_size           = 4;
 		sub_key_list->at_leaf_level = 1;
 	}
-	else if( ( data[ 0 ] == (uint8_t) 'l' )
-	      && ( ( data[ 1 ] == (uint8_t) 'f' )
-	        || ( data[ 1 ] == (uint8_t) 'h' ) ) )
+	else if( ( data[ data_offset ] == (uint8_t) 'l' )
+	      && ( ( data[ data_offset + 1 ] == (uint8_t) 'f' )
+	        || ( data[ data_offset + 1 ] == (uint8_t) 'h' ) ) )
 	{
 		element_data_size           = 8;
 		sub_key_list->at_leaf_level = 1;
@@ -265,25 +295,38 @@ int libregf_sub_key_list_read_data(
 		goto on_error;
 	}
 	byte_stream_copy_to_uint16_little_endian(
-	 ( (regf_sub_key_list_t *) data )->number_of_elements,
+	 ( (regf_sub_key_list_t *) &( data[ data_offset ] ) )->number_of_elements,
 	 number_of_elements );
 
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
 	{
+		if( ( io_handle->major_version == 1 )
+		 && ( io_handle->minor_version <= 1 ) )
+		{
+			byte_stream_copy_to_uint32_little_endian(
+			 data,
+			 value_32bit );
+			libcnotify_printf(
+			 "%s: unknown0\t\t\t\t\t: 0x%08" PRIx32 " (%" PRIi32 ")\n",
+			 function,
+			 value_32bit,
+			 (int32_t) value_32bit );
+		}
 		libcnotify_printf(
 		 "%s: signature\t\t\t\t: %c%c\n",
 		 function,
-		 ( (regf_sub_key_list_t *) data )->signature[ 0 ],
-		 ( (regf_sub_key_list_t *) data )->signature[ 1 ] );
+		 ( (regf_sub_key_list_t *) &( data[ data_offset ] ) )->signature[ 0 ],
+		 ( (regf_sub_key_list_t *) &( data[ data_offset ] ) )->signature[ 1 ] );
 
 		libcnotify_printf(
 		 "%s: number of elements\t\t\t: %" PRIu16 "\n",
 		 function,
 		 number_of_elements );
 	}
-#endif
-	data_offset = sizeof( regf_sub_key_list_t );
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
+
+	data_offset += sizeof( regf_sub_key_list_t );
 
 	if( (size_t) number_of_elements > ( data_size / element_data_size ) )
 	{

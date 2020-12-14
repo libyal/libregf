@@ -2024,26 +2024,12 @@ int libregf_value_item_get_data(
 		}
 		value_item->data_buffer_size = (size_t) stream_data_size;
 
-		if( libfdata_stream_seek_offset(
-		     value_item->data_stream,
-		     0,
-		     SEEK_SET,
-		     error ) == -1 )
-		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_IO,
-			 LIBCERROR_IO_ERROR_SEEK_FAILED,
-			 "%s: unable to seek start of data stream.",
-			 function );
-
-			goto on_error;
-		}
-		read_count = libfdata_stream_read_buffer(
+		read_count = libfdata_stream_read_buffer_at_offset(
 		              value_item->data_stream,
 		              (intptr_t *) file_io_handle,
 		              value_item->data_buffer,
 		              value_item->data_buffer_size,
+		              0,
 		              0,
 		              error );
 
@@ -2053,7 +2039,7 @@ int libregf_value_item_get_data(
 			 error,
 			 LIBCERROR_ERROR_DOMAIN_IO,
 			 LIBCERROR_IO_ERROR_READ_FAILED,
-			 "%s: unable to read data from data stream.",
+			 "%s: unable to read data from data stream at offset: 0 (0x00000000).",
 			 function );
 
 			goto on_error;

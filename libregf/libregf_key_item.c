@@ -574,10 +574,10 @@ int libregf_key_item_read_named_key(
 	}
 	if( libregf_named_key_read_data(
 	     named_key,
+	     hive_bins_list->io_handle,
 	     hive_bin_cell->data,
 	     hive_bin_cell->size,
 	     named_key_hash,
-	     hive_bins_list->io_handle->ascii_codepage,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -954,6 +954,7 @@ int libregf_key_item_read_security_key(
 	}
 	if( libregf_security_key_read_data(
 	     security_key,
+	     hive_bins_list->io_handle,
 	     hive_bin_cell->data,
 	     hive_bin_cell->size,
 	     error ) != 1 )
@@ -1265,6 +1266,7 @@ int libregf_key_item_read_sub_keys_list(
 	}
 	if( libregf_sub_key_list_read_data(
 	     sub_key_list,
+	     hive_bins_list->io_handle,
 	     hive_bin_cell->data,
 	     hive_bin_cell->size,
 	     error ) != 1 )

@@ -24,6 +24,7 @@
 #include <memory.h>
 #include <types.h>
 
+#include "libregf_io_handle.h"
 #include "libregf_libcerror.h"
 #include "libregf_libcnotify.h"
 #include "libregf_libfwnt.h"
@@ -144,12 +145,14 @@ int libregf_security_key_free(
  */
 int libregf_security_key_read_data(
      libregf_security_key_t *security_key,
+     libregf_io_handle_t *io_handle,
      const uint8_t *data,
      size_t data_size,
      libcerror_error_t **error )
 {
 	static char *function                              = "libregf_security_key_read_data";
 	size_t data_offset                                 = 0;
+	size_t security_key_data_size                      = 0;
 	uint32_t security_descriptor_size                  = 0;
 
 #if defined( HAVE_DEBUG_OUTPUT )
@@ -180,6 +183,24 @@ int libregf_security_key_read_data(
 
 		return( -1 );
 	}
+	if( io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	security_key_data_size = sizeof( regf_security_key_t );
+
+	if( ( io_handle->major_version == 1 )
+	 && ( io_handle->minor_version <= 1 ) )
+	{
+		security_key_data_size += 4;
+	}
 	if( data == NULL )
 	{
 		libcerror_error_set(
@@ -191,24 +212,14 @@ int libregf_security_key_read_data(
 
 		return( -1 );
 	}
-	if( data_size < sizeof( regf_security_key_t ) )
+	if( ( data_size < security_key_data_size )
+	 || ( data_size > (size_t) SSIZE_MAX ) )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-		 "%s: invalid data size value too small.",
-		 function );
-
-		return( -1 );
-	}
-	if( data_size > (size_t) SSIZE_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid data size value exceeds maximum.",
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid data size value out of bounds.",
 		 function );
 
 		return( -1 );
@@ -225,10 +236,15 @@ int libregf_security_key_read_data(
 		 0 );
 	}
 #endif
+	if( ( io_handle->major_version == 1 )
+	 && ( io_handle->minor_version <= 1 ) )
+	{
+		data_offset += 4;
+	}
 	/* Check if the signature matches that of a security key: "sk"
 	 */
-	if( ( data[ 0 ] != (uint8_t) 's' )
-	 || ( data[ 1 ] != (uint8_t) 'k' ) )
+	if( ( data[ data_offset ] != (uint8_t) 's' )
+	 || ( data[ data_offset + 1 ] != (uint8_t) 'k' ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -240,20 +256,32 @@ int libregf_security_key_read_data(
 		goto on_error;
 	}
 	byte_stream_copy_to_uint32_little_endian(
-	 ( (regf_security_key_t *) data )->security_descriptor_size,
+	 ( (regf_security_key_t *) &( data[ data_offset ] ) )->security_descriptor_size,
 	 security_descriptor_size );
 
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
 	{
+		if( ( io_handle->major_version == 1 )
+		 && ( io_handle->minor_version <= 1 ) )
+		{
+			byte_stream_copy_to_uint32_little_endian(
+			 data,
+			 value_32bit );
+			libcnotify_printf(
+			 "%s: unknown0\t\t\t\t: 0x%08" PRIx32 " (%" PRIi32 ")\n",
+			 function,
+			 value_32bit,
+			 (int32_t) value_32bit );
+		}
 		libcnotify_printf(
 		 "%s: signature\t\t\t\t: %c%c\n",
 		 function,
-		 ( (regf_security_key_t *) data )->signature[ 0 ],
-		 ( (regf_security_key_t *) data )->signature[ 1 ] );
+		 ( (regf_security_key_t *) &( data[ data_offset ] ) )->signature[ 0 ],
+		 ( (regf_security_key_t *) &( data[ data_offset ] ) )->signature[ 1 ] );
 
 		byte_stream_copy_to_uint16_little_endian(
-		 ( (regf_security_key_t *) data )->unknown1,
+		 ( (regf_security_key_t *) &( data[ data_offset ] ) )->unknown1,
 		 value_16bit );
 		libcnotify_printf(
 		 "%s: unknown1\t\t\t\t: 0x%04" PRIx16 " (%" PRIu16 ")\n",
@@ -262,7 +290,7 @@ int libregf_security_key_read_data(
 		 value_16bit );
 
 		byte_stream_copy_to_uint32_little_endian(
-		 ( (regf_security_key_t *) data )->previous_security_key_offset,
+		 ( (regf_security_key_t *) &( data[ data_offset ] ) )->previous_security_key_offset,
 		 value_32bit );
 		libcnotify_printf(
 		 "%s: previous security key offset\t\t: 0x%08" PRIx32 "\n",
@@ -270,7 +298,7 @@ int libregf_security_key_read_data(
 		 value_32bit );
 
 		byte_stream_copy_to_uint32_little_endian(
-		 ( (regf_security_key_t *) data )->next_security_key_offset,
+		 ( (regf_security_key_t *) &( data[ data_offset ] ) )->next_security_key_offset,
 		 value_32bit );
 		libcnotify_printf(
 		 "%s: next security key offset\t\t: 0x%08" PRIx32 "\n",
@@ -278,7 +306,7 @@ int libregf_security_key_read_data(
 		 value_32bit );
 
 		byte_stream_copy_to_uint32_little_endian(
-		 ( (regf_security_key_t *) data )->reference_count,
+		 ( (regf_security_key_t *) &( data[ data_offset ] ) )->reference_count,
 		 value_32bit );
 		libcnotify_printf(
 		 "%s: reference count\t\t\t\t: %" PRIu32 "\n",
@@ -295,7 +323,7 @@ int libregf_security_key_read_data(
 	}
 #endif /* defined( HAVE_DEBUG_OUTPUT ) */
 
-	data_offset = sizeof( regf_security_key_t );
+	data_offset += sizeof( regf_security_key_t );
 
 	if( security_descriptor_size > ( data_size - data_offset ) )
 	{

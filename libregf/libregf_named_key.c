@@ -30,6 +30,7 @@
 
 #include "libregf_debug.h"
 #include "libregf_definitions.h"
+#include "libregf_io_handle.h"
 #include "libregf_libcerror.h"
 #include "libregf_libcnotify.h"
 #include "libregf_libfdatetime.h"
@@ -152,16 +153,17 @@ int libregf_named_key_free(
  */
 int libregf_named_key_read_data(
      libregf_named_key_t *named_key,
+     libregf_io_handle_t *io_handle,
      const uint8_t *data,
      size_t data_size,
      uint32_t named_key_hash LIBREGF_ATTRIBUTE_UNUSED,
-     int ascii_codepage LIBREGF_ATTRIBUTE_UNUSED,
      libcerror_error_t **error )
 {
 	static char *function                        = "libregf_named_key_read_data";
 	libuna_unicode_character_t unicode_character = 0;
 	size_t data_offset                           = 0;
 	size_t name_index                            = 0;
+	size_t named_key_data_size                   = 0;
 	int result                                   = 0;
 
 #if defined( HAVE_DEBUG_OUTPUT )
@@ -169,7 +171,6 @@ int libregf_named_key_read_data(
 #endif
 
 	LIBREGF_UNREFERENCED_PARAMETER( named_key_hash )
-	LIBREGF_UNREFERENCED_PARAMETER( ascii_codepage )
 
 	if( named_key == NULL )
 	{
@@ -193,6 +194,24 @@ int libregf_named_key_read_data(
 
 		return( -1 );
 	}
+	if( io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	named_key_data_size = sizeof( regf_named_key_t );
+
+	if( ( io_handle->major_version == 1 )
+	 && ( io_handle->minor_version <= 1 ) )
+	{
+		named_key_data_size += 4;
+	}
 	if( data == NULL )
 	{
 		libcerror_error_set(
@@ -204,15 +223,15 @@ int libregf_named_key_read_data(
 
 		return( -1 );
 	}
-	if( ( data_size < sizeof( regf_named_key_t ) )
+	if( ( data_size < named_key_data_size )
 	 || ( data_size > (size_t) SSIZE_MAX ) )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
-		 "%s: invalid data size value out of bounds.",
-		 function );
+		 "%s: invalid data size value out of bounds (%zd < %zd).",
+		 function, data_size, named_key_data_size );
 
 		return( -1 );
 	}
@@ -228,10 +247,15 @@ int libregf_named_key_read_data(
 		 0 );
 	}
 #endif
+	if( ( io_handle->major_version == 1 )
+	 && ( io_handle->minor_version <= 1 ) )
+	{
+		data_offset += 4;
+	}
 	/* Check if the signature matches that of a named key: "nk"
 	 */
-	if( ( data[ 0 ] != (uint8_t) 'n' )
-	 || ( data[ 1 ] != (uint8_t) 'k' ) )
+	if( ( data[ data_offset ] != (uint8_t) 'n' )
+	 || ( data[ data_offset + 1 ] != (uint8_t) 'k' ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -243,53 +267,65 @@ int libregf_named_key_read_data(
 		goto on_error;
 	}
 	byte_stream_copy_to_uint16_little_endian(
-	 ( (regf_named_key_t *) data )->flags,
+	 ( (regf_named_key_t *) &( data[ data_offset ] ) )->flags,
 	 named_key->flags );
 
 	byte_stream_copy_to_uint64_little_endian(
-	 ( (regf_named_key_t *) data )->last_written_time,
+	 ( (regf_named_key_t *) &( data[ data_offset ] ) )->last_written_time,
 	 named_key->last_written_time );
 
 	byte_stream_copy_to_uint32_little_endian(
-	 ( (regf_named_key_t *) data )->number_of_sub_keys,
+	 ( (regf_named_key_t *) &( data[ data_offset ] ) )->number_of_sub_keys,
 	 named_key->number_of_sub_keys );
 
 	byte_stream_copy_to_uint32_little_endian(
-	 ( (regf_named_key_t *) data )->sub_keys_list_offset,
+	 ( (regf_named_key_t *) &( data[ data_offset ] ) )->sub_keys_list_offset,
 	 named_key->sub_keys_list_offset );
 
 	byte_stream_copy_to_uint32_little_endian(
-	 ( (regf_named_key_t *) data )->number_of_values,
+	 ( (regf_named_key_t *) &( data[ data_offset ] ) )->number_of_values,
 	 named_key->number_of_values );
 
 	byte_stream_copy_to_uint32_little_endian(
-	 ( (regf_named_key_t *) data )->values_list_offset,
+	 ( (regf_named_key_t *) &( data[ data_offset ] ) )->values_list_offset,
 	 named_key->values_list_offset );
 
 	byte_stream_copy_to_uint32_little_endian(
-	 ( (regf_named_key_t *) data )->security_key_offset,
+	 ( (regf_named_key_t *) &( data[ data_offset ] ) )->security_key_offset,
 	 named_key->security_key_offset );
 
 	byte_stream_copy_to_uint32_little_endian(
-	 ( (regf_named_key_t *) data )->class_name_offset,
+	 ( (regf_named_key_t *) &( data[ data_offset ] ) )->class_name_offset,
 	 named_key->class_name_offset );
 
 	byte_stream_copy_to_uint16_little_endian(
-	 ( (regf_named_key_t *) data )->key_name_size,
+	 ( (regf_named_key_t *) &( data[ data_offset ] ) )->key_name_size,
 	 named_key->name_size );
 
 	byte_stream_copy_to_uint16_little_endian(
-	 ( (regf_named_key_t *) data )->class_name_size,
+	 ( (regf_named_key_t *) &( data[ data_offset ] ) )->class_name_size,
 	 named_key->class_name_size );
 
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
 	{
+		if( ( io_handle->major_version == 1 )
+		 && ( io_handle->minor_version <= 1 ) )
+		{
+			byte_stream_copy_to_uint32_little_endian(
+			 data,
+			 value_32bit );
+			libcnotify_printf(
+			 "%s: unknown0\t\t\t\t\t: 0x%08" PRIx32 " (%" PRIi32 ")\n",
+			 function,
+			 value_32bit,
+			 (int32_t) value_32bit );
+		}
 		libcnotify_printf(
 		 "%s: signature\t\t\t\t\t: %c%c\n",
 		 function,
-		 ( (regf_named_key_t *) data )->signature[ 0 ],
-		 ( (regf_named_key_t *) data )->signature[ 1 ] );
+		 ( (regf_named_key_t *) &( data[ data_offset ] ) )->signature[ 0 ],
+		 ( (regf_named_key_t *) &( data[ data_offset ] ) )->signature[ 1 ] );
 
 		libcnotify_printf(
 		 "%s: flags\t\t\t\t\t: 0x%04" PRIx16 "\n",
@@ -301,7 +337,7 @@ int libregf_named_key_read_data(
 		if( libregf_debug_print_filetime_value(
 		     function,
 		     "last written time\t\t\t\t",
-		     ( (regf_named_key_t *) data )->last_written_time,
+		     ( (regf_named_key_t *) &( data[ data_offset ] ) )->last_written_time,
 		     8,
 		     LIBFDATETIME_ENDIAN_LITTLE,
 		     LIBFDATETIME_STRING_FORMAT_TYPE_CTIME | LIBFDATETIME_STRING_FORMAT_FLAG_DATE_TIME_NANO_SECONDS,
@@ -317,7 +353,7 @@ int libregf_named_key_read_data(
 			goto on_error;
 		}
 		byte_stream_copy_to_uint32_little_endian(
-		 ( (regf_named_key_t *) data )->unknown1,
+		 ( (regf_named_key_t *) &( data[ data_offset ] ) )->unknown1,
 		 value_32bit );
 		libcnotify_printf(
 		 "%s: unknown1\t\t\t\t\t: 0x%08" PRIx32 " (%" PRIu32 ")\n",
@@ -326,7 +362,7 @@ int libregf_named_key_read_data(
 		 value_32bit );
 
 		byte_stream_copy_to_uint32_little_endian(
-		 ( (regf_named_key_t *) data )->parent_key_offset,
+		 ( (regf_named_key_t *) &( data[ data_offset ] ) )->parent_key_offset,
 		 value_32bit );
 		libcnotify_printf(
 		 "%s: parent key offset\t\t\t\t: 0x%08" PRIx32 "\n",
@@ -339,7 +375,7 @@ int libregf_named_key_read_data(
 		 named_key->number_of_sub_keys );
 
 		byte_stream_copy_to_uint32_little_endian(
-		 ( (regf_named_key_t *) data )->number_of_volatile_sub_keys,
+		 ( (regf_named_key_t *) &( data[ data_offset ] ) )->number_of_volatile_sub_keys,
 		 value_32bit );
 		libcnotify_printf(
 		 "%s: number of volatile sub keys\t\t: %" PRIu32 "\n",
@@ -352,7 +388,7 @@ int libregf_named_key_read_data(
 		 named_key->sub_keys_list_offset );
 
 		byte_stream_copy_to_uint32_little_endian(
-		 ( (regf_named_key_t *) data )->volatile_sub_keys_list_offset,
+		 ( (regf_named_key_t *) &( data[ data_offset ] ) )->volatile_sub_keys_list_offset,
 		 value_32bit );
 		libcnotify_printf(
 		 "%s: volatile sub keys list offset\t\t: 0x%08" PRIx32 "\n",
@@ -380,7 +416,7 @@ int libregf_named_key_read_data(
 		 named_key->class_name_offset );
 
 		byte_stream_copy_to_uint32_little_endian(
-		 ( (regf_named_key_t *) data )->largest_sub_key_name_size,
+		 ( (regf_named_key_t *) &( data[ data_offset ] ) )->largest_sub_key_name_size,
 		 value_32bit );
 		libcnotify_printf(
 		 "%s: largest sub key name size\t\t\t: 0x%08" PRIx32 " (%" PRIu32 ")\n",
@@ -389,7 +425,7 @@ int libregf_named_key_read_data(
 		 value_32bit );
 
 		byte_stream_copy_to_uint32_little_endian(
-		 ( (regf_named_key_t *) data )->largest_sub_key_class_name_size,
+		 ( (regf_named_key_t *) &( data[ data_offset ] ) )->largest_sub_key_class_name_size,
 		 value_32bit );
 		libcnotify_printf(
 		 "%s: largest sub key class name size\t\t: 0x%08" PRIx32 " (%" PRIu32 ")\n",
@@ -398,7 +434,7 @@ int libregf_named_key_read_data(
 		 value_32bit );
 
 		byte_stream_copy_to_uint32_little_endian(
-		 ( (regf_named_key_t *) data )->largest_value_name_size,
+		 ( (regf_named_key_t *) &( data[ data_offset ] ) )->largest_value_name_size,
 		 value_32bit );
 		libcnotify_printf(
 		 "%s: largest value name size\t\t\t: 0x%08" PRIx32 " (%" PRIu32 ")\n",
@@ -407,7 +443,7 @@ int libregf_named_key_read_data(
 		 value_32bit );
 
 		byte_stream_copy_to_uint32_little_endian(
-		 ( (regf_named_key_t *) data )->largest_value_data_size,
+		 ( (regf_named_key_t *) &( data[ data_offset ] ) )->largest_value_data_size,
 		 value_32bit );
 		libcnotify_printf(
 		 "%s: largest value data size\t\t\t: 0x%08" PRIx32 " (%" PRIu32 ")\n",
@@ -416,7 +452,7 @@ int libregf_named_key_read_data(
 		 value_32bit );
 
 		byte_stream_copy_to_uint32_little_endian(
-		 ( (regf_named_key_t *) data )->unknown6,
+		 ( (regf_named_key_t *) &( data[ data_offset ] ) )->unknown6,
 		 value_32bit );
 		libcnotify_printf(
 		 "%s: unknown6\t\t\t\t\t: 0x%08" PRIx32 " (%" PRIu32 ")\n",
@@ -436,7 +472,7 @@ int libregf_named_key_read_data(
 	}
 #endif /* defined( HAVE_DEBUG_OUTPUT ) */
 
-	data_offset = sizeof( regf_named_key_t );
+	data_offset += sizeof( regf_named_key_t );
 
 	if( ( named_key->name_size == 0 )
 	 || ( named_key->name_size > ( data_size - data_offset ) ) )
@@ -489,7 +525,7 @@ int libregf_named_key_read_data(
 				  named_key->name,
 				  (size_t) named_key->name_size,
 				  &name_index,
-				  ascii_codepage,
+				  io_handle->ascii_codepage,
 				  error );
 		}
 		else
@@ -526,7 +562,7 @@ int libregf_named_key_read_data(
 			     "key name\t\t\t\t\t",
 			     named_key->name,
 			     (size_t) named_key->name_size,
-			     ascii_codepage,
+			     io_handle->ascii_codepage,
 			     error ) != 1 )
 			{
 				libcerror_error_set(

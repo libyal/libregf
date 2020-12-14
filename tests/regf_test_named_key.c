@@ -35,6 +35,7 @@
 #include "regf_test_memory.h"
 #include "regf_test_unused.h"
 
+#include "../libregf/libregf_io_handle.h"
 #include "../libregf/libregf_named_key.h"
 
 uint8_t regf_test_named_key_data1[ 140 ] = {
@@ -290,11 +291,33 @@ int regf_test_named_key_read_data(
      void )
 {
 	libcerror_error_t *error       = NULL;
+	libregf_io_handle_t *io_handle = NULL;
 	libregf_named_key_t *named_key = NULL;
 	int result                     = 0;
 
 	/* Initialize test
 	 */
+	result = libregf_io_handle_initialize(
+	          &io_handle,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "io_handle",
+	 io_handle );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	io_handle->major_version  = 1;
+	io_handle->minor_version  = 5;
+	io_handle->ascii_codepage = LIBREGF_CODEPAGE_WINDOWS_1252;
+
 	result = libregf_named_key_initialize(
 	          &named_key,
 	          &error );
@@ -316,10 +339,10 @@ int regf_test_named_key_read_data(
 	 */
 	result = libregf_named_key_read_data(
 	          named_key,
+	          io_handle,
 	          regf_test_named_key_data1,
 	          140,
 	          0,
-	          LIBREGF_CODEPAGE_WINDOWS_1252,
 	          &error );
 
 	REGF_TEST_ASSERT_EQUAL_INT(
@@ -340,10 +363,10 @@ int regf_test_named_key_read_data(
 	 */
 	result = libregf_named_key_read_data(
 	          named_key,
+	          io_handle,
 	          regf_test_named_key_data1,
 	          140,
 	          0,
-	          LIBREGF_CODEPAGE_WINDOWS_1252,
 	          &error );
 
 	REGF_TEST_ASSERT_EQUAL_INT(
@@ -400,10 +423,10 @@ int regf_test_named_key_read_data(
 	 */
 	result = libregf_named_key_read_data(
 	          NULL,
+	          io_handle,
 	          regf_test_named_key_data1,
 	          140,
 	          0,
-	          LIBREGF_CODEPAGE_WINDOWS_1252,
 	          &error );
 
 	REGF_TEST_ASSERT_EQUAL_INT(
@@ -421,9 +444,9 @@ int regf_test_named_key_read_data(
 	result = libregf_named_key_read_data(
 	          named_key,
 	          NULL,
+	          regf_test_named_key_data1,
 	          140,
 	          0,
-	          LIBREGF_CODEPAGE_WINDOWS_1252,
 	          &error );
 
 	REGF_TEST_ASSERT_EQUAL_INT(
@@ -440,10 +463,30 @@ int regf_test_named_key_read_data(
 
 	result = libregf_named_key_read_data(
 	          named_key,
+	          io_handle,
+	          NULL,
+	          140,
+	          0,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
+	result = libregf_named_key_read_data(
+	          named_key,
+	          io_handle,
 	          regf_test_named_key_data1,
 	          0,
 	          0,
-	          LIBREGF_CODEPAGE_WINDOWS_1252,
 	          &error );
 
 	REGF_TEST_ASSERT_EQUAL_INT(
@@ -460,10 +503,10 @@ int regf_test_named_key_read_data(
 
 	result = libregf_named_key_read_data(
 	          named_key,
+	          io_handle,
 	          regf_test_named_key_data1,
 	          (size_t) SSIZE_MAX + 1,
 	          0,
-	          LIBREGF_CODEPAGE_WINDOWS_1252,
 	          &error );
 
 	REGF_TEST_ASSERT_EQUAL_INT(
@@ -486,10 +529,10 @@ int regf_test_named_key_read_data(
 
 	result = libregf_named_key_read_data(
 	          named_key,
+	          io_handle,
 	          regf_test_named_key_data1,
 	          140,
 	          0,
-	          LIBREGF_CODEPAGE_WINDOWS_1252,
 	          &error );
 
 	if( regf_test_malloc_attempts_before_fail != -1 )
@@ -518,10 +561,10 @@ int regf_test_named_key_read_data(
 
 	result = libregf_named_key_read_data(
 	          named_key,
+	          io_handle,
 	          regf_test_named_key_data1,
 	          140,
 	          0,
-	          LIBREGF_CODEPAGE_WINDOWS_1252,
 	          &error );
 
 	if( regf_test_memcpy_attempts_before_fail != -1 )
@@ -553,10 +596,10 @@ int regf_test_named_key_read_data(
 
 	result = libregf_named_key_read_data(
 	          named_key,
+	          io_handle,
 	          regf_test_named_key_data1,
 	          140,
 	          0,
-	          LIBREGF_CODEPAGE_WINDOWS_1252,
 	          &error );
 
 	byte_stream_copy_from_uint16_little_endian(
@@ -583,10 +626,10 @@ int regf_test_named_key_read_data(
 
 	result = libregf_named_key_read_data(
 	          named_key,
+	          io_handle,
 	          regf_test_named_key_data1,
 	          140,
 	          0,
-	          LIBREGF_CODEPAGE_WINDOWS_1252,
 	          &error );
 
 	byte_stream_copy_from_uint16_little_endian(
@@ -624,6 +667,23 @@ int regf_test_named_key_read_data(
 	 "error",
 	 error );
 
+	result = libregf_io_handle_free(
+	          &io_handle,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "io_handle",
+	 io_handle );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
 	return( 1 );
 
 on_error:
@@ -636,6 +696,12 @@ on_error:
 	{
 		libregf_named_key_free(
 		 &named_key,
+		 NULL );
+	}
+	if( io_handle != NULL )
+	{
+		libregf_io_handle_free(
+		 &io_handle,
 		 NULL );
 	}
 	return( 0 );
@@ -1510,6 +1576,7 @@ int main(
 #if defined( __GNUC__ ) && !defined( LIBREGF_DLL_IMPORT )
 
 	libcerror_error_t *error       = NULL;
+	libregf_io_handle_t *io_handle = NULL;
 	libregf_named_key_t *named_key = NULL;
 	int result                     = 0;
 
@@ -1536,6 +1603,27 @@ int main(
 
 	/* Initialize test
 	 */
+	result = libregf_io_handle_initialize(
+	          &io_handle,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "io_handle",
+	 io_handle );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
+	io_handle->major_version  = 1;
+	io_handle->minor_version  = 5;
+	io_handle->ascii_codepage = LIBREGF_CODEPAGE_WINDOWS_1252;
+
 	result = libregf_named_key_initialize(
 	          &named_key,
 	          &error );
@@ -1555,10 +1643,10 @@ int main(
 
 	result = libregf_named_key_read_data(
 	          named_key,
+	          io_handle,
 	          regf_test_named_key_data1,
 	          140,
 	          0,
-	          LIBREGF_CODEPAGE_WINDOWS_1252,
 	          &error );
 
 	REGF_TEST_ASSERT_EQUAL_INT(
@@ -1636,6 +1724,23 @@ int main(
 	 "error",
 	 error );
 
+	result = libregf_io_handle_free(
+	          &io_handle,
+	          &error );
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 1 );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "io_handle",
+	 io_handle );
+
+	REGF_TEST_ASSERT_IS_NULL(
+	 "error",
+	 error );
+
 #endif /* !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 ) */
 
 #endif /* defined( __GNUC__ ) && !defined( LIBREGF_DLL_IMPORT ) */
@@ -1654,6 +1759,12 @@ on_error:
 	{
 		libregf_named_key_free(
 		 &named_key,
+		 NULL );
+	}
+	if( io_handle != NULL )
+	{
+		libregf_io_handle_free(
+		 &io_handle,
 		 NULL );
 	}
 #endif /* defined( __GNUC__ ) && !defined( LIBREGF_DLL_IMPORT ) */

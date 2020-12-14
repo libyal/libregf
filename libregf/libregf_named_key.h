@@ -25,6 +25,7 @@
 #include <common.h>
 #include <types.h>
 
+#include "libregf_io_handle.h"
 #include "libregf_libcerror.h"
 
 #if defined( __cplusplus )
@@ -94,10 +95,10 @@ int libregf_named_key_free(
 
 int libregf_named_key_read_data(
      libregf_named_key_t *named_key,
+     libregf_io_handle_t *io_handle,
      const uint8_t *data,
      size_t data_size,
      uint32_t named_key_hash,
-     int ascii_codepage,
      libcerror_error_t **error );
 
 int libregf_named_key_get_name_size(

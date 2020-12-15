@@ -204,7 +204,7 @@ See section: <<file_types,File types>>
 | 32 | 4 | | [yellow-background]*Unknown (file format)* +
 [yellow-background]*0x0001 => 1 means direct memory load*
 | 36 | 4 | | The root key offset +
-Value in bytes and relative from the start of the hive bin data
+Value in bytes and relative from the start of the hive bin data area
 | 40 | 4 | | Hive bins data size
 | 44 | 4 | | [yellow-background]*Unknown (Clustering factor)* +
 [yellow-background]*Logical sector size of the underlying disk in bytes divided by 512* +
@@ -289,7 +289,7 @@ The hive bin header is 32 bytes of size and consists of:
 | Offset | Size | Value | Description
 | 0 | 4 | "hbin" | The signature
 | 4 | 4 | | The offset of the hive bin +
-Value in bytes and relative from the start of the hive bin data
+Value in bytes and relative from the start of the hive bin data area
 | 8 | 4 | | Size of the hive bin +
 Value in bytes
 | 12 | 4 | | [yellow-background]*Unknown (Reserved)* +
@@ -356,28 +356,28 @@ See section: <<named_key_flags,Flags>>
 Contains a FILETIME
 | 16 | 4 | | [yellow-background]*Unknown (Empty value)* +
 | 20 | 4 | | Parent key offset +
-The offset value is in bytes and relative from the start of the hive bin data
+The offset value is in bytes and relative from the start of the hive bin data area
 | 24 | 4 | | Number of sub keys
 | 28 | 4 | | Number of volatile sub keys
 | 32 | 4 | | Sub keys list offset +
-The offset value is in bytes and relative from the start of the hive bin data +
+The offset value is in bytes and relative from the start of the hive bin data area +
 Refers to a sub keys list or contains -1 (0xffffffff) if empty. +
 See section: <<sub_key_list,Sub key list>>
 | 36 | 4 | | Volatile sub keys list offset +
-The offset value is in bytes and relative from the start of the hive bin data +
+The offset value is in bytes and relative from the start of the hive bin data area +
 Refers to a sub keys list or contains -1 (0xffffffff) if empty. +
 See section: <<sub_key_list,Sub key list>>
 | 40 | 4 | | Number of values
 | 44 | 4 | | Values list offset +
-The offset value is in bytes and relative from the start of the hive bin data +
+The offset value is in bytes and relative from the start of the hive bin data area +
 Refers to a values list or -1 (0xffffffff) if empty. +
 See section: <<values_list,Values list>>
 | 48 | 4 | | Security key offset +
-The offset value is in bytes and relative from the start of the hive bin data +
+The offset value is in bytes and relative from the start of the hive bin data area +
 Refers to a security key or -1 (0xffffffff) if empty. +
 See section: <<security_key,Security key>>
 | 52 | 4 | | Class name offset +
-The offset value is in bytes and relative from the start of the hive bin data +
+The offset value is in bytes and relative from the start of the hive bin data area +
 Refers to a class name or -1 (0xffffffff) if empty.
 | 56 | 4 | | Largest sub key name size
 | 60 | 4 | | Largest sub key class name size
@@ -410,28 +410,28 @@ See section: <<named_key_flags,Flags>>
 Contains a FILETIME
 | 12 | 4 | | [yellow-background]*Unknown (Empty value)* +
 | 16 | 4 | | Parent key offset +
-The offset value is in bytes and relative from the start of the hive bin data
+The offset value is in bytes and relative from the start of the hive bin data area
 | 20 | 4 | | Number of sub keys
 | 24 | 4 | | Number of volatile sub keys
 | 28 | 4 | | Sub keys list offset +
-The offset value is in bytes and relative from the start of the hive bin data +
+The offset value is in bytes and relative from the start of the hive bin data area +
 Refers to a sub keys list or contains -1 (0xffffffff) if empty. +
 See section: <<sub_key_list,Sub key list>>
 | 32 | 4 | | Volatile sub keys list offset +
-The offset value is in bytes and relative from the start of the hive bin data +
+The offset value is in bytes and relative from the start of the hive bin data area +
 Refers to a sub keys list or contains -1 (0xffffffff) if empty. +
 See section: <<sub_key_list,Sub key list>>
 | 36 | 4 | | Number of values
 | 40 | 4 | | Values list offset +
-The offset value is in bytes and relative from the start of the hive bin data +
+The offset value is in bytes and relative from the start of the hive bin data area +
 Refers to a values list or -1 (0xffffffff) if empty. +
 See section: <<values_list,Values list>>
 | 44 | 4 | | Security key offset +
-The offset value is in bytes and relative from the start of the hive bin data +
+The offset value is in bytes and relative from the start of the hive bin data area +
 Refers to a security key or -1 (0xffffffff) if empty. +
 See section: <<security_key,Security key>>
 | 48 | 4 | | Class name offset +
-The offset value is in bytes and relative from the start of the hive bin data +
+The offset value is in bytes and relative from the start of the hive bin data area +
 Refers to a class name or -1 (0xffffffff) if empty.
 | 52 | 4 | | Largest sub key name size
 | 56 | 4 | | Largest sub key class name size
@@ -512,9 +512,9 @@ The security key - version 1.1 is variable of size and consists of:
 | 4 | 2 | "sk" | Signature
 | 6 | 2 | | [yellow-background]*Unknown*
 | 8 | 4 | | Previous security key offset +
-The offset value is in bytes and relative from the start of the hive bin data
+The offset value is in bytes and relative from the start of the hive bin data area
 | 12 | 4 | | Next security key offset +
-The offset value is in bytes and relative from the start of the hive bin data
+The offset value is in bytes and relative from the start of the hive bin data area
 | 16 | 4 | | Reference count
 | 20 | 4 | | NT security descriptor size
 | 24 | ... | | NT security descriptor
@@ -532,9 +532,9 @@ The security key - version 1.2 and later is variable of size and consists of:
 | 0 | 2 | "sk" | Signature
 | 2 | 2 | | [yellow-background]*Unknown*
 | 4 | 4 | | Previous security key offset +
-The offset value is in bytes and relative from the start of the hive bin data
+The offset value is in bytes and relative from the start of the hive bin data area
 | 8 | 4 | | Next security key offset +
-The offset value is in bytes and relative from the start of the hive bin data
+The offset value is in bytes and relative from the start of the hive bin data area
 | 12 | 4 | | Reference count
 | 16 | 4 | | NT security descriptor size
 | 20 | ... | | NT security descriptor
@@ -584,7 +584,7 @@ consists of:
 |===
 | Offset | Size | Value | Description
 | 0 | 4 | | Named key offset +
-The offset value is in bytes and relative from the start of the hive bin data +
+The offset value is in bytes and relative from the start of the hive bin data area +
 [yellow-background]*What about data offset 0 and 0xffffffff?*
 | 4 | 4 | | Hash value +
 A different hash function is used for different sub key list types
@@ -602,7 +602,7 @@ of:
 |===
 | Offset | Size | Value | Description
 | 0 | 4 | | Named key offset +
-The offset value is in bytes and relative from the start of the hive bin data. +
+The offset value is in bytes and relative from the start of the hive bin data area +
 [yellow-background]*What about data offset 0 and 0xffffffff?*
 |===
 
@@ -617,7 +617,7 @@ of:
 |===
 | Offset | Size | Value | Description
 | 0 | 4 | | Sub key list offset +
-The offset value is in bytes and relative from the start of the hive bin data +
+The offset value is in bytes and relative from the start of the hive bin data area +
 [yellow-background]*What about data offset 0 and 0xffffffff?*
 |===
 
@@ -625,7 +625,40 @@ The offset value is in bytes and relative from the start of the hive bin data +
 
 === Value key
 
-The value key (CM_KEY_VALUE) is variable of size and consists of:
+==== Value key - version 1.1
+
+The value key - version 1.1 is variable of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 4 | | [yellow-background]*Unknown*
+| 4 | 2 | "vk" | Signature
+| 6 | 2 | | Value name size +
+If the value name size is 0 the value name is "(default)"
+| 8 | 4 | | Data size +
+See note below
+| 12 | 4 | | Data offset +
+The offset value is in bytes and relative from the start of the hive bin data area +
+[yellow-background]*What about data offset 0 and 0xffffffff?*
+| 16 | 4 | | Data type +
+See section: <<value_data_types,Data types>>
+| 20 | 2 | | Flags +
+See section: <<value_key_flags,Flags>>
+| 22 | 2 | | [yellow-background]*Unknown (padding)* +
+[yellow-background]*Can contain remnant data*
+| 24 | ... | | Value name +
+ASCII or Unicode string not terminated by an end-of-string character +
+Maximum of 260 ASCII characters or 16383 Unicode characters
+| ... | ... | | Padding +
+due to 8 byte alignment of cell size +
+Sometimes contains remnant data
+|===
+
+==== Value key - version 1.2 and later
+
+The value key - version 1.2 and later (CM_KEY_VALUE) is variable of size and
+consists of:
 
 [cols="1,1,1,5",options="header"]
 |===
@@ -636,7 +669,7 @@ If the value name size is 0 the value name is "(default)"
 | 4 | 4 | | Data size +
 See note below
 | 8 | 4 | | Data offset +
-The offset value is in bytes and relative from the start of the hive bin data. +
+The offset value is in bytes and relative from the start of the hive bin data area +
 [yellow-background]*What about data offset 0 and 0xffffffff?*
 | 12 | 4 | | Data type +
 See section: <<value_data_types,Data types>>
@@ -849,7 +882,23 @@ Otherwise the name is an Unicode (UTF-16 little-endian) string
 
 === [[values_list]]Values list
 
-The value list is variable of size and consists of:
+==== Values list - version 1.1
+
+The value list - version 1.1 is variable of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 4 | | [yellow-background]*Unknown*
+| 4 | ... | | Value key list entries
+| ... | ... | | Padding +
+due to 8 byte alignment of cell size +
+Sometimes contains remnant data
+|===
+
+==== Values list - version 1.2 and later
+
+The value list - version 1.2 and later is variable of size and consists of:
 
 [cols="1,1,1,5",options="header"]
 |===
@@ -860,13 +909,15 @@ due to 8 byte alignment of cell size +
 Sometimes contains remnant data
 |===
 
+==== Values list entry
+
 A value list entry is 4 bytes of size and consists of:
 
 [cols="1,1,1,5",options="header"]
 |===
 | Offset | Size | Value | Description
 | 0 | 4 | | Value key offset +
-The offset value is in bytes and relative from the start of the hive bin data.
+Contains an offset value in bytes, relative from the start of the hive bin data area. +
 [yellow-background]*What about data offset 0 and 0xffffffff?*
 |===
 
@@ -883,6 +934,27 @@ are also referred to as long values (more than 2048 bytes).
 `[MSDN]` recommends that long values are stored as files with the file names
 stored in the Registry, which helps the Registry perform efficiently.
 
+==== Value data - version 1.1
+
+The value data - version 1.1 is variable of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | 4 | | [yellow-background]*Unknown*
+| 4 | ... | | Value data
+|===
+
+==== Value data - version 1.2 and later
+
+The value data - version 1.2 and later is variable of size and consists of:
+
+[cols="1,1,1,5",options="header"]
+|===
+| Offset | Size | Value | Description
+| 0 | ... | | Value data
+|===
+
 ==== Data block key
 
 The data block key is 12 bytes of size and consists of:
@@ -893,7 +965,7 @@ The data block key is 12 bytes of size and consists of:
 | 0 | 2 | "db" | Signature
 | 2 | 2 | | number of segments
 | 4 | 4 | | Data block (segment) list offset +
-The offset value is in bytes and relative from the start of the hive bin data. +
+The offset value is in bytes and relative from the start of the hive bin data area +
 [yellow-background]*What about data offset 0 and 0xffffffff?*
 | 8 | 4 | | Padding +
 due to 8 byte alignment of cell size +
@@ -919,7 +991,7 @@ A data block list entry is 4 bytes of size and consists of:
 |===
 | Offset | Size | Value | Description
 | 0 | 4 | | Data block segment data offset +
-The offset value is in bytes and relative from the start of the hive bin data. +
+The offset value is in bytes and relative from the start of the hive bin data area +
 [yellow-background]*What about data offset 0 and 0xffffffff?*
 |===
 
@@ -1036,7 +1108,7 @@ page bitmap is set.
 
 In a Windows 8.1 SYSTEM regf file a scenario was encountered that the last
 part of the hive bins data contained empty (zero byte filled) blocks. The
-hive bins size is 8695808 bytes but the hive bin data ends at file offset
+hive bins size is 8695808 bytes but the hive bin data area ends at file offset
 8388608.
 
 ....

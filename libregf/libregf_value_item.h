@@ -26,6 +26,7 @@
 #include <types.h>
 
 #include "libregf_hive_bins_list.h"
+#include "libregf_io_handle.h"
 #include "libregf_libbfio.h"
 #include "libregf_libcerror.h"
 #include "libregf_libfcache.h"

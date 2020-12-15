@@ -1,4 +1,4 @@
-.Dd January 12, 2014
+.Dd December 15, 2020
 .Dt regfinfo
 .Os libregf
 .Sh NAME
@@ -6,8 +6,9 @@
 .Nd determines information about a Windows NT Registry File (REGF)
 .Sh SYNOPSIS
 .Nm regfinfo
+.Op Fl B Ar bodyfile
 .Op Fl c Ar codepage
-.Op Fl hvV
+.Op Fl hHvV
 .Va Ar source
 .Sh DESCRIPTION
 .Nm regfinfo
@@ -25,10 +26,14 @@ is the source file.
 .Pp
 The options are as follows:
 .Bl -tag -width Ds
+.It Fl B Ar bodyfile
+output key and value hierarchy as a bodyfile
 .It Fl c Ar codepage
 specify the codepage of ASCII strings, options: ascii, windows-874, windows-932, windows-936, windows-949, windows-950, windows-1250, windows-1251, windows-1252 (default), windows-1253, windows-1254, windows-1255, windows-1256, windows-1257 or windows-1258
 .It Fl h
 shows this help
+.It Fl H
+shows the key and value hierarcy
 .It Fl v
 verbose output to stderr
 .It Fl V
@@ -41,19 +46,12 @@ None
 .Sh EXAMPLES
 .Bd -literal
 # regfinfo NTUSER.DAT
-regfinfo 20120826
-
+regfinfo 20201213
+.sp
 Windows NT Registry File information:
-        Version:        1.3
-
-Key hierarchy
-(key:) $$$PROTO.HIV
- (key:) AppEvents
-  (key:) EventLabels
-   (key:) .Default
-    (value: 0) (default)
-.Dl        ...
-
+	Version:	1.5
+	File type:	Registry
+.sp
 .Ed
 .Sh DIAGNOSTICS
 Errors, verbose and debug output are printed to stderr when verbose output \-v is enabled.

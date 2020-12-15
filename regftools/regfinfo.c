@@ -48,6 +48,12 @@
 #include "regftools_signal.h"
 #include "regftools_unused.h"
 
+enum REGFINFO_MODES
+{
+	REGFINFO_MODE_FILE,
+	REGFINFO_MODE_KEY_VALUE_HIERARCHY
+};
+
 info_handle_t *regfinfo_info_handle = NULL;
 int regfinfo_abort                  = 0;
 
@@ -63,16 +69,18 @@ void usage_fprint(
 	fprintf( stream, "Use regfinfo to determine information about a Windows NT\n"
 	                 "Registry File (REGF).\n\n" );
 
-	fprintf( stream, "Usage: regfinfo [ -c codepage ] [ -hvV ] source\n\n" );
+	fprintf( stream, "Usage: regfinfo [ -B bodyfile ] [ -c codepage ] [ -hHvV ] source\n\n" );
 
 	fprintf( stream, "\tsource: the source file\n\n" );
 
+	fprintf( stream, "\t-B:     output key and value hierarchy as a bodyfile\n" );
 	fprintf( stream, "\t-c:     codepage of ASCII strings, options: ascii, windows-874,\n"
 	                 "\t        windows-932, windows-936, windows-949, windows-950,\n"
 	                 "\t        windows-1250, windows-1251, windows-1252 (default),\n"
 	                 "\t        windows-1253, windows-1254, windows-1255, windows-1256\n"
 	                 "\t        windows-1257 or windows-1258\n" );
 	fprintf( stream, "\t-h:     shows this help\n" );
+	fprintf( stream, "\t-H:     shows the key and value hierarchy\n" );
 	fprintf( stream, "\t-v:     verbose output to stderr\n" );
 	fprintf( stream, "\t-V:     print version\n" );
 }
@@ -83,7 +91,7 @@ void regfinfo_signal_handler(
       regftools_signal_t signal REGFTOOLS_ATTRIBUTE_UNUSED )
 {
 	libcerror_error_t *error = NULL;
-	static char *function   = "regfinfo_signal_handler";
+	static char *function    = "regfinfo_signal_handler";
 
 	REGFTOOLS_UNREFERENCED_PARAMETER( signal )
 
@@ -131,9 +139,11 @@ int main( int argc, char * const argv[] )
 {
 	libcerror_error_t *error                  = NULL;
 	system_character_t *option_ascii_codepage = NULL;
+	system_character_t *option_bodyfile       = NULL;
 	system_character_t *source                = NULL;
 	char *program                             = "regfinfo";
 	system_integer_t option                   = 0;
+	int option_mode                           = REGFINFO_MODE_FILE;
 	int result                                = 0;
 	int verbose                               = 0;
 
@@ -170,7 +180,7 @@ int main( int argc, char * const argv[] )
 	while( ( option = regftools_getopt(
 	                   argc,
 	                   argv,
-	                   _SYSTEM_STRING( "c:hvV" ) ) ) != (system_integer_t) -1 )
+	                   _SYSTEM_STRING( "B:c:hHvV" ) ) ) != (system_integer_t) -1 )
 	{
 		switch( option )
 		{
@@ -186,6 +196,11 @@ int main( int argc, char * const argv[] )
 
 				return( EXIT_FAILURE );
 
+			case (system_integer_t) 'B':
+				option_bodyfile = optarg;
+
+				break;
+
 			case (system_integer_t) 'c':
 				option_ascii_codepage = optarg;
 
@@ -196,6 +211,11 @@ int main( int argc, char * const argv[] )
 				 stdout );
 
 				return( EXIT_SUCCESS );
+
+			case (system_integer_t) 'H':
+				option_mode = REGFINFO_MODE_KEY_VALUE_HIERARCHY;
+
+				break;
 
 			case (system_integer_t) 'v':
 				verbose = 1;
@@ -262,6 +282,20 @@ int main( int argc, char * const argv[] )
 			 "Unsupported ASCII codepage defaulting to: windows-1252.\n" );
 		}
 	}
+	if( option_bodyfile != NULL )
+	{
+		if( info_handle_set_bodyfile(
+		     regfinfo_info_handle,
+		     option_bodyfile,
+		     &error ) != 1 )
+		{
+			fprintf(
+			 stderr,
+			 "Unable to set bodyfile.\n" );
+
+			goto on_error;
+		}
+	}
 	if( info_handle_open_input(
 	     regfinfo_info_handle,
 	     source,
@@ -274,15 +308,34 @@ int main( int argc, char * const argv[] )
 
 		goto on_error;
 	}
-	if( info_handle_file_fprint(
-	     regfinfo_info_handle,
-	     &error ) != 1 )
+	switch( option_mode )
 	{
-		fprintf(
-		 stderr,
-		 "Unable to print file information.\n" );
+		case REGFINFO_MODE_KEY_VALUE_HIERARCHY:
+			if( info_handle_key_value_hierarchy_fprint(
+			     regfinfo_info_handle,
+			     &error ) != 1 )
+			{
+				fprintf(
+				 stderr,
+				 "Unable to print key and value hierarchy.\n" );
 
-		goto on_error;
+				goto on_error;
+			}
+			break;
+
+		case REGFINFO_MODE_FILE:
+		default:
+			if( info_handle_file_fprint(
+			     regfinfo_info_handle,
+			     &error ) != 1 )
+			{
+				fprintf(
+				 stderr,
+				 "Unable to print file information.\n" );
+
+				goto on_error;
+			}
+			break;
 	}
 	if( info_handle_close_input(
 	     regfinfo_info_handle,

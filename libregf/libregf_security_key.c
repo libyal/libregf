@@ -150,15 +150,14 @@ int libregf_security_key_read_data(
      size_t data_size,
      libcerror_error_t **error )
 {
-	static char *function                              = "libregf_security_key_read_data";
-	size_t data_offset                                 = 0;
-	size_t security_key_data_size                      = 0;
-	uint32_t security_descriptor_size                  = 0;
+	static char *function             = "libregf_security_key_read_data";
+	size_t data_offset                = 0;
+	size_t security_key_data_size     = 0;
+	uint32_t security_descriptor_size = 0;
 
 #if defined( HAVE_DEBUG_OUTPUT )
-	libfwnt_security_descriptor_t *security_descriptor = NULL;
-	uint32_t value_32bit                               = 0;
-	uint16_t value_16bit                               = 0;
+	uint32_t value_32bit              = 0;
+	uint16_t value_16bit              = 0;
 #endif
 
 	if( security_key == NULL )
@@ -375,8 +374,6 @@ int libregf_security_key_read_data(
 
 			goto on_error;
 		}
-		security_key->security_descriptor_size = security_descriptor_size;
-
 		if( memory_copy(
 		     security_key->security_descriptor,
 		     &( data[ data_offset ] ),
@@ -391,24 +388,12 @@ int libregf_security_key_read_data(
 
 			goto on_error;
 		}
+		security_key->security_descriptor_size = security_descriptor_size;
+
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
 		{
-			if( libfwnt_security_descriptor_initialize(
-			     &security_descriptor,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
-				 "%s: unable to create security descriptor.",
-				 function );
-
-				goto on_error;
-			}
-			if( libfwnt_security_descriptor_copy_from_byte_stream(
-			     security_descriptor,
+			if( libregf_debug_print_security_descriptor_value(
 			     security_key->security_descriptor,
 			     security_key->security_descriptor_size,
 			     LIBFWNT_ENDIAN_LITTLE,
@@ -417,21 +402,8 @@ int libregf_security_key_read_data(
 				libcerror_error_set(
 				 error,
 				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
-				 "%s: unable to copy security descriptor from byte stream.",
-				 function );
-
-				goto on_error;
-			}
-			if( libfwnt_security_descriptor_free(
-			     &security_descriptor,
-			     error ) != 1 )
-			{
-				libcerror_error_set(
-				 error,
-				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-				 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
-				 "%s: unable to free security descriptor.",
+				 LIBCERROR_RUNTIME_ERROR_PRINT_FAILED,
+				 "%s: unable to print security descriptor value.",
 				 function );
 
 				goto on_error;
@@ -460,14 +432,6 @@ int libregf_security_key_read_data(
 	return( 1 );
 
 on_error:
-#if defined( HAVE_DEBUG_OUTPUT )
-	if( security_descriptor != NULL )
-	{
-		libfwnt_security_descriptor_free(
-		 &security_descriptor,
-		 NULL );
-	}
-#endif
 	if( security_key->security_descriptor != NULL )
 	{
 		memory_free(

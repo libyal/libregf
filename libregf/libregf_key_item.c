@@ -1013,10 +1013,10 @@ int libregf_key_item_read_values_list(
      libcerror_error_t **error )
 {
 	libregf_hive_bin_cell_t *hive_bin_cell = NULL;
-	const uint8_t *hive_bin_cell_data      = NULL;
 	static char *function                  = "libregf_key_item_read_values_list";
+	size_t data_offset                     = 0;
 	size_t hive_bin_cell_size              = 0;
-	uint32_t values_list_element_iterator  = 0;
+	uint32_t values_list_element_index     = 0;
 	uint32_t values_list_element_offset    = 0;
 	int element_index                      = 0;
 	int hive_bin_index                     = 0;
@@ -1040,6 +1040,17 @@ int libregf_key_item_read_values_list(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
 		 "%s: invalid hive bins list.",
+		 function );
+
+		return( -1 );
+	}
+	if( hive_bins_list->io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid hive bins list - missing IO handle.",
 		 function );
 
 		return( -1 );
@@ -1078,7 +1089,6 @@ int libregf_key_item_read_values_list(
 
 		return( -1 );
 	}
-	hive_bin_cell_data = hive_bin_cell->data;
 	hive_bin_cell_size = hive_bin_cell->size;
 
 #if defined( HAVE_DEBUG_OUTPUT )
@@ -1088,12 +1098,18 @@ int libregf_key_item_read_values_list(
 		 "%s: data:\n",
 		 function );
 		libcnotify_print_data(
-		 hive_bin_cell_data,
+		 hive_bin_cell->data,
 		 hive_bin_cell_size,
 		 0 );
 	}
 #endif
-	if( hive_bin_cell_size < ( number_of_values_list_elements * 4 ) )
+	if( ( hive_bins_list->io_handle->major_version == 1 )
+	 && ( hive_bins_list->io_handle->minor_version <= 1 ) )
+	{
+		data_offset += 4;
+	}
+	if( ( hive_bin_cell_size < data_offset )
+	 || ( hive_bin_cell_size - data_offset ) < ( number_of_values_list_elements * 4 ) )
 	{
 		libcerror_error_set(
 		 error,
@@ -1104,16 +1120,15 @@ int libregf_key_item_read_values_list(
 
 		return( -1 );
 	}
-	for( values_list_element_iterator = 0;
-	     values_list_element_iterator < number_of_values_list_elements;
-	     values_list_element_iterator++ )
+	for( values_list_element_index = 0;
+	     values_list_element_index < number_of_values_list_elements;
+	     values_list_element_index++ )
 	{
 		byte_stream_copy_to_uint32_little_endian(
-		 hive_bin_cell_data,
+		 &( hive_bin_cell->data[ data_offset ] ),
 		 values_list_element_offset );
 
-		hive_bin_cell_data += 4;
-		hive_bin_cell_size -= 4;
+		data_offset += 4;
 
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
@@ -1121,7 +1136,7 @@ int libregf_key_item_read_values_list(
 			libcnotify_printf(
 			 "%s: element: %03" PRIu32 " offset\t\t\t: 0x%08" PRIx32 "\n",
 			 function,
-			 values_list_element_iterator,
+			 values_list_element_index,
 			 values_list_element_offset );
 		}
 #endif
@@ -1146,37 +1161,40 @@ int libregf_key_item_read_values_list(
 		{
 			key_item->item_flags |= LIBREGF_ITEM_FLAG_IS_CORRUPTED;
 		}
-		else if( libfdata_list_append_element(
-		          key_item->values_list,
-		          &element_index,
-		          0,
-		          (off64_t) values_list_element_offset,
-		          0,
-		          0,
-		          error ) != 1 )
+		else
 		{
-			libcerror_error_set(
-			 error,
-			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-			 LIBCERROR_RUNTIME_ERROR_RESIZE_FAILED,
-			 "%s: unable to set value list element: %" PRIu32 " in list.",
-			 function,
-			 values_list_element_iterator );
+			if( libfdata_list_append_element(
+			     key_item->values_list,
+			     &element_index,
+			     0,
+			     (off64_t) values_list_element_offset,
+			     0,
+			     0,
+			     error ) != 1 )
+			{
+				libcerror_error_set(
+				 error,
+				 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+				 LIBCERROR_RUNTIME_ERROR_RESIZE_FAILED,
+				 "%s: unable to set value list element: %" PRIu32 " in list.",
+				 function,
+				 values_list_element_index );
 
-			return( -1 );
+				return( -1 );
+			}
 		}
 	}
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
 	{
-		if( hive_bin_cell_size > 0 )
+		if( data_offset < hive_bin_cell_size )
 		{
 			libcnotify_printf(
 			 "%s: padding:\n",
 			 function );
 			libcnotify_print_data(
-			 hive_bin_cell_data,
-			 hive_bin_cell_size,
+			 &( hive_bin_cell->data[ data_offset ] ),
+			 hive_bin_cell_size - data_offset,
 			 0 );
 		}
 		else
@@ -1185,7 +1203,8 @@ int libregf_key_item_read_values_list(
 			 "\n" );
 		}
 	}
-#endif
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
+
 	return( 1 );
 }
 

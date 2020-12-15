@@ -68,6 +68,7 @@ regfinfo_SOURCES = \
 	regftools_unused.h
 
 regfinfo_LDADD = \
+	@LIBUNA_LIBADD@ \
 	@LIBCNOTIFY_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
 	../libregf/libregf.la \

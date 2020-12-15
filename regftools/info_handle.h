@@ -41,6 +41,10 @@ struct info_handle
 	 */
 	libregf_file_t *input_file;
 
+	/* The bodyfile output stream
+	 */
+	FILE *bodyfile_stream;
+
 	/* The notification output stream
 	 */
 	FILE *notify_stream;
@@ -66,6 +70,11 @@ int info_handle_signal_abort(
      info_handle_t *info_handle,
      libcerror_error_t **error );
 
+int info_handle_set_bodyfile(
+     info_handle_t *info_handle,
+     const system_character_t *filename,
+     libcerror_error_t **error );
+
 int info_handle_set_ascii_codepage(
      info_handle_t *info_handle,
      const system_character_t *string,
@@ -80,11 +89,22 @@ int info_handle_close_input(
      info_handle_t *info_handle,
      libcerror_error_t **error );
 
+int info_handle_name_value_fprint(
+     info_handle_t *info_handle,
+     const system_character_t *value_string,
+     size_t value_string_length,
+     libcerror_error_t **error );
+
 int info_handle_key_fprint(
      info_handle_t *info_handle,
      libregf_key_t *key,
-     int indentation_level,
+     const system_character_t *key_path,
+     size_t key_path_length,
      libregf_error_t **error );
+
+int info_handle_key_value_hierarchy_fprint(
+     info_handle_t *info_handle,
+     libcerror_error_t **error );
 
 int info_handle_file_fprint(
      info_handle_t *info_handle,

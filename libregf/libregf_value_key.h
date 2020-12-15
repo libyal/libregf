@@ -25,6 +25,7 @@
 #include <common.h>
 #include <types.h>
 
+#include "libregf_io_handle.h"
 #include "libregf_libcerror.h"
 
 #if defined( __cplusplus )
@@ -87,10 +88,10 @@ int libregf_value_key_clone(
 
 int libregf_value_key_read_data(
      libregf_value_key_t *value_key,
+     libregf_io_handle_t *io_handle,
      const uint8_t *data,
      size_t data_size,
      uint32_t value_key_hash,
-     int ascii_codepage,
      libcerror_error_t **error );
 
 int libregf_value_key_get_name_size(

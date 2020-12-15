@@ -31,6 +31,7 @@
 #include "libregf_data_type.h"
 #include "libregf_debug.h"
 #include "libregf_definitions.h"
+#include "libregf_io_handle.h"
 #include "libregf_libcerror.h"
 #include "libregf_libcnotify.h"
 #include "libregf_libuna.h"
@@ -311,26 +312,27 @@ on_error:
  */
 int libregf_value_key_read_data(
      libregf_value_key_t *value_key,
+     libregf_io_handle_t *io_handle,
      const uint8_t *data,
      size_t data_size,
      uint32_t value_key_hash LIBREGF_ATTRIBUTE_UNUSED,
-     int ascii_codepage LIBREGF_ATTRIBUTE_UNUSED,
      libcerror_error_t **error )
 {
 	static char *function                        = "libregf_value_key_read_data";
 	libuna_unicode_character_t unicode_character = 0;
 	size_t data_offset                           = 0;
 	size_t name_index                            = 0;
+	size_t value_key_data_size                   = 0;
 	uint32_t value_data_offset                   = 0;
 	uint8_t correct_string_size                  = 0;
 	int result                                   = 0;
 
 #if defined( HAVE_DEBUG_OUTPUT )
+	uint32_t value_32bit                         = 0;
 	uint16_t value_16bit                         = 0;
 #endif
 
 	LIBREGF_UNREFERENCED_PARAMETER( value_key_hash )
-	LIBREGF_UNREFERENCED_PARAMETER( ascii_codepage )
 
 	if( value_key == NULL )
 	{
@@ -365,6 +367,24 @@ int libregf_value_key_read_data(
 
 		return( -1 );
 	}
+	if( io_handle == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid IO handle.",
+		 function );
+
+		return( -1 );
+	}
+	value_key_data_size = sizeof( regf_value_key_t );
+
+	if( ( io_handle->major_version == 1 )
+	 && ( io_handle->minor_version <= 1 ) )
+	{
+		value_key_data_size += 4;
+	}
 	if( data == NULL )
 	{
 		libcerror_error_set(
@@ -376,24 +396,14 @@ int libregf_value_key_read_data(
 
 		return( -1 );
 	}
-	if( data_size < sizeof( regf_value_key_t ) )
+	if( ( data_size < value_key_data_size )
+	 || ( data_size > (size_t) SSIZE_MAX ) )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-		 "%s: invalid data size value too small.",
-		 function );
-
-		return( -1 );
-	}
-	if( data_size > (size_t) SSIZE_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid data size value exceeds maximum.",
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid data size value out of bounds.",
 		 function );
 
 		return( -1 );
@@ -410,41 +420,58 @@ int libregf_value_key_read_data(
 		 LIBCNOTIFY_PRINT_DATA_FLAG_GROUP_DATA );
 	}
 #endif
+	if( ( io_handle->major_version == 1 )
+	 && ( io_handle->minor_version <= 1 ) )
+	{
+		data_offset += 4;
+	}
 	/* Check if the signature matches that of a value key: "vk"
 	 */
-	if( ( data[ 0 ] != (uint8_t) 'v' )
-	 || ( data[ 1 ] != (uint8_t) 'k' ) )
+	if( ( data[ data_offset ] != (uint8_t) 'v' )
+	 || ( data[ data_offset + 1 ] != (uint8_t) 'k' ) )
 	{
 		return( 0 );
 	}
 	byte_stream_copy_to_uint16_little_endian(
-	 ( (regf_value_key_t *) data )->value_name_size,
+	 ( (regf_value_key_t *) &( data[ data_offset ] ) )->value_name_size,
 	 value_key->name_size );
 
 	byte_stream_copy_to_uint32_little_endian(
-	 ( (regf_value_key_t *) data )->data_size,
+	 ( (regf_value_key_t *) &( data[ data_offset ] ) )->data_size,
 	 value_key->data_size );
 
 	byte_stream_copy_to_uint32_little_endian(
-	 ( (regf_value_key_t *) data )->data_offset,
+	 ( (regf_value_key_t *) &( data[ data_offset ] ) )->data_offset,
 	 value_data_offset );
 
 	byte_stream_copy_to_uint32_little_endian(
-	 ( (regf_value_key_t *) data )->value_type,
+	 ( (regf_value_key_t *) &( data[ data_offset ] ) )->value_type,
 	 value_key->value_type );
 
 	byte_stream_copy_to_uint16_little_endian(
-	 ( (regf_value_key_t *) data )->flags,
+	 ( (regf_value_key_t *) &( data[ data_offset ] ) )->flags,
 	 value_key->flags );
 
 #if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
 	{
+		if( ( io_handle->major_version == 1 )
+		 && ( io_handle->minor_version <= 1 ) )
+		{
+			byte_stream_copy_to_uint32_little_endian(
+			 data,
+			 value_32bit );
+			libcnotify_printf(
+			 "%s: unknown0\t\t\t\t\t: 0x%08" PRIx32 " (%" PRIi32 ")\n",
+			 function,
+			 value_32bit,
+			 (int32_t) value_32bit );
+		}
 		libcnotify_printf(
 		 "%s: signature\t\t\t\t\t: %c%c\n",
 		 function,
-		 ( (regf_value_key_t *) data )->signature[ 0 ],
-		 ( (regf_value_key_t *) data )->signature[ 1 ] );
+		 ( (regf_value_key_t *) &( data[ data_offset ] ) )->signature[ 0 ],
+		 ( (regf_value_key_t *) &( data[ data_offset ] ) )->signature[ 1 ] );
 
 		libcnotify_printf(
 		 "%s: value name size\t\t\t\t: %" PRIu16 "\n",
@@ -470,7 +497,7 @@ int libregf_value_key_read_data(
 			 "%s: value data:\n",
 			 function );
 			libcnotify_print_data(
-			 ( (regf_value_key_t *) data )->data_offset,
+			 ( (regf_value_key_t *) &( data[ data_offset ] ) )->data_offset,
 			 4,
 			 0 );
 		}
@@ -491,7 +518,7 @@ int libregf_value_key_read_data(
 		 value_key->flags );
 
 		byte_stream_copy_to_uint16_little_endian(
-		 ( (regf_value_key_t *) data )->unknown1,
+		 ( (regf_value_key_t *) &( data[ data_offset ] ) )->unknown1,
 		 value_16bit );
 		libcnotify_printf(
 		 "%s: unknown1\t\t\t\t\t: 0x%04" PRIx16 " (%" PRIu16 ")\n",
@@ -499,8 +526,7 @@ int libregf_value_key_read_data(
 		 value_16bit,
 		 value_16bit );
 	}
-#endif
-	data_offset = sizeof( regf_value_key_t );
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
 
 	if( ( value_key->data_size & 0x80000000UL ) != 0 )
 	{
@@ -569,7 +595,7 @@ int libregf_value_key_read_data(
 
 			if( memory_copy(
 			     value_key->data,
-			     &( ( ( (regf_value_key_t *) data )->data_offset )[ 4 - value_key->data_size ] ),
+			     &( ( ( (regf_value_key_t *) &( data[ data_offset ] ) )->data_offset )[ 4 - value_key->data_size ] ),
 			     value_key->data_size ) == NULL )
 			{
 				libcerror_error_set(
@@ -589,6 +615,8 @@ int libregf_value_key_read_data(
 			}
 		}
 	}
+	data_offset += sizeof( regf_value_key_t );
+
 	if( value_key->name_size > 0 )
 	{
 /* TODO mark value as corrupted and handle issue */
@@ -642,7 +670,7 @@ int libregf_value_key_read_data(
 					  value_key->name,
 					  (size_t) value_key->name_size,
 					  &name_index,
-					  ascii_codepage,
+					  io_handle->ascii_codepage,
 					  error );
 			}
 			else
@@ -679,7 +707,7 @@ int libregf_value_key_read_data(
 				     "value name\t\t\t\t\t",
 				     value_key->name,
 				     (size_t) value_key->name_size,
-				     ascii_codepage,
+				     io_handle->ascii_codepage,
 				     error ) != 1 )
 				{
 					libcerror_error_set(
@@ -696,7 +724,7 @@ int libregf_value_key_read_data(
 			{
 				if( libregf_debug_print_utf16_string_value(
 				     function,
-				     "value name\t\t\t\t",
+				     "value name\t\t\t\t\t",
 				     value_key->name,
 				     (size_t) value_key->name_size,
 				     LIBUNA_ENDIAN_LITTLE,

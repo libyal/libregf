@@ -9,6 +9,8 @@ TODO
   - move named key, value key etc into separate source files
   - libregf_hive_bins_list_read_element_data remove the need for + 4096
 * dokan add classname and values support
+* regfinfo:
+  - do not print (default) for corrupt value, but something like (corrupt)
 * libregf:
   - add file type definitions
   - add error tollerance for missing value key
@@ -16,7 +18,6 @@ TODO
     check documentation for more values
   - make signal abort part of IO handle
 * pyregf
-  - add multi string value support
   - as string function: if not a string try to represent the data as a string?
 * profile large regf files
 * libregf_value_item_values_get_data
@@ -26,23 +27,13 @@ TODO
 * get value: add support for an empty string ("") to retrieve the default value
 * refactor libregf_value_item_values_read_element_data to hive bins list
 * merge functionality of evttools registry_file with regftools
-* security descriptor:
-  - add debug print (libfwnt)
-  - add libregf_key_get_security_descriptor_size() API function
 * code clean up
   - libregf_value_item_values implement libfdata_reference
 
 Tools:
-* regfexport
-  - export keys, values and value data
-  - export specific paths
-  - create .reg similar output?
 * regfinfo
   - print hive bins list size
-  - add option to control print of entire hierarchy
-  - print file type
   - print last part of filename stored in header?
-  - print key index
   - size usage distribution
 * regfmount:
   - fix list file of specific value success withouh (values)\
@@ -80,18 +71,10 @@ Library
 * string values
   - how are they stored ?
   - use codepage in string value conversions
-* file
-  - add get key by path function
 * data recovery
 
 Error tollerance:
 * deal with cyclic keys, add max depth or track key offsets
-
-Python bindings
-* add functionality
-
-Release:
-* check TODOs
 
 20140929
 * see `git log' for more recent change log

@@ -32,6 +32,7 @@
 #include "libregf_libcerror.h"
 #include "libregf_libcnotify.h"
 #include "libregf_libfdatetime.h"
+#include "libregf_libfwnt.h"
 #include "libregf_libuna.h"
 
 #if defined( HAVE_DEBUG_OUTPUT )
@@ -445,6 +446,72 @@ on_error:
 	{
 		memory_free(
 		 string );
+	}
+	return( -1 );
+}
+
+/* Prints a security descriptor value
+ * Returns 1 if successful or -1 on error
+ */
+int libregf_debug_print_security_descriptor_value(
+     const uint8_t *byte_stream,
+     size_t byte_stream_size,
+     int byte_order,
+     libcerror_error_t **error )
+{
+	libfwnt_security_descriptor_t *security_descriptor = NULL;
+	static char *function                              = "libregf_debug_print_security_descriptor_value";
+
+	if( libfwnt_security_descriptor_initialize(
+	     &security_descriptor,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to create security descriptor.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfwnt_security_descriptor_copy_from_byte_stream(
+	     security_descriptor,
+	     byte_stream,
+	     byte_stream_size,
+	     byte_order,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_COPY_FAILED,
+		 "%s: unable to copy security descriptor from byte stream.",
+		 function );
+
+		goto on_error;
+	}
+	if( libfwnt_security_descriptor_free(
+	     &security_descriptor,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_FINALIZE_FAILED,
+		 "%s: unable to free security descriptor.",
+		 function );
+
+		goto on_error;
+	}
+	return( 1 );
+
+on_error:
+	if( security_descriptor != NULL )
+	{
+		libfwnt_security_descriptor_free(
+		 &security_descriptor,
+		 NULL );
 	}
 	return( -1 );
 }

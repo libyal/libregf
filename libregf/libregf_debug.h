@@ -65,6 +65,12 @@ int libregf_debug_print_utf16_string_value(
      int byte_order,
      libcerror_error_t **error );
 
+int libregf_debug_print_security_descriptor_value(
+     const uint8_t *byte_stream,
+     size_t byte_stream_size,
+     int byte_order,
+     libcerror_error_t **error );
+
 int libregf_debug_print_read_offsets(
      libbfio_handle_t *file_io_handle,
      libcerror_error_t **error );

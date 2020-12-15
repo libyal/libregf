@@ -7,8 +7,8 @@ EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
 EXIT_IGNORE=77;
 
-PROFILES=("regfinfo");
-OPTIONS_PER_PROFILE=("");
+PROFILES=("regfinfo" "regfinfo_hierarchy");
+OPTIONS_PER_PROFILE=("" "-H");
 OPTION_SETS="";
 
 INPUT_GLOB="*";

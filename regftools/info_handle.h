@@ -95,6 +95,27 @@ int info_handle_name_value_fprint(
      size_t value_string_length,
      libcerror_error_t **error );
 
+int info_handle_filetime_value_fprint(
+     info_handle_t *info_handle,
+     const char *value_name,
+     uint64_t value_64bit,
+     libcerror_error_t **error );
+
+int info_handle_bodyfile_name_value_fprint(
+     info_handle_t *info_handle,
+     const system_character_t *value_string,
+     size_t value_string_length,
+     libcerror_error_t **error );
+
+int info_handle_bodyfile_key_value_fprint(
+     info_handle_t *info_handle,
+     libregf_key_t *key,
+     const system_character_t *key_path,
+     size_t key_path_length,
+     const system_character_t *key_name,
+     size_t key_name_length,
+     libcerror_error_t **error );
+
 int info_handle_key_fprint(
      info_handle_t *info_handle,
      libregf_key_t *key,

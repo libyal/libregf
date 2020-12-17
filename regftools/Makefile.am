@@ -68,6 +68,7 @@ regfinfo_SOURCES = \
 	regftools_unused.h
 
 regfinfo_LDADD = \
+	@LIBFDATETIME_LIBADD@ \
 	@LIBUNA_LIBADD@ \
 	@LIBCNOTIFY_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \

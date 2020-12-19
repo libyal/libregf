@@ -88,6 +88,12 @@ int export_handle_close_input(
      export_handle_t *export_handle,
      libcerror_error_t **error );
 
+int export_handle_export_filetime(
+     export_handle_t *export_handle,
+     const char *value_name,
+     uint64_t value_64bit,
+     libcerror_error_t **error );
+
 int export_handle_export_key(
      export_handle_t *export_handle,
      const system_character_t *key_path,

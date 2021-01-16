@@ -43,6 +43,7 @@ regfexport_SOURCES = \
 	regftools_unused.h
 
 regfexport_LDADD = \
+	@LIBFDATETIME_LIBADD@ \
 	@LIBCNOTIFY_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
 	../libregf/libregf.la \

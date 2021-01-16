@@ -412,6 +412,8 @@ regf_test_tools_info_handle_SOURCES = \
 	regf_test_unused.h
 
 regf_test_tools_info_handle_LDADD = \
+	@LIBFDATETIME_LIBADD@ \
+	@LIBUNA_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
 	../libregf/libregf.la \
 	@LIBCERROR_LIBADD@

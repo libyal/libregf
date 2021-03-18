@@ -39,7 +39,7 @@
 
 #include "../regftools/regftools_output.h"
 
-/* Tests the regftools_output_initialize and function
+/* Tests the regftools_output_initialize function
  * Returns 1 if successful or 0 if not
  */
 int regf_test_tools_output_initialize(

@@ -619,6 +619,7 @@ int libregf_hive_bins_list_append_bin(
 }
 
 /* Reads a hive bin
+ * Callback function for the data list
  * Returns 1 if successful or -1 on error
  */
 int libregf_hive_bins_list_read_element_data(

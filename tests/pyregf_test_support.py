@@ -37,27 +37,30 @@ class SupportFunctionsTests(unittest.TestCase):
 
   def test_check_file_signature(self):
     """Tests the check_file_signature function."""
-    if not unittest.source:
+    test_source = unittest.source
+    if not test_source:
       raise unittest.SkipTest("missing source")
 
-    result = pyregf.check_file_signature(unittest.source)
+    result = pyregf.check_file_signature(test_source)
     self.assertTrue(result)
 
   def test_check_file_signature_file_object(self):
     """Tests the check_file_signature_file_object function."""
-    if not unittest.source:
+    test_source = unittest.source
+    if not test_source:
       raise unittest.SkipTest("missing source")
 
-    with open(unittest.source, "rb") as file_object:
+    with open(test_source, "rb") as file_object:
       result = pyregf.check_file_signature_file_object(file_object)
       self.assertTrue(result)
 
   def test_open(self):
     """Tests the open function."""
-    if not unittest.source:
+    test_source = unittest.source
+    if not test_source:
       raise unittest.SkipTest("missing source")
 
-    regf_file = pyregf.open(unittest.source)
+    regf_file = pyregf.open(test_source)
     self.assertIsNotNone(regf_file)
 
     regf_file.close()
@@ -66,17 +69,18 @@ class SupportFunctionsTests(unittest.TestCase):
       pyregf.open(None)
 
     with self.assertRaises(ValueError):
-      pyregf.open(unittest.source, mode="w")
+      pyregf.open(test_source, mode="w")
 
   def test_open_file_object(self):
     """Tests the open_file_object function."""
-    if not unittest.source:
+    test_source = unittest.source
+    if not test_source:
       raise unittest.SkipTest("missing source")
 
-    if not os.path.isfile(unittest.source):
+    if not os.path.isfile(test_source):
       raise unittest.SkipTest("source not a regular file")
 
-    with open(unittest.source, "rb") as file_object:
+    with open(test_source, "rb") as file_object:
       regf_file = pyregf.open_file_object(file_object)
       self.assertIsNotNone(regf_file)
 

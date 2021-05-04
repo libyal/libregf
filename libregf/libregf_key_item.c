@@ -1108,8 +1108,8 @@ int libregf_key_item_read_values_list(
 	{
 		data_offset += 4;
 	}
-	if( ( hive_bin_cell_size < data_offset )
-	 || ( hive_bin_cell_size - data_offset ) < ( number_of_values_list_elements * 4 ) )
+	if( ( data_offset > hive_bin_cell_size )
+	 || ( number_of_values_list_elements > ( ( hive_bin_cell_size - data_offset ) / 4 ) ) )
 	{
 		libcerror_error_set(
 		 error,

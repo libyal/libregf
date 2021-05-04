@@ -224,24 +224,14 @@ int libregf_hive_bin_read_cells_data(
 
 		return( -1 );
 	}
-	if( data_size < 4 )
+	if( ( data_size < 4 )
+	 || ( data_size > (size_t) SSIZE_MAX ) )
 	{
 		libcerror_error_set(
 		 error,
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-		 LIBCERROR_ARGUMENT_ERROR_VALUE_TOO_SMALL,
-		 "%s: invalid data size value too small.",
-		 function );
-
-		return( -1 );
-	}
-	if( data_size > (size_t) SSIZE_MAX )
-	{
-		libcerror_error_set(
-		 error,
-		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
-		 LIBCERROR_RUNTIME_ERROR_VALUE_EXCEEDS_MAXIMUM,
-		 "%s: invalid data size value exceeds maximum.",
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid data size value out of bounds.",
 		 function );
 
 		return( -1 );
@@ -273,12 +263,12 @@ int libregf_hive_bin_read_cells_data(
 			 file_offset );
 		}
 #endif
-		if( data_offset > ( data_size - 4 ) )
+		if( data_offset >= ( data_size - 4 ) )
 		{
 			libcerror_error_set(
 			 error,
-			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 			 "%s: invalid cell size value exceeds hive bin size.",
 			 function );
 
@@ -303,8 +293,17 @@ int libregf_hive_bin_read_cells_data(
 #endif
 		flags = 0;
 
-/* TODO check and handle cell_size < 4 */
+		if( cell_size == 0x80000000UL )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: invalid cell size value out of bounds.",
+			 function );
 
+			goto on_error;
+		}
 		if( (int32_t) cell_size < 0 )
 		{
 			cell_size = (uint32_t) ( -1 * (int32_t) cell_size );
@@ -313,12 +312,23 @@ int libregf_hive_bin_read_cells_data(
 		{
 			flags |= LIBREGF_HIVE_BIN_CELL_FLAG_UNALLOCATED;
 		}
+		if( cell_size < 4 )
+		{
+			libcerror_error_set(
+			 error,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+			 "%s: invalid cell size value out of bounds.",
+			 function );
+
+			goto on_error;
+		}
 		if( ( cell_size % 8 ) != 0 )
 		{
 			libcerror_error_set(
 			 error,
-			 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
-			 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
+			 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+			 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
 			 "%s: invalid cell size value should be multitude of 8.",
 			 function );
 

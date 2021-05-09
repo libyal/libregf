@@ -254,7 +254,7 @@ int libregf_sub_key_list_read_data(
 		libcnotify_print_data(
 		 data,
 		 data_size,
-		 0 );
+		 LIBCNOTIFY_PRINT_DATA_FLAG_GROUP_DATA );
 	}
 #endif
 	if( ( io_handle->major_version == 1 )
@@ -417,7 +417,7 @@ int libregf_sub_key_list_read_data(
 			libcnotify_print_data(
 			 &( data[ data_offset ]),
 			 data_size - data_offset,
-			 0 );
+			 LIBCNOTIFY_PRINT_DATA_FLAG_GROUP_DATA );
 		}
 		else
 		{
@@ -425,7 +425,8 @@ int libregf_sub_key_list_read_data(
 			 "\n" );
 		}
 	}
-#endif
+#endif /* defined( HAVE_DEBUG_OUTPUT ) */
+
 	return( 1 );
 
 on_error:

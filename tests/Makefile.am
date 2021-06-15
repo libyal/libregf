@@ -50,6 +50,7 @@ check_PROGRAMS = \
 	regf_test_data_block_key \
 	regf_test_data_block_stream \
 	regf_test_data_type \
+	regf_test_dirty_vector \
 	regf_test_error \
 	regf_test_file \
 	regf_test_file_header \
@@ -129,6 +130,18 @@ regf_test_data_type_SOURCES = \
 	regf_test_unused.h
 
 regf_test_data_type_LDADD = \
+	../libregf/libregf.la \
+	@LIBCERROR_LIBADD@
+
+regf_test_dirty_vector_SOURCES = \
+	regf_test_dirty_vector.c \
+	regf_test_libcerror.h \
+	regf_test_libregf.h \
+	regf_test_macros.h \
+	regf_test_memory.c regf_test_memory.h \
+	regf_test_unused.h
+
+regf_test_dirty_vector_LDADD = \
 	../libregf/libregf.la \
 	@LIBCERROR_LIBADD@
 

@@ -350,6 +350,7 @@ int libregf_key_item_read(
 		          file_io_handle,
 		          hive_bins_list,
 		          (off64_t) key_item->named_key->sub_keys_list_offset,
+		          0,
 		          error );
 
 		if( result == -1 )
@@ -1216,6 +1217,7 @@ int libregf_key_item_read_sub_keys_list(
      libbfio_handle_t *file_io_handle,
      libregf_hive_bins_list_t *hive_bins_list,
      off64_t sub_keys_list_offset,
+     int recursion_depth,
      libcerror_error_t **error )
 {
 	libregf_hive_bin_cell_t *hive_bin_cell       = NULL;
@@ -1248,6 +1250,18 @@ int libregf_key_item_read_sub_keys_list(
 		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
 		 LIBCERROR_ARGUMENT_ERROR_UNSUPPORTED_VALUE,
 		 "%s: invalid sub keys list offset.",
+		 function );
+
+		return( -1 );
+	}
+	if( ( recursion_depth < 0 )
+	 || ( recursion_depth > LIBREGF_MAXIMUM_SUB_KEY_RECURSION_DEPTH ) )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_VALUE_OUT_OF_BOUNDS,
+		 "%s: invalid recursion depth value out of bounds.",
 		 function );
 
 		return( -1 );
@@ -1413,6 +1427,7 @@ int libregf_key_item_read_sub_keys_list(
 					  file_io_handle,
 					  hive_bins_list,
 				          (off64_t) sub_key_descriptor->key_offset,
+				          recursion_depth + 1,
 					  error );
 
 				if( result == -1 )

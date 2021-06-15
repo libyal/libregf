@@ -138,6 +138,7 @@ int libregf_key_item_read_sub_keys_list(
      libbfio_handle_t *file_io_handle,
      libregf_hive_bins_list_t *hive_bins_list,
      off64_t sub_keys_list_offset,
+     int recursion_depth,
      libcerror_error_t **error );
 
 int libregf_key_item_is_corrupted(

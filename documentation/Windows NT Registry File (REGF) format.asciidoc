@@ -93,7 +93,7 @@ A REGF consist of the following distinguishable elements:
 According to `[MSDN]`:
 
 * a key name has a limit of 255 characters
-* a value name has a limit of 16383 characters (for Windows 2000 this is limit is 260 ASCII or 16383 Unicode characters)
+* a value name has a limit of 16383 characters (for Windows 2000 this limit is 260 ASCII or 16383 Unicode characters)
 * a Registry tree can be 512 levels deep
 
 Both key and values names are case insensitive. The \ character is used as the

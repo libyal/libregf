@@ -1,7 +1,7 @@
 name: regf
 type: format
 description: Windows NT Registry File (REGF) format
-urls: ['https://github.com/libyal/libregf/blob/master/documentation/Windows%20NT%20Registry%20File%20(REGF)%20format.asciidoc']
+urls: ['https://github.com/libyal/libregf/blob/main/documentation/Windows%20NT%20Registry%20File%20(REGF)%20format.asciidoc']
 metadata:
   authors: ['Joachim Metz <joachim.metz@gmail.com>']
   year: 2009

@@ -352,6 +352,15 @@ void pyregf_file_free(
 
 		return;
 	}
+	if( pyregf_file->file_io_handle != NULL )
+	{
+		if( pyregf_file_close(
+		     pyregf_file,
+		     NULL ) == NULL )
+		{
+			return;
+		}
+	}
 	if( pyregf_file->file != NULL )
 	{
 		Py_BEGIN_ALLOW_THREADS

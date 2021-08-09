@@ -328,7 +328,7 @@ int libregf_sub_key_list_read_data(
 
 	data_offset += sizeof( regf_sub_key_list_t );
 
-	if( (size_t) number_of_elements > ( data_size / element_data_size ) )
+	if( (size_t) number_of_elements > ( ( data_size - data_offset ) / element_data_size ) )
 	{
 		libcerror_error_set(
 		 error,

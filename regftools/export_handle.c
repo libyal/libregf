@@ -1,7 +1,7 @@
 /*
  * Export handle
  *
- * Copyright (C) 2009-2021, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2009-2022, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -1449,7 +1449,14 @@ int export_handle_export_key(
 		}
 		if( data_size != expected_data_size )
 		{
-			if( expected_data_size != 0 )
+			if( ( data_size == 4 )
+			 && ( expected_data_size == 2 )
+			 && ( ( value_type == LIBREGF_VALUE_TYPE_STRING )
+			  ||  ( value_type == LIBREGF_VALUE_TYPE_EXPANDABLE_STRING ) ) )
+			{
+				/* An empty string is sometimes stored as 4 bytes */
+			}
+			else if( expected_data_size != 0 )
 			{
 				fprintf(
 				 export_handle->notify_stream,

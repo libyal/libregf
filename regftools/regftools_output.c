@@ -1,7 +1,7 @@
 /*
  * Common output functions for the regftools
  *
- * Copyright (C) 2009-2021, Joachim Metz <joachim.metz@gmail.com>
+ * Copyright (C) 2009-2022, Joachim Metz <joachim.metz@gmail.com>
  *
  * Refer to AUTHORS for acknowledgements.
  *
@@ -107,7 +107,7 @@ void regftools_output_copyright_fprint(
 	 */
 	fprintf(
 	 stream,
-	 _( "Copyright (C) 2009-2021, %s.\n" ),
+	 _( "Copyright (C) 2009-2022, %s.\n" ),
 	 _( "Joachim Metz" ) );
 
 	fprintf(

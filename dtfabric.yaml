@@ -9,6 +9,7 @@ attributes:
   byte_order: little-endian
 layout:
 - data_type: file_header
+  offset: 0
 ---
 name: byte
 type: integer
@@ -41,7 +42,7 @@ name: filetime
 aliases: [FILETIME]
 type: structure
 description: FILETIME structure
-urls: ['https://msdn.microsoft.com/en-us/library/windows/desktop/ms724284(v=vs.85).aspx']
+urls: ['https://docs.microsoft.com/en-us/windows/win32/api/minwinbase/ns-minwinbase-filetime']
 members:
 - name: lower_part
   data_type: uint32

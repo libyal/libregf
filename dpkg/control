@@ -1,7 +1,7 @@
 Source: libregf
 Priority: extra
 Maintainer: Joachim Metz <joachim.metz@gmail.com>
-Build-Depends: debhelper (>= 9), dh-autoreconf, pkg-config, python-dev, python-setuptools, python3-dev, python3-setuptools, libfuse-dev
+Build-Depends: debhelper (>= 9), dh-autoreconf, pkg-config, python3-dev, python3-setuptools, libfuse-dev
 Standards-Version: 4.1.4
 Section: libs
 Homepage: https://github.com/libyal/libregf
@@ -45,23 +45,6 @@ Architecture: any
 Depends: libregf-tools (= ${binary:Version}), ${misc:Depends}
 Description: Debugging symbols for libregf-tools
  Debugging symbols for libregf-tools.
-
-Package: libregf-python
-Section: python
-Architecture: any
-Depends: libregf (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
-Conflicts: python-libregf
-Replaces: python-libregf
-Suggests: libregf-python-dbg
-Description: Python 2 bindings for libregf
- Python 2 bindings for libregf.
-
-Package: libregf-python-dbg
-Section: debug
-Architecture: any
-Depends: libregf-python (= ${binary:Version}), ${misc:Depends}
-Description: Debugging symbols for libregf-python
- Debugging symbols for libregf-python.
 
 Package: libregf-python3
 Section: python

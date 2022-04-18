@@ -29,17 +29,6 @@ Requires: libregf = %{version}-%{release}
 %description -n libregf-devel
 Header files and libraries for developing applications for libregf.
 
-%package -n libregf-python2
-Obsoletes: libregf-python < %{version}
-Provides: libregf-python = %{version}
-Summary: Python 2 bindings for libregf
-Group: System Environment/Libraries
-Requires: libregf = %{version}-%{release} python2
-BuildRequires: python2-devel
-
-%description -n libregf-python2
-Python 2 bindings for libregf
-
 %package -n libregf-python3
 Summary: Python 3 bindings for libregf
 Group: System Environment/Libraries
@@ -62,7 +51,7 @@ Several tools for reading Windows NT Registry Files (REGF)
 %setup -q
 
 %build
-%configure --prefix=/usr --libdir=%{_libdir} --mandir=%{_mandir} --enable-python2 --enable-python3
+%configure --prefix=/usr --libdir=%{_libdir} --mandir=%{_mandir} --enable-python3
 make %{?_smp_mflags}
 
 %install
@@ -97,14 +86,6 @@ rm -rf %{buildroot}
 %{_libdir}/pkgconfig/libregf.pc
 %{_includedir}/*
 %{_mandir}/man3/*
-
-%files -n libregf-python2
-%defattr(644,root,root,755)
-%license COPYING COPYING.LESSER
-%doc AUTHORS README
-%{_libdir}/python2*/site-packages/*.a
-%{_libdir}/python2*/site-packages/*.la
-%{_libdir}/python2*/site-packages/*.so
 
 %files -n libregf-python3
 %defattr(644,root,root,755)

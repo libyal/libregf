@@ -37,7 +37,6 @@ DPKG_FILES = \
 	dpkg/rules \
 	dpkg/libregf.install \
 	dpkg/libregf-dev.install \
-	dpkg/libregf-python.install \
 	dpkg/libregf-python3.install \
 	dpkg/libregf-tools.install \
 	dpkg/source/format

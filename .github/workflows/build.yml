@@ -27,7 +27,7 @@ jobs:
           compiler: 'gcc'
           configure_options: '--enable-static-executables=yes --enable-multi-threading-support=no'
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Install build dependencies
       run: |
         sudo apt-get -y install autoconf automake autopoint build-essential git libfuse-dev libtool pkg-config
@@ -56,7 +56,7 @@ jobs:
           configure_options: '--enable-python3'
           python_version: '3'
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Install build dependencies
       run: |
         sudo add-apt-repository universe &&
@@ -85,7 +85,7 @@ jobs:
           configure_options: ''
           python-version: '3.10'
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v1
       with:
@@ -115,7 +115,7 @@ jobs:
           compiler: 'gcc'
           configure_options: '--enable-wide-character-type'
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Install build dependencies
       run: |
         sudo apt-get -y install autoconf automake autopoint build-essential git libfuse-dev libtool pkg-config

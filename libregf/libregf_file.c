@@ -1186,7 +1186,7 @@ int libregf_internal_file_read_hive_bins(
 
 		goto on_error;
 	}
-	result = libregf_hive_bins_list_read(
+	result = libregf_hive_bins_list_read_file_io_handle(
 		  internal_file->hive_bins_list,
 		  file_io_handle,
 		  internal_file->io_handle->hive_bins_list_offset,

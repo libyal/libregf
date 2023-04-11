@@ -29,6 +29,7 @@
 #endif
 
 #include "regf_test_functions.h"
+#include "regf_test_libbfio.h"
 #include "regf_test_libcerror.h"
 #include "regf_test_libregf.h"
 #include "regf_test_macros.h"
@@ -832,7 +833,11 @@ int main(
 
 	return( EXIT_SUCCESS );
 
+#if defined( __GNUC__ ) && !defined( LIBREGF_DLL_IMPORT )
+
 on_error:
 	return( EXIT_FAILURE );
+
+#endif /* defined( __GNUC__ ) && !defined( LIBREGF_DLL_IMPORT ) */
 }
 

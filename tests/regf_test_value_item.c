@@ -1486,10 +1486,10 @@ int regf_test_value_item_is_corrupted(
 	          value_item,
 	          &error );
 
-	REGF_TEST_ASSERT_NOT_EQUAL_INT(
+	REGF_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
-	 -1 );
+	 0 );
 
 	REGF_TEST_ASSERT_IS_NULL(
 	 "error",
@@ -2384,10 +2384,10 @@ int regf_test_value_item_get_data_size(
 	          &data_size,
 	          &error );
 
-	REGF_TEST_ASSERT_NOT_EQUAL_INT(
+	REGF_TEST_ASSERT_EQUAL_INT(
 	 "result",
 	 result,
-	 -1 );
+	 1 );
 
 	REGF_TEST_ASSERT_EQUAL_SIZE(
 	 "data_size",

@@ -261,14 +261,28 @@ regf_test_hive_bin_header_LDADD = \
 	@LIBCERROR_LIBADD@
 
 regf_test_hive_bins_list_SOURCES = \
+	regf_test_functions.c regf_test_functions.h \
 	regf_test_hive_bins_list.c \
+	regf_test_libbfio.h \
 	regf_test_libcerror.h \
+	regf_test_libfcache.h \
+	regf_test_libfdata.h \
 	regf_test_libregf.h \
 	regf_test_macros.h \
 	regf_test_memory.c regf_test_memory.h \
 	regf_test_unused.h
 
 regf_test_hive_bins_list_LDADD = \
+	@LIBFDATA_LIBADD@ \
+	@LIBFCACHE_LIBADD@ \
+	@LIBBFIO_LIBADD@ \
+	@LIBCPATH_LIBADD@ \
+	@LIBCFILE_LIBADD@ \
+	@LIBUNA_LIBADD@ \
+	@LIBCSPLIT_LIBADD@ \
+	@LIBCNOTIFY_LIBADD@ \
+	@LIBCLOCALE_LIBADD@ \
+	@LIBCDATA_LIBADD@ \
 	../libregf/libregf.la \
 	@LIBCERROR_LIBADD@
 
@@ -311,6 +325,7 @@ regf_test_key_descriptor_LDADD = \
 regf_test_key_item_SOURCES = \
 	regf_test_functions.c regf_test_functions.h \
 	regf_test_key_item.c \
+	regf_test_libbfio.h \
 	regf_test_libcerror.h \
 	regf_test_libregf.h \
 	regf_test_macros.h \

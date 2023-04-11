@@ -198,6 +198,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\tests\regf_test_libbfio.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\tests\regf_test_libcerror.h"
 				>
 			</File>

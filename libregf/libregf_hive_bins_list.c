@@ -271,7 +271,7 @@ int libregf_hive_bins_list_empty_cache(
 /* Reads the hive bins
  * Returns 1 if successful, 0 if no hive bin signature was found or -1 on error
  */
-int libregf_hive_bins_list_read(
+int libregf_hive_bins_list_read_file_io_handle(
      libregf_hive_bins_list_t *hive_bins_list,
      libbfio_handle_t *file_io_handle,
      off64_t file_offset,
@@ -279,7 +279,7 @@ int libregf_hive_bins_list_read(
      libcerror_error_t **error )
 {
 	libregf_hive_bin_header_t *hive_bin_header = NULL;
-	static char *function                      = "libregf_hive_bins_list_read";
+	static char *function                      = "libregf_hive_bins_list_read_file_io_handle";
 	off64_t alignment_size                     = 0;
 	int hive_bin_index                         = 0;
 	int result                                 = 0;
@@ -744,7 +744,7 @@ int libregf_hive_bins_list_read_element_data(
 		 "%s: unable to free hive bin header.",
 		 function );
 
-		return( -1 );
+		goto on_error;
 	}
 	return( 1 );
 

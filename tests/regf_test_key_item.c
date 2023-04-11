@@ -27,6 +27,7 @@
 #include <stdlib.h>
 #endif
 
+#include "regf_test_libbfio.h"
 #include "regf_test_libcerror.h"
 #include "regf_test_libregf.h"
 #include "regf_test_macros.h"

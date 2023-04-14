@@ -472,7 +472,7 @@ on_error:
 
 		key_item->security_descriptor = NULL;
 	}
-	key_item->class_name_size = 0;
+	key_item->security_descriptor_size = 0;
 
 	if( key_item->class_name != NULL )
 	{

@@ -568,7 +568,7 @@ int regf_test_hive_bins_list_initialize(
 	int result                               = 0;
 
 #if defined( HAVE_REGF_TEST_MEMORY )
-	int number_of_malloc_fail_tests          = 1;
+	int number_of_malloc_fail_tests          = 3;
 	int number_of_memset_fail_tests          = 1;
 	int test_number                          = 0;
 #endif
@@ -1105,6 +1105,29 @@ int regf_test_hive_bins_list_read_file_io_handle(
 	libcerror_error_free(
 	 &error );
 
+	hive_bins_list->io_handle = NULL;
+
+	result = libregf_hive_bins_list_read_file_io_handle(
+	          hive_bins_list,
+	          file_io_handle,
+	          4096,
+	          4096,
+	          &error );
+
+	hive_bins_list->io_handle = io_handle;
+
+	REGF_TEST_ASSERT_EQUAL_INT(
+	 "result",
+	 result,
+	 -1 );
+
+	REGF_TEST_ASSERT_IS_NOT_NULL(
+	 "error",
+	 error );
+
+	libcerror_error_free(
+	 &error );
+
 	result = libregf_hive_bins_list_read_file_io_handle(
 	          hive_bins_list,
 	          NULL,
@@ -1123,6 +1146,39 @@ int regf_test_hive_bins_list_read_file_io_handle(
 
 	libcerror_error_free(
 	 &error );
+
+#if defined( HAVE_REGF_TEST_MEMORY )
+
+	/* Test libregf_hive_bins_list_read_file_io_handle with malloc failing in libregf_hive_bin_header_initialize
+	 */
+	regf_test_malloc_attempts_before_fail = 0;
+
+	result = libregf_hive_bins_list_read_file_io_handle(
+	          hive_bins_list,
+	          file_io_handle,
+	          4096,
+	          4096,
+	          &error );
+
+	if( regf_test_malloc_attempts_before_fail != -1 )
+	{
+		regf_test_malloc_attempts_before_fail = -1;
+	}
+	else
+	{
+		REGF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		REGF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_REGF_TEST_MEMORY ) */
 
 	/* Clean up file IO handle
 	 */
@@ -1734,6 +1790,44 @@ int regf_test_hive_bins_list_read_element_data(
 
 	libcerror_error_free(
 	 &error );
+
+#if defined( HAVE_REGF_TEST_MEMORY )
+
+	/* Test libregf_hive_bins_list_read_element_data with malloc failing in libregf_hive_bin_header_initialize
+	 */
+	regf_test_malloc_attempts_before_fail = 0;
+
+	result = libregf_hive_bins_list_read_element_data(
+	          NULL,
+	          file_io_handle,
+	          list_element,
+	          (libfdata_cache_t *) cache,
+	          0,
+	          4096,
+	          4096,
+	          0,
+	          0,
+	          &error );
+
+	if( regf_test_malloc_attempts_before_fail != -1 )
+	{
+		regf_test_malloc_attempts_before_fail = -1;
+	}
+	else
+	{
+		REGF_TEST_ASSERT_EQUAL_INT(
+		 "result",
+		 result,
+		 -1 );
+
+		REGF_TEST_ASSERT_IS_NOT_NULL(
+		 "error",
+		 error );
+
+		libcerror_error_free(
+		 &error );
+	}
+#endif /* defined( HAVE_REGF_TEST_MEMORY ) */
 
 	/* Clean up file IO handle
 	 */

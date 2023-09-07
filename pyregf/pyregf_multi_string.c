@@ -367,7 +367,6 @@ PyObject *pyregf_multi_string_getitem(
 	PyObject *string_object  = NULL;
 	libcerror_error_t *error = NULL;
 	uint8_t *utf8_string     = NULL;
-	const char *errors       = NULL;
 	static char *function    = "pyregf_multi_string_getitem";
 	size_t utf8_string_size  = 0;
 	int result               = 0;
@@ -420,7 +419,7 @@ PyObject *pyregf_multi_string_getitem(
 	if( utf8_string == NULL )
 	{
 		PyErr_Format(
-		 PyExc_IOError,
+		 PyExc_MemoryError,
 		 "%s: unable to create string.",
 		 function );
 
@@ -457,7 +456,7 @@ PyObject *pyregf_multi_string_getitem(
 	string_object = PyUnicode_DecodeUTF8(
 			 (char *) utf8_string,
 			 (Py_ssize_t) utf8_string_size - 1,
-			 errors );
+			 NULL );
 
 	PyMem_Free(
 	 utf8_string );
@@ -503,7 +502,6 @@ PyObject *pyregf_multi_string_iternext(
 	PyObject *string_object  = NULL;
 	libcerror_error_t *error = NULL;
 	uint8_t *utf8_string     = NULL;
-	const char *errors       = NULL;
 	static char *function    = "pyregf_multi_string_iternext";
 	size_t utf8_string_size  = 0;
 	int result               = 0;
@@ -562,7 +560,7 @@ PyObject *pyregf_multi_string_iternext(
 	if( utf8_string == NULL )
 	{
 		PyErr_Format(
-		 PyExc_IOError,
+		 PyExc_MemoryError,
 		 "%s: unable to create string.",
 		 function );
 
@@ -599,7 +597,7 @@ PyObject *pyregf_multi_string_iternext(
 	string_object = PyUnicode_DecodeUTF8(
 			 (char *) utf8_string,
 			 (Py_ssize_t) utf8_string_size - 1,
-			 errors );
+			 NULL );
 
 	PyMem_Free(
 	 utf8_string );

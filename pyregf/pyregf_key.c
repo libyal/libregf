@@ -568,7 +568,6 @@ PyObject *pyregf_key_get_name(
 {
 	libcerror_error_t *error = NULL;
 	PyObject *string_object  = NULL;
-	const char *errors       = NULL;
 	uint8_t *utf8_string     = NULL;
 	static char *function    = "pyregf_key_get_name";
 	size_t utf8_string_size  = 0;
@@ -621,7 +620,7 @@ PyObject *pyregf_key_get_name(
 	if( utf8_string == NULL )
 	{
 		PyErr_Format(
-		 PyExc_IOError,
+		 PyExc_MemoryError,
 		 "%s: unable to create name.",
 		 function );
 
@@ -657,7 +656,7 @@ PyObject *pyregf_key_get_name(
 	string_object = PyUnicode_DecodeUTF8(
 			 (char *) utf8_string,
 			 (Py_ssize_t) utf8_string_size - 1,
-			 errors );
+			 NULL );
 
 	PyMem_Free(
 	 utf8_string );
@@ -682,7 +681,6 @@ PyObject *pyregf_key_get_class_name(
 {
 	libcerror_error_t *error = NULL;
 	PyObject *string_object  = NULL;
-	const char *errors       = NULL;
 	uint8_t *utf8_string     = NULL;
 	static char *function    = "pyregf_key_get_class_name";
 	size_t utf8_string_size  = 0;
@@ -735,7 +733,7 @@ PyObject *pyregf_key_get_class_name(
 	if( utf8_string == NULL )
 	{
 		PyErr_Format(
-		 PyExc_IOError,
+		 PyExc_MemoryError,
 		 "%s: unable to create class name.",
 		 function );
 
@@ -771,7 +769,7 @@ PyObject *pyregf_key_get_class_name(
 	string_object = PyUnicode_DecodeUTF8(
 			 (char *) utf8_string,
 			 (Py_ssize_t) utf8_string_size - 1,
-			 errors );
+			 NULL );
 
 	PyMem_Free(
 	 utf8_string );

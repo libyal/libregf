@@ -2,6 +2,7 @@
 name = libregf-python
 version = @VERSION@
 description = Python bindings module for libregf
+long_description = Python bindings module for libregf
 author = Joachim Metz
 author_email = joachim.metz@gmail.com
 license = GNU Lesser General Public License v3 or later (LGPLv3+)

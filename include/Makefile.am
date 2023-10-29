@@ -19,9 +19,9 @@ MAINTAINERCLEANFILES = \
 	Makefile.in
 
 distclean: clean
-	/bin/rm -f libregf.h
-	/bin/rm -f libregf/definitions.h
-	/bin/rm -f libregf/features.h
-	/bin/rm -f libregf/types.h
-	/bin/rm -f Makefile
+	-rm -f libregf.h
+	-rm -f libregf/definitions.h
+	-rm -f libregf/features.h
+	-rm -f libregf/types.h
+	-rm -f Makefile
 

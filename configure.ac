@@ -2,13 +2,14 @@ AC_PREREQ([2.71])
 
 AC_INIT(
  [libregf],
- [20231018],
+ [20231029],
  [joachim.metz@gmail.com])
 
 AC_CONFIG_SRCDIR(
  [include/libregf.h.in])
 
 AM_INIT_AUTOMAKE([gnu 1.6 tar-ustar])
+AM_EXTRA_RECURSIVE_TARGETS([sources splint])
 
 AC_CONFIG_MACRO_DIR([m4])
 

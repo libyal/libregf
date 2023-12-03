@@ -1,6 +1,6 @@
 # Files to ignore by git
 #
-# Version: 20230926
+# Version: 20231119
 
 # Generic auto-generated build files
 *~
@@ -127,7 +127,6 @@ stamp-h[1-9]
 /libregf.spec
 /libregf/libregf.rc
 /libregf/libregf_definitions.h
-/pyregf-python[23]/*.[ch]
 /setup.cfg
 /regftools/*.exe
 /regftools/regfexport

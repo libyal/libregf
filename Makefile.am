@@ -20,8 +20,6 @@ SUBDIRS = \
 	libregf \
 	regftools \
 	pyregf \
-	pyregf-python2 \
-	pyregf-python3 \
 	po \
 	manuals \
 	tests \

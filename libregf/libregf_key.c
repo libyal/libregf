@@ -1935,6 +1935,104 @@ int libregf_key_get_value(
 	return( result );
 }
 
+/* Retrieves the value
+ * Creates a new value
+ * Returns 1 if successful or -1 on error
+ */
+int libregf_key_get_value_by_index(
+     libregf_key_t *key,
+     int value_index,
+     libregf_value_t **value,
+     libcerror_error_t **error )
+{
+	libregf_internal_key_t *internal_key = NULL;
+	static char *function                = "libregf_key_get_value_by_index";
+	int result                           = 1;
+
+	if( key == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid key.",
+		 function );
+
+		return( -1 );
+	}
+	internal_key = (libregf_internal_key_t *) key;
+
+	if( value == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid value.",
+		 function );
+
+		return( -1 );
+	}
+	if( *value != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: value already set.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_key->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	if( libregf_internal_key_get_value(
+	     internal_key,
+	     value_index,
+	     value,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve value: %d.",
+		 function,
+		 value_index );
+
+		result = -1;
+	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_key->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
+}
+
 /* Retrieves the value for the specific UTF-8 encoded name
  * To retrieve the default value specify value name as NULL and its length as 0
  * Creates a new value
@@ -2682,6 +2780,135 @@ int libregf_key_get_sub_key(
 	libregf_internal_key_t *internal_key         = NULL;
 	libregf_key_descriptor_t *sub_key_descriptor = NULL;
 	static char *function                        = "libregf_key_get_sub_key";
+	int result                                   = 1;
+
+	if( key == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid key.",
+		 function );
+
+		return( -1 );
+	}
+	internal_key = (libregf_internal_key_t *) key;
+
+	if( sub_key == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_ARGUMENTS,
+		 LIBCERROR_ARGUMENT_ERROR_INVALID_VALUE,
+		 "%s: invalid sub key.",
+		 function );
+
+		return( -1 );
+	}
+	if( *sub_key != NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_ALREADY_SET,
+		 "%s: sub key already set.",
+		 function );
+
+		return( -1 );
+	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_grab_for_write(
+	     internal_key->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to grab read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	if( libregf_key_item_get_sub_key_descriptor_by_index(
+	     internal_key->key_item,
+             sub_key_index,
+	     &sub_key_descriptor,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_GET_FAILED,
+		 "%s: unable to retrieve sub key: %d descriptor.",
+		 function,
+		 sub_key_index );
+
+		result = -1;
+	}
+	else if( sub_key_descriptor == NULL )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_VALUE_MISSING,
+		 "%s: invalid sub key: %d descriptor.",
+		 function,
+		 sub_key_index );
+
+		result = -1;
+	}
+	else if( libregf_key_initialize(
+	          sub_key,
+	          internal_key->io_handle,
+	          internal_key->file_io_handle,
+	          sub_key_descriptor->key_offset,
+	          internal_key->hive_bins_list,
+	          error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_INITIALIZE_FAILED,
+		 "%s: unable to initialize sub key: %d.",
+		 function,
+		 sub_key_index );
+
+		result = -1;
+	}
+#if defined( HAVE_LIBREGF_MULTI_THREAD_SUPPORT )
+	if( libcthreads_read_write_lock_release_for_write(
+	     internal_key->read_write_lock,
+	     error ) != 1 )
+	{
+		libcerror_error_set(
+		 error,
+		 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+		 LIBCERROR_RUNTIME_ERROR_SET_FAILED,
+		 "%s: unable to release read/write lock for writing.",
+		 function );
+
+		return( -1 );
+	}
+#endif
+	return( result );
+}
+
+/* Retrieves a specific sub key
+ * Creates a new key
+ * Returns 1 if successful or -1 on error
+ */
+int libregf_key_get_sub_key_by_index(
+     libregf_key_t *key,
+     int sub_key_index,
+     libregf_key_t **sub_key,
+     libcerror_error_t **error )
+{
+	libregf_internal_key_t *internal_key         = NULL;
+	libregf_key_descriptor_t *sub_key_descriptor = NULL;
+	static char *function                        = "libregf_key_get_sub_key_by_index";
 	int result                                   = 1;
 
 	if( key == NULL )

@@ -969,7 +969,7 @@ PyObject *pyregf_key_get_sub_key_by_index(
 	}
 	Py_BEGIN_ALLOW_THREADS
 
-	result = libregf_key_get_sub_key(
+	result = libregf_key_get_sub_key_by_index(
 	          ( (pyregf_key_t *) pyregf_key )->key,
 	          sub_key_index,
 	          &sub_key,
@@ -1379,7 +1379,7 @@ PyObject *pyregf_key_get_value_by_index(
 	}
 	Py_BEGIN_ALLOW_THREADS
 
-	result = libregf_key_get_value(
+	result = libregf_key_get_value_by_index(
 	          ( (pyregf_key_t *) pyregf_key )->key,
 	          value_index,
 	          &value,

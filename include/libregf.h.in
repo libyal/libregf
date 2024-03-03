@@ -532,11 +532,26 @@ int libregf_key_get_number_of_values(
      libregf_error_t **error );
 
 /* Retrieves the value
+ *
+ * This function deprecated use libregf_key_get_value_by_index
+ *
+ * Creates a new value
+ * Returns 1 if successful or -1 on error
+ */
+LIBREGF_DEPRECATED \
+LIBREGF_EXTERN \
+int libregf_key_get_value(
+     libregf_key_t *key,
+     int value_index,
+     libregf_value_t **value,
+     libregf_error_t **error );
+
+/* Retrieves the value
  * Creates a new value
  * Returns 1 if successful or -1 on error
  */
 LIBREGF_EXTERN \
-int libregf_key_get_value(
+int libregf_key_get_value_by_index(
      libregf_key_t *key,
      int value_index,
      libregf_value_t **value,
@@ -578,11 +593,26 @@ int libregf_key_get_number_of_sub_keys(
      libregf_error_t **error );
 
 /* Retrieves a specific sub key
+ *
+ * This function deprecated use libregf_key_get_sub_key_by_index
+ *
+ * Creates a new key
+ * Returns 1 if successful or -1 on error
+ */
+LIBREGF_DEPRECATED \
+LIBREGF_EXTERN \
+int libregf_key_get_sub_key(
+     libregf_key_t *key,
+     int sub_key_index,
+     libregf_key_t **sub_key,
+     libregf_error_t **error );
+
+/* Retrieves a specific sub key
  * Creates a new key
  * Returns 1 if successful or -1 on error
  */
 LIBREGF_EXTERN \
-int libregf_key_get_sub_key(
+int libregf_key_get_sub_key_by_index(
      libregf_key_t *key,
      int sub_key_index,
      libregf_key_t **sub_key,

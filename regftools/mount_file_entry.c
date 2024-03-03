@@ -899,8 +899,7 @@ int mount_file_entry_get_sub_file_entry_by_index(
 	}
 	if( file_entry->type == MOUNT_FILE_ENTRY_TYPE_VALUES )
 	{
-/* TODO refactor to libregf_key_get_sub_value_by_index */
-		if( libregf_key_get_value(
+		if( libregf_key_get_value_by_index(
 		     file_entry->regf_key,
 		     sub_file_entry_index,
 		     &regf_value,
@@ -953,8 +952,7 @@ int mount_file_entry_get_sub_file_entry_by_index(
 		}
 		if( sub_file_entry_index < number_of_sub_keys )
 		{
-/* TODO refactor to libregf_key_get_sub_key_by_index */
-			if( libregf_key_get_sub_key(
+			if( libregf_key_get_sub_key_by_index(
 			     file_entry->regf_key,
 			     sub_file_entry_index,
 			     &sub_regf_key,

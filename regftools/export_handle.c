@@ -1031,7 +1031,7 @@ int export_handle_export_key(
 	     value_index < number_of_values;
 	     value_index++ )
 	{
-		if( libregf_key_get_value(
+		if( libregf_key_get_value_by_index(
 		     key,
 		     value_index,
 		     &value,
@@ -1576,7 +1576,7 @@ int export_handle_export_key(
 		{
 			goto on_error;
 		}
-		if( libregf_key_get_sub_key(
+		if( libregf_key_get_sub_key_by_index(
 		     key,
 		     sub_key_index,
 		     &sub_key,

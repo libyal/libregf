@@ -209,6 +209,13 @@ int libregf_key_get_value(
      libregf_value_t **value,
      libcerror_error_t **error );
 
+LIBREGF_EXTERN \
+int libregf_key_get_value_by_index(
+     libregf_key_t *key,
+     int value_index,
+     libregf_value_t **value,
+     libcerror_error_t **error );
+
 int libregf_internal_key_get_value_by_utf8_name(
      libregf_internal_key_t *internal_key,
      const uint8_t *utf8_string,
@@ -247,6 +254,13 @@ int libregf_key_get_number_of_sub_keys(
 
 LIBREGF_EXTERN \
 int libregf_key_get_sub_key(
+     libregf_key_t *key,
+     int sub_key_index,
+     libregf_key_t **sub_key,
+     libcerror_error_t **error );
+
+LIBREGF_EXTERN \
+int libregf_key_get_sub_key_by_index(
      libregf_key_t *key,
      int sub_key_index,
      libregf_key_t **sub_key,

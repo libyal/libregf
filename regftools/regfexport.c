@@ -139,7 +139,6 @@ int main( int argc, char * const argv[] )
 	system_character_t *log_filename          = NULL;
 	system_character_t *source                = NULL;
 	char *program                             = "regfexport";
-	size_t source_length                      = 0;
 	system_integer_t option                   = 0;
 	int result                                = 0;
 	int verbose                               = 0;

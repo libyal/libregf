@@ -1375,7 +1375,7 @@ int main(
 	 regf_test_key_get_number_of_values,
 	 key );
 
-	/* TODO: add tests for libregf_key_get_value */
+	/* TODO: add tests for libregf_key_get_value_by_index */
 
 	/* TODO: add tests for libregf_key_get_value_by_utf8_name */
 
@@ -1386,7 +1386,7 @@ int main(
 	 regf_test_key_get_number_of_sub_keys,
 	 key );
 
-	/* TODO: add tests for libregf_key_get_sub_key */
+	/* TODO: add tests for libregf_key_get_sub_key_by_index */
 
 	/* TODO: add tests for libregf_key_get_sub_key_by_utf8_name */
 

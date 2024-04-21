@@ -134,6 +134,7 @@ stamp-h[1-9]
 /regftools/regfmount
 /tests/*.exe
 /tests/input
+/tests/notify_stream.log
 /tests/regf_test_checksum
 /tests/regf_test_data_block_key
 /tests/regf_test_data_block_stream

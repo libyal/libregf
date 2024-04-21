@@ -6,9 +6,7 @@ EXTRA_DIST = \
 	regfinfo.1 \
 	libregf.3
 
-MAINTAINERCLEANFILES = \
+DISTCLEANFILES = \
+	Makefile \
 	Makefile.in
-
-distclean: clean
-	-rm -f Makefile
 

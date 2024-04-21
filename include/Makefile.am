@@ -15,13 +15,11 @@ EXTRA_DIST = \
 	libregf/features.h.in \
 	libregf/types.h.in
 
-MAINTAINERCLEANFILES = \
+DISTCLEANFILES = \
+	libregf.h \
+	libregf/definitions.h \
+	libregf/features.h \
+	libregf/types.h \
+	Makefile \
 	Makefile.in
-
-distclean: clean
-	-rm -f libregf.h
-	-rm -f libregf/definitions.h
-	-rm -f libregf/features.h
-	-rm -f libregf/types.h
-	-rm -f Makefile
 

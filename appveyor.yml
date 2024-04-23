@@ -229,7 +229,7 @@ environment:
   - TARGET: cygwin64-gcc-static-executables
     BUILD_ENVIRONMENT: cygwin64
     APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022
-    CONFIGURE_OPTIONS: "--enable-static-executables"
+    CONFIGURE_OPTIONS: "--enable-static-executables --with-libfuse=no"
   - TARGET: mingw-w64-gcc
     BUILD_ENVIRONMENT: mingw-w64
     APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2022

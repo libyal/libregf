@@ -1,5 +1,5 @@
 /*
- * Shows information obtained from a Windows NT Registry File (REGF)
+ * Shows information obtained from a Windows NT Registry File (REGF).
  *
  * Copyright (C) 2009-2024, Joachim Metz <joachim.metz@gmail.com>
  *
@@ -57,7 +57,7 @@ enum REGFINFO_MODES
 info_handle_t *regfinfo_info_handle = NULL;
 int regfinfo_abort                  = 0;
 
-/* Prints the executable usage information
+/* Prints usage information
  */
 void usage_fprint(
       FILE *stream )

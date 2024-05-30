@@ -38,6 +38,7 @@ MSVSCPP_FILES = \
 	regf_test_sub_key_list/regf_test_sub_key_list.vcproj \
 	regf_test_support/regf_test_support.vcproj \
 	regf_test_tools_info_handle/regf_test_tools_info_handle.vcproj \
+	regf_test_tools_mount_path_string/regf_test_tools_mount_path_string.vcproj \
 	regf_test_tools_output/regf_test_tools_output.vcproj \
 	regf_test_tools_signal/regf_test_tools_signal.vcproj \
 	regf_test_value/regf_test_value.vcproj \

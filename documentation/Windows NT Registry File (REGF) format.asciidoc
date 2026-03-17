@@ -354,7 +354,7 @@ The named key - version 1.1 is variable of size and consists of:
 | 4 | 2 | "nk" | Signature
 | 6 | 2 | | Flags +
 See section: <<named_key_flags,Flags>>
-| 10 | 8 | | Last (key) written date and time +
+| 8 | 8 | | Last (key) written date and time +
 Contains a FILETIME
 | 16 | 4 | | [yellow-background]*Unknown (Empty value)* +
 | 20 | 4 | | Parent key offset +

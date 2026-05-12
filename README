@@ -3,7 +3,7 @@ libregf is a library to access the Windows NT Registry File (REGF) format.
 Project information:
 
 * Status: alpha
-* Licence: LGPLv3+
+* Licence: LGPL-3.0-or-later
 
 Planned:
 

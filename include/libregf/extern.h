@@ -31,14 +31,17 @@
  */
 #if defined( LIBREGF_DLL_EXPORT )
 #define LIBREGF_EXTERN __declspec(dllexport)
+#define LIBREGF_EXTERN_VARIABLE extern __declspec(dllexport)
 
 #elif defined( LIBREGF_DLL_IMPORT )
-#define LIBREGF_EXTERN extern __declspec(dllimport)
+#define LIBREGF_EXTERN __declspec(dllimport)
+#define LIBREGF_EXTERN_VARIABLE extern __declspec(dllimport)
 
 #else
 #define LIBREGF_EXTERN extern
+#define LIBREGF_EXTERN_VARIABLE extern
 
-#endif
+#endif /* defined( LIBREGF_DLL_EXPORT ) */
 
 #endif /* !defined( _LIBREGF_EXTERN_H ) */
 

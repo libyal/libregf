@@ -31,6 +31,7 @@
 #include "pyregf_libregf.h"
 #include "pyregf_multi_string.h"
 #include "pyregf_python.h"
+#include "pyregf_string.h"
 
 PySequenceMethods pyregf_multi_string_sequence_methods = {
 	/* sq_length */
@@ -449,6 +450,11 @@ PyObject *pyregf_multi_string_getitem(
 
 		goto on_error;
 	}
+#if PY_MAJOR_VERSION >= 3 && PY_MINOR_VERSION >= 3
+	string_object = pyregf_string_new_from_utf8_rfc2279(
+	                 (uint8_t *) utf8_string,
+	                 utf8_string_size );
+#else
 	/* Pass the string length to PyUnicode_DecodeUTF8
 	 * otherwise it makes the end of string character is part
 	 * of the string
@@ -457,7 +463,7 @@ PyObject *pyregf_multi_string_getitem(
 			 (char *) utf8_string,
 			 (Py_ssize_t) utf8_string_size - 1,
 			 NULL );
-
+#endif
 	PyMem_Free(
 	 utf8_string );
 
@@ -590,6 +596,11 @@ PyObject *pyregf_multi_string_iternext(
 
 		goto on_error;
 	}
+#if PY_MAJOR_VERSION >= 3 && PY_MINOR_VERSION >= 3
+	string_object = pyregf_string_new_from_utf8_rfc2279(
+	                 (uint8_t *) utf8_string,
+	                 utf8_string_size );
+#else
 	/* Pass the string length to PyUnicode_DecodeUTF8
 	 * otherwise it makes the end of string character is part
 	 * of the string
@@ -598,7 +609,7 @@ PyObject *pyregf_multi_string_iternext(
 			 (char *) utf8_string,
 			 (Py_ssize_t) utf8_string_size - 1,
 			 NULL );
-
+#endif
 	PyMem_Free(
 	 utf8_string );
 

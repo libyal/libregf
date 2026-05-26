@@ -214,6 +214,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\pyregf\pyregf_string.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\pyregf\pyregf_value.c"
 				>
 			</File>
@@ -288,11 +292,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\pyregf\pyregf_libuna.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\pyregf\pyregf_multi_string.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\pyregf\pyregf_python.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\pyregf\pyregf_string.h"
 				>
 			</File>
 			<File

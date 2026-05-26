@@ -713,7 +713,7 @@ int libregf_key_item_read_class_name_data(
 		     "class name\t\t\t",
 		     key_item->class_name,
 		     (size_t) key_item->class_name_size,
-		     LIBUNA_ENDIAN_LITTLE,
+		     LIBUNA_ENDIAN_LITTLE | LIBUNA_UTF16_STREAM_ALLOW_UNPAIRED_SURROGATE,
 		     error ) != 1 )
 		{
 			libcerror_error_set(
@@ -1879,16 +1879,19 @@ int libregf_key_item_get_class_name(
 }
 
 /* Retrieves the UTF-8 string size of the class name
+ * This function uses UTF-8 RFC 2279 (or 6-byte UTF-8) to support characters outside Unicode
  * The returned size includes the end of string character
  * Returns 1 if successful, 0 if no such value or -1 on error
  */
 int libregf_key_item_get_utf8_class_name_size(
      libregf_key_item_t *key_item,
      size_t *utf8_string_size,
-     int ascii_codepage,
+     int ascii_codepage LIBREGF_ATTRIBUTE_UNUSED,
      libcerror_error_t **error )
 {
 	static char *function = "libregf_key_item_get_utf8_class_name_size";
+
+	LIBREGF_UNREFERENCED_PARAMETER( ascii_codepage )
 
 	if( key_item == NULL )
 	{
@@ -1909,7 +1912,7 @@ int libregf_key_item_get_utf8_class_name_size(
 	if( libuna_utf8_string_size_from_utf16_stream(
 	     key_item->class_name,
 	     (size_t) key_item->class_name_size,
-	     LIBUNA_ENDIAN_LITTLE,
+	     LIBUNA_ENDIAN_LITTLE | LIBUNA_UTF16_STREAM_ALLOW_UNPAIRED_SURROGATE,
 	     utf8_string_size,
 	     error ) != 1 )
 	{
@@ -1926,6 +1929,7 @@ int libregf_key_item_get_utf8_class_name_size(
 }
 
 /* Retrieves the UTF-8 string value of the class name
+ * This function uses UTF-8 RFC 2279 (or 6-byte UTF-8) to support characters outside Unicode
  * The function uses a codepage if necessary, it uses the codepage set for the library
  * The size should include the end of string character
  * Returns 1 if successful, 0 if no such value or -1 on error
@@ -1934,10 +1938,12 @@ int libregf_key_item_get_utf8_class_name(
      libregf_key_item_t *key_item,
      uint8_t *utf8_string,
      size_t utf8_string_size,
-     int ascii_codepage,
+     int ascii_codepage LIBREGF_ATTRIBUTE_UNUSED,
      libcerror_error_t **error )
 {
 	static char *function = "libregf_key_item_get_utf8_class_name";
+
+	LIBREGF_UNREFERENCED_PARAMETER( ascii_codepage )
 
 	if( key_item == NULL )
 	{
@@ -1960,7 +1966,7 @@ int libregf_key_item_get_utf8_class_name(
 	     utf8_string_size,
 	     key_item->class_name,
 	     (size_t) key_item->class_name_size,
-	     LIBUNA_ENDIAN_LITTLE,
+	     LIBUNA_ENDIAN_LITTLE | LIBUNA_UTF16_STREAM_ALLOW_UNPAIRED_SURROGATE,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -1976,16 +1982,19 @@ int libregf_key_item_get_utf8_class_name(
 }
 
 /* Retrieves the UTF-16 string size of the class name
+ * This function uses UCS-2 (with surrogates) to support characters outside Unicode
  * The returned size includes the end of string character
  * Returns 1 if successful, 0 if no such value or -1 on error
  */
 int libregf_key_item_get_utf16_class_name_size(
      libregf_key_item_t *key_item,
      size_t *utf16_string_size,
-     int ascii_codepage,
+     int ascii_codepage LIBREGF_ATTRIBUTE_UNUSED,
      libcerror_error_t **error )
 {
 	static char *function = "libregf_key_item_get_utf16_class_name_size";
+
+	LIBREGF_UNREFERENCED_PARAMETER( ascii_codepage )
 
 	if( key_item == NULL )
 	{
@@ -2006,7 +2015,7 @@ int libregf_key_item_get_utf16_class_name_size(
 	if( libuna_utf16_string_size_from_utf16_stream(
 	     key_item->class_name,
 	     (size_t) key_item->class_name_size,
-	     LIBUNA_ENDIAN_LITTLE,
+	     LIBUNA_ENDIAN_LITTLE | LIBUNA_UTF16_STREAM_ALLOW_UNPAIRED_SURROGATE,
 	     utf16_string_size,
 	     error ) != 1 )
 	{
@@ -2023,6 +2032,7 @@ int libregf_key_item_get_utf16_class_name_size(
 }
 
 /* Retrieves the UTF-16 string value of the class name
+ * This function uses UCS-2 (with surrogates) to support characters outside Unicode
  * The function uses a codepage if necessary, it uses the codepage set for the library
  * The size should include the end of string character
  * Returns 1 if successful, 0 if no such value or -1 on error
@@ -2031,10 +2041,12 @@ int libregf_key_item_get_utf16_class_name(
      libregf_key_item_t *key_item,
      uint16_t *utf16_string,
      size_t utf16_string_size,
-     int ascii_codepage,
+     int ascii_codepage LIBREGF_ATTRIBUTE_UNUSED,
      libcerror_error_t **error )
 {
 	static char *function = "libregf_key_item_get_utf16_class_name";
+
+	LIBREGF_UNREFERENCED_PARAMETER( ascii_codepage )
 
 	if( key_item == NULL )
 	{
@@ -2057,7 +2069,7 @@ int libregf_key_item_get_utf16_class_name(
 	     utf16_string_size,
 	     key_item->class_name,
 	     (size_t) key_item->class_name_size,
-	     LIBUNA_ENDIAN_LITTLE,
+	     LIBUNA_ENDIAN_LITTLE | LIBUNA_UTF16_STREAM_ALLOW_UNPAIRED_SURROGATE,
 	     error ) != 1 )
 	{
 		libcerror_error_set(

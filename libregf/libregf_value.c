@@ -526,6 +526,7 @@ int libregf_value_get_name(
 }
 
 /* Retrieves the UTF-8 string size of the value name
+ * This function uses UTF-8 RFC 2279 (or 6-byte UTF-8) to support characters outside Unicode
  * The returned size includes the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -611,6 +612,7 @@ int libregf_value_get_utf8_name_size(
 }
 
 /* Retrieves the UTF-8 string value of the value name
+ * This function uses UTF-8 RFC 2279 (or 6-byte UTF-8) to support characters outside Unicode
  * The function uses a codepage if necessary, it uses the codepage set for the library
  * The size should include the end of string character
  * Returns 1 if successful or -1 on error
@@ -699,6 +701,7 @@ int libregf_value_get_utf8_name(
 }
 
 /* Retrieves the UTF-16 string size of the value name
+ * This function uses UCS-2 (with surrogates) to support characters outside Unicode
  * The returned size includes the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -784,6 +787,7 @@ int libregf_value_get_utf16_name_size(
 }
 
 /* Retrieves the UTF-16 string value of the value name
+ * This function uses UCS-2 (with surrogates) to support characters outside Unicode
  * The function uses a codepage if necessary, it uses the codepage set for the library
  * The size should include the end of string character
  * Returns 1 if successful or -1 on error
@@ -1286,6 +1290,7 @@ int libregf_value_get_value_64bit(
 }
 
 /* Retrieves the UTF-8 string size
+ * This function uses UTF-8 RFC 2279 (or 6-byte UTF-8) to support characters outside Unicode
  * The returned size includes the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -1360,6 +1365,7 @@ int libregf_value_get_value_utf8_string_size(
 }
 
 /* Retrieves the UTF-8 string value
+ * This function uses UTF-8 RFC 2279 (or 6-byte UTF-8) to support characters outside Unicode
  * The function uses a codepage if necessary, it uses the codepage set for the library
  * The size should include the end of string character
  * Returns 1 if successful or -1 on error
@@ -1437,6 +1443,7 @@ int libregf_value_get_value_utf8_string(
 }
 
 /* Retrieves the UTF-16 string size at a specific value from the referenced value
+ * This function uses UCS-2 (with surrogates) to support characters outside Unicode
  * The returned size includes the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -1511,6 +1518,7 @@ int libregf_value_get_value_utf16_string_size(
 }
 
 /* Retrieves the UTF-16 string value
+ * This function uses UCS-2 (with surrogates) to support characters outside Unicode
  * The function uses a codepage if necessary, it uses the codepage set for the library
  * The size should include the end of string character
  * Returns 1 if successful or -1 on error

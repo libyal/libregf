@@ -6,8 +6,8 @@ $ExitSuccess = 0
 $ExitFailure = 1
 $ExitIgnore = 77
 
-$Profiles = @("regfinfo" "regfinfo_hierarchy")
-$OptionsPerProfile = @("" "-H")
+$Profiles = @("regfinfo", "regfinfo_hierarchy")
+$OptionsPerProfile = @("", "-H")
 $OptionSets = ""
 
 $InputGlob = "*"

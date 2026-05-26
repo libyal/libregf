@@ -857,7 +857,7 @@ int libregf_value_item_read_value_data(
 				result = libuna_utf16_string_size_from_utf16_stream(
 					  &( hive_bin_cell->data[ data_offset ] ),
 					  calculated_value_data_size,
-					  LIBUNA_ENDIAN_LITTLE,
+					  LIBUNA_ENDIAN_LITTLE | LIBUNA_UTF16_STREAM_ALLOW_UNPAIRED_SURROGATE,
 					  &utf16_string_size,
 					  NULL );
 
@@ -866,9 +866,9 @@ int libregf_value_item_read_value_data(
 					calculated_value_data_size = value_data_size;
 				}
 			}
+#if defined( HAVE_DEBUG_OUTPUT )
 			if( calculated_value_data_size != value_data_size )
 			{
-#if defined( HAVE_DEBUG_OUTPUT )
 				if( libcnotify_verbose != 0 )
 				{
 					libcnotify_printf(
@@ -877,7 +877,10 @@ int libregf_value_item_read_value_data(
 					 calculated_value_data_size,
 					 value_data_size );
 				}
+			}
 #endif
+			if( calculated_value_data_size < value_data_size )
+			{
 				value_data_size = calculated_value_data_size;
 			}
 		}
@@ -2291,6 +2294,7 @@ int libregf_value_item_get_value_64bit(
 }
 
 /* Retrieves the UTF-8 string size
+ * This function uses UTF-8 RFC 2279 (or 6-byte UTF-8) to support characters outside Unicode
  * The returned size includes the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -2380,7 +2384,7 @@ int libregf_value_item_get_value_utf8_string_size(
 		if( libuna_utf8_string_size_from_utf16_stream(
 		     value_data,
 		     value_data_size,
-		     LIBUNA_ENDIAN_LITTLE,
+		     LIBUNA_ENDIAN_LITTLE | LIBUNA_UTF16_STREAM_ALLOW_UNPAIRED_SURROGATE,
 		     utf8_string_size,
 		     error ) != 1 )
 		{
@@ -2398,6 +2402,7 @@ int libregf_value_item_get_value_utf8_string_size(
 }
 
 /* Retrieves the UTF-8 string value
+ * This function uses UTF-8 RFC 2279 (or 6-byte UTF-8) to support characters outside Unicode
  * The function uses a codepage if necessary, it uses the codepage set for the library
  * The size should include the end of string character
  * Returns 1 if successful or -1 on error
@@ -2474,7 +2479,7 @@ int libregf_value_item_get_value_utf8_string(
 	     utf8_string_size,
 	     value_data,
 	     value_data_size,
-	     LIBUNA_ENDIAN_LITTLE,
+	     LIBUNA_ENDIAN_LITTLE | LIBUNA_UTF16_STREAM_ALLOW_UNPAIRED_SURROGATE,
 	     error ) != 1 )
 	{
 		libcerror_error_set(
@@ -2490,6 +2495,7 @@ int libregf_value_item_get_value_utf8_string(
 }
 
 /* Retrieves the UTF-16 string size at a specific value from the referenced value
+ * This function uses UCS-2 (with surrogates) to support characters outside Unicode
  * The returned size includes the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -2579,7 +2585,7 @@ int libregf_value_item_get_value_utf16_string_size(
 		if( libuna_utf16_string_size_from_utf16_stream(
 		     value_data,
 		     value_data_size,
-		     LIBUNA_ENDIAN_LITTLE,
+		     LIBUNA_ENDIAN_LITTLE | LIBUNA_UTF16_STREAM_ALLOW_UNPAIRED_SURROGATE,
 		     utf16_string_size,
 		     error ) != 1 )
 		{
@@ -2597,6 +2603,7 @@ int libregf_value_item_get_value_utf16_string_size(
 }
 
 /* Retrieves the UTF-16 string value
+ * This function uses UCS-2 (with surrogates) to support characters outside Unicode
  * The function uses a codepage if necessary, it uses the codepage set for the library
  * The size should include the end of string character
  * Returns 1 if successful or -1 on error
@@ -2673,7 +2680,7 @@ int libregf_value_item_get_value_utf16_string(
 	     utf16_string_size,
 	     value_data,
 	     value_data_size,
-	     LIBUNA_ENDIAN_LITTLE,
+	     LIBUNA_ENDIAN_LITTLE | LIBUNA_UTF16_STREAM_ALLOW_UNPAIRED_SURROGATE,
 	     error ) != 1 )
 	{
 		libcerror_error_set(

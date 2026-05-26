@@ -29,8 +29,10 @@ pyregf_la_SOURCES = \
 	pyregf_libcerror.h \
 	pyregf_libclocale.h \
 	pyregf_libregf.h \
+	pyregf_libuna.h \
 	pyregf_multi_string.c pyregf_multi_string.h \
 	pyregf_python.h \
+	pyregf_string.c pyregf_string.h \
 	pyregf_unused.h \
 	pyregf_value.c pyregf_value.h \
 	pyregf_value_types.c pyregf_value_types.h \
@@ -43,6 +45,7 @@ pyregf_la_LIBADD = \
 	@LIBCPATH_LIBADD@ \
 	@LIBCFILE_LIBADD@ \
 	@LIBCSPLIT_LIBADD@ \
+	@LIBUNA_LIBADD@ \
 	@LIBCLOCALE_LIBADD@ \
 	@LIBCDATA_LIBADD@
 

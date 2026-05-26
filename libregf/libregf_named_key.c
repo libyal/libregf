@@ -535,7 +535,7 @@ int libregf_named_key_read_data(
 				  named_key->name,
 				  (size_t) named_key->name_size,
 				  &name_index,
-				  LIBUNA_ENDIAN_LITTLE,
+				  LIBUNA_ENDIAN_LITTLE | LIBUNA_UTF16_STREAM_ALLOW_UNPAIRED_SURROGATE,
 				  error );
 		}
 		if( result != 1 )
@@ -582,7 +582,7 @@ int libregf_named_key_read_data(
 			     "key name\t\t\t\t\t",
 			     named_key->name,
 			     (size_t) named_key->name_size,
-			     LIBUNA_ENDIAN_LITTLE,
+			     LIBUNA_ENDIAN_LITTLE | LIBUNA_UTF16_STREAM_ALLOW_UNPAIRED_SURROGATE,
 			     error ) != 1 )
 			{
 				libcerror_error_set(
@@ -770,6 +770,7 @@ int libregf_named_key_get_name(
 }
 
 /* Retrieves the UTF-8 string size of the key name
+ * This function uses UTF-8 RFC 2279 (or 6-byte UTF-8) to support characters outside Unicode
  * The returned size includes the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -807,7 +808,7 @@ int libregf_named_key_get_utf8_name_size(
 		result = libuna_utf8_string_size_from_utf16_stream(
 			  named_key->name,
 			  (size_t) named_key->name_size,
-			  LIBUNA_ENDIAN_LITTLE,
+			  LIBUNA_ENDIAN_LITTLE | LIBUNA_UTF16_STREAM_ALLOW_UNPAIRED_SURROGATE,
 			  utf8_string_size,
 			  error );
 	}
@@ -826,6 +827,7 @@ int libregf_named_key_get_utf8_name_size(
 }
 
 /* Retrieves the UTF-8 string value of the key name
+ * This function uses UTF-8 RFC 2279 (or 6-byte UTF-8) to support characters outside Unicode
  * The function uses a codepage if necessary, it uses the codepage set for the library
  * The size should include the end of string character
  * Returns 1 if successful or -1 on error
@@ -868,7 +870,7 @@ int libregf_named_key_get_utf8_name(
 			  utf8_string_size,
 			  named_key->name,
 			  (size_t) named_key->name_size,
-			  LIBUNA_ENDIAN_LITTLE,
+			  LIBUNA_ENDIAN_LITTLE | LIBUNA_UTF16_STREAM_ALLOW_UNPAIRED_SURROGATE,
 			  error );
 	}
 	if( result != 1 )
@@ -886,6 +888,7 @@ int libregf_named_key_get_utf8_name(
 }
 
 /* Retrieves the UTF-16 string size of the key name
+ * This function uses UCS-2 (with surrogates) to support characters outside Unicode
  * The returned size includes the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -923,7 +926,7 @@ int libregf_named_key_get_utf16_name_size(
 		result = libuna_utf16_string_size_from_utf16_stream(
 			  named_key->name,
 			  (size_t) named_key->name_size,
-			  LIBUNA_ENDIAN_LITTLE,
+			  LIBUNA_ENDIAN_LITTLE | LIBUNA_UTF16_STREAM_ALLOW_UNPAIRED_SURROGATE,
 			  utf16_string_size,
 			  error );
 	}
@@ -942,6 +945,7 @@ int libregf_named_key_get_utf16_name_size(
 }
 
 /* Retrieves the UTF-16 string value of the key name
+ * This function uses UCS-2 (with surrogates) to support characters outside Unicode
  * The function uses a codepage if necessary, it uses the codepage set for the library
  * The size should include the end of string character
  * Returns 1 if successful or -1 on error
@@ -984,7 +988,7 @@ int libregf_named_key_get_utf16_name(
 			  utf16_string_size,
 			  named_key->name,
 			  (size_t) named_key->name_size,
-			  LIBUNA_ENDIAN_LITTLE,
+			  LIBUNA_ENDIAN_LITTLE | LIBUNA_UTF16_STREAM_ALLOW_UNPAIRED_SURROGATE,
 			  error );
 	}
 	if( result != 1 )
@@ -1093,7 +1097,7 @@ int libregf_named_key_compare_name_with_utf8_string(
 					  named_key->name,
 					  (size_t) named_key->name_size,
 					  &name_index,
-					  LIBUNA_ENDIAN_LITTLE,
+					  LIBUNA_ENDIAN_LITTLE | LIBUNA_UTF16_STREAM_ALLOW_UNPAIRED_SURROGATE,
 					  error );
 			}
 			if( result != 1 )
@@ -1232,7 +1236,7 @@ int libregf_named_key_compare_name_with_utf16_string(
 					  named_key->name,
 					  (size_t) named_key->name_size,
 					  &name_index,
-					  LIBUNA_ENDIAN_LITTLE,
+					  LIBUNA_ENDIAN_LITTLE | LIBUNA_UTF16_STREAM_ALLOW_UNPAIRED_SURROGATE,
 					  error );
 			}
 			if( result != 1 )

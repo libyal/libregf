@@ -388,6 +388,7 @@ int libregf_key_get_name(
      libregf_error_t **error );
 
 /* Retrieves the UTF-8 string size of the key name
+ * This function uses UTF-8 RFC 2279 (or 6-byte UTF-8) to support characters outside Unicode
  * The returned size includes the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -398,6 +399,7 @@ int libregf_key_get_utf8_name_size(
      libregf_error_t **error );
 
 /* Retrieves the UTF-8 string value of the key name
+ * This function uses UTF-8 RFC 2279 (or 6-byte UTF-8) to support characters outside Unicode
  * The function uses a codepage if necessary, it uses the codepage set for the library
  * The size should include the end of string character
  * Returns 1 if successful or -1 on error
@@ -410,6 +412,7 @@ int libregf_key_get_utf8_name(
      libregf_error_t **error );
 
 /* Retrieves the UTF-16 string size of the key name
+ * This function uses UCS-2 (with surrogates) to support characters outside Unicode
  * The returned size includes the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -420,6 +423,7 @@ int libregf_key_get_utf16_name_size(
      libregf_error_t **error );
 
 /* Retrieves the UTF-16 string value of the key name
+ * This function uses UCS-2 (with surrogates) to support characters outside Unicode
  * The function uses a codepage if necessary, it uses the codepage set for the library
  * The size should include the end of string character
  * Returns 1 if successful or -1 on error
@@ -451,6 +455,7 @@ int libregf_key_get_class_name(
      libregf_error_t **error );
 
 /* Retrieves the UTF-8 string size of the class name
+ * This function uses UTF-8 RFC 2279 (or 6-byte UTF-8) to support characters outside Unicode
  * The returned size includes the end of string character
  * Returns 1 if successful, 0 if no such value or -1 on error
  */
@@ -461,6 +466,7 @@ int libregf_key_get_utf8_class_name_size(
      libregf_error_t **error );
 
 /* Retrieves the UTF-8 string value of the class name
+ * This function uses UTF-8 RFC 2279 (or 6-byte UTF-8) to support characters outside Unicode
  * The function uses a codepage if necessary, it uses the codepage set for the library
  * The size should include the end of string character
  * Returns 1 if successful, 0 if no such value or -1 on error
@@ -473,6 +479,7 @@ int libregf_key_get_utf8_class_name(
      libregf_error_t **error );
 
 /* Retrieves the UTF-16 string size of the class name
+ * This function uses UCS-2 (with surrogates) to support characters outside Unicode
  * The returned size includes the end of string character
  * Returns 1 if successful, 0 if no such value or -1 on error
  */
@@ -483,6 +490,7 @@ int libregf_key_get_utf16_class_name_size(
      libregf_error_t **error );
 
 /* Retrieves the UTF-16 string value of the class name
+ * This function uses UCS-2 (with surrogates) to support characters outside Unicode
  * The function uses a codepage if necessary, it uses the codepage set for the library
  * The size should include the end of string character
  * Returns 1 if successful, 0 if no such value or -1 on error
@@ -717,6 +725,7 @@ int libregf_value_get_name(
      libregf_error_t **error );
 
 /* Retrieves the UTF-8 string size of the value name
+ * This function uses UTF-8 RFC 2279 (or 6-byte UTF-8) to support characters outside Unicode
  * The returned size includes the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -727,6 +736,7 @@ int libregf_value_get_utf8_name_size(
      libregf_error_t **error );
 
 /* Retrieves the UTF-8 string value of the value name
+ * This function uses UTF-8 RFC 2279 (or 6-byte UTF-8) to support characters outside Unicode
  * The function uses a codepage if necessary, it uses the codepage set for the library
  * The size should include the end of string character
  * Returns 1 if successful or -1 on error
@@ -739,6 +749,7 @@ int libregf_value_get_utf8_name(
      libregf_error_t **error );
 
 /* Retrieves the UTF-16 string size of the value name
+ * This function uses UCS-2 (with surrogates) to support characters outside Unicode
  * The returned size includes the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -749,6 +760,7 @@ int libregf_value_get_utf16_name_size(
      libregf_error_t **error );
 
 /* Retrieves the UTF-16 string value of the value name
+ * This function uses UCS-2 (with surrogates) to support characters outside Unicode
  * The function uses a codepage if necessary, it uses the codepage set for the library
  * The size should include the end of string character
  * Returns 1 if successful or -1 on error
@@ -807,6 +819,7 @@ int libregf_value_get_value_64bit(
      libregf_error_t **error );
 
 /* Retrieves the UTF-8 string size
+ * This function uses UTF-8 RFC 2279 (or 6-byte UTF-8) to support characters outside Unicode
  * The returned size includes the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -817,6 +830,7 @@ int libregf_value_get_value_utf8_string_size(
      libregf_error_t **error );
 
 /* Retrieves the UTF-8 string value
+ * This function uses UTF-8 RFC 2279 (or 6-byte UTF-8) to support characters outside Unicode
  * The function uses a codepage if necessary, it uses the codepage set for the library
  * The size should include the end of string character
  * Returns 1 if successful or -1 on error
@@ -829,6 +843,7 @@ int libregf_value_get_value_utf8_string(
      libregf_error_t **error );
 
 /* Retrieves the UTF-16 string size
+ * This function uses UCS-2 (with surrogates) to support characters outside Unicode
  * The returned size includes the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -839,6 +854,7 @@ int libregf_value_get_value_utf16_string_size(
      libregf_error_t **error );
 
 /* Retrieves the UTF-16 string value
+ * This function uses UCS-2 (with surrogates) to support characters outside Unicode
  * The function uses a codepage if necessary, it uses the codepage set for the library
  * The size should include the end of string character
  * Returns 1 if successful or -1 on error
@@ -901,6 +917,7 @@ int libregf_multi_string_get_number_of_strings(
      libregf_error_t **error );
 
 /* Retrieves the UTF-8 string size of a specific string
+ * This function uses UTF-8 RFC 2279 (or 6-byte UTF-8) to support characters outside Unicode
  * The returned size includes the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -912,6 +929,7 @@ int libregf_multi_string_get_utf8_string_size(
      libregf_error_t **error );
 
 /* Retrieves the UTF-8 encoded string of a specific string
+ * This function uses UTF-8 RFC 2279 (or 6-byte UTF-8) to support characters outside Unicode
  * The size should include the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -924,6 +942,7 @@ int libregf_multi_string_get_utf8_string(
      libregf_error_t **error );
 
 /* Retrieves the UTF-16 string size of a specific string
+ * This function uses UCS-2 (with surrogates) to support characters outside Unicode
  * The returned size includes the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -935,6 +954,7 @@ int libregf_multi_string_get_utf16_string_size(
      libregf_error_t **error );
 
 /* Retrieves the UTF-16 encoded string of a specific string
+ * This function uses UCS-2 (with surrogates) to support characters outside Unicode
  * The size should include the end of string character
  * Returns 1 if successful or -1 on error
  */

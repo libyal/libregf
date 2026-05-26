@@ -540,6 +540,7 @@ int libregf_multi_string_get_number_of_strings(
 }
 
 /* Retrieves the UTF-8 string size of a specific string
+ * This function uses UTF-8 RFC 2279 (or 6-byte UTF-8) to support characters outside Unicode
  * The returned size includes the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -596,7 +597,7 @@ int libregf_multi_string_get_utf8_string_size(
 	else if( libuna_utf8_string_size_from_utf16_stream(
 	          internal_multi_string->strings[ string_index ],
 	          internal_multi_string->string_sizes[ string_index ],
-	          LIBUNA_ENDIAN_LITTLE,
+	          LIBUNA_ENDIAN_LITTLE | LIBUNA_UTF16_STREAM_ALLOW_UNPAIRED_SURROGATE,
 	          utf8_string_size,
 	          error ) != 1 )
 	{
@@ -628,6 +629,7 @@ int libregf_multi_string_get_utf8_string_size(
 }
 
 /* Retrieves the UTF-8 encoded string of a specific string
+ * This function uses UTF-8 RFC 2279 (or 6-byte UTF-8) to support characters outside Unicode
  * The size should include the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -687,7 +689,7 @@ int libregf_multi_string_get_utf8_string(
 	          utf8_string_size,
 	          internal_multi_string->strings[ string_index ],
 	          internal_multi_string->string_sizes[ string_index ],
-	          LIBUNA_ENDIAN_LITTLE,
+	          LIBUNA_ENDIAN_LITTLE | LIBUNA_UTF16_STREAM_ALLOW_UNPAIRED_SURROGATE,
 	          error ) != 1 )
 	{
 		libcerror_error_set(
@@ -718,6 +720,7 @@ int libregf_multi_string_get_utf8_string(
 }
 
 /* Retrieves the UTF-16 string size of a specific string
+ * This function uses UCS-2 (with surrogates) to support characters outside Unicode
  * The returned size includes the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -774,7 +777,7 @@ int libregf_multi_string_get_utf16_string_size(
 	else if( libuna_utf16_string_size_from_utf16_stream(
 	          internal_multi_string->strings[ string_index ],
 	          internal_multi_string->string_sizes[ string_index ],
-	          LIBUNA_ENDIAN_LITTLE,
+	          LIBUNA_ENDIAN_LITTLE | LIBUNA_UTF16_STREAM_ALLOW_UNPAIRED_SURROGATE,
 	          utf16_string_size,
 	          error ) != 1 )
 	{
@@ -806,6 +809,7 @@ int libregf_multi_string_get_utf16_string_size(
 }
 
 /* Retrieves the UTF-16 encoded string of a specific string
+ * This function uses UCS-2 (with surrogates) to support characters outside Unicode
  * The size should include the end of string character
  * Returns 1 if successful or -1 on error
  */
@@ -865,7 +869,7 @@ int libregf_multi_string_get_utf16_string(
 	          utf16_string_size,
 	          internal_multi_string->strings[ string_index ],
 	          internal_multi_string->string_sizes[ string_index ],
-	          LIBUNA_ENDIAN_LITTLE,
+	          LIBUNA_ENDIAN_LITTLE | LIBUNA_UTF16_STREAM_ALLOW_UNPAIRED_SURROGATE,
 	          error ) != 1 )
 	{
 		libcerror_error_set(

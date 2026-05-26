@@ -33,6 +33,7 @@
 #include "pyregf_libregf.h"
 #include "pyregf_multi_string.h"
 #include "pyregf_python.h"
+#include "pyregf_string.h"
 #include "pyregf_unused.h"
 #include "pyregf_value.h"
 
@@ -613,6 +614,11 @@ PyObject *pyregf_value_get_name(
 
 		goto on_error;
 	}
+#if PY_MAJOR_VERSION >= 3 && PY_MINOR_VERSION >= 3
+	string_object = pyregf_string_new_from_utf8_rfc2279(
+	                 (uint8_t *) utf8_string,
+	                 utf8_string_size );
+#else
 	/* Pass the string length to PyUnicode_DecodeUTF8
 	 * otherwise it makes the end of string character is part
 	 * of the string
@@ -621,7 +627,7 @@ PyObject *pyregf_value_get_name(
 			 (char *) utf8_string,
 			 (Py_ssize_t) utf8_string_size - 1,
 			 NULL );
-
+#endif
 	PyMem_Free(
 	 utf8_string );
 
@@ -1088,6 +1094,11 @@ PyObject *pyregf_value_get_data_as_string(
 
 		goto on_error;
 	}
+#if PY_MAJOR_VERSION >= 3 && PY_MINOR_VERSION >= 3
+	string_object = pyregf_string_new_from_utf8_rfc2279(
+	                 (uint8_t *) value_string,
+	                 value_string_size );
+#else
 	/* Pass the string length to PyUnicode_DecodeUTF8
 	 * otherwise it makes the end of string character is part
 	 * of the string
@@ -1096,7 +1107,7 @@ PyObject *pyregf_value_get_data_as_string(
 			 (char *) value_string,
 			 (Py_ssize_t) value_string_size - 1,
 			 NULL );
-
+#endif
 	PyMem_Free(
 	 value_string );
 

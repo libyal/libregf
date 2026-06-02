@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Export tool testing script
 #
-# Version: 20240413
+# Version: 20260601
 
 EXIT_SUCCESS=0;
 EXIT_FAILURE=1;
@@ -9,7 +9,7 @@ EXIT_IGNORE=77;
 
 PROFILES=("regfexport");
 OPTIONS_PER_PROFILE=("");
-OPTION_SETS=();
+OPTIONS=();
 
 INPUT_GLOB="*";
 

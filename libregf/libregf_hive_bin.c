@@ -478,7 +478,7 @@ int libregf_hive_bin_read_cells_file_io_handle(
 
 	hive_bin->data = (uint8_t *) memory_allocate(
 	                              sizeof( uint8_t ) * hive_bin->data_size );
-	
+
 	if( hive_bin->data == NULL )
 	{
 		libcerror_error_set(

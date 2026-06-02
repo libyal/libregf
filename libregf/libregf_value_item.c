@@ -931,7 +931,9 @@ int libregf_value_item_read_value_data(
 
 				goto on_error;
 			}
+#if defined( HAVE_DEBUG_OUTPUT )
 			data_offset += value_data_size;
+#endif
 		}
 #if defined( HAVE_DEBUG_OUTPUT )
 		if( libcnotify_verbose != 0 )
@@ -1218,6 +1220,9 @@ int libregf_value_item_read_data_block_list(
 				libfdata_stream_free(
 				 &( value_item->data_stream ),
 				 NULL );
+
+				memory_free(
+				 list_data );
 
 				return( 0 );
 			}

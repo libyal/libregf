@@ -20,6 +20,10 @@ AM_CPPFLAGS = \
 	@PTHREAD_CPPFLAGS@ \
 	@LIBREGF_DLL_IMPORT@
 
+AM_TESTS_ENVIRONMENT = \
+	export PYTHON="@PYTHON@"; \
+	export TESTS_USE_WINAPI="@TESTS_USE_WINAPI@";
+
 if HAVE_PYTHON_TESTS
 TESTS_PYREGF = \
 	test_python_module.sh
@@ -469,7 +473,8 @@ regf_test_tools_output_SOURCES = \
 
 regf_test_tools_output_LDADD = \
 	../libregf/libregf.la \
-	@LIBCERROR_LIBADD@
+	@LIBCERROR_LIBADD@ \
+	@LIBINTL@
 
 regf_test_tools_signal_SOURCES = \
 	../regftools/regftools_signal.c ../regftools/regftools_signal.h \

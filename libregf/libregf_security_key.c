@@ -412,9 +412,9 @@ int libregf_security_key_read_data(
 		}
 #endif /* defined( HAVE_DEBUG_OUTPUT ) */
 	}
+#if defined( HAVE_DEBUG_OUTPUT )
 	data_offset += security_descriptor_size;
 
-#if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
 	{
 		if( data_offset < data_size )

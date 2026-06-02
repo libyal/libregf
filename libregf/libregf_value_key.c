@@ -772,9 +772,9 @@ int libregf_value_key_read_data(
 	}
 #endif /* defined( HAVE_DEBUG_OUTPUT ) */
 
+#if defined( HAVE_DEBUG_OUTPUT )
 	data_offset += value_key->name_size;
 
-#if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
 	{
 		if( ( value_key_hash != 0 )

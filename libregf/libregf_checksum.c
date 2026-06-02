@@ -172,6 +172,17 @@ int libregf_checksum_calculate_little_endian_xor32(
 
 			if( byte_order == _BYTE_STREAM_ENDIAN_BIG )
 			{
+				if( alignment_count > sizeof( libregf_aligned_t ) )
+				{
+					libcerror_error_set(
+					 error,
+					 LIBCERROR_ERROR_DOMAIN_RUNTIME,
+					 LIBCERROR_RUNTIME_ERROR_VALUE_OUT_OF_BOUNDS,
+					 "%s: invalid alignment count value out of bounds.",
+					 function );
+
+					return( -1 );
+				}
 				/* Shift twice to set unused bytes to 0
 				 */
 				big_endian_value_32bit = (uint32_t) ( ( value_aligned >> alignment_count ) << byte_count );

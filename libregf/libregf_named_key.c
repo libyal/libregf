@@ -613,9 +613,9 @@ int libregf_named_key_read_data(
 	}
 #endif /* defined( HAVE_DEBUG_OUTPUT ) */
 
+#if defined( HAVE_DEBUG_OUTPUT )
 	data_offset += named_key->name_size;
 
-#if defined( HAVE_DEBUG_OUTPUT )
 	if( libcnotify_verbose != 0 )
 	{
 		if( ( named_key_hash != 0 )

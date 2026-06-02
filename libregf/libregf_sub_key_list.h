@@ -37,7 +37,7 @@ typedef struct libregf_sub_key_list libregf_sub_key_list_t;
 
 struct libregf_sub_key_list
 {
-	/* The sub key descriptors 
+	/* The sub key descriptors
 	 */
 	libcdata_array_t *sub_key_descriptors;
 

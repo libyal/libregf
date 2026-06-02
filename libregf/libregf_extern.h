@@ -24,6 +24,19 @@
 
 #include <common.h>
 
+#if !defined( __CYGWIN__ ) && !defined( _WIN32 ) && defined( __has_attribute )
+#if __has_attribute( visibility )
+#define LIBREGF_INTERNAL	__attribute__((visibility("hidden"))) extern
+
+#else
+#define LIBREGF_INTERNAL	extern
+
+#endif /* __has_attribute( visibility ) */
+#else
+#define LIBREGF_INTERNAL	extern
+
+#endif /* !defined( __CYGWIN__ ) && !defined( _WIN32 ) && defined( __has_attribute ) */
+
 /* Define HAVE_LOCAL_LIBREGF for local use of libregf
  */
 #if !defined( HAVE_LOCAL_LIBREGF )
@@ -32,7 +45,7 @@
 
 #else
 #define LIBREGF_EXTERN		/* extern */
-#define LIBREGF_EXTERN_VARIABLE	extern
+#define LIBREGF_EXTERN_VARIABLE	LIBREGF_INTERNAL
 
 #endif /* !defined( HAVE_LOCAL_LIBREGF ) */
 

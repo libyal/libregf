@@ -1229,7 +1229,7 @@ int mount_file_system_get_filename_from_value(
 		goto on_error;
 	}
 	if( ( value_name != NULL )
-	 && ( value_name != default_value_name ) ) 
+	 && ( value_name != default_value_name ) )
 	{
 		memory_free(
 		 value_name );
@@ -1238,7 +1238,7 @@ int mount_file_system_get_filename_from_value(
 
 on_error:
 	if( ( value_name != NULL )
-	 && ( value_name != default_value_name ) ) 
+	 && ( value_name != default_value_name ) )
 	{
 		memory_free(
 		 value_name );

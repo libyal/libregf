@@ -37,8 +37,8 @@
 #include "../libregf/libregf_multi_string.h"
 
 /* Define to make regf_test_multi_string generate verbose output
- */
 #define REGF_TEST_MULTI_STRING_VERBOSE
+ */
 
 uint8_t regf_test_multi_string_data1[ 712 ] = {
 	0x53, 0x00, 0x79, 0x00, 0x73, 0x00, 0x74, 0x00, 0x65, 0x00, 0x6d, 0x00, 0x20, 0x00, 0x42, 0x00,

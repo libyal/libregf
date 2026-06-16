@@ -12,6 +12,11 @@ If (-Not (Test-Path ${TestInputDirectory}))
 {
 	New-Item -Name ${TestInputDirectory} -ItemType "directory" | Out-Null
 }
+If (-Not (Test-Path "${TestInputDirectory}\.regfinfo_hierarchy"))
+{
+	New-Item -Name "${TestInputDirectory}\.regfinfo_hierarchy" -ItemType "directory" | Out-Null
+	Write-Output "-H" | Out-File -Encoding ascii -FilePath "${TestInputDirectory}\.regfinfo_hierarchy\options"
+}
 If (-Not (Test-Path "${TestInputDirectory}\${TestSet}"))
 {
 	New-Item -Name "${TestInputDirectory}\${TestSet}" -ItemType "directory" | Out-Null

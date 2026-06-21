@@ -523,7 +523,7 @@ int export_handle_open_input(
 }
 
 /* Closes the input
- * Returns the 0 if succesful or -1 on error
+ * Returns the 0 if successful or -1 on error
  */
 int export_handle_close_input(
      export_handle_t *export_handle,
@@ -690,7 +690,7 @@ on_error:
 }
 
 /* Exports a key
- * Returns the 1 if succesful or -1 on error
+ * Returns the 1 if successful or -1 on error
  */
 int export_handle_export_key(
      export_handle_t *export_handle,
@@ -1662,7 +1662,7 @@ on_error:
 }
 
 /* Exports keys and values from the file for a specific key path
- * Returns the 1 if succesful or -1 on error
+ * Returns the 1 if successful or -1 on error
  */
 int export_handle_export_key_path(
      export_handle_t *export_handle,
@@ -1783,7 +1783,7 @@ on_error:
 }
 
 /* Exports keys and values from the file
- * Returns the 1 if succesful or -1 on error
+ * Returns the 1 if successful or -1 on error
  */
 int export_handle_export_file(
      export_handle_t *export_handle,

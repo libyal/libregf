@@ -1622,6 +1622,8 @@ on_error:
 	return( 0 );
 }
 
+#if defined( HAVE_LOCAL_LIBFDATA )
+
 /* Tests the libregf_hive_bins_list_read_element_data function
  * Returns 1 if successful or 0 if not
  */
@@ -1909,6 +1911,8 @@ on_error:
 	return( 0 );
 }
 
+#endif /* defined( HAVE_LOCAL_LIBFDATA ) */
+
 #endif /* defined( __GNUC__ ) && !defined( LIBREGF_DLL_IMPORT ) */
 
 /* The main program
@@ -1958,9 +1962,13 @@ int main(
 	 "libregf_hive_bins_list_append_bin",
 	 regf_test_hive_bins_list_append_bin );
 
+#if defined( HAVE_LOCAL_LIBFDATA )
+
 	REGF_TEST_RUN(
 	 "libregf_hive_bins_list_read_element_data",
 	 regf_test_hive_bins_list_read_element_data );
+
+#endif /* defined( HAVE_LOCAL_LIBFDATA ) */
 
 #if !defined( __BORLANDC__ ) || ( __BORLANDC__ >= 0x0560 )
 

@@ -1,20 +1,21 @@
 .Dd June 24, 2026
-.Dt REGFINFO 1
+.Dt REGFMOUNT 1
 .Os
 .Sh NAME
-.Nm regfinfo
-.Nd determines information about a Windows NT Registry File (REGF)
+.Nm regfmount
+.Nd mounts a Windows NT Registry File (REGF)
 .Sh SYNOPSIS
-.Nm regfinfo
-.Op Fl B Ar bodyfile
+.Nm regfmount
 .Op Fl c Ar codepage
-.Op Fl hHvV
+.Op Fl X Ar extended_options
+.Op Fl hvV
 .Ar source
+.Ar mount_point
 .Sh DESCRIPTION
-.Nm regfinfo
-is a utility to determine information about a Windows NT Registry File (REGF)
+.Nm regfmount
+is a utility to mount a Windows NT Registry File (REGF)
 .Pp
-.Nm regfinfo
+.Nm regfmount
 is part of the
 .Nm libregf
 package.
@@ -22,12 +23,12 @@ package.
 is a library to access the Windows NT Registry File (REGF) format
 .Pp
 .Ar source
-is the source file.
+a Windows NT Registry File (REGF)
+.Ar mount_point
+the directory to serve as mount point
 .Pp
 The options are as follows:
 .Bl -tag -width Ds
-.It Fl B Ar bodyfile
-output key and value hierarchy as a bodyfile
 .It Fl c Ar codepage
 codepage of ASCII strings, options: ascii, windows-874, windows-932, \
 windows-936, windows-949, windows-950, windows-1250, windows-1251, windows-1252 \
@@ -35,12 +36,12 @@ windows-936, windows-949, windows-950, windows-1250, windows-1251, windows-1252 
 or windows-1258
 .It Fl h
 shows this help
-.It Fl H
-shows the key and value hierarchy
 .It Fl v
-verbose output to stderr
+verbose output to stderr, while regfmount will remain running in the foreground
 .It Fl V
 print version
+.It Fl X Ar extended_options
+extended options to pass to sub system
 .El
 .Sh ENVIRONMENT
 None
@@ -48,12 +49,8 @@ None
 None
 .Sh EXAMPLES
 .Bd -literal
-# regfinfo NTUSER.DAT
-regfinfo 20201213
-.sp
-Windows NT Registry File information:
-	Version:	1.5
-	File type:	Registry
+# cregmount SYSTEM.DAT /mnt/creg
+cregmount 20260623
 .sp
 .Ed
 .Sh DIAGNOSTICS
@@ -62,7 +59,7 @@ Errors, verbose and debug output are printed to stderr when verbose output \
 Verbose and debug output are only printed when enabled at compilation.
 .Sh SEE ALSO
 .Xr regfexport 1 ,
-.Xr regfmount 1
+.Xr regfinfo 1
 .Sh AUTHORS
 .An Joachim Metz <joachim.metz@gmail.com>
 .Sh BUGS

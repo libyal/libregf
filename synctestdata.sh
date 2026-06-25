@@ -1,23 +1,18 @@
 #!/bin/sh
 # Script that synchronizes the local test data
-#
-# Version: 20251217
 
-REPOSITORY="log2timeline/dfwinreg";
-TEST_DATA_PATH="test_data";
-TEST_SET="public";
-TEST_INPUT_DIRECTORY="tests/input";
-TEST_FILES="NTUSER.DAT SOFTWARE SYSTEM";
+TESTS_INPUT_DIRECTORY="tests/input"
+TEST_SET="public"
+TEST_FILES="NTUSER.DAT SOFTWARE SYSTEM"
 
-mkdir -p "${TEST_INPUT_DIRECTORY}/.regfinfo_hierarchy";
-echo "-H" > "${TEST_INPUT_DIRECTORY}/.regfinfo_hierarchy/options";
+mkdir -p "${TESTS_INPUT_DIRECTORY}/.regfinfo_hierarchy"
+echo "-H" > "${TESTS_INPUT_DIRECTORY}/.regfinfo_hierarchy/options"
 
-mkdir -p "${TEST_INPUT_DIRECTORY}/${TEST_SET}";
+mkdir -p "${TESTS_INPUT_DIRECTORY}/${TEST_SET}"
 
-for TEST_FILE in ${TEST_FILES};
+for TEST_FILE in ${TEST_FILES}
 do
-	URL="https://raw.githubusercontent.com/${REPOSITORY}/refs/heads/main/${TEST_DATA_PATH}/${TEST_FILE}";
+	URL="https://raw.githubusercontent.com/log2timeline/dfwinreg/refs/heads/main/test_data/${TEST_FILE}"
 
-	curl -L -o "${TEST_INPUT_DIRECTORY}/${TEST_SET}/${TEST_FILE}" ${URL};
+	curl -L -o "${TESTS_INPUT_DIRECTORY}/${TEST_SET}/${TEST_FILE}" ${URL}
 done
-
